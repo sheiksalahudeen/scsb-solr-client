@@ -9,26 +9,15 @@ import java.util.Date;
  * Created by pvsubrah on 6/11/16.
  */
 public class Bib {
-    @Field
-    private Long bibId;
 
     @Field
-    private Date createDate;
+    private Long id;
 
-
-    public Long getBibId() {
-        return bibId;
+    public Long getId() {
+        return id;
     }
 
-    public void setBibId(Long bibId) {
-        this.bibId = bibId;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 }

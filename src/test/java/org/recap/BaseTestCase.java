@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Main.class)
 @WebAppConfiguration
-@Transactional(rollbackForClassName={})
 public class BaseTestCase {
 
 	@Test

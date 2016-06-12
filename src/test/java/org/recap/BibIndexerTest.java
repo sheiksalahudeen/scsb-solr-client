@@ -27,8 +27,6 @@ public class BibIndexerTest extends BaseTestCase {
     @Test
     public void indexBib() throws Exception {
         Bib bib = new Bib();
-        bib.setBibId(new Long(1));
-        bib.setCreateDate(new Date());
 
         Bib indexedBib = bibCrudRepository.save(bib);
 
