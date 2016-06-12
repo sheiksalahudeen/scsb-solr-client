@@ -34,5 +34,8 @@ public class BibIndexerTest extends BaseTestCase {
 
         assertNotNull(indexedBib);
 
+        Bib solrBib = bibCrudRepository.findOne(1L);
+        assertNotNull(solrBib);
+
     }
 }
