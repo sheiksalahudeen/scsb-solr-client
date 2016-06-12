@@ -8,5 +8,4 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  */
 
 public interface BibCrudRepository extends SolrCrudRepository<Bib, Long> {
-
 }

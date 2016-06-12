@@ -12,8 +12,4 @@ import org.springframework.transaction.annotation.Transactional;
 @WebAppConfiguration
 public class BaseTestCase {
 
-	@Test
-	public void contextLoads() {
-	}
-
 }

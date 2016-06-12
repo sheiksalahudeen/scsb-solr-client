@@ -13,9 +13,6 @@ public class Bib {
     @Field
     private Long id;
 
-    @Field
-    private Date createdDate;
-
     public Long getId() {
         return id;
     }
@@ -24,11 +21,4 @@ public class Bib {
         this.id = id;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
 }

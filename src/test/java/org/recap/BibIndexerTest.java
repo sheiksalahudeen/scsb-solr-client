@@ -29,13 +29,12 @@ public class BibIndexerTest extends BaseTestCase {
     public void indexBib() throws Exception {
         Bib bib = new Bib();
         bib.setId(1L);
-        bib.setCreatedDate(new Date());
         Bib indexedBib = bibCrudRepository.save(bib);
 
         assertNotNull(indexedBib);
 
-        Bib solrBib = bibCrudRepository.findOne(1L);
-        assertNotNull(solrBib);
+        Iterable<Bib> bibs = bibCrudRepository.findAll();
+        assertNotNull(bibs);
 
     }
 }
