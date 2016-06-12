@@ -36,12 +36,13 @@ public class SolrAdminTest extends BaseTestCase {
 
     @Test
     public void createSolrCoresTest() throws Exception {
-        String tempCoreName = "core1";
+        String tempCoreName = "temp1";
         unloadCore(tempCoreName);
         CoreAdminResponse coreAdminResponse = solrAdmin.createSolrCore(tempCoreName);
         assertNotNull(coreAdminResponse);
         assertTrue(coreAdminResponse.getStatus() == 0);
         System.out.println("Core created");
+        unloadCore(tempCoreName);
     }
 
 }

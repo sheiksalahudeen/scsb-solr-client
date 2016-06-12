@@ -29,7 +29,7 @@ public class SolrAdmin {
         CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
         CoreAdminResponse coreAdminResponse = null;
         try {
-            coreAdminResponse = coreAdminRequest.createCore(coreName, "/opt/solr-6.0.1/server/solr/temp1", solrAdminClient);
+            coreAdminResponse = coreAdminRequest.createCore(coreName, "/opt/solr-6.0.1/server/solr/" + coreName, solrAdminClient);
             if (coreAdminResponse.getStatus() == 0) {
                 logger.info("Created Solr core with name: " + coreName);
             } else {
