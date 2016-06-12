@@ -9,16 +9,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
+import java.io.File;
+
 @SpringBootApplication
-@EnableSolrRepositories("org.recap.repository")
+@EnableSolrRepositories(value = "org.recap.repository", multicoreSupport = true)
 public class Main {
 
 	@Value("${solr.url}")
 	String solrUrl;
 
+	@Value("${solr.parent.core}")
+	String parentCore;
+
+	@Bean
+	public SolrClient solrAdminClient() {
+		return new HttpSolrClient(solrUrl);
+	}
+
 	@Bean
 	public SolrClient solrClient() {
-		return new HttpSolrClient(solrUrl);
+		return new HttpSolrClient(solrUrl + File.separator + parentCore);
 	}
 
 	@Bean
