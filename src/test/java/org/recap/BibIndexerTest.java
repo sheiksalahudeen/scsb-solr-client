@@ -22,12 +22,14 @@ public class BibIndexerTest extends BaseTestCase {
     @Before
     public void setUp() throws Exception {
         assertNotNull(bibCrudRepository);
+        bibCrudRepository.deleteAll();
     }
 
     @Test
     public void indexBib() throws Exception {
         Bib bib = new Bib();
-
+        bib.setId(1L);
+        bib.setCreatedDate(new Date());
         Bib indexedBib = bibCrudRepository.save(bib);
 
         assertNotNull(indexedBib);
