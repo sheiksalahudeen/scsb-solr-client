@@ -7,7 +7,6 @@ import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,9 +21,6 @@ public class SolrAdmin {
 
     private CoreAdminRequest coreAdminRequest;
 
-    @Value("${solr.solr.home}")
-    String solrHome;
-
     @Autowired
     private SolrClient solrAdminClient;
 
@@ -33,7 +29,7 @@ public class SolrAdmin {
         CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
         CoreAdminResponse coreAdminResponse = null;
         try {
-            coreAdminResponse = coreAdminRequest.createCore(coreName, solrHome + coreName, solrAdminClient);
+            coreAdminResponse = coreAdminRequest.createCore(coreName, "/opt/solr-6.0.1/server/solr/" + coreName, solrAdminClient);
             if (coreAdminResponse.getStatus() == 0) {
                 logger.info("Created Solr core with name: " + coreName);
             } else {
