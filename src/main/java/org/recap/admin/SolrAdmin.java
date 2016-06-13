@@ -22,8 +22,8 @@ public class SolrAdmin {
 
     private CoreAdminRequest coreAdminRequest;
 
-    @Value("${solr.solr.home}")
-    String solrHome;
+    @Value("${solr.instance.dir}")
+    String instanceDir;
 
     @Autowired
     private SolrClient solrAdminClient;
@@ -33,7 +33,7 @@ public class SolrAdmin {
         CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
         CoreAdminResponse coreAdminResponse = null;
         try {
-            coreAdminResponse = coreAdminRequest.createCore(coreName, solrHome + coreName, solrAdminClient);
+            coreAdminResponse = coreAdminRequest.createCore(coreName, instanceDir, solrAdminClient);
             if (coreAdminResponse.getStatus() == 0) {
                 logger.info("Created Solr core with name: " + coreName);
             } else {
