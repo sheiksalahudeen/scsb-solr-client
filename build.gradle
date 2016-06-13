@@ -31,7 +31,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-ws')
-	compile('org.springframework.data:spring-data-solr:1.5.4.RELEASE')
+	compile('org.springframework.data:spring-data-solr:2.0.1.RELEASE') {exclude module: "solr-solrj"}
+	compile('org.apache.solr:solr-solrj:6.0.1')
 	runtime('mysql:mysql-connector-java')
 	testCompile('org.springframework.boot:spring-boot-starter-test') 
 	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
