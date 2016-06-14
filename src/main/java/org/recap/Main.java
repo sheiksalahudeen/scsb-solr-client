@@ -12,14 +12,14 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import java.io.File;
 
 @SpringBootApplication
-@EnableSolrRepositories(value = "org.recap.repository", multicoreSupport = true)
+@EnableSolrRepositories(value = "org.recap.repository.main", multicoreSupport = true)
 public class Main {
 
 	@Value("${solr.url}")
 	String solrUrl;
 
 	@Value("${solr.parent.core}")
-	String parentCore;
+	String solrParentCore;
 
 	@Bean
 	public SolrClient solrAdminClient() {
@@ -28,7 +28,8 @@ public class Main {
 
 	@Bean
 	public SolrClient solrClient() {
-		return new HttpSolrClient(solrUrl + File.separator + parentCore);
+		String baseURLForParentCore = solrUrl + File.separator + solrParentCore;
+		return new HttpSolrClient(baseURLForParentCore);
 	}
 
 	@Bean

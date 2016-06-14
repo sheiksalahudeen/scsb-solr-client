@@ -3,10 +3,8 @@ package org.recap;
 import org.junit.Before;
 import org.junit.Test;
 import org.recap.model.Bib;
-import org.recap.repository.BibCrudRepository;
+import org.recap.repository.main.BibCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertNotNull;
 

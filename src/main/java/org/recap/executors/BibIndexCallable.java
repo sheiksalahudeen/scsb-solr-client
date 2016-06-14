@@ -1,7 +1,7 @@
 package org.recap.executors;
 
 import org.recap.model.Bib;
-import org.recap.repository.BibCrudRepository;
+import org.recap.repository.temp.BibCrudRepositoryImpl;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -13,18 +13,20 @@ import java.util.concurrent.Callable;
 
 public class BibIndexCallable implements Callable {
     private String coreName;
+    private String solrURL;
     private List<Bib> bibs;
 
-    private BibCrudRepository bibCrudRepository;
+    private BibCrudRepositoryImpl bibCrudRepository;
 
-    public BibIndexCallable(String coreName, List<Bib> bibs, BibCrudRepository bibCrudRepository) {
+    public BibIndexCallable(String solrURL, String coreName, List<Bib> bibs) {
         this.coreName = coreName;
         this.bibs = bibs;
-        this.bibCrudRepository = bibCrudRepository;
+        this.solrURL = solrURL;
     }
 
     @Override
     public Object call() throws Exception {
+        bibCrudRepository = new BibCrudRepositoryImpl(coreName, solrURL);
         bibCrudRepository.save(bibs);
 
         //TODO: Need to return something more meaningful.

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,11 +33,19 @@ public class SolrAdmin {
     @Value("${solr.solr.home}")
     String solrHome;
 
+    @Value("${solr.parent.core}")
+    String solrParentCore;
+
     @Autowired
     private SolrClient solrAdminClient;
 
+    @Autowired
+    private SolrClient solrClient;
 
-    public CoreAdminResponse createSolrCore(List<String> coreNames) {
+    private CoreAdminRequest coreAdminRequest;
+
+
+    public CoreAdminResponse createSolrCores(List<String> coreNames) {
         CoreAdminRequest.Create coreAdminRequest = getCoreAdminCreateRequest();
         CoreAdminResponse coreAdminResponse = null;
 
@@ -46,7 +55,7 @@ public class SolrAdmin {
 
             coreAdminRequest.setCoreName(coreName);
             coreAdminRequest.setConfigSet("recap_config");
-            coreAdminRequest.setInstanceDir(solrHome+File.separator+coreName);
+            coreAdminRequest.setInstanceDir(solrHome + File.separator + coreName);
             coreAdminRequest.setDataDir(dataDir);
 
             try {
@@ -78,5 +87,34 @@ public class SolrAdmin {
             coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
         }
         return coreAdminUnloadRequest;
+    }
+
+    public void mergeCores(List<String> coreNames) {
+        List<String> tempCores = new ArrayList();
+        List<String> tempCoreNames = new ArrayList();
+
+        for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
+            String coreName = iterator.next();
+            tempCores.add(solrHome + File.separator + coreName + File.separator + "data" + File.separator + "index");
+            tempCoreNames.add(coreName);
+        }
+
+        String[] indexDirs = tempCores.toArray(new String[tempCores.size()]);
+        String[] tempCoreNamesObjectArray = tempCoreNames.toArray(new String[tempCores.size()]);
+        try {
+            getCoreAdminRequest().mergeIndexes(solrParentCore, indexDirs, tempCoreNamesObjectArray, solrAdminClient);
+            solrClient.commit();
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private CoreAdminRequest getCoreAdminRequest() {
+        if (null == coreAdminRequest) {
+            coreAdminRequest = new CoreAdminRequest();
+        }
+        return coreAdminRequest;
     }
 }

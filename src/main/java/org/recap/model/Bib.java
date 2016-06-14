@@ -2,12 +2,14 @@ package org.recap.model;
 
 
 import org.apache.solr.client.solrj.beans.Field;
+import org.springframework.data.solr.core.mapping.SolrDocument;
 
 import java.util.Date;
 
 /**
  * Created by pvsubrah on 6/11/16.
  */
+
 public class Bib {
 
     @Field
