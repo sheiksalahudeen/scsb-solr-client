@@ -13,9 +13,9 @@ import java.io.File;
  * Created by pvsubrah on 6/14/16.
  */
 
-public class BibCrudRepositoryImpl extends SimpleSolrRepository<Bib, Integer> {
+public class BibCrudRepositoryMultiCoreSupport extends SimpleSolrRepository<Bib, Integer> {
 
-    public  BibCrudRepositoryImpl(String coreName, String solrUrl) {
+    public BibCrudRepositoryMultiCoreSupport(String coreName, String solrUrl) {
 
         SolrTemplate solrTemplate = new SolrTemplate( new HttpSolrClient(solrUrl+ File.separator+coreName));
         solrTemplate.setSolrConverter(new MappingSolrConverter(new SimpleSolrMappingContext()) {
