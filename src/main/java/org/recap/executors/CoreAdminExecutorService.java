@@ -29,7 +29,7 @@ public class CoreAdminExecutorService {
     String solrUrl;
 
 
-    public void index(Integer numThreads, Integer chunkSize , List<Bib> bibs){
+    public void indexBibs(Integer numThreads, Integer chunkSize , List<Bib> bibs){
         ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
         List<String> coreNames = new ArrayList<>();

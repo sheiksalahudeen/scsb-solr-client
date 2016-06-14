@@ -56,7 +56,7 @@ public class ExecutorTest extends BaseTestCase {
         List<Bib> bibList = asList(bib1, bib2, bib3);
 
         numThreads = 3;
-        coreAdminExecutorService.index(numThreads, 1, bibList);
+        coreAdminExecutorService.indexBibs(numThreads, 1, bibList);
 
     }
 
