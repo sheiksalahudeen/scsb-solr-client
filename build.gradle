@@ -32,6 +32,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-ws')
 	compile('org.springframework.data:spring-data-solr:2.0.1.RELEASE') {exclude module: "solr-solrj"}
+	compile('com.google.guava:guava:19.0') {exclude module: "solr-solrj"}
 	compile('org.apache.solr:solr-solrj:6.0.1')
 	runtime('mysql:mysql-connector-java')
 	testCompile('org.springframework.boot:spring-boot-starter-test') 
