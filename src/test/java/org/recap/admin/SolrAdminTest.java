@@ -46,9 +46,9 @@ public class SolrAdminTest extends BaseTestCase {
 
         CoreAdminRequest.Unload coreAdminRequest = solrAdmin.getCoreAdminUnloadRequest();
         for(String tempCoreName : tempCores){
-            coreAdminRequest.unloadCore(tempCoreName, true, true, solrAdminClient);
+            CoreAdminResponse adminResponse = coreAdminRequest.unloadCore(tempCoreName, true, true, solrAdminClient);
+            assertTrue(adminResponse.getStatus() == 0);
         }
-
     }
 
 }
