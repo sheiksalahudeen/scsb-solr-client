@@ -1,15 +1,16 @@
 package org.recap.admin;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
+import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,18 +31,24 @@ public class SolrAdminTest extends BaseTestCase {
         assertNotNull(solrAdminClient);
     }
 
-    private void unloadCore(String coreName) throws IOException, SolrServerException {
-        solrAdmin.getCoreAdminRequest().unloadCore(coreName, solrAdminClient);
-    }
-
     @Test
     public void createSolrCoresTest() throws Exception {
-        String tempCoreName = "temp1";
-        CoreAdminResponse coreAdminResponse = solrAdmin.createSolrCore(tempCoreName);
+        String tempCoreName1 = "temp1";
+        String tempCoreName2 = "temp2";
+        String tempCoreName3 = "temp3";
+
+        List<String> tempCores = asList(tempCoreName1, tempCoreName2, tempCoreName3);
+
+        CoreAdminResponse coreAdminResponse = solrAdmin.createSolrCore(tempCores);
         assertNotNull(coreAdminResponse);
         assertTrue(coreAdminResponse.getStatus() == 0);
         System.out.println("Core created");
-        unloadCore(tempCoreName);
+
+        CoreAdminRequest.Unload coreAdminRequest = solrAdmin.getCoreAdminUnloadRequest();
+        for(String tempCoreName : tempCores){
+            coreAdminRequest.unloadCore(tempCoreName, true, true, solrAdminClient);
+        }
+
     }
 
 }

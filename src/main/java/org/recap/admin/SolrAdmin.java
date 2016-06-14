@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by pvsubrah on 6/12/16.
@@ -21,10 +23,11 @@ public class SolrAdmin {
 
     Logger logger = LoggerFactory.getLogger(SolrAdmin.class);
 
-    private CoreAdminRequest coreAdminRequest;
+    private CoreAdminRequest.Create coreAdminCreateRequest;
+    private CoreAdminRequest.Unload coreAdminUnloadRequest;
 
-    @Value("${solr.instance.dir}")
-    String instanceDir;
+    @Value("${solr.configsets.dir}")
+    String configSetsDir;
 
     @Value("${solr.solr.home}")
     String solrHome;
@@ -33,29 +36,47 @@ public class SolrAdmin {
     private SolrClient solrAdminClient;
 
 
-    public CoreAdminResponse createSolrCore(String coreName) {
-        CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
+    public CoreAdminResponse createSolrCore(List<String> coreNames) {
+        CoreAdminRequest.Create coreAdminRequest = getCoreAdminCreateRequest();
         CoreAdminResponse coreAdminResponse = null;
-        String dataDir = solrHome + coreName + File.separator + "data";
-        try {
-            coreAdminResponse = coreAdminRequest.createCore(coreName, instanceDir, solrAdminClient, null, null, dataDir, null);
-            if (coreAdminResponse.getStatus() == 0) {
-                logger.info("Created Solr core with name: " + coreName);
-            } else {
-                logger.error("Error in creating Solr core with name: " + coreName);
+
+        for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
+            String coreName = iterator.next();
+            String dataDir = solrHome + coreName + File.separator + "data";
+
+            coreAdminRequest.setCoreName(coreName);
+            coreAdminRequest.setConfigSet("recap_config");
+            coreAdminRequest.setInstanceDir(solrHome+File.separator+coreName);
+            coreAdminRequest.setDataDir(dataDir);
+
+            try {
+                coreAdminResponse = coreAdminRequest.process(solrAdminClient);
+                if (coreAdminResponse.getStatus() == 0) {
+                    logger.info("Created Solr core with name: " + coreName);
+                } else {
+                    logger.error("Error in creating Solr core with name: " + coreName);
+                }
+            } catch (SolrServerException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (SolrServerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
         return coreAdminResponse;
     }
 
-    public CoreAdminRequest getCoreAdminRequest() {
-        if (null == coreAdminRequest) {
-            coreAdminRequest = new CoreAdminRequest();
+    public CoreAdminRequest.Create getCoreAdminCreateRequest() {
+        if (null == coreAdminCreateRequest) {
+            coreAdminCreateRequest = new CoreAdminRequest.Create();
         }
-        return coreAdminRequest;
+        return coreAdminCreateRequest;
+    }
+
+    public CoreAdminRequest.Unload getCoreAdminUnloadRequest() {
+        if (null == coreAdminUnloadRequest) {
+            coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
+        }
+        return coreAdminUnloadRequest;
     }
 }
