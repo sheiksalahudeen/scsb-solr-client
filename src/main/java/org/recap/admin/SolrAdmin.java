@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -25,6 +26,9 @@ public class SolrAdmin {
     @Value("${solr.instance.dir}")
     String instanceDir;
 
+    @Value("${solr.solr.home}")
+    String solrHome;
+
     @Autowired
     private SolrClient solrAdminClient;
 
@@ -32,8 +36,9 @@ public class SolrAdmin {
     public CoreAdminResponse createSolrCore(String coreName) {
         CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
         CoreAdminResponse coreAdminResponse = null;
+        String dataDir = solrHome + coreName + File.separator + "data";
         try {
-            coreAdminResponse = coreAdminRequest.createCore(coreName, instanceDir, solrAdminClient);
+            coreAdminResponse = coreAdminRequest.createCore(coreName, instanceDir, solrAdminClient, null, null, dataDir, null);
             if (coreAdminResponse.getStatus() == 0) {
                 logger.info("Created Solr core with name: " + coreName);
             } else {
