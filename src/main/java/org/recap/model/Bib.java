@@ -15,6 +15,12 @@ public class Bib {
     @Field
     private String id;
 
+    @Field("BibId")
+    private Integer bibId;
+
+    @Field("DocType")
+    private String docType;
+
     @Field("Barcode")
     private String barcode;
 
@@ -60,12 +66,34 @@ public class Bib {
     @Field("Imprint")
     private String imprint;
 
+    @Field("HoldingsId")
+    private List<Integer> holdingsIdList;
+
+    @Field("BibItemId")
+    private List<Integer> bibItemIdList;
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Integer getBibId() {
+        return bibId;
+    }
+
+    public void setBibId(Integer bibId) {
+        this.bibId = bibId;
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
     }
 
     public String getBarcode() {
@@ -186,5 +214,21 @@ public class Bib {
 
     public void setImprint(String imprint) {
         this.imprint = imprint;
+    }
+
+    public List<Integer> getHoldingsIdList() {
+        return holdingsIdList;
+    }
+
+    public void setHoldingsIdList(List<Integer> holdingsIdList) {
+        this.holdingsIdList = holdingsIdList;
+    }
+
+    public List<Integer> getBibItemIdList() {
+        return bibItemIdList;
+    }
+
+    public void setBibItemIdList(List<Integer> bibItemIdList) {
+        this.bibItemIdList = bibItemIdList;
     }
 }

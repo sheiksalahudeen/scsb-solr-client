@@ -3,6 +3,7 @@ package org.recap.executors;
 import com.google.common.collect.Lists;
 import org.recap.admin.SolrAdmin;
 import org.recap.model.Bib;
+import org.recap.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,45 @@ public class CoreAdminExecutorService {
             }
         }
 
+        getFuture(futures);
+
+        solrAdmin.mergeCores(coreNames);
+        solrAdmin.unLoadCores(coreNames);
+        executorService.shutdown();
+    }
+
+    public void indexItems(Integer numThreads, Integer chunkSize, List<Item> items) {
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+
+        List<String> coreNames = new ArrayList<>();
+
+        setupCoreNames(numThreads, coreNames);
+
+        solrAdmin.createSolrCores(coreNames);
+
+        List<Future> futures = new ArrayList<>();
+
+        List<List<Item>> partitionedLists = Lists.partition(items, chunkSize);
+
+        int i=0;
+        for(Iterator<List<Item>> iterator = partitionedLists.iterator(); iterator.hasNext();) {
+            List<Item> itemList = iterator.next();
+            ItemIndexCallable itemIndexCallable = new ItemIndexCallable(solrUrl, coreNames.get(i), itemList);
+            futures.add(executorService.submit(itemIndexCallable));
+            i++;
+            if(i > numThreads) {
+                i=0;
+            }
+        }
+
+        getFuture(futures);
+
+        solrAdmin.mergeCores(coreNames);
+        solrAdmin.unLoadCores(coreNames);
+        executorService.shutdown();
+    }
+
+    private void getFuture(List<Future> futures) {
         for (Future future : futures){
             try {
                 future.get();
@@ -62,10 +102,6 @@ public class CoreAdminExecutorService {
                 e.printStackTrace();
             }
         }
-
-        solrAdmin.mergeCores(coreNames);
-        solrAdmin.unLoadCores(coreNames);
-        executorService.shutdown();
     }
 
     private void setupCoreNames(Integer numThreads, List<String> coreNames) {

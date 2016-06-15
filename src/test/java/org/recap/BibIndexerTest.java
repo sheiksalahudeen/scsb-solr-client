@@ -28,14 +28,21 @@ public class BibIndexerTest extends BaseTestCase {
         List<String> issnList = new ArrayList<>();
         List<String>isbnList = new ArrayList<>();
         List<String> oclcNumberList = new ArrayList<>();
+        List<Integer> holdingsIdList = new ArrayList<>();
+        List<Integer> itemIdList = new ArrayList<>();
         issnList.add("0394469756");
         isbnList.add("0394469755");
         oclcNumberList.add("00133182");
         oclcNumberList.add("00440790");
-
+        holdingsIdList.add(201);
+        holdingsIdList.add(202);
+        itemIdList.add(301);
+        itemIdList.add(302);
 
         Bib bib = new Bib();
-        bib.setBarcode("101");
+        bib.setId("1");
+        bib.setBibId(101);
+        bib.setDocType("Bibliographic");
         bib.setTitle("Middleware for ReCAP");
         bib.setBarcode("1");
         bib.setTitle("Test Bib 1");
@@ -52,6 +59,8 @@ public class BibIndexerTest extends BaseTestCase {
         bib.setSubject("Arab countries Politics and government.");
         bib.setPublicationPlace("Paris");
         bib.setLccn("71448228");
+        bib.setHoldingsIdList(holdingsIdList);
+        bib.setBibItemIdList(itemIdList);
         Bib indexedBib = bibCrudRepository.save(bib);
 
         assertNotNull(indexedBib);
