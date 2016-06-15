@@ -64,6 +64,7 @@ public class CoreAdminExecutorService {
         }
 
         solrAdmin.mergeCores(coreNames);
+        solrAdmin.unLoadCores(coreNames);
         executorService.shutdown();
     }
 

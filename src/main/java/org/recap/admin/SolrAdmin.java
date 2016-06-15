@@ -98,6 +98,20 @@ public class SolrAdmin {
         }
     }
 
+    public void unLoadCores(List<String> coreNames){
+        for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
+            String coreName = iterator.next();
+            try {
+                CoreAdminResponse adminResponse = getCoreAdminRequest().unloadCore(coreName, true, true, solrAdminClient);
+            } catch (SolrServerException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     public CoreAdminRequest.Create getCoreAdminCreateRequest() {
         if (null == coreAdminCreateRequest) {
             coreAdminCreateRequest = new CoreAdminRequest.Create();
