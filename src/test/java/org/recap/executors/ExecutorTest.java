@@ -42,20 +42,20 @@ public class ExecutorTest extends BaseTestCase {
         List<String> issnList = new ArrayList<>();
         List<String>isbnList = new ArrayList<>();
         List<String> oclcNumberList = new ArrayList<>();
-        List<Integer> holdingsIdList = new ArrayList<>();
-        List<Integer> itemIdList = new ArrayList<>();
+        List<String> holdingsIdList = new ArrayList<>();
+        List<String> itemIdList = new ArrayList<>();
         issnList.add("0394469756");
         isbnList.add("0394469755");
         oclcNumberList.add("00133182");
         oclcNumberList.add("00440790");
-        holdingsIdList.add(201);
-        holdingsIdList.add(202);
-        itemIdList.add(301);
-        itemIdList.add(302);
+        holdingsIdList.add("201");
+        holdingsIdList.add("202");
+        itemIdList.add("203");
+        itemIdList.add("204");
 
         Bib bib1 = new Bib();
         bib1.setId("1");
-        bib1.setBibId(101);
+        bib1.setBibId("101");
         bib1.setDocType("Bibliographic");
         bib1.setBarcode("1");
         bib1.setTitle("Test Bib 1");
@@ -77,7 +77,7 @@ public class ExecutorTest extends BaseTestCase {
 
         Bib bib2 = new Bib();
         bib2.setId("2");
-        bib2.setBibId(102);
+        bib2.setBibId("102");
         bib2.setDocType("Bibliographic");
         bib2.setBarcode("2");
         bib2.setTitle("Test Bib 2");
@@ -99,7 +99,7 @@ public class ExecutorTest extends BaseTestCase {
 
         Bib bib3 = new Bib();
         bib3.setId("1");
-        bib3.setBibId(103);
+        bib3.setBibId("103");
         bib3.setDocType("Bibliographic");
         bib3.setBarcode("3");
         bib3.setTitle("Test Bib 3");
