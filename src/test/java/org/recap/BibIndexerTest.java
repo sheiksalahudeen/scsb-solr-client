@@ -13,10 +13,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public class BibIndexerTest extends BaseTestCase {
 
-    @Autowired
-    BibCrudRepository bibCrudRepository;
-
-
     @Before
     public void setUp() throws Exception {
         assertNotNull(bibCrudRepository);

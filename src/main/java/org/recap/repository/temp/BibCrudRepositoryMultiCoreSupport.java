@@ -13,7 +13,7 @@ import java.io.File;
  * Created by pvsubrah on 6/14/16.
  */
 
-public class BibCrudRepositoryMultiCoreSupport extends SimpleSolrRepository<Bib, Integer> {
+public class BibCrudRepositoryMultiCoreSupport extends SimpleSolrRepository<Bib, String> {
 
     public BibCrudRepositoryMultiCoreSupport(String coreName, String solrUrl) {
 

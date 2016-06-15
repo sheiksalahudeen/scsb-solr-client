@@ -28,8 +28,6 @@ public class BibIndexCallable implements Callable {
     public Object call() throws Exception {
         bibCrudRepository = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         bibCrudRepository.save(bibs);
-
-        //TODO: Need to return something more meaningful.
         return null;
     }
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -26,19 +27,10 @@ public class ExecutorTest extends BaseTestCase {
 
     @Autowired
     CoreAdminExecutorService coreAdminExecutorService;
-    private int numThreads;
-
-    @Autowired
-    SolrAdmin solrAdmin;
-
-    @Autowired
-    SolrClient solrAdminClient;
-
-    @Autowired
-    BibCrudRepository bibCrudRepository;
+    private int numThreads = 3;
 
     @Test
-    public void indexMultipleBibsWithThreads() {
+    public void indexMultipleBibsWithThreads() throws Exception {
 
         try {
             bibCrudRepository.deleteAll();
@@ -55,29 +47,18 @@ public class ExecutorTest extends BaseTestCase {
 
         List<Bib> bibList = asList(bib1, bib2, bib3);
 
-        numThreads = 3;
         coreAdminExecutorService.indexBibs(numThreads, 1, bibList);
 
+        Bib searchBib1 = bibCrudRepository.findByBarcode(bib1.getBarcode());
+        assertNotNull(searchBib1);
+
+
+        Bib searchBib2 = bibCrudRepository.findByBarcode(bib2.getBarcode());
+        assertNotNull(searchBib2);
+
+
+        Bib searchBib3 = bibCrudRepository.findByBarcode(bib3.getBarcode());
+        assertNotNull(searchBib3);
     }
-
-
-    @After
-    public void unloadTempCores() throws Exception {
-        List<String> coreNames = new ArrayList<>();
-        for(int i = 0; i < numThreads; i++){
-            coreNames.add("temp"+i);
-        }
-
-        unloadCores(coreNames);
-    }
-
-    private void unloadCores(List<String> tempCores) throws SolrServerException, IOException {
-        CoreAdminRequest.Unload coreAdminRequest = solrAdmin.getCoreAdminUnloadRequest();
-        for(String tempCoreName : tempCores){
-            CoreAdminResponse adminResponse = coreAdminRequest.unloadCore(tempCoreName, true, true, solrAdminClient);
-            assertTrue(adminResponse.getStatus() == 0);
-        }
-    }
-
 
 }

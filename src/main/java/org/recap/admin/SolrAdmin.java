@@ -24,9 +24,6 @@ public class SolrAdmin {
 
     Logger logger = LoggerFactory.getLogger(SolrAdmin.class);
 
-    private CoreAdminRequest.Create coreAdminCreateRequest;
-    private CoreAdminRequest.Unload coreAdminUnloadRequest;
-
     @Value("${solr.configsets.dir}")
     String configSetsDir;
 
@@ -43,6 +40,10 @@ public class SolrAdmin {
     private SolrClient solrClient;
 
     private CoreAdminRequest coreAdminRequest;
+
+    private CoreAdminRequest.Create coreAdminCreateRequest;
+
+    private CoreAdminRequest.Unload coreAdminUnloadRequest;
 
 
     public CoreAdminResponse createSolrCores(List<String> coreNames) {
@@ -75,20 +76,6 @@ public class SolrAdmin {
         return coreAdminResponse;
     }
 
-    public CoreAdminRequest.Create getCoreAdminCreateRequest() {
-        if (null == coreAdminCreateRequest) {
-            coreAdminCreateRequest = new CoreAdminRequest.Create();
-        }
-        return coreAdminCreateRequest;
-    }
-
-    public CoreAdminRequest.Unload getCoreAdminUnloadRequest() {
-        if (null == coreAdminUnloadRequest) {
-            coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
-        }
-        return coreAdminUnloadRequest;
-    }
-
     public void mergeCores(List<String> coreNames) {
         List<String> tempCores = new ArrayList();
         List<String> tempCoreNames = new ArrayList();
@@ -111,7 +98,21 @@ public class SolrAdmin {
         }
     }
 
-    private CoreAdminRequest getCoreAdminRequest() {
+    public CoreAdminRequest.Create getCoreAdminCreateRequest() {
+        if (null == coreAdminCreateRequest) {
+            coreAdminCreateRequest = new CoreAdminRequest.Create();
+        }
+        return coreAdminCreateRequest;
+    }
+
+    public CoreAdminRequest.Unload getCoreAdminUnloadRequest() {
+        if (null == coreAdminUnloadRequest) {
+            coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
+        }
+        return coreAdminUnloadRequest;
+    }
+
+    public CoreAdminRequest getCoreAdminRequest() {
         if (null == coreAdminRequest) {
             coreAdminRequest = new CoreAdminRequest();
         }
