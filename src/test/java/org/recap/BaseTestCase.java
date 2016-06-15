@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.admin.SolrAdmin;
 import org.recap.repository.main.BibCrudRepository;
+import org.recap.repository.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -37,6 +38,9 @@ public class BaseTestCase {
 
     @Autowired
     public BibCrudRepository bibCrudRepository;
+
+    @Autowired
+    public ItemCrudRepository itemCrudRepository;
 
     @Value("${bib.rest.url}")
     public String bibResourceURL;
