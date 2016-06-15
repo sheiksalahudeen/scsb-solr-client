@@ -14,9 +14,8 @@ public class Bib {
     @Field("Barcode")
     private String barcode;
 
-
-//    @Field
-//    private String title;
+    @Field("Title")
+    private String title;
 
     public String getId() {
         return id;
@@ -34,12 +33,11 @@ public class Bib {
         this.barcode = barcode;
     }
 
+    public String getTitle() {
+        return title;
+    }
 
-    //    public String getTitle() {
-//        return title;
-//    }
-//
-//    public void setTitle(String title) {
-//        this.title = title;
-//    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
