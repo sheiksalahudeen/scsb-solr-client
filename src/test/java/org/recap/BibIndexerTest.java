@@ -26,13 +26,14 @@ public class BibIndexerTest extends BaseTestCase {
     @Test
     public void indexBib() throws Exception {
         Bib bib = new Bib();
-        bib.setId(1L);
+        bib.setBarcode("101");
+//        bib.setTitle("Middleware for ReCAP");
         Bib indexedBib = bibCrudRepository.save(bib);
 
         assertNotNull(indexedBib);
 
-        Iterable<Bib> bibs = bibCrudRepository.findAll();
-        assertNotNull(bibs);
+        Bib searchBib = bibCrudRepository.findByBarcode(indexedBib.getBarcode());
+        assertNotNull(searchBib);
 
     }
 }

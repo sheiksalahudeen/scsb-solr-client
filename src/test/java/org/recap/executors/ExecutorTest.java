@@ -47,11 +47,11 @@ public class ExecutorTest extends BaseTestCase {
         }
 
         Bib bib1 = new Bib();
-        bib1.setId(1L);
+        bib1.setBarcode("1");
         Bib bib2 = new Bib();
-        bib2.setId(2L);
+        bib2.setBarcode("2");
         Bib bib3 = new Bib();
-        bib3.setId(3L);
+        bib3.setBarcode("3");
 
         List<Bib> bibList = asList(bib1, bib2, bib3);
 
