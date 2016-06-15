@@ -34,7 +34,6 @@ dependencies {
 	compile('org.springframework.data:spring-data-solr:2.0.1.RELEASE')
 			{exclude module: 'solr-solrj'; exclude module: 'solr-data-commons'}
 	compile('org.springframework.data:spring-data-commons:1.12.1.RELEASE')
-	compile('org.springframework.data:spring-data-commons:1.12.1.RELEASE')
 	compile('com.google.guava:guava:19.0') {exclude module: "solr-solrj"}
 	compile('org.apache.solr:solr-solrj:6.0.1')
 	runtime('mysql:mysql-connector-java')
