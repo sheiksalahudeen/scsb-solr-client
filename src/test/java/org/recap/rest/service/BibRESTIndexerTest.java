@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.model.Bib;
+import org.recap.util.BibJSONUtil;
 import org.recap.util.MarcUtil;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
@@ -67,41 +68,12 @@ public class BibRESTIndexerTest extends BaseTestCase {
             assertNotNull(bibliographicId);
             assertNotNull(content);
 
-            bibsToIndex.add(generateBibForIndex(jsonObject));
+            bibsToIndex.add(BibJSONUtil.getInstance().generateBibForIndex(jsonObject));
         }
 
         bibCrudRepository.save(bibsToIndex);
         long count = bibCrudRepository.count();
         assertEquals(2, count);
 
-    }
-
-    private Bib generateBibForIndex(JSONObject jsonObject) {
-        Bib bib = new Bib();
-        MarcUtil marcUtil = new MarcUtil();
-        try {
-            bib.setBibId(jsonObject.getString("bibliographicId"));
-            String bibContent = jsonObject.getString("content");
-            List<Record> records = marcUtil.convertMarcXmlToRecord(bibContent);
-            Record marcRecord = records.get(0);
-            bib.setAuthor(marcUtil.getDataFieldValue(marcRecord, "100", null, null, "a"));
-            bib.setTitle(marcUtil.getDataFieldValue(marcRecord, "245", null, null, "a"));
-            bib.setIssn(marcUtil.getMultiDataFieldValues(marcRecord, "010", null, null, "a"));
-
-            JSONArray holdingsEntities = jsonObject.getJSONArray("holdingsEntities");
-            List<String> holdingsIds = new ArrayList<>();
-            for(int j=0;j<holdingsEntities.length();j++){
-                JSONObject holdings = holdingsEntities.getJSONObject(j);
-                String holdingsId = holdings.getString("holdingsId");
-                holdingsIds.add(holdingsId);
-            }
-
-            bib.setHoldingsIdList(holdingsIds);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return bib;
     }
 }

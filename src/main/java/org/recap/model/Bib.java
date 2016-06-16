@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Bib {
     @Id
-    @Field
+    @Field("id")
     private String id;
 
     @Field("BibId")

@@ -127,4 +127,16 @@ public class MarcUtilTest {
 
     }
 
+    @Test
+    public void math() throws Exception {
+        int numThreads = 5;
+        int docsPerThread = 1;
+        int totalDocs = 15;
+
+        System.out.println(totalDocs % (docsPerThread*numThreads));
+        System.out.println(totalDocs / (docsPerThread*numThreads));
+
+
+    }
+
 }
