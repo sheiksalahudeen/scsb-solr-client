@@ -1,18 +1,12 @@
 package org.recap.rest.service;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
-import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.model.Bib;
+import org.recap.model.Item;
 import org.recap.util.BibJSONUtil;
-import org.recap.util.MarcUtil;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
-import org.springframework.boot.json.JsonSimpleJsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -45,6 +39,7 @@ public class BibRESTIndexerTest extends BaseTestCase {
     public void indexRESTCallResponseFindByRangeOfIdsRESTCall() throws Exception {
 
         bibCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
 
         Integer fromId = 2;
         Integer toId = 3;
@@ -59,6 +54,7 @@ public class BibRESTIndexerTest extends BaseTestCase {
         JSONArray jsonArray = new JSONArray(response.getBody());
 
         List<Bib> bibsToIndex = new ArrayList<Bib>();
+        List<Item> itemsToIndex = new ArrayList<>();
 
         for (int i =0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -68,12 +64,20 @@ public class BibRESTIndexerTest extends BaseTestCase {
             assertNotNull(bibliographicId);
             assertNotNull(content);
 
-            bibsToIndex.add(BibJSONUtil.getInstance().generateBibForIndex(jsonObject));
+            Map<String, List> map = BibJSONUtil.getInstance().generateBibAndItemsForIndex(jsonObject);
+            Bib bib = (Bib) map.get("Bib");
+            bibsToIndex.add(bib);
+
+            List<Item> items = map.get("Item");
+            itemsToIndex.addAll(items);
         }
 
         bibCrudRepository.save(bibsToIndex);
         long count = bibCrudRepository.count();
         assertEquals(2, count);
+
+        itemCrudRepository.save(itemsToIndex);
+        assertEquals(4, itemCrudRepository.count());
 
     }
 }

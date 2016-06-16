@@ -6,11 +6,10 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.model.Bib;
+import org.recap.model.Item;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by pvsubrah on 6/15/16.
@@ -29,13 +28,16 @@ public class BibJSONUtil extends MarcUtil {
         return bibJSONUtil;
     }
 
-    public Bib generateBibForIndex(JSONObject jsonObject) {
+    public Map<String, List> generateBibAndItemsForIndex(JSONObject jsonObject) {
+        Map map = new HashMap();
         Bib bib = new Bib();
+        List<Item> items = new ArrayList<>();
         try {
             String bibliographicId = jsonObject.getString("bibliographicId");
             bib.setBibId(bibliographicId);
-            bib.setId(bibliographicId);
+            bib.setId("wbm-"+bibliographicId);
 
+            bib.setDocType("Bib");
             String bibContent = jsonObject.getString("content");
             List<Record> records = convertMarcXmlToRecord(bibContent);
             Record marcRecord = records.get(0);
@@ -47,25 +49,72 @@ public class BibJSONUtil extends MarcUtil {
             bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
             bib.setPublicationDate(getPublicationDateValue(marcRecord));
             bib.setSubject(getDataFieldValue(marcRecord, "6"));
-            bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null,null,"a"));
+            bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
             bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
             bib.setOclcNumber(getOCLCNumbers(marcRecord, owningInstitution));
-            bib.setMaterialType(getDataFieldValue(marcRecord, "245",null, null, "h"));
+            bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
             bib.setNotes(getDataFieldValue(marcRecord, "5"));
             bib.setLccn(getLCCNValue(marcRecord));
 
             JSONArray holdingsEntities = jsonObject.getJSONArray("holdingsEntities");
             List<String> holdingsIds = new ArrayList<>();
+            List<String> itemIds = new ArrayList<>();
             for (int j = 0; j < holdingsEntities.length(); j++) {
-                JSONObject holdings = holdingsEntities.getJSONObject(j);
-                String holdingsId = holdings.getString("holdingsId");
+                JSONObject holdingsJSON = holdingsEntities.getJSONObject(j);
+                String holdingsId = holdingsJSON.getString("holdingsId");
                 holdingsIds.add(holdingsId);
+
+                JSONArray itemEntities = holdingsJSON.getJSONArray("itemEntities");
+                for (int i = 0; i < itemEntities.length(); i++) {
+                    JSONObject itemJSON = itemEntities.getJSONObject(i);
+                    Item item = generateItemForIndex(itemJSON, holdingsJSON);
+                    items.add(item);
+                    itemIds.add(item.getItemId());
+                }
             }
             bib.setHoldingsIdList(holdingsIds);
+            bib.setBibItemIdList(itemIds);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return bib;
+        map.put("Bib", bib);
+        map.put("Item", items);
+        return map;
+    }
+
+    public Item generateItemForIndex(JSONObject itemJSON, JSONObject holdingsJSON) {
+        Item item = new Item();
+        try {
+            String itemId = itemJSON.getString("itemId");
+            item.setItemId(itemId);
+            item.setId("wio-"+itemId);
+            item.setBarcode(itemJSON.getString("barcode"));
+            item.setDocType("Item");
+            item.setCustomerCode(itemJSON.getString("customerCode"));
+            item.setUseRestriction(itemJSON.getString("useRestrictions"));
+            item.setVolumePartYear(itemJSON.getString("volumePartYear"));
+            item.setCallNumber(itemJSON.getString("callNumber"));
+            String bibId = itemJSON.getString("bibliographicId");
+            List<String> bibIdList = new ArrayList<>();
+            bibIdList.add(bibId);
+            item.setItemBibIdList(bibIdList);
+            List<String> holdingsIds = new ArrayList<>();
+            holdingsIds.add(itemJSON.getString("holdingsId"));
+            item.setHoldingsIdList(holdingsIds);
+
+            JSONObject itemAvailabilityStatus = itemJSON.getJSONObject("itemStatusEntity");
+            item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
+            JSONObject collectionGroup = itemJSON.getJSONObject("collectionGroupEntity");
+            item.setCollectionGroupDesignation(null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
+
+            String holdingsContent = holdingsJSON.getString("content");
+            List<Record> records = convertMarcXmlToRecord(holdingsContent);
+            Record marcRecord = records.get(0);
+            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return item;
     }
 
     private String getPublisherValue(Record record) {
@@ -115,18 +164,18 @@ public class BibJSONUtil extends MarcUtil {
         return lccnValue;
     }
 
-    private List<String> getOCLCNumbers(Record record, String owningInstitution){
+    private List<String> getOCLCNumbers(Record record, String owningInstitution) {
         List<String> oclcNumbers = new ArrayList<>();
-        List<String> oclcNumberList = getMultiDataFieldValues(record, "035",null, null, "a");
-        for (String oclcNumber : oclcNumberList){
-            if (StringUtils.isNotBlank(oclcNumber) && oclcNumber.contains("OCoLC")){
+        List<String> oclcNumberList = getMultiDataFieldValues(record, "035", null, null, "a");
+        for (String oclcNumber : oclcNumberList) {
+            if (StringUtils.isNotBlank(oclcNumber) && oclcNumber.contains("OCoLC")) {
                 oclcNumbers.add(oclcNumber.replaceAll("[^0-9]", ""));
             }
         }
         if (CollectionUtils.isEmpty(oclcNumbers) && StringUtils.isNotBlank(owningInstitution) && owningInstitution.equalsIgnoreCase("3")) {
             String oclcTag = getControlFieldValue(record, "003");
-            if (StringUtils.isNotBlank(oclcTag) && oclcTag.equalsIgnoreCase("OCoLC")){
-                oclcNumbers.add(getControlFieldValue(record,"001"));
+            if (StringUtils.isNotBlank(oclcTag) && oclcTag.equalsIgnoreCase("OCoLC")) {
+                oclcNumbers.add(getControlFieldValue(record, "001"));
             }
         }
         return oclcNumbers;
