@@ -1,8 +1,6 @@
 package org.recap.executors;
 
-import com.google.common.collect.Lists;
 import org.recap.admin.SolrAdmin;
-import org.recap.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
@@ -89,7 +87,7 @@ public abstract class IndexExecutorService {
         }
     }
 
-    public abstract Callable getCallable(String coreName, String bibResourceURL, int from, int to);
+    public abstract Callable getCallable(String coreName, String resourceURL, int from, int to);
 
     protected abstract Integer getTotalDocCount();
 
