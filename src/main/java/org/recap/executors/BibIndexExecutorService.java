@@ -27,4 +27,9 @@ public class BibIndexExecutorService extends IndexExecutorService {
         return bibliographicCount;
 
     }
+
+    @Override
+    protected String getResourceURL() {
+        return bibResourceURL;
+    }
 }

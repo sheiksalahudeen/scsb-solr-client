@@ -26,6 +26,9 @@ public abstract class IndexExecutorService {
     @Value("${bib.rest.url}")
     public String bibResourceURL;
 
+    @Value("${item.rest.url}")
+    public String itemResourceURL;
+
     public void index(Integer numThreads, Integer docsPerThread) {
 
         ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
@@ -51,7 +54,7 @@ public abstract class IndexExecutorService {
 
             List<Future> futures = new ArrayList<>();
             for (int j = 0; j < numThreads; j++) {
-                Callable callable = getCallable(coreNames.get(j), bibResourceURL, from, to);
+                Callable callable = getCallable(coreNames.get(j), getResourceURL(), from, to);
                 futures.add(executorService.submit(callable));
                 from = to+1;
                 to = from+docsPerThread-1;
@@ -80,50 +83,6 @@ public abstract class IndexExecutorService {
 
     }
 
-    public void indexItems(Integer numThreads, Integer chunkSize, List<Item> items) {
-        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-
-        List<String> coreNames = new ArrayList<>();
-
-        setupCoreNames(numThreads, coreNames);
-
-        solrAdmin.createSolrCores(coreNames);
-
-        List<Future> futures = new ArrayList<>();
-
-        List<List<Item>> partitionedLists = Lists.partition(items, chunkSize);
-
-        int i = 0;
-        for (Iterator<List<Item>> iterator = partitionedLists.iterator(); iterator.hasNext(); ) {
-            List<Item> itemList = iterator.next();
-            ItemIndexCallable itemIndexCallable = new ItemIndexCallable(solrUrl, coreNames.get(i), itemList);
-            futures.add(executorService.submit(itemIndexCallable));
-            i++;
-            if (i > numThreads) {
-                i = 0;
-            }
-        }
-
-        getFuture(futures);
-
-        solrAdmin.mergeCores(coreNames);
-        solrAdmin.unLoadCores(coreNames);
-        executorService.shutdown();
-    }
-
-
-    private void getFuture(List<Future> futures) {
-        for (Future future : futures) {
-            try {
-                future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void setupCoreNames(Integer numThreads, List<String> coreNames) {
         for (int i = 0; i < numThreads; i++) {
             coreNames.add("temp" + i);
@@ -133,4 +92,6 @@ public abstract class IndexExecutorService {
     public abstract Callable getCallable(String coreName, String bibResourceURL, int from, int to);
 
     protected abstract Integer getTotalDocCount();
+
+    protected abstract String getResourceURL();
 }
