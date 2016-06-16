@@ -12,7 +12,11 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'spring-boot' 
+apply plugin: 'spring-boot'
+
+springBoot {
+	executable = true
+}
 
 jar {
 	baseName = 'scsb-solr-client'
