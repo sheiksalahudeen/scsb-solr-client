@@ -1,7 +1,6 @@
 package org.recap;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
@@ -16,9 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +41,9 @@ public class BaseTestCase {
 
     @Value("${bib.rest.url}")
     public String bibResourceURL;
+
+    @Value(("${item.rest.url}"))
+    public String itemResourceURL;
 
 
     @Before
