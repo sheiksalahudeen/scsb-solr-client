@@ -27,8 +27,52 @@ public class MarcUtil {
             Record record = reader.next();
             records.add(record);
         }
-
         return records;
+    }
+
+    public String getDataFieldValue(Record record, String dataFieldStartTag) {
+        StringBuffer fieldValue = new StringBuffer();
+        if (record != null) {
+            List<VariableField> variableFields = record.getVariableFields();
+            if (!CollectionUtils.isEmpty(variableFields)) {
+                for (VariableField variableField : variableFields) {
+                    if (variableField != null && StringUtils.isNotBlank(variableField.getTag()) && variableField.getTag().startsWith(dataFieldStartTag)) {
+                        DataField dataField = (DataField) variableField;
+                        List<Subfield> subfields = dataField.getSubfields();
+                        for (Subfield subfield : subfields) {
+                            if (subfield != null && StringUtils.isNotBlank(subfield.getData())) {
+                                fieldValue.append(subfield.getData());
+                                fieldValue.append(" ");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return fieldValue.toString().trim();
+    }
+
+    public String getDataFieldValue(Record record, String dataFieldStartTag, List<Character> subFieldTags) {
+        StringBuffer fieldValue = new StringBuffer();
+        if (record != null) {
+            List<VariableField> variableFields = record.getVariableFields();
+            if (!CollectionUtils.isEmpty(variableFields)) {
+                Subfield subfield;
+                for (VariableField variableField : variableFields) {
+                    if (variableField != null && StringUtils.isNotBlank(variableField.getTag()) && variableField.getTag().startsWith(dataFieldStartTag)) {
+                        DataField dataField = (DataField) variableField;
+                        for (Character subFieldTag : subFieldTags){
+                            subfield = dataField.getSubfield(subFieldTag);
+                            if (subfield != null) {
+                                fieldValue.append(subfield.getData());
+                                fieldValue.append(" ");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return fieldValue.toString().trim();
     }
 
     public String getDataFieldValue(Record marcRecord, String field, String ind1, String ind2, String subField) {
@@ -48,13 +92,17 @@ public class MarcUtil {
 
         for (Iterator<VariableField> variableFieldIterator = dataFields.iterator(); variableFieldIterator.hasNext(); ) {
             DataField dataField = (DataField) variableFieldIterator.next();
-            if (doIndicatorsMatch(indicator1, indicator2, dataField)) {
-                List<Subfield> subFields = dataField.getSubfields(subField);
-                for (Iterator<Subfield> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
-                    Subfield subfield = subfieldIterator.next();
-                    String data = subfield.getData();
-                    if (StringUtils.isNotBlank(data)) {
-                        values.add(data);
+            if(dataField!=null){
+                if (doIndicatorsMatch(indicator1, indicator2, dataField)) {
+                    List<Subfield> subFields = dataField.getSubfields(subField);
+                    for (Iterator<Subfield> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                        Subfield subfield = subfieldIterator.next();
+                        if (subField!=null){
+                            String data = subfield.getData();
+                            if (StringUtils.isNotBlank(data)) {
+                                values.add(data);
+                            }
+                        }
                     }
                 }
             }
@@ -73,13 +121,13 @@ public class MarcUtil {
         return result;
     }
 
-
-
     public String getControlFieldValue(Record marcRecord, String field) {
         List<VariableField> variableFields = marcRecord.getVariableFields(field);
         for (Iterator<VariableField> variableFieldIterator = variableFields.iterator(); variableFieldIterator.hasNext(); ) {
             ControlFieldImpl controlField = (ControlFieldImpl) variableFieldIterator.next();
-            return controlField.getData();
+            if (controlField!=null) {
+                return controlField.getData();
+            }
         }
         return null;
     }
