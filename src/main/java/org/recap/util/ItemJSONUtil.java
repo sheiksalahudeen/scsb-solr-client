@@ -34,8 +34,6 @@ public class ItemJSONUtil {
             item.setId(itemId);
             item.setBarcode(jsonObject.getString("barcode"));
             item.setDocType("Item");
-            item.setAvailability(jsonObject.getString("itemAvailabilityStatusId"));
-            item.setCollectionGroupDesignation(jsonObject.getString("collectionGroupId"));
             item.setCustomerCode(jsonObject.getString("customerCode"));
             item.setUseRestriction(jsonObject.getString("useRestrictions"));
             item.setVolumePartYear(jsonObject.getString("volumePartYear"));
@@ -47,6 +45,11 @@ public class ItemJSONUtil {
             List<String> holdingsIds = new ArrayList<>();
             holdingsIds.add(jsonObject.getString("holdingsId"));
             item.setHoldingsIdList(holdingsIds);
+
+            JSONObject itemAvailabilityStatus = jsonObject.getJSONObject("itemStatusEntity");
+            item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
+            JSONObject collectionGroup = jsonObject.getJSONObject("collectionGroupEntity");
+            item.setCollectionGroupDesignation( null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
 
             /*JSONObject holdingsEntity = jsonObject.getJSONObject("holdingsEntity");
             String holdingsContent = holdingsEntity.getString("content");
