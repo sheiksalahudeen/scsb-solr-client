@@ -7,6 +7,8 @@ import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
 import org.recap.util.BibJSONUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
 
@@ -14,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Created by pvsubrah on 6/13/16.
@@ -46,10 +46,10 @@ public class BibIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        List<Integer> bibliographicIds = IntStream.rangeClosed(from, to).boxed().collect(Collectors.toList());
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Iterable<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(bibliographicIds);
+
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(from, to));
         stopWatch.stop();
         System.out.println("Time taken to get bibs and related data: " + stopWatch.getTotalTimeSeconds());
 

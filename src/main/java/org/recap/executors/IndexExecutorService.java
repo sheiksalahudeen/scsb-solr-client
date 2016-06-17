@@ -29,22 +29,16 @@ public abstract class IndexExecutorService {
 
     public void index(Integer numThreads, Integer docsPerThread) {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);;
+
+        Integer totalDocCount = getTotalDocCount();
+        int quotient = totalDocCount / docsPerThread;
+        int remainder = totalDocCount % docsPerThread;
+        Integer loopCount = remainder == 0 ? quotient : quotient + 1;
 
         List<String> coreNames = new ArrayList<>();
 
         setupCoreNames(numThreads, coreNames);
-
-
-        Integer totalDocCount = getTotalDocCount();
-
-        int quotient = totalDocCount / (numThreads * docsPerThread);
-        int remainder = totalDocCount % (numThreads * docsPerThread);
-
-        Integer loopCount = remainder == 0 ? quotient : quotient + 1;
-
-        int from=0;
-        int to=docsPerThread-1;
 
         solrAdmin.createSolrCores(coreNames);
 
@@ -52,10 +46,8 @@ public abstract class IndexExecutorService {
 
             List<Future> futures = new ArrayList<>();
             for (int j = 0; j < numThreads; j++) {
-                Callable callable = getCallable(coreNames.get(j), getResourceURL(), from, to);
+                Callable callable = getCallable(coreNames.get(j), getResourceURL(), i, docsPerThread);
                 futures.add(executorService.submit(callable));
-                from = to+1;
-                to = from+docsPerThread-1;
             }
 
             for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
