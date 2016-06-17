@@ -1,8 +1,6 @@
 package org.recap.executors;
 
-import org.recap.model.Bib;
-import org.recap.model.BibliographicEntity;
-import org.recap.model.Item;
+import org.recap.model.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
@@ -13,9 +11,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by pvsubrah on 6/13/16.
@@ -23,7 +25,6 @@ import java.util.concurrent.Callable;
 
 
 public class BibIndexCallable implements Callable {
-    private final String bibResourceUrl;
     private final int from;
     private final int to;
     private String coreName;
@@ -34,10 +35,9 @@ public class BibIndexCallable implements Callable {
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public BibIndexCallable(String solrURL, String bibResourceUrl, String coreName, int from, int to, BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public BibIndexCallable(String solrURL, String coreName, int from, int to, BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.coreName = coreName;
         this.solrURL = solrURL;
-        this.bibResourceUrl = bibResourceUrl;
         this.from = from;
         this.to = to;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
@@ -46,36 +46,35 @@ public class BibIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        String threadName = Thread.currentThread().getName();
+        System.out.println("Executing thread " + threadName);
+        long startTime = System.currentTimeMillis();
 
         Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(from, to));
-        stopWatch.stop();
-        System.out.println("Time taken to get bibs and related data: " + stopWatch.getTotalTimeSeconds());
 
-        List<Bib> bibsToIndex = new ArrayList<Bib>();
+        List<Bib> bibsToIndex = new ArrayList<>();
         List<Item> itemsToIndex = new ArrayList<>();
 
-        for (BibliographicEntity bibliographicEntity : bibliographicEntities){
-            Map<String, List> map = BibJSONUtil.getInstance().generateBibAndItemsForIndex(bibliographicEntity);
-            Bib bib = (Bib) map.get("Bib");
-            bibsToIndex.add(bib);
-
-            List<Item> items = map.get("Item");
-            itemsToIndex.addAll(items);
+        Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
+        while(iterator.hasNext()){
+            BibliographicEntity bibliographicEntity = iterator.next();
+            Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity);
+            bibsToIndex.addAll(stringListMap.get("Bib"));
+            itemsToIndex.addAll((stringListMap.get("Item")));
         }
 
-        stopWatch.start();
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken to build Bib and related data: " + threadName + " is :" + (endTime-startTime)/1000 + " milli seconds");
+
         bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
         }
-        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
-        if(!CollectionUtils.isEmpty(itemsToIndex)) {
-            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
-        }
-        stopWatch.stop();
-        System.out.println("Time taken to index temp core: " + stopWatch.getTotalTimeSeconds());
+//        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
+//        if (!CollectionUtils.isEmpty(itemsToIndex)) {
+//            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
+//        }
         return null;
     }
 }

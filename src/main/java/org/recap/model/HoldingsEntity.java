@@ -22,7 +22,7 @@ public class HoldingsEntity {
     @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "BIBLIOGRAPHIC_ID", insertable=false, updatable=false)
+    @Column(name = "BIBLIOGRAPHIC_ID")
     private Integer bibliographicId;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -36,12 +36,10 @@ public class HoldingsEntity {
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="BIBLIOGRAPHIC_ID")
-    @JsonIgnore
-    private BibliographicEntity bibliographicEntity;
+    @OneToMany(mappedBy="holdingsEntity")
+    private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
 
-    @OneToMany(mappedBy = "holdingsEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "holdingsEntity", cascade = CascadeType.ALL)
     private List<ItemEntity> itemEntities;
 
     public Integer getHoldingsId() {
@@ -92,12 +90,12 @@ public class HoldingsEntity {
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
-    public BibliographicEntity getBibliographicEntity() {
-        return bibliographicEntity;
+    public List<BibliographicHoldingsEntity> getBibliographicHoldingsEntities() {
+        return bibliographicHoldingsEntities;
     }
 
-    public void setBibliographicEntity(BibliographicEntity bibliographicEntity) {
-        this.bibliographicEntity = bibliographicEntity;
+    public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
+        this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
     }
 
     public List<ItemEntity> getItemEntities() {

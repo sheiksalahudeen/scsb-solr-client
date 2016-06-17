@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
  */
 public class ItemIndexCallable implements Callable {
 
-    private final String itemResourceUrl;
     private final int from;
     private final int to;
     private String coreName;
@@ -27,10 +26,9 @@ public class ItemIndexCallable implements Callable {
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public ItemIndexCallable(String solrURL, String itemResourceUrl, String coreName, int from, int to) {
+    public ItemIndexCallable(String solrURL, String coreName, int from, int to) {
         this.coreName = coreName;
         this.solrURL = solrURL;
-        this.itemResourceUrl = itemResourceUrl;
         this.from = from;
         this.to = to;
     }
@@ -38,34 +36,34 @@ public class ItemIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        RestTemplate restTemplate = new RestTemplate();
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(itemResourceUrl + "/findByRangeOfIds?fromId=" + from + "&toId=" + to, String.class);
-        stopWatch.stop();
-        System.out.println("Time taken to get items and related data: " + stopWatch.getTotalTimeSeconds());
-
-        JSONArray jsonArray = new JSONArray(response.getBody());
-
-        List<Item> itemsToIndex = new ArrayList<>();
-
-        for(int i=0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-            Item item = ItemJSONUtil.getInstance().generateItemForIndex(jsonObject);
-            itemsToIndex.add(item);
-        }
-
-        stopWatch.start();
-        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
-        if(!CollectionUtils.isEmpty(itemsToIndex)) {
-            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
-        }
-        stopWatch.stop();
-        System.out.println("Time taken to index temp core: " + stopWatch.getTotalTimeSeconds());
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start();
+//
+//        ResponseEntity<String> response =
+//                restTemplate.getForEntity(itemResourceUrl + "/findByRangeOfIds?fromId=" + from + "&toId=" + to, String.class);
+//        stopWatch.stop();
+//        System.out.println("Time taken to get items and related data: " + stopWatch.getTotalTimeSeconds());
+//
+//        JSONArray jsonArray = new JSONArray(response.getBody());
+//
+//        List<Item> itemsToIndex = new ArrayList<>();
+//
+//        for(int i=0; i < jsonArray.length(); i++) {
+//            JSONObject jsonObject = jsonArray.getJSONObject(i);
+//
+//            Item item = ItemJSONUtil.getInstance().generateItemForIndex(jsonObject);
+//            itemsToIndex.add(item);
+//        }
+//
+//        stopWatch.start();
+//        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
+//        if(!CollectionUtils.isEmpty(itemsToIndex)) {
+//            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
+//        }
+//        stopWatch.stop();
+//        System.out.println("Time taken to index temp core: " + stopWatch.getTotalTimeSeconds());
         return null;
     }
 }

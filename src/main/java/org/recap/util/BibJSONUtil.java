@@ -7,6 +7,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.model.*;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 
 import java.util.*;
 
@@ -14,18 +15,6 @@ import java.util.*;
  * Created by pvsubrah on 6/15/16.
  */
 public class BibJSONUtil extends MarcUtil {
-
-    private static BibJSONUtil bibJSONUtil;
-
-    private BibJSONUtil() {
-    }
-
-    public static BibJSONUtil getInstance() {
-        if (bibJSONUtil == null) {
-            bibJSONUtil = new BibJSONUtil();
-        }
-        return bibJSONUtil;
-    }
 
     public Map<String, List> generateBibAndItemsForIndex(JSONObject jsonObject) {
         Map map = new HashMap();
@@ -210,24 +199,28 @@ public class BibJSONUtil extends MarcUtil {
 
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
-        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
-        if (!CollectionUtils.isEmpty(holdingsEntities)) {
-            for (HoldingsEntity holdingsEntity : holdingsEntities) {
-                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
-                List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
-                if (!CollectionUtils.isEmpty(itemEntities)) {
-                    for (ItemEntity itemEntity : itemEntities) {
-                        itemIds.add(itemEntity.getItemId().toString());
-                        Item item = generateItemForIndex(itemEntity, holdingsEntity);
-                        items.add(item);
-                    }
-                }
+
+        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
+
+        if (!CollectionUtils.isEmpty(bibliographicHoldingsEntities)) {
+            for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
+                holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
+//
+//                HoldingsEntity holdingsEntity = bibliographicHoldingsEntity.getHoldingsEntity();
+//                List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
+//                if (!CollectionUtils.isEmpty(itemEntities)) {
+//                    for (ItemEntity itemEntity : itemEntities) {
+//                        itemIds.add(itemEntity.getItemId().toString());
+//                        Item item = generateItemForIndex(itemEntity, holdingsEntity);
+//                        items.add(item);
+//                    }
+//                }
             }
         }
         bib.setHoldingsIdList(holdingsIds);
         bib.setBibItemIdList(itemIds);
 
-        map.put("Bib", bib);
+        map.put("Bib", Arrays.asList(bib));
         map.put("Item", items);
         return map;
     }

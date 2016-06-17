@@ -24,11 +24,12 @@ public class ExecutorTest extends BaseTestCase {
     @Autowired
     ItemCrudRepository itemCrudRepository;
 
-    private int numThreads = 5;
-    private int docsPerThread = 1000;
+    private int numThreads = 2;
+    private int docsPerThread = 5000;
 
     @Test
     public void indexBibsFromDB() throws Exception {
+        unloadCores();
         bibCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();

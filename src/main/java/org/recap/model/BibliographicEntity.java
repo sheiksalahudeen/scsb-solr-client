@@ -34,8 +34,9 @@ public class BibliographicEntity {
     @Column(name = "OWNING_INST_BIB_ID")
     private String owningInstitutionBibId;
 
-    @OneToMany(mappedBy = "bibliographicEntity", fetch = FetchType.EAGER)
-    private List<HoldingsEntity> holdingsEntities;
+    @OneToMany(mappedBy="bibliographicEntity")
+    private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
+
 
     public Integer getBibliographicId() {
         return bibliographicId;
@@ -85,11 +86,11 @@ public class BibliographicEntity {
         this.owningInstitutionBibId = owningInstitutionBibId;
     }
 
-    public List<HoldingsEntity> getHoldingsEntities() {
-        return holdingsEntities;
+    public List<BibliographicHoldingsEntity> getBibliographicHoldingsEntities() {
+        return bibliographicHoldingsEntities;
     }
 
-    public void setHoldingsEntities(List<HoldingsEntity> holdingsEntities) {
-        this.holdingsEntities = holdingsEntities;
+    public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
+        this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
     }
 }

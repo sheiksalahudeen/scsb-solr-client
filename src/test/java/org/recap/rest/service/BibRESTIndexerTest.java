@@ -64,7 +64,7 @@ public class BibRESTIndexerTest extends BaseTestCase {
             assertNotNull(bibliographicId);
             assertNotNull(content);
 
-            Map<String, List> map = BibJSONUtil.getInstance().generateBibAndItemsForIndex(jsonObject);
+            Map<String, List> map = new BibJSONUtil().generateBibAndItemsForIndex(jsonObject);
             Bib bib = (Bib) map.get("Bib");
             bibsToIndex.add(bib);
 

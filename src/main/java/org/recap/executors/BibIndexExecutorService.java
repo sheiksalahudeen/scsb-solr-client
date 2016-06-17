@@ -20,8 +20,8 @@ public class BibIndexExecutorService extends IndexExecutorService {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Override
-    public Callable getCallable(String coreName, String bibResourceUrl, int from, int to) {
-        return new BibIndexCallable(solrUrl, bibResourceUrl, coreName, from, to, bibliographicDetailsRepository);
+    public Callable getCallable(String coreName, int from, int to) {
+        return new BibIndexCallable(solrUrl, coreName, from, to, bibliographicDetailsRepository);
     }
 
     @Override

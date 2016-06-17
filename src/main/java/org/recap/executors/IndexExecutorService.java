@@ -29,11 +29,13 @@ public abstract class IndexExecutorService {
 
     public void index(Integer numThreads, Integer docsPerThread) {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);;
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
         Integer totalDocCount = getTotalDocCount();
-        int quotient = totalDocCount / docsPerThread;
-        int remainder = totalDocCount % docsPerThread;
+
+        int quotient = totalDocCount / (docsPerThread);
+        int remainder = totalDocCount % (docsPerThread);
+
         Integer loopCount = remainder == 0 ? quotient : quotient + 1;
 
         List<String> coreNames = new ArrayList<>();
@@ -42,25 +44,24 @@ public abstract class IndexExecutorService {
 
         solrAdmin.createSolrCores(coreNames);
 
+        int coreNum = 0;
+        List<Future> futures = new ArrayList<>();
         for (int i = 0; i < loopCount; i++) {
+            Callable callable = getCallable(coreNames.get(coreNum), i, docsPerThread);
+            futures.add(executorService.submit(callable));
+           coreNum = coreNum < numThreads ? 0 : coreNum+1;
+        }
 
-            List<Future> futures = new ArrayList<>();
-            for (int j = 0; j < numThreads; j++) {
-                Callable callable = getCallable(coreNames.get(j), getResourceURL(), i, docsPerThread);
-                futures.add(executorService.submit(callable));
+
+        for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+            Future future = iterator.next();
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-
-            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
-                Future future = iterator.next();
-                try {
-                    future.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
 
         StopWatch stopWatch = new StopWatch();
@@ -79,7 +80,7 @@ public abstract class IndexExecutorService {
         }
     }
 
-    public abstract Callable getCallable(String coreName, String resourceURL, int from, int to);
+    public abstract Callable getCallable(String coreName, int from, int to);
 
     protected abstract Integer getTotalDocCount();
 
