@@ -1,21 +1,21 @@
 package org.recap.executors;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 import org.recap.model.Bib;
+import org.recap.model.BibliographicEntity;
 import org.recap.model.Item;
+import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
 import org.recap.util.BibJSONUtil;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by pvsubrah on 6/13/16.
@@ -28,42 +28,36 @@ public class BibIndexCallable implements Callable {
     private final int to;
     private String coreName;
     private String solrURL;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public BibIndexCallable(String solrURL, String bibResourceUrl, String coreName, int from, int to) {
+    public BibIndexCallable(String solrURL, String bibResourceUrl, String coreName, int from, int to, BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.bibResourceUrl = bibResourceUrl;
         this.from = from;
         this.to = to;
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     @Override
     public Object call() throws Exception {
 
-        RestTemplate restTemplate = new RestTemplate();
-
+        List<Integer> bibliographicIds = IntStream.rangeClosed(from, to).boxed().collect(Collectors.toList());
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(bibResourceUrl + "/findByRangeOfIds?fromId=" + from + "&toId=" + to, String.class);
-
+        Iterable<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(bibliographicIds);
         stopWatch.stop();
         System.out.println("Time taken to get bibs and related data: " + stopWatch.getTotalTimeSeconds());
-
-        JSONArray jsonArray = new JSONArray(response.getBody());
 
         List<Bib> bibsToIndex = new ArrayList<Bib>();
         List<Item> itemsToIndex = new ArrayList<>();
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-            Map<String, List> map = BibJSONUtil.getInstance().generateBibAndItemsForIndex(jsonObject);
+        for (BibliographicEntity bibliographicEntity : bibliographicEntities){
+            Map<String, List> map = BibJSONUtil.getInstance().generateBibAndItemsForIndex(bibliographicEntity);
             Bib bib = (Bib) map.get("Bib");
             bibsToIndex.add(bib);
 

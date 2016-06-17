@@ -5,8 +5,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
-import org.recap.model.Bib;
-import org.recap.model.Item;
+import org.recap.model.*;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -179,5 +178,96 @@ public class BibJSONUtil extends MarcUtil {
             }
         }
         return oclcNumbers;
+    }
+
+    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
+        Map map = new HashMap();
+        Bib bib = new Bib();
+        List<Item> items = new ArrayList<>();
+
+        Integer bibliographicId = bibliographicEntity.getBibliographicId();
+        bib.setBibId(bibliographicId.toString());
+        bib.setId("wbm-" + bibliographicId);
+
+        bib.setDocType("Bib");
+        String bibContent = bibliographicEntity.getContent();
+        List<Record> records = convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        Integer owningInstitution = bibliographicEntity.getOwningInstitutionId();
+
+        bib.setTitle(getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b')));
+        bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
+        bib.setPublisher(getPublisherValue(marcRecord));
+        bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
+        bib.setPublicationDate(getPublicationDateValue(marcRecord));
+        bib.setSubject(getDataFieldValue(marcRecord, "6"));
+        bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
+        bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
+        bib.setOclcNumber(getOCLCNumbers(marcRecord, owningInstitution.toString()));
+        bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
+        bib.setNotes(getDataFieldValue(marcRecord, "5"));
+        bib.setLccn(getLCCNValue(marcRecord));
+
+        List<String> holdingsIds = new ArrayList<>();
+        List<String> itemIds = new ArrayList<>();
+        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        if (!CollectionUtils.isEmpty(holdingsEntities)) {
+            for (HoldingsEntity holdingsEntity : holdingsEntities) {
+                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
+                if (!CollectionUtils.isEmpty(itemEntities)) {
+                    for (ItemEntity itemEntity : itemEntities) {
+                        itemIds.add(itemEntity.getItemId().toString());
+                        Item item = generateItemForIndex(itemEntity, holdingsEntity);
+                        items.add(item);
+                    }
+                }
+            }
+        }
+        bib.setHoldingsIdList(holdingsIds);
+        bib.setBibItemIdList(itemIds);
+
+        map.put("Bib", bib);
+        map.put("Item", items);
+        return map;
+    }
+
+    private Item generateItemForIndex(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
+        Item item = new Item();
+        try {
+            Integer itemId = itemEntity.getItemId();
+            item.setItemId(itemId.toString());
+            item.setId("wio-" + itemId);
+            item.setBarcode(itemEntity.getBarcode());
+            item.setDocType("Item");
+            item.setCustomerCode(itemEntity.getCustomerCode());
+            item.setUseRestriction(itemEntity.getUseRestrictions());
+            item.setVolumePartYear(itemEntity.getVolumePartYear());
+            item.setCallNumber(itemEntity.getCallNumber());
+            String bibId = itemEntity.getBibliographicId().toString();
+            List<String> bibIdList = new ArrayList<>();
+            bibIdList.add(bibId);
+            item.setItemBibIdList(bibIdList);
+            List<String> holdingsIds = new ArrayList<>();
+            holdingsIds.add(itemEntity.getHoldingsId().toString());
+            item.setHoldingsIdList(holdingsIds);
+
+            ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
+            if (itemStatusEntity != null) {
+                item.setAvailability(itemStatusEntity.getStatusCode());
+            }
+            CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
+            if (collectionGroupEntity != null) {
+                item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
+            }
+
+            String holdingsContent = holdingsEntity.getContent();
+            List<Record> records = convertMarcXmlToRecord(holdingsContent);
+            Record marcRecord = records.get(0);
+            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return item;
     }
 }

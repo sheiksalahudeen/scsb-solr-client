@@ -30,6 +30,7 @@ public class ExecutorTest extends BaseTestCase {
     @Test
     public void indexBibsFromDB() throws Exception {
         bibCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         bibIndexExecutorService.index(numThreads, docsPerThread);

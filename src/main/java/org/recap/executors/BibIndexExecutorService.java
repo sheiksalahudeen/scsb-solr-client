@@ -1,5 +1,7 @@
 package org.recap.executors;
 
+import org.recap.repository.BibliographicDetailsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,19 +15,20 @@ import java.util.concurrent.Callable;
 @Service
 public class BibIndexExecutorService extends IndexExecutorService {
 
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
     @Override
     public Callable getCallable(String coreName, String bibResourceUrl, int from, int to) {
-        return new BibIndexCallable(solrUrl, bibResourceUrl, coreName, from, to);
+        return new BibIndexCallable(solrUrl, bibResourceUrl, coreName, from, to, bibliographicDetailsRepository);
     }
 
     @Override
     protected Integer getTotalDocCount() {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(bibResourceURL + "/count", String.class);
-        Integer bibliographicCount = Integer.valueOf(response.getBody());
-        return bibliographicCount;
-
+        Long count = bibliographicDetailsRepository.count();
+        return count.intValue();
     }
 
     @Override
