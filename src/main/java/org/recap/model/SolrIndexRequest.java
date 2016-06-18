@@ -1,9 +1,9 @@
 package org.recap.model;
 
 /**
- * Created by Sheik on 6/18/2016.
+ * Created by SheikS on 6/18/2016.
  */
-public class SolrIndexerRequest {
+public class SolrIndexRequest {
     private Integer numberOfThread;
     private Integer numberOfDoc;
 

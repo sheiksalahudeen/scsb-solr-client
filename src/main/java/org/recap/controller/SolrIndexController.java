@@ -1,7 +1,7 @@
 package org.recap.controller;
 
 import org.recap.executors.BibIndexExecutorService;
-import org.recap.model.SolrIndexerRequest;
+import org.recap.model.SolrIndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,15 +22,15 @@ public class SolrIndexController {
 
     @RequestMapping("/")
     public String solrIndexer(Model model){
-        model.addAttribute("solrIndexerRequest",new SolrIndexerRequest());
+        model.addAttribute("solrIndexRequest",new SolrIndexRequest());
         return "solrIndexer";
     }
 
     @RequestMapping(value="/solrIndexer", params={"fullIndex"})
-    public String fullIndex(final SolrIndexerRequest solrIndexerRequest, final BindingResult bindingResult, Model model) {
+    public String fullIndex(final SolrIndexRequest solrIndexRequest, final BindingResult bindingResult, Model model) {
 
-        Integer numberOfThread = solrIndexerRequest.getNumberOfThread();
-        Integer numberOfDoc = solrIndexerRequest.getNumberOfDoc();
+        Integer numberOfThread = solrIndexRequest.getNumberOfThread();
+        Integer numberOfDoc = solrIndexRequest.getNumberOfDoc();
         System.out.println("Number of Thread : " + numberOfThread + "   Number of Doc :" + numberOfDoc);
 
         StopWatch stopWatch = new StopWatch();
