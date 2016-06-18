@@ -25,7 +25,7 @@ public class ExecutorTest extends BaseTestCase {
     ItemCrudRepository itemCrudRepository;
 
     private int numThreads = 5;
-    private int docsPerThread = 2000;
+    private int docsPerThread = 1000;
 
     @Test
     public void indexBibsFromDB() throws Exception {
