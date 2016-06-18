@@ -1,6 +1,7 @@
 package org.recap.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "collection_group_t", schema = "recap", catalog = "")
-public class CollectionGroupEntity {
+public class CollectionGroupEntity implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "COLLECTION_GROUP_ID")

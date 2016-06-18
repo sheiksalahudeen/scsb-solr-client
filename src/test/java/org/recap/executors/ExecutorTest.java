@@ -24,8 +24,8 @@ public class ExecutorTest extends BaseTestCase {
     @Autowired
     ItemCrudRepository itemCrudRepository;
 
-    private int numThreads = 2;
-    private int docsPerThread = 5000;
+    private int numThreads = 5;
+    private int docsPerThread = 2000;
 
     @Test
     public void indexBibsFromDB() throws Exception {

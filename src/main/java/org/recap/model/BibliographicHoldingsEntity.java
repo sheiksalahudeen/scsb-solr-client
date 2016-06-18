@@ -1,6 +1,7 @@
 package org.recap.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by pvsubrah on 6/17/16.
@@ -8,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bibliographic_holdings_t", schema = "recap", catalog = "")
-public class BibliographicHoldingsEntity {
+public class BibliographicHoldingsEntity implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "BIBLIOGRAPHIC_HOLDINGS_ID")

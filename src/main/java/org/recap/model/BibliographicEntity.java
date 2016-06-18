@@ -1,5 +1,6 @@
 package org.recap.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
-public class BibliographicEntity {
+public class BibliographicEntity implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "BIBLIOGRAPHIC_ID")

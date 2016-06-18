@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -7,7 +8,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.model.*;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
 
 import java.util.*;
 
@@ -169,10 +169,15 @@ public class BibJSONUtil extends MarcUtil {
         return oclcNumbers;
     }
 
-    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
+    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
         Map map = new HashMap();
         Bib bib = new Bib();
         List<Item> items = new ArrayList<>();
+        List<ItemEntity> localItemEntityCopies = new ArrayList<>();
+        for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
+            ItemEntity itemEntity = iterator.next();
+            localItemEntityCopies.add(SerializationUtils.clone(itemEntity));
+        }
 
         Integer bibliographicId = bibliographicEntity.getBibliographicId();
         bib.setBibId(bibliographicId.toString());
@@ -200,21 +205,14 @@ public class BibJSONUtil extends MarcUtil {
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
 
-        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
-
-        if (!CollectionUtils.isEmpty(bibliographicHoldingsEntities)) {
-            for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
-                holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
-//
-//                HoldingsEntity holdingsEntity = bibliographicHoldingsEntity.getHoldingsEntity();
-//                List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
-//                if (!CollectionUtils.isEmpty(itemEntities)) {
-//                    for (ItemEntity itemEntity : itemEntities) {
-//                        itemIds.add(itemEntity.getItemId().toString());
-//                        Item item = generateItemForIndex(itemEntity, holdingsEntity);
-//                        items.add(item);
-//                    }
-//                }
+        if (!CollectionUtils.isEmpty(holdingsEntities)) {
+            for (HoldingsEntity holdingsEntity : holdingsEntities) {
+                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                for (ItemEntity itemEntity : localItemEntityCopies) {
+                    itemIds.add(itemEntity.getItemId().toString());
+                    Item item = generateItemForIndex(itemEntity, holdingsEntity);
+                    items.add(item);
+                }
             }
         }
         bib.setHoldingsIdList(holdingsIds);

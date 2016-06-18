@@ -3,6 +3,7 @@ package org.recap.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "item_t", schema = "recap", catalog = "")
-public class ItemEntity {
+public class ItemEntity implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ITEM_ID")

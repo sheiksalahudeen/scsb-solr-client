@@ -1,14 +1,14 @@
 package org.recap.executors;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.recap.model.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
-import org.recap.util.BibJSONUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
+
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,25 +56,56 @@ public class BibIndexCallable implements Callable {
         List<Item> itemsToIndex = new ArrayList<>();
 
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
+
+
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        List<Future> futures = new ArrayList<>();
         while(iterator.hasNext()){
             BibliographicEntity bibliographicEntity = iterator.next();
-            Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity);
-            bibsToIndex.addAll(stringListMap.get("Bib"));
-            itemsToIndex.addAll((stringListMap.get("Item")));
+
+            List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
+
+            List<HoldingsEntity> holdingsEntities = new ArrayList<>();
+
+            List<ItemEntity> itemEntities = new ArrayList<>();
+
+            for (Iterator<BibliographicHoldingsEntity> bibliographicHoldingsEntityIterator = bibliographicHoldingsEntities.iterator(); bibliographicHoldingsEntityIterator.hasNext(); ) {
+                BibliographicHoldingsEntity bibliographicHoldingsEntity = bibliographicHoldingsEntityIterator.next();
+                HoldingsEntity holdingsEntity = bibliographicHoldingsEntity.getHoldingsEntity();
+                holdingsEntities.add(holdingsEntity);
+                for (Iterator<ItemEntity> itemEntityIterator = holdingsEntity.getItemEntities().iterator(); itemEntityIterator.hasNext(); ) {
+                    ItemEntity itemEntity = itemEntityIterator.next();
+                    itemEntities.add(itemEntity);
+                }
+            }
+            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, holdingsEntities, itemEntities));
+            futures.add(submit);
         }
+
+        for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
+            Future future = futureIterator.next();
+
+            Map<String, List> stringListMap = (Map<String, List>) future.get();
+            List bibs = stringListMap.get("Bib");
+            bibsToIndex.addAll(bibs);
+            List items = stringListMap.get("Item");
+            itemsToIndex.addAll(items);
+        }
+
+        executorService.shutdown();
 
 
         long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to build Bib and related data: " + threadName + " is :" + (endTime-startTime)/1000 + " milli seconds");
+        System.out.println("Time taken to build Bib and related data: " + threadName + " is :" + (endTime-startTime)/1000 + " seconds");
 
         bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
         }
-//        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
-//        if (!CollectionUtils.isEmpty(itemsToIndex)) {
-//            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
-//        }
+        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
+        if (!CollectionUtils.isEmpty(itemsToIndex)) {
+            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
+        }
         return null;
     }
 }
