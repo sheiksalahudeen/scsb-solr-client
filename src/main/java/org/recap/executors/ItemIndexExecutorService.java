@@ -13,8 +13,8 @@ import java.util.concurrent.Callable;
 public class ItemIndexExecutorService extends IndexExecutorService {
 
     @Override
-    public Callable getCallable(String coreName, int from, int to) {
-        return new ItemIndexCallable(solrUrl, coreName, from, to);
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
+        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage);
     }
 
     @Override

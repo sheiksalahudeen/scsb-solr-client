@@ -19,18 +19,18 @@ import java.util.concurrent.Callable;
  */
 public class ItemIndexCallable implements Callable {
 
-    private final int from;
-    private final int to;
+    private int pageNum;
+    private int docsPerPage;
     private String coreName;
     private String solrURL;
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public ItemIndexCallable(String solrURL, String coreName, int from, int to) {
+    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage) {
         this.coreName = coreName;
         this.solrURL = solrURL;
-        this.from = from;
-        this.to = to;
+        this.pageNum = pageNum;
+        this.docsPerPage = docsPerPage;
     }
 
     @Override

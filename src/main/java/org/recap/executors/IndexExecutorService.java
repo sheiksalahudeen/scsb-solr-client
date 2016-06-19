@@ -53,8 +53,8 @@ public abstract class IndexExecutorService {
         int coreNum = 0;
         List<Future> futures = new ArrayList<>();
 
-        for (int i = 0; i < loopCount; i++) {
-            Callable callable = getCallable(coreNames.get(coreNum), i, docsPerThread);
+        for (int pageNum = 0; pageNum < loopCount; pageNum++) {
+            Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread);
             futures.add(executorService.submit(callable));
             coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
         }
@@ -90,7 +90,7 @@ public abstract class IndexExecutorService {
         System.out.println("Num futures executed: " + futureCount);
         solrAdmin.mergeCores(coreNames);
         stopWatch.stop();
-        System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds());
+        System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
         solrAdmin.unLoadCores(coreNames);
         executorService.shutdown();
 
@@ -129,7 +129,7 @@ public abstract class IndexExecutorService {
         this.solrAdmin = solrAdmin;
     }
 
-    public abstract Callable getCallable(String coreName, int from, int to);
+    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage);
 
     protected abstract Integer getTotalDocCount();
 

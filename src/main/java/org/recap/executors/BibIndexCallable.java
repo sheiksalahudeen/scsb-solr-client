@@ -1,6 +1,5 @@
 package org.recap.executors;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.recap.model.*;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
@@ -25,8 +24,8 @@ import java.util.concurrent.Future;
 
 
 public class BibIndexCallable implements Callable {
-    private final int from;
-    private final int to;
+    private final int pageNum;
+    private final int docsPerPage;
     private String coreName;
     private String solrURL;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -35,22 +34,18 @@ public class BibIndexCallable implements Callable {
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public BibIndexCallable(String solrURL, String coreName, int from, int to, BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.coreName = coreName;
         this.solrURL = solrURL;
-        this.from = from;
-        this.to = to;
+        this.pageNum = pageNum;
+        this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 
     @Override
     public Object call() throws Exception {
 
-        String threadName = Thread.currentThread().getName();
-        System.out.println("Executing thread " + threadName);
-        long startTime = System.currentTimeMillis();
-
-        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(from, to));
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage));
 
         List<Bib> bibsToIndex = new ArrayList<>();
         List<Item> itemsToIndex = new ArrayList<>();
@@ -93,10 +88,6 @@ public class BibIndexCallable implements Callable {
         }
 
         executorService.shutdown();
-
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to build Bib and related data: " + threadName + " is :" + (endTime-startTime)/1000 + " seconds");
 
         bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
