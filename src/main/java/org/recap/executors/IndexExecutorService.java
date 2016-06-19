@@ -57,11 +57,17 @@ public abstract class IndexExecutorService {
         }
 
         int mergeIndexCount = 0;
+        int totalBibsProcessed = 0;
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
             try {
-                future.get();
+               int numBibsProcessed = (int) future.get();
+                totalBibsProcessed = totalBibsProcessed + numBibsProcessed;
+                System.out.println("Num bibs processed :" + numBibsProcessed);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -76,12 +82,9 @@ public abstract class IndexExecutorService {
                 mergeIndexCount = 0;
             }
         }
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         solrAdmin.mergeCores(coreNames);
         stopWatch.stop();
-        System.out.println("Time taken to merge cores: " + stopWatch.getTotalTimeSeconds());
+        System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds());
         solrAdmin.unLoadCores(coreNames);
         executorService.shutdown();
 

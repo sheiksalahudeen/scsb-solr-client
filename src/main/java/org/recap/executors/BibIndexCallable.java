@@ -106,6 +106,6 @@ public class BibIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
         }
-        return null;
+        return bibliographicEntities.getSize();
     }
 }
