@@ -45,12 +45,15 @@ public abstract class IndexExecutorService {
 
         solrAdmin.createSolrCores(coreNames);
 
+        double mergeIndexInterval = Math.ceil(loopCount / 4);
+
         int coreNum = 0;
         List<Future> futures = new ArrayList<>();
+
         for (int i = 0; i < loopCount; i++) {
             Callable callable = getCallable(coreNames.get(coreNum), i, docsPerThread);
             futures.add(executorService.submit(callable));
-            coreNum = coreNum < numThreads ? 0 : coreNum + 1;
+            coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
         }
 
         int mergeIndexCount = 0;
@@ -65,11 +68,12 @@ public abstract class IndexExecutorService {
                 e.printStackTrace();
             }
 
-            if (mergeIndexCount < loopCount / 3) {
+            if (mergeIndexCount <= mergeIndexInterval) {
                 mergeIndexCount++;
             } else {
                 solrAdmin.mergeCores(coreNames);
                 deleteTempIndexes(coreNames, solrUrl);
+                mergeIndexCount = 0;
             }
         }
 
