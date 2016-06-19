@@ -69,10 +69,8 @@ public abstract class IndexExecutorService {
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
             try {
-               int numBibsProcessed = (int) future.get();
+                future.get();
                 futureCount++;
-                totalBibsProcessed = totalBibsProcessed + numBibsProcessed;
-                System.out.println("Num bibs processed :" + numBibsProcessed);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
