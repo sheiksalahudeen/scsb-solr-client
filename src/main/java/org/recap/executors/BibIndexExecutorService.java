@@ -15,18 +15,16 @@ import java.util.concurrent.Callable;
 @Service
 public class BibIndexExecutorService extends IndexExecutorService {
 
-
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Override
-    public Callable getCallable(String coreName, int from, int to) {
-        return new BibIndexCallable(solrUrl, coreName, from, to, bibliographicDetailsRepository);
+    public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage) {
+        return new BibIndexCallable(solrUrl, coreName, startingPage, numRecordsPerPage, bibliographicDetailsRepository);
     }
 
     @Override
     protected Integer getTotalDocCount() {
-        RestTemplate restTemplate = new RestTemplate();
         Long count = bibliographicDetailsRepository.count();
         return count.intValue();
     }
@@ -34,5 +32,9 @@ public class BibIndexExecutorService extends IndexExecutorService {
     @Override
     protected String getResourceURL() {
         return bibResourceURL;
+    }
+
+    public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
+        this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }
 }

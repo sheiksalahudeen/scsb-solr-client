@@ -27,17 +27,20 @@ public abstract class IndexExecutorService {
 
     @Value("${item.rest.url}")
     public String itemResourceURL;
+    private ExecutorService executorService;
+    private Integer loopCount;
+    private double mergeIndexInterval;
 
     public void index(Integer numThreads, Integer docsPerThread) {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+        ExecutorService executorService = getExecutorService(numThreads);
 
         Integer totalDocCount = getTotalDocCount();
 
         int quotient = totalDocCount / (docsPerThread);
         int remainder = totalDocCount % (docsPerThread);
 
-        Integer loopCount = remainder == 0 ? quotient : quotient + 1;
+        loopCount = remainder == 0 ? quotient : quotient + 1;
 
         List<String> coreNames = new ArrayList<>();
 
@@ -45,7 +48,7 @@ public abstract class IndexExecutorService {
 
         solrAdmin.createSolrCores(coreNames);
 
-        double mergeIndexInterval = Math.ceil(loopCount / 4);
+        mergeIndexInterval = Math.ceil(loopCount / 2);
 
         int coreNum = 0;
         List<Future> futures = new ArrayList<>();
@@ -62,10 +65,12 @@ public abstract class IndexExecutorService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+        int futureCount=0;
         for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
             Future future = iterator.next();
             try {
                int numBibsProcessed = (int) future.get();
+                futureCount++;
                 totalBibsProcessed = totalBibsProcessed + numBibsProcessed;
                 System.out.println("Num bibs processed :" + numBibsProcessed);
             } catch (InterruptedException e) {
@@ -74,7 +79,7 @@ public abstract class IndexExecutorService {
                 e.printStackTrace();
             }
 
-            if (mergeIndexCount <= mergeIndexInterval) {
+            if (mergeIndexCount < mergeIndexInterval-1) {
                 mergeIndexCount++;
             } else {
                 solrAdmin.mergeCores(coreNames);
@@ -82,6 +87,7 @@ public abstract class IndexExecutorService {
                 mergeIndexCount = 0;
             }
         }
+        System.out.println("Num futures executed: " + futureCount);
         solrAdmin.mergeCores(coreNames);
         stopWatch.stop();
         System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds());
@@ -90,18 +96,37 @@ public abstract class IndexExecutorService {
 
     }
 
+    private ExecutorService getExecutorService(Integer numThreads) {
+        if (null == executorService) {
+            executorService = Executors.newFixedThreadPool(numThreads);
+        }
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
     private void deleteTempIndexes(List<String> coreNames, String solrUrl) {
         for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
             String coreName = iterator.next();
-            BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrUrl);
+            BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport = getBibCrudRepositoryMultiCoreSupport(solrUrl, coreName);
             bibCrudRepositoryMultiCoreSupport.deleteAll();
         }
+    }
+
+    protected BibCrudRepositoryMultiCoreSupport getBibCrudRepositoryMultiCoreSupport(String solrUrl, String coreName) {
+        return new BibCrudRepositoryMultiCoreSupport(coreName, solrUrl);
     }
 
     private void setupCoreNames(Integer numThreads, List<String> coreNames) {
         for (int i = 0; i < numThreads; i++) {
             coreNames.add("temp" + i);
         }
+    }
+
+    public void setSolrAdmin(SolrAdmin solrAdmin) {
+        this.solrAdmin = solrAdmin;
     }
 
     public abstract Callable getCallable(String coreName, int from, int to);
