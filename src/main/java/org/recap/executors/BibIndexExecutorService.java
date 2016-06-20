@@ -24,7 +24,7 @@ public class BibIndexExecutorService extends IndexExecutorService {
 
     @Override
     protected Integer getTotalDocCount(Integer owningInstitutionId) {
-        Long count = owningInstitutionId == null ? bibliographicDetailsRepository.count() : bibliographicDetailsRepository.findByOwningInstitutionId(owningInstitutionId).size();
+        Long count = owningInstitutionId == null ? bibliographicDetailsRepository.count() : bibliographicDetailsRepository.countByOwningInstitutionId(owningInstitutionId).size();
         return count.intValue();
     }
 
