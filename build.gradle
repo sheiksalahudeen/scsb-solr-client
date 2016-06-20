@@ -36,9 +36,10 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-ws')
 	compile('org.springframework.data:spring-data-solr:2.0.1.RELEASE')
-			{exclude module: 'solr-solrj'; exclude module: 'solr-data-commons'}
+			{exclude module: 'solr-solrj'; exclude module: 'solr-data-commons'; exclude module: 'spring-data-jpa'}
 	compile('org.codehaus.jettison:jettison:1.3.7')
 	compile('org.springframework.data:spring-data-commons:1.12.1.RELEASE')
+	compile('org.springframework.data:spring-data-jpa:1.10.2.RELEASE')
 	compile('com.google.guava:guava:19.0') {exclude module: "solr-solrj"}
 	compile('org.apache.solr:solr-solrj:6.0.1')
 	compile('info.freelibrary:freelib-marc4j:2.6.11')

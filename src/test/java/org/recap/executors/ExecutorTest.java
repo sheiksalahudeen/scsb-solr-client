@@ -2,7 +2,7 @@ package org.recap.executors;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.repository.solr.main.BibCrudRepository;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
@@ -16,7 +16,7 @@ public class ExecutorTest extends BaseTestCase {
     BibIndexExecutorService bibIndexExecutorService;
 
     @Autowired
-    BibCrudRepository bibCrudRepository;
+    BibSolrCrudRepository bibCrudRepository;
 
     @Autowired
     ItemIndexExecutorService itemIndexExecutorService;

@@ -8,7 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.admin.SolrAdmin;
-import org.recap.repository.solr.main.BibCrudRepository;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +35,10 @@ public class BaseTestCase {
     public SolrClient solrAdminClient;
 
     @Autowired
-    public BibCrudRepository bibCrudRepository;
+    public BibSolrCrudRepository bibCrudRepository;
+
+    @Autowired
+    public BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;
