@@ -31,7 +31,10 @@ public class BibJSONUtil extends MarcUtil {
             String bibContent = jsonObject.getString("content");
             List<Record> records = convertMarcXmlToRecord(bibContent);
             Record marcRecord = records.get(0);
-            String owningInstitution = jsonObject.getString("owningInstitutionId");
+
+            JSONObject institutionEntity = jsonObject.getJSONObject("institutionEntity");
+            String institutionCode = null != institutionEntity ? institutionEntity.getString("institutionCode") : "";
+            bib.setOwningInstitution(institutionCode);
 
             bib.setTitle(getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b')));
             bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
@@ -41,7 +44,7 @@ public class BibJSONUtil extends MarcUtil {
             bib.setSubject(getDataFieldValue(marcRecord, "6"));
             bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
             bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
-            bib.setOclcNumber(getOCLCNumbers(marcRecord, owningInstitution));
+            bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode));
             bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
             bib.setNotes(getDataFieldValue(marcRecord, "5"));
             bib.setLccn(getLCCNValue(marcRecord));
@@ -154,7 +157,7 @@ public class BibJSONUtil extends MarcUtil {
         return lccnValue;
     }
 
-    private List<String> getOCLCNumbers(Record record, String owningInstitution) {
+    private List<String> getOCLCNumbers(Record record, String institutionCode) {
         List<String> oclcNumbers = new ArrayList<>();
         List<String> oclcNumberList = getMultiDataFieldValues(record, "035", null, null, "a");
         for (String oclcNumber : oclcNumberList) {
@@ -162,7 +165,7 @@ public class BibJSONUtil extends MarcUtil {
                 oclcNumbers.add(oclcNumber.replaceAll("[^0-9]", ""));
             }
         }
-        if (CollectionUtils.isEmpty(oclcNumbers) && StringUtils.isNotBlank(owningInstitution) && owningInstitution.equalsIgnoreCase("3")) {
+        if (CollectionUtils.isEmpty(oclcNumbers) && StringUtils.isNotBlank(institutionCode) && institutionCode.equalsIgnoreCase("NYPL")) {
             String oclcTag = getControlFieldValue(record, "003");
             if (StringUtils.isNotBlank(oclcTag) && oclcTag.equalsIgnoreCase("OCoLC")) {
                 oclcNumbers.add(getControlFieldValue(record, "001"));
@@ -189,8 +192,11 @@ public class BibJSONUtil extends MarcUtil {
         String bibContent = bibliographicEntity.getContent();
         List<Record> records = convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
-        Integer owningInstitution = bibliographicEntity.getOwningInstitutionId();
 
+        InstitutionEntity institutionEntity = bibliographicEntity.getInstitutionEntity();
+        String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
+
+        bib.setOwningInstitution(institutionCode);
         bib.setTitle(getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b')));
         bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
         bib.setPublisher(getPublisherValue(marcRecord));
@@ -199,7 +205,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setSubject(getDataFieldValue(marcRecord, "6"));
         bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
         bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
-        bib.setOclcNumber(getOCLCNumbers(marcRecord, owningInstitution.toString()));
+        bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode.toString()));
         bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
         bib.setNotes(getDataFieldValue(marcRecord, "5"));
         bib.setLccn(getLCCNValue(marcRecord));

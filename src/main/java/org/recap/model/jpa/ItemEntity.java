@@ -24,7 +24,7 @@ public class ItemEntity implements Serializable{
     @Column(name = "CUSTOMER_CODE")
     private String customerCode;
 
-    @Column(name = "HOLDINGS_ID", insertable=false, updatable=false)
+    @Column(name = "HOLDINGS_ID")
     private Integer holdingsId;
 
     @Column(name = "CALL_NUMBER")
@@ -33,16 +33,16 @@ public class ItemEntity implements Serializable{
     @Column(name = "CALL_NUMBER_TYPE")
     private String callNumberType;
 
-    @Column(name = "ITEM_AVAIL_STATUS_ID", insertable=false, updatable=false)
+    @Column(name = "ITEM_AVAIL_STATUS_ID")
     private Integer itemAvailabilityStatusId;
 
     @Column(name = "COPY_NUMBER")
     private Integer copyNumber;
 
-    @Column(name = "OWNING_INST_ID", insertable=false, updatable=false)
+    @Column(name = "OWNING_INST_ID")
     private Integer owningInstitutionId;
 
-    @Column(name = "COLLECTION_GROUP_ID", insertable=false, updatable=false)
+    @Column(name = "COLLECTION_GROUP_ID")
     private Integer collectionGroupId;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -69,20 +69,20 @@ public class ItemEntity implements Serializable{
     private Integer notesId;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="HOLDINGS_ID")
+    @JoinColumn(name="HOLDINGS_ID", insertable=false, updatable=false)
     @JsonIgnore
     private HoldingsEntity holdingsEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ITEM_AVAIL_STATUS_ID")
+    @JoinColumn(name = "ITEM_AVAIL_STATUS_ID", insertable=false, updatable=false)
     private ItemStatusEntity itemStatusEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "COLLECTION_GROUP_ID")
+    @JoinColumn(name = "COLLECTION_GROUP_ID", insertable=false, updatable=false)
     private CollectionGroupEntity collectionGroupEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "OWNING_INST_ID")
+    @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
 
     public Integer getItemId() {
