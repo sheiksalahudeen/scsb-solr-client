@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,34 +30,46 @@ public class ExecutorTest extends BaseTestCase {
 
     @Test
     public void indexBibsFromDB() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(null);
         unloadCores();
         bibCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        bibIndexExecutorService.index(numThreads, docsPerThread);
+        bibIndexExecutorService.index(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
 
     @Test
     public void indexBibsFromDBByOwningInstitutionId() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(3);
         unloadCores();
         bibCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        bibIndexExecutorService.indexByOwningInstitutionId(numThreads, docsPerThread, 3);
+        bibIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
 
     @Test
     public void indexItemsFromDB() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(null);
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        itemIndexExecutorService.index(numThreads, docsPerThread);
+        itemIndexExecutorService.index(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }

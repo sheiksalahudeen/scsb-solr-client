@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.admin.SolrAdmin;
+import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 
@@ -42,7 +43,11 @@ public class BibExecutorServiceUT {
         BibIndexExecutorService bibIndexExecutorService = new MockBibIndexExecutorService();
         bibIndexExecutorService.setBibliographicDetailsRepository(mockBibliographicDetailsRepository);
         bibIndexExecutorService.setSolrAdmin(mockSolrAdmin);
-        bibIndexExecutorService.index(5, 1000);
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(5);
+        solrIndexRequest.setNumberOfDocs(1000);
+        solrIndexRequest.setOwningInstitutionId(null);
+        bibIndexExecutorService.index(solrIndexRequest);
     }
 
     private class MockBibIndexExecutorService extends BibIndexExecutorService {

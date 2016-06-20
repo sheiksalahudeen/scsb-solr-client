@@ -4,22 +4,40 @@ package org.recap.model.solr;
  * Created by SheikS on 6/18/2016.
  */
 public class SolrIndexRequest {
-    private Integer numberOfThread;
-    private Integer numberOfDoc;
+    private Integer numberOfThreads;
+    private Integer numberOfDocs;
+    private Integer owningInstitutionId;
+    private boolean doClean;
 
-    public Integer getNumberOfThread() {
-        return numberOfThread;
+    public Integer getNumberOfThreads() {
+        return numberOfThreads;
     }
 
-    public void setNumberOfThread(Integer numberOfThread) {
-        this.numberOfThread = numberOfThread;
+    public void setNumberOfThreads(Integer numberOfThreads) {
+        this.numberOfThreads = numberOfThreads;
     }
 
-    public Integer getNumberOfDoc() {
-        return numberOfDoc;
+    public Integer getNumberOfDocs() {
+        return numberOfDocs;
     }
 
-    public void setNumberOfDoc(Integer numberOfDoc) {
-        this.numberOfDoc = numberOfDoc;
+    public void setNumberOfDocs(Integer numberOfDocs) {
+        this.numberOfDocs = numberOfDocs;
+    }
+
+    public Integer getOwningInstitutionId() {
+        return owningInstitutionId;
+    }
+
+    public void setOwningInstitutionId(Integer owningInstitutionId) {
+        this.owningInstitutionId = owningInstitutionId;
+    }
+
+    public boolean isDoClean() {
+        return doClean;
+    }
+
+    public void setDoClean(boolean doClean) {
+        this.doClean = doClean;
     }
 }
