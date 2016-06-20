@@ -1,7 +1,7 @@
 package org.recap.executors;
 
 import org.recap.admin.SolrAdmin;
-import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
+import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;

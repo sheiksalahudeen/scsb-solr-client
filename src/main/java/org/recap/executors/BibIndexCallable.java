@@ -1,9 +1,9 @@
 package org.recap.executors;
 
 import org.recap.model.*;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
-import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
+import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;

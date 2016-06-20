@@ -12,7 +12,7 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import java.io.File;
 
 @SpringBootApplication
-@EnableSolrRepositories(value = "org.recap.repository.main", multicoreSupport = true)
+@EnableSolrRepositories(value = "org.recap.repository.solr.main", multicoreSupport = true)
 public class Main {
 
 	@Value("${solr.url}")

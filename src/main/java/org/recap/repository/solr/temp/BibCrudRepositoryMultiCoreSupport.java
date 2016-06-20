@@ -1,4 +1,4 @@
-package org.recap.repository.temp;
+package org.recap.repository.solr.temp;
 
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.recap.model.Bib;

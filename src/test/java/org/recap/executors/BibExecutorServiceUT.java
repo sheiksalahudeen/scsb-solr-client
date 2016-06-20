@@ -6,8 +6,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.admin.SolrAdmin;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.temp.BibCrudRepositoryMultiCoreSupport;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 
 import java.util.concurrent.Callable;
 

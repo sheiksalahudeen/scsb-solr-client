@@ -1,4 +1,4 @@
-package org.recap.repository.main;
+package org.recap.repository.solr.main;
 
 import org.recap.model.Bib;
 import org.springframework.context.annotation.Scope;

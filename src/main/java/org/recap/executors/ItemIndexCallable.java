@@ -1,17 +1,7 @@
 package org.recap.executors;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
-import org.recap.model.Item;
-import org.recap.repository.temp.ItemCrudRepositoryMultiCoreSupport;
-import org.recap.util.ItemJSONUtil;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
+import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**

@@ -2,8 +2,8 @@ package org.recap.executors;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.repository.main.BibCrudRepository;
-import org.recap.repository.main.ItemCrudRepository;
+import org.recap.repository.solr.main.BibCrudRepository;
+import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
