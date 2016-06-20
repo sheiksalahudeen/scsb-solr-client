@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -15,8 +16,9 @@ public class BibliographicEntityTest extends BaseTestCase {
 
     @Test
     public void findByInstitutionId() throws Exception {
-        List<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(3);
+        List<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
         assertNotNull(byInstitutionId);
+        assertTrue(byInstitutionId.size() == 3);
     }
 
 }
