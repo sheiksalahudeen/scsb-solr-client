@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.recap.admin.SolrAdmin;
+import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +34,13 @@ public abstract class IndexExecutorService {
     private long startTime;
     private StopWatch stopWatch;
 
-    public void indexByOwningInstitutionId(int numThreads, int docsPerThread, Integer owningInstitutionId) {
+    public void indexByOwningInstitutionId(SolrIndexRequest solrIndexRequest) {
         startProcess();
+
+        Integer numThreads = solrIndexRequest.getNumberOfThreads();
+        Integer docsPerThread = solrIndexRequest.getNumberOfDocs();
+        Integer owningInstitutionId = solrIndexRequest.getOwningInstitutionId();
+
         try {
             ExecutorService executorService = getExecutorService(numThreads);
 
@@ -100,8 +106,8 @@ public abstract class IndexExecutorService {
         endProcess();
     }
 
-    public void index(Integer numThreads, Integer docsPerThread) {
-        indexByOwningInstitutionId(numThreads, docsPerThread, null);
+    public void index(SolrIndexRequest solrIndexRequest) {
+        indexByOwningInstitutionId(solrIndexRequest);
     }
 
     private ExecutorService getExecutorService(Integer numThreads) {

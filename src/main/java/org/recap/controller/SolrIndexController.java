@@ -4,6 +4,7 @@ import org.recap.RecapConstants;
 import org.recap.executors.BibIndexExecutorService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,9 @@ public class SolrIndexController {
     @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;
 
+    @Autowired
+    ItemCrudRepository itemCrudRepository;
+
     @RequestMapping("/")
     public String solrIndexer(Model model){
         model.addAttribute("solrIndexRequest",new SolrIndexRequest());
@@ -40,10 +44,14 @@ public class SolrIndexController {
     public String fullIndex(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
                             BindingResult result,
                             Model model) {
-        Integer numberOfThread = solrIndexRequest.getNumberOfThread();
-        Integer numberOfDoc = solrIndexRequest.getNumberOfDoc();
-        System.out.println("Number of Thread : " + numberOfThread + "   Number of Doc :" + numberOfDoc);
-        bibIndexExecutorService.index(numberOfThread, numberOfDoc);
+        Integer numberOfThread = solrIndexRequest.getNumberOfThreads();
+        Integer numberOfDoc = solrIndexRequest.getNumberOfDocs();
+        System.out.println("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc);
+        if (solrIndexRequest.isDoClean()) {
+            bibSolrCrudRepository.deleteAll();
+            itemCrudRepository.deleteAll();
+        }
+        bibIndexExecutorService.index(solrIndexRequest);
         String totalTimeTaken = bibIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
 
         System.out.println("Total time taken:" + totalTimeTaken);
