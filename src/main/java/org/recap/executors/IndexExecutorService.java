@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,66 +30,74 @@ public abstract class IndexExecutorService {
     private ExecutorService executorService;
     private Integer loopCount;
     private double mergeIndexInterval;
+    private long startTime;
+    private StopWatch stopWatch;
 
     public void indexByOwningInstitutionId(int numThreads, int docsPerThread, Integer owningInstitutionId) {
-        ExecutorService executorService = getExecutorService(numThreads);
+        startProcess();
+        try {
+            ExecutorService executorService = getExecutorService(numThreads);
 
-        Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
+            Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
-        int quotient = totalDocCount / (docsPerThread);
-        int remainder = totalDocCount % (docsPerThread);
+            int quotient = totalDocCount / (docsPerThread);
+            int remainder = totalDocCount % (docsPerThread);
 
-        loopCount = remainder == 0 ? quotient : quotient + 1;
+            loopCount = remainder == 0 ? quotient : quotient + 1;
 
-        List<String> coreNames = new ArrayList<>();
+            List<String> coreNames = new ArrayList<>();
 
-        setupCoreNames(numThreads, coreNames);
+            setupCoreNames(numThreads, coreNames);
 
-        solrAdmin.createSolrCores(coreNames);
+            solrAdmin.createSolrCores(coreNames);
 
-        mergeIndexInterval = Math.ceil(loopCount / 2);
+            mergeIndexInterval = Math.ceil(loopCount / 2);
 
-        int coreNum = 0;
-        List<Future> futures = new ArrayList<>();
+            int coreNum = 0;
+            List<Future> futures = new ArrayList<>();
 
-        for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-            Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread);
-            futures.add(executorService.submit(callable));
-            coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
-        }
-
-        int mergeIndexCount = 0;
-        int totalBibsProcessed = 0;
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        int futureCount=0;
-        for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
-            Future future = iterator.next();
-            try {
-                future.get();
-                futureCount++;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            for (int pageNum = 0; pageNum < loopCount; pageNum++) {
+                Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread);
+                futures.add(executorService.submit(callable));
+                coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
             }
 
-            if (mergeIndexCount < mergeIndexInterval-1) {
-                mergeIndexCount++;
-            } else {
-                solrAdmin.mergeCores(coreNames);
-                deleteTempIndexes(coreNames, solrUrl);
-                mergeIndexCount = 0;
+            int mergeIndexCount = 0;
+            int totalBibsProcessed = 0;
+
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            int futureCount=0;
+            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+                Future future = iterator.next();
+                try {
+                    future.get();
+                    futureCount++;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                if (mergeIndexCount < mergeIndexInterval-1) {
+                    mergeIndexCount++;
+                } else {
+                    solrAdmin.mergeCores(coreNames);
+                    deleteTempIndexes(coreNames, solrUrl);
+                    mergeIndexCount = 0;
+                }
             }
+            System.out.println("Num futures executed: " + futureCount);
+            solrAdmin.mergeCores(coreNames);
+            stopWatch.stop();
+            System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
+            solrAdmin.unLoadCores(coreNames);
+            executorService.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        System.out.println("Num futures executed: " + futureCount);
-        solrAdmin.mergeCores(coreNames);
-        stopWatch.stop();
-        System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
-        solrAdmin.unLoadCores(coreNames);
-        executorService.shutdown();
+        endProcess();
     }
 
     public void index(Integer numThreads, Integer docsPerThread) {
@@ -102,6 +109,21 @@ public abstract class IndexExecutorService {
             executorService = Executors.newFixedThreadPool(numThreads);
         }
         return executorService;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public StopWatch getStopWatch() {
+        if(null == stopWatch) {
+            stopWatch = new StopWatch();
+        }
+        return stopWatch;
     }
 
     public void setExecutorService(ExecutorService executorService) {
@@ -124,6 +146,15 @@ public abstract class IndexExecutorService {
         for (int i = 0; i < numThreads; i++) {
             coreNames.add("temp" + i);
         }
+    }
+
+    private void startProcess() {
+        startTime = System.currentTimeMillis();
+        getStopWatch().start();
+    }
+
+    private void endProcess() {
+        getStopWatch().stop();
     }
 
     public void setSolrAdmin(SolrAdmin solrAdmin) {
