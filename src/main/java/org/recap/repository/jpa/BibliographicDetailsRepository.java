@@ -11,5 +11,6 @@ import java.util.List;
  * Created by pvsubrah on 6/10/16.
  */
 public interface BibliographicDetailsRepository extends PagingAndSortingRepository<BibliographicEntity, Integer> {
+    public List<BibliographicEntity> findByOwningInstitutionId(Integer institutionId);
     public List<BibliographicEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
 }

@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Callable;
@@ -15,15 +16,19 @@ public class BibIndexExecutorService extends IndexExecutorService {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+    private int pageNum;
+    private int docsPerPage;
 
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
+        this.pageNum = pageNum;
+        this.docsPerPage = docsPerPage;
         return new BibIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository);
     }
 
     @Override
-    protected Integer getTotalDocCount() {
-        Long count = bibliographicDetailsRepository.count();
+    protected Integer getTotalDocCount(Integer owningInstitutionId) {
+        Long count = owningInstitutionId == null ? bibliographicDetailsRepository.count() : bibliographicDetailsRepository.findByOwningInstitutionId(owningInstitutionId).size();
         return count.intValue();
     }
 

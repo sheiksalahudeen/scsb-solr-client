@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,11 +32,10 @@ public abstract class IndexExecutorService {
     private Integer loopCount;
     private double mergeIndexInterval;
 
-    public void index(Integer numThreads, Integer docsPerThread) {
-
+    public void indexByOwningInstitutionId(int numThreads, int docsPerThread, Integer owningInstitutionId) {
         ExecutorService executorService = getExecutorService(numThreads);
 
-        Integer totalDocCount = getTotalDocCount();
+        Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
         int quotient = totalDocCount / (docsPerThread);
         int remainder = totalDocCount % (docsPerThread);
@@ -91,7 +91,10 @@ public abstract class IndexExecutorService {
         System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
         solrAdmin.unLoadCores(coreNames);
         executorService.shutdown();
+    }
 
+    public void index(Integer numThreads, Integer docsPerThread) {
+        indexByOwningInstitutionId(numThreads, docsPerThread, null);
     }
 
     private ExecutorService getExecutorService(Integer numThreads) {
@@ -129,7 +132,7 @@ public abstract class IndexExecutorService {
 
     public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage);
 
-    protected abstract Integer getTotalDocCount();
+    protected abstract Integer getTotalDocCount(Integer owningInstitutionId);
 
     protected abstract String getResourceURL();
 }

@@ -18,7 +18,7 @@ public class ItemIndexExecutorService extends IndexExecutorService {
     }
 
     @Override
-    protected Integer getTotalDocCount() {
+    protected Integer getTotalDocCount(Integer owningInstitutionId) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response =
                 restTemplate.getForEntity(itemResourceURL + "/count", String.class);

@@ -40,6 +40,18 @@ public class ExecutorTest extends BaseTestCase {
     }
 
     @Test
+    public void indexBibsFromDBByOwningInstitutionId() throws Exception {
+        unloadCores();
+        bibCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        bibIndexExecutorService.indexByOwningInstitutionId(numThreads, docsPerThread, 3);
+        stopWatch.stop();
+        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
     public void indexItemsFromDB() throws Exception {
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
