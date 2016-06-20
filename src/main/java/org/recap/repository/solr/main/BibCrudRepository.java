@@ -1,8 +1,6 @@
 package org.recap.repository.solr.main;
 
-import org.recap.model.Bib;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.solr.repository.Query;
+import org.recap.model.solr.Bib;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 /**

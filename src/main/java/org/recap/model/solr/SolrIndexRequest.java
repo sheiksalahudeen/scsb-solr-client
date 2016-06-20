@@ -1,4 +1,4 @@
-package org.recap.model;
+package org.recap.model.solr;
 
 /**
  * Created by SheikS on 6/18/2016.

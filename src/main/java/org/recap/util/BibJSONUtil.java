@@ -6,7 +6,9 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
-import org.recap.model.*;
+import org.recap.model.jpa.*;
+import org.recap.model.solr.Bib;
+import org.recap.model.solr.Item;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;

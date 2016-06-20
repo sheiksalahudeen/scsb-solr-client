@@ -4,7 +4,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.Item;
+import org.recap.model.solr.Item;
 import org.recap.util.ItemJSONUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

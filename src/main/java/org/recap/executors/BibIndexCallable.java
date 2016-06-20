@@ -1,6 +1,11 @@
 package org.recap.executors;
 
-import org.recap.model.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.BibliographicHoldingsEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.solr.Bib;
+import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;

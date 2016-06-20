@@ -1,7 +1,7 @@
 package org.recap.repository.solr.temp;
 
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.recap.model.Bib;
+import org.recap.model.solr.Bib;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.convert.MappingSolrConverter;
 import org.springframework.data.solr.core.mapping.SimpleSolrMappingContext;

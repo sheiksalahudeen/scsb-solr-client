@@ -1,15 +1,13 @@
 package org.recap.controller;
 
 import org.recap.executors.BibIndexExecutorService;
-import org.recap.model.SolrIndexRequest;
+import org.recap.model.solr.SolrIndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.Map;
 
 /**
  * Created by Sheik on 6/18/2016.

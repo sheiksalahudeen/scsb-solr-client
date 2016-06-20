@@ -1,6 +1,6 @@
 package org.recap.repository.solr.main;
 
-import org.recap.model.Item;
+import org.recap.model.solr.Item;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 /**

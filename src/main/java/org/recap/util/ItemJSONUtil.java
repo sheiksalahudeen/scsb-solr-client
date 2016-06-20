@@ -2,8 +2,7 @@ package org.recap.util;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.marc4j.marc.Record;
-import org.recap.model.Item;
+import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
 import java.util.List;

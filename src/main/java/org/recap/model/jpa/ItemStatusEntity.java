@@ -1,4 +1,4 @@
-package org.recap.model;
+package org.recap.model.jpa;
 
 import javax.persistence.*;
 import java.io.Serializable;

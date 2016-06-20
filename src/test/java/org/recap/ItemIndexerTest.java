@@ -2,7 +2,7 @@ package org.recap;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.recap.model.Item;
+import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
 import java.util.List;

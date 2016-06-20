@@ -1,4 +1,4 @@
-package org.recap.model;
+package org.recap.model.solr;
 
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;

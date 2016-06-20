@@ -1,4 +1,4 @@
-package org.recap.model;
+package org.recap.model.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

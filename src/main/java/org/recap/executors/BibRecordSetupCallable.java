@@ -1,9 +1,8 @@
 package org.recap.executors;
 
-import org.recap.model.BibliographicEntity;
-import org.recap.model.BibliographicHoldingsEntity;
-import org.recap.model.HoldingsEntity;
-import org.recap.model.ItemEntity;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.util.BibJSONUtil;
 
 import java.util.List;

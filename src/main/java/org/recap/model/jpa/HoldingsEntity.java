@@ -1,6 +1,4 @@
-package org.recap.model;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+package org.recap.model.jpa;
 
 import javax.persistence.*;
 import java.io.Serializable;

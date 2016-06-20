@@ -1,6 +1,6 @@
 package org.recap.repository.jpa;
 
-import org.recap.model.BibliographicEntity;
+import org.recap.model.jpa.BibliographicEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

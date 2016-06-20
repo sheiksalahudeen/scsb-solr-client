@@ -1,4 +1,4 @@
-package org.recap.model;
+package org.recap.model.jpa;
 
 import java.io.Serializable;
 import java.util.Date;
