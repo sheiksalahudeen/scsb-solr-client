@@ -38,7 +38,6 @@ public class BibIndexerTest extends BaseTestCase {
         itemIdList.add("302");
 
         Bib bib = new Bib();
-        bib.setId("1");
         bib.setBibId("101");
         bib.setDocType("Bibliographic");
         bib.setTitle("Middleware for ReCAP");

@@ -26,11 +26,9 @@ public class ItemJSONUtil {
 
     public Item generateItemForIndex(JSONObject jsonObject) {
         Item item = new Item();
-        MarcUtil marcUtil = new MarcUtil();
         try {
             String itemId = jsonObject.getString("itemId");
             item.setItemId(itemId);
-            item.setId(itemId);
             item.setBarcode(jsonObject.getString("barcode"));
             item.setDocType("Item");
             item.setCustomerCode(jsonObject.getString("customerCode"));
@@ -49,12 +47,6 @@ public class ItemJSONUtil {
             item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
             JSONObject collectionGroup = jsonObject.getJSONObject("collectionGroupEntity");
             item.setCollectionGroupDesignation( null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
-
-            /*JSONObject holdingsEntity = jsonObject.getJSONObject("holdingsEntity");
-            String holdingsContent = holdingsEntity.getString("content");
-            List<Record> records = marcUtil.convertMarcXmlToRecord(holdingsContent);
-            Record marcRecord = records.get(0);
-            item.setSummaryHoldings(marcUtil.getDataFieldValue(marcRecord, "866", null, null, "a"));*/
         } catch (JSONException e) {
             e.printStackTrace();
         }
