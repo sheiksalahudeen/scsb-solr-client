@@ -2,9 +2,7 @@ package org.recap.executors;
 
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Callable;
 
@@ -18,8 +16,8 @@ public class ItemIndexExecutorService extends IndexExecutorService {
     ItemDetailsRepository itemDetailsRepository;
 
     @Override
-    public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
-        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository);
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
+        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository, owningInstitutionId);
     }
 
     @Override

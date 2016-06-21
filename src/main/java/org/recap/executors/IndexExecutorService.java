@@ -63,7 +63,7 @@ public abstract class IndexExecutorService {
             List<Future> futures = new ArrayList<>();
 
             for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread);
+                Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId);
                 futures.add(executorService.submit(callable));
                 coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
             }
@@ -167,7 +167,7 @@ public abstract class IndexExecutorService {
         this.solrAdmin = solrAdmin;
     }
 
-    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage);
+    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, Integer owningInstitutionId);
 
     protected abstract Integer getTotalDocCount(Integer owningInstitutionId);
 
