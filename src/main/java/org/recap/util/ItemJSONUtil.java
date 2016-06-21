@@ -2,6 +2,11 @@ package org.recap.util;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.marc4j.marc.Record;
+import org.recap.model.jpa.CollectionGroupEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
@@ -10,11 +15,11 @@ import java.util.List;
 /**
  * Created by angelind on 16/6/16.
  */
-public class ItemJSONUtil {
+public class ItemJSONUtil extends MarcUtil{
 
     private static ItemJSONUtil itemJSONUtil;
 
-    private ItemJSONUtil() {
+    public ItemJSONUtil() {
     }
 
     public static ItemJSONUtil getInstance() {
@@ -24,33 +29,77 @@ public class ItemJSONUtil {
         return itemJSONUtil;
     }
 
-    public Item generateItemForIndex(JSONObject jsonObject) {
+    public Item generateItemForIndex(JSONObject itemJSON, JSONObject holdingsJSON) {
         Item item = new Item();
         try {
-            String itemId = jsonObject.getString("itemId");
+            String itemId = itemJSON.getString("itemId");
             item.setItemId(itemId);
-            item.setBarcode(jsonObject.getString("barcode"));
+            item.setBarcode(itemJSON.getString("barcode"));
             item.setDocType("Item");
-            item.setCustomerCode(jsonObject.getString("customerCode"));
-            item.setUseRestriction(jsonObject.getString("useRestrictions"));
-            item.setVolumePartYear(jsonObject.getString("volumePartYear"));
-            item.setCallNumber(jsonObject.getString("callNumber"));
-            String bibId = jsonObject.getString("bibliographicId");
+            item.setCustomerCode(itemJSON.getString("customerCode"));
+            item.setUseRestriction(itemJSON.getString("useRestrictions"));
+            item.setVolumePartYear(itemJSON.getString("volumePartYear"));
+            item.setCallNumber(itemJSON.getString("callNumber"));
+            String bibId = itemJSON.getString("bibliographicId");
             List<String> bibIdList = new ArrayList<>();
             bibIdList.add(bibId);
             item.setItemBibIdList(bibIdList);
             List<String> holdingsIds = new ArrayList<>();
-            holdingsIds.add(jsonObject.getString("holdingsId"));
+            holdingsIds.add(itemJSON.getString("holdingsId"));
             item.setHoldingsIdList(holdingsIds);
 
-            JSONObject itemAvailabilityStatus = jsonObject.getJSONObject("itemStatusEntity");
+            JSONObject itemAvailabilityStatus = itemJSON.getJSONObject("itemStatusEntity");
             item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
-            JSONObject collectionGroup = jsonObject.getJSONObject("collectionGroupEntity");
-            item.setCollectionGroupDesignation( null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
+            JSONObject collectionGroup = itemJSON.getJSONObject("collectionGroupEntity");
+            item.setCollectionGroupDesignation(null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
+
+            if (holdingsJSON != null) {
+                String holdingsContent = holdingsJSON.getString("content");
+                List<Record> records = convertMarcXmlToRecord(holdingsContent);
+                Record marcRecord = records.get(0);
+                item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return item;
+    }
 
+    public Item generateItemForIndex(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
+        Item item = new Item();
+        try {
+            Integer itemId = itemEntity.getItemId();
+            item.setItemId(itemId.toString());
+            item.setBarcode(itemEntity.getBarcode());
+            item.setDocType("Item");
+            item.setCustomerCode(itemEntity.getCustomerCode());
+            item.setUseRestriction(itemEntity.getUseRestrictions());
+            item.setVolumePartYear(itemEntity.getVolumePartYear());
+            item.setCallNumber(itemEntity.getCallNumber());
+            String bibId = itemEntity.getBibliographicId().toString();
+            List<String> bibIdList = new ArrayList<>();
+            bibIdList.add(bibId);
+            item.setItemBibIdList(bibIdList);
+            List<String> holdingsIds = new ArrayList<>();
+            holdingsIds.add(itemEntity.getHoldingsId().toString());
+            item.setHoldingsIdList(holdingsIds);
+
+            ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
+            if (itemStatusEntity != null) {
+                item.setAvailability(itemStatusEntity.getStatusCode());
+            }
+            CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
+            if (collectionGroupEntity != null) {
+                item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
+            }
+
+            String holdingsContent = holdingsEntity.getContent();
+            List<Record> records = convertMarcXmlToRecord(holdingsContent);
+            Record marcRecord = records.get(0);
+            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return item;
     }
 }
