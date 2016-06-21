@@ -25,8 +25,6 @@ public class BibJSONUtil extends MarcUtil {
         try {
             String bibliographicId = jsonObject.getString("bibliographicId");
             bib.setBibId(bibliographicId);
-            bib.setId("wbm-"+bibliographicId);
-
             bib.setDocType("Bib");
             String bibContent = jsonObject.getString("content");
             List<Record> records = convertMarcXmlToRecord(bibContent);
@@ -80,7 +78,6 @@ public class BibJSONUtil extends MarcUtil {
         try {
             String itemId = itemJSON.getString("itemId");
             item.setItemId(itemId);
-            item.setId("wio-"+itemId);
             item.setBarcode(itemJSON.getString("barcode"));
             item.setDocType("Item");
             item.setCustomerCode(itemJSON.getString("customerCode"));
@@ -186,7 +183,6 @@ public class BibJSONUtil extends MarcUtil {
 
         Integer bibliographicId = bibliographicEntity.getBibliographicId();
         bib.setBibId(bibliographicId.toString());
-        bib.setId("wbm-" + bibliographicId);
 
         bib.setDocType("Bib");
         String bibContent = bibliographicEntity.getContent();
@@ -236,7 +232,6 @@ public class BibJSONUtil extends MarcUtil {
         try {
             Integer itemId = itemEntity.getItemId();
             item.setItemId(itemId.toString());
-            item.setId("wio-" + itemId);
             item.setBarcode(itemEntity.getBarcode());
             item.setDocType("Item");
             item.setCustomerCode(itemEntity.getCustomerCode());

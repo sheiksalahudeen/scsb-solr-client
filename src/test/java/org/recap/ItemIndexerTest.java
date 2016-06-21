@@ -31,7 +31,6 @@ public class ItemIndexerTest extends  BaseTestCase {
         holdingsIdList.add("202");
 
         Item item = new Item();
-        item.setId("1");
         item.setBarcode("1");
         item.setItemId("301");
         item.setDocType("Item");
