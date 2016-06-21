@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by pvsubrah on 6/11/16.
@@ -84,6 +85,9 @@ public class ItemEntity implements Serializable{
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
+
+    @OneToMany(mappedBy="itemEntity")
+    private List<BibliographicItemEntity> bibliographicItemEntities;
 
     public Integer getItemId() {
         return itemId;
@@ -251,5 +255,13 @@ public class ItemEntity implements Serializable{
 
     public void setInstitutionEntity(InstitutionEntity institutionEntity) {
         this.institutionEntity = institutionEntity;
+    }
+
+    public List<BibliographicItemEntity> getBibliographicItemEntities() {
+        return bibliographicItemEntities;
+    }
+
+    public void setBibliographicItemEntities(List<BibliographicItemEntity> bibliographicItemEntities) {
+        this.bibliographicItemEntities = bibliographicItemEntities;
     }
 }

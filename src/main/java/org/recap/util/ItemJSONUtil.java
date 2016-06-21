@@ -3,10 +3,7 @@ package org.recap.util;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
@@ -76,10 +73,14 @@ public class ItemJSONUtil extends MarcUtil{
             item.setUseRestriction(itemEntity.getUseRestrictions());
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumber(itemEntity.getCallNumber());
-            String bibId = itemEntity.getBibliographicId().toString();
+
             List<String> bibIdList = new ArrayList<>();
-            bibIdList.add(bibId);
+            List<BibliographicItemEntity> bibliographicItemEntities = itemEntity.getBibliographicItemEntities();
+            for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities){
+                bibIdList.add(bibliographicItemEntity.getBibliographicId().toString());
+            }
             item.setItemBibIdList(bibIdList);
+            
             List<String> holdingsIds = new ArrayList<>();
             holdingsIds.add(itemEntity.getHoldingsId().toString());
             item.setHoldingsIdList(holdingsIds);

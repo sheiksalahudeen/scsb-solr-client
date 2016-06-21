@@ -38,6 +38,9 @@ public class BibliographicEntity implements Serializable{
     @OneToMany(mappedBy="bibliographicEntity")
     private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
 
+    @OneToMany(mappedBy="bibliographicEntity")
+    private List<BibliographicItemEntity> bibliographicItemEntities;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
@@ -96,6 +99,14 @@ public class BibliographicEntity implements Serializable{
 
     public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
         this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
+    }
+
+    public List<BibliographicItemEntity> getBibliographicItemEntities() {
+        return bibliographicItemEntities;
+    }
+
+    public void setBibliographicItemEntities(List<BibliographicItemEntity> bibliographicItemEntities) {
+        this.bibliographicItemEntities = bibliographicItemEntities;
     }
 
     public InstitutionEntity getInstitutionEntity() {
