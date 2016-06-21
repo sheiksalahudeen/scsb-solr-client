@@ -2,6 +2,7 @@ package org.recap.model.jpa;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
@@ -23,9 +24,9 @@ public class BibliographicEntityTest extends BaseTestCase {
 
     @Test
     public void findByInstitutionIdPagable() throws Exception {
-        List<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
-        assertNotNull(byInstitutionId);
-        assertTrue(byInstitutionId.size() == 3);
+        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
+        assertNotNull(bibliographicEntities);
+        assertTrue(bibliographicEntities.getTotalElements() == 3);
     }
 
 }

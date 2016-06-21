@@ -33,22 +33,26 @@ public class BibIndexCallable implements Callable {
     private final int docsPerPage;
     private String coreName;
     private String solrURL;
+    private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
 
-    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository) {
+    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+        this.owningInstitutionId = owningInstitutionId;
     }
 
     @Override
     public Object call() throws Exception {
 
-        Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage));
+        Page<BibliographicEntity> bibliographicEntities = owningInstitutionId == null ?
+                bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
+                bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         List<Bib> bibsToIndex = new ArrayList<>();
 

@@ -52,7 +52,7 @@ public class BibExecutorServiceUT {
 
     private class MockBibIndexExecutorService extends BibIndexExecutorService {
         @Override
-        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage) {
+        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId) {
             return mockBibIndexCallable;
         }
 

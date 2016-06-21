@@ -16,8 +16,8 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Override
-    public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
-        return new BibItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository);
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
+        return new BibItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, owningInstitutionId);
     }
 
     @Override

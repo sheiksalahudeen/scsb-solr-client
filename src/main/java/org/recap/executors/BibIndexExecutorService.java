@@ -2,7 +2,6 @@ package org.recap.executors;
 
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Callable;
@@ -18,8 +17,8 @@ public class BibIndexExecutorService extends IndexExecutorService {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Override
-    public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
-        return new BibIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository);
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
+        return new BibIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, owningInstitutionId);
     }
 
     @Override

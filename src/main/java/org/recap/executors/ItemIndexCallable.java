@@ -25,21 +25,25 @@ public class ItemIndexCallable implements Callable {
     private int docsPerPage;
     private String coreName;
     private String solrURL;
+    private Integer owningInstitutionId;
     private ItemDetailsRepository itemDetailsRepository;
 
     private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
 
-    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository) {
+    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository, Integer owningInstitutionId) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.itemDetailsRepository = itemDetailsRepository;
+        this.owningInstitutionId = owningInstitutionId;
     }
 
     @Override
     public Object call() throws Exception {
-        Page<ItemEntity> itemEntities = itemDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage));
+        Page<ItemEntity> itemEntities = owningInstitutionId == null ?
+                itemDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
+                itemDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         List<Item> itemsToIndex = new ArrayList<>();
 
