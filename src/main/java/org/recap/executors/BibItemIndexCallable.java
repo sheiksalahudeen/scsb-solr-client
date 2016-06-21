@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,11 +23,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Created by pvsubrah on 6/13/16.
+ * Created by chenchulakshmig on 21/6/16.
  */
-
-
-public class BibIndexCallable implements Callable {
+public class BibItemIndexCallable implements Callable {
     private final int pageNum;
     private final int docsPerPage;
     private String coreName;
@@ -37,7 +34,9 @@ public class BibIndexCallable implements Callable {
 
     private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
 
-    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository) {
+    private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
+
+    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
@@ -51,6 +50,7 @@ public class BibIndexCallable implements Callable {
         Page<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage));
 
         List<Bib> bibsToIndex = new ArrayList<>();
+        List<Item> itemsToIndex = new ArrayList<>();
 
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
 
@@ -75,15 +75,18 @@ public class BibIndexCallable implements Callable {
                     itemEntities.add(itemEntity);
                 }
             }
-            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, holdingsEntities, itemEntities));
+            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, holdingsEntities, itemEntities));
             futures.add(submit);
         }
 
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
             Future future = futureIterator.next();
 
-            Bib bib = (Bib) future.get();
-            bibsToIndex.add(bib);
+            Map<String, List> stringListMap = (Map<String, List>) future.get();
+            List bibs = stringListMap.get("Bib");
+            bibsToIndex.addAll(bibs);
+            List items = stringListMap.get("Item");
+            itemsToIndex.addAll(items);
         }
 
         executorService.shutdown();
@@ -91,6 +94,10 @@ public class BibIndexCallable implements Callable {
         bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
+        }
+        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
+        if (!CollectionUtils.isEmpty(itemsToIndex)) {
+            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
         }
         return bibliographicEntities.getSize();
     }

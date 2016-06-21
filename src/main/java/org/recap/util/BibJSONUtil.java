@@ -58,7 +58,7 @@ public class BibJSONUtil extends MarcUtil {
                 JSONArray itemEntities = holdingsJSON.getJSONArray("itemEntities");
                 for (int i = 0; i < itemEntities.length(); i++) {
                     JSONObject itemJSON = itemEntities.getJSONObject(i);
-                    Item item = generateItemForIndex(itemJSON, holdingsJSON);
+                    Item item = new ItemJSONUtil().generateItemForIndex(itemJSON, holdingsJSON);
                     items.add(item);
                     itemIds.add(item.getItemId());
                 }
@@ -71,40 +71,6 @@ public class BibJSONUtil extends MarcUtil {
         map.put("Bib", bib);
         map.put("Item", items);
         return map;
-    }
-
-    public Item generateItemForIndex(JSONObject itemJSON, JSONObject holdingsJSON) {
-        Item item = new Item();
-        try {
-            String itemId = itemJSON.getString("itemId");
-            item.setItemId(itemId);
-            item.setBarcode(itemJSON.getString("barcode"));
-            item.setDocType("Item");
-            item.setCustomerCode(itemJSON.getString("customerCode"));
-            item.setUseRestriction(itemJSON.getString("useRestrictions"));
-            item.setVolumePartYear(itemJSON.getString("volumePartYear"));
-            item.setCallNumber(itemJSON.getString("callNumber"));
-            String bibId = itemJSON.getString("bibliographicId");
-            List<String> bibIdList = new ArrayList<>();
-            bibIdList.add(bibId);
-            item.setItemBibIdList(bibIdList);
-            List<String> holdingsIds = new ArrayList<>();
-            holdingsIds.add(itemJSON.getString("holdingsId"));
-            item.setHoldingsIdList(holdingsIds);
-
-            JSONObject itemAvailabilityStatus = itemJSON.getJSONObject("itemStatusEntity");
-            item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
-            JSONObject collectionGroup = itemJSON.getJSONObject("collectionGroupEntity");
-            item.setCollectionGroupDesignation(null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
-
-            String holdingsContent = holdingsJSON.getString("content");
-            List<Record> records = convertMarcXmlToRecord(holdingsContent);
-            Record marcRecord = records.get(0);
-            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return item;
     }
 
     private String getPublisherValue(Record record) {
@@ -173,14 +139,62 @@ public class BibJSONUtil extends MarcUtil {
 
     public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
         Map map = new HashMap();
-        Bib bib = new Bib();
         List<Item> items = new ArrayList<>();
+
+        Bib bib = generateBib(bibliographicEntity);
+
+        List<String> holdingsIds = new ArrayList<>();
+        List<String> itemIds = new ArrayList<>();
+
         List<ItemEntity> localItemEntityCopies = new ArrayList<>();
         for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
             ItemEntity itemEntity = iterator.next();
             localItemEntityCopies.add(SerializationUtils.clone(itemEntity));
         }
+        if (!CollectionUtils.isEmpty(holdingsEntities)) {
+            for (HoldingsEntity holdingsEntity : holdingsEntities) {
+                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                for (ItemEntity itemEntity : localItemEntityCopies) {
+                    itemIds.add(itemEntity.getItemId().toString());
+                    Item item = new ItemJSONUtil().generateItemForIndex(itemEntity, holdingsEntity);
+                    items.add(item);
+                }
+            }
+        }
+        bib.setHoldingsIdList(holdingsIds);
+        bib.setBibItemIdList(itemIds);
 
+        map.put("Bib", Arrays.asList(bib));
+        map.put("Item", items);
+        return map;
+    }
+
+    public Bib generateBibForIndex(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
+        Bib bib = generateBib(bibliographicEntity);
+
+        List<String> holdingsIds = new ArrayList<>();
+        List<String> itemIds = new ArrayList<>();
+
+        List<ItemEntity> localItemEntityCopies = new ArrayList<>();
+        for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
+            ItemEntity itemEntity = iterator.next();
+            localItemEntityCopies.add(SerializationUtils.clone(itemEntity));
+        }
+        if (!CollectionUtils.isEmpty(holdingsEntities)) {
+            for (HoldingsEntity holdingsEntity : holdingsEntities) {
+                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                for (ItemEntity itemEntity : localItemEntityCopies) {
+                    itemIds.add(itemEntity.getItemId().toString());
+                }
+            }
+        }
+        bib.setHoldingsIdList(holdingsIds);
+        bib.setBibItemIdList(itemIds);
+        return bib;
+    }
+
+    private Bib generateBib(BibliographicEntity bibliographicEntity) {
+        Bib bib = new Bib();
         Integer bibliographicId = bibliographicEntity.getBibliographicId();
         bib.setBibId(bibliographicId.toString());
 
@@ -205,63 +219,8 @@ public class BibJSONUtil extends MarcUtil {
         bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
         bib.setNotes(getDataFieldValue(marcRecord, "5"));
         bib.setLccn(getLCCNValue(marcRecord));
-
-        List<String> holdingsIds = new ArrayList<>();
-        List<String> itemIds = new ArrayList<>();
-
-        if (!CollectionUtils.isEmpty(holdingsEntities)) {
-            for (HoldingsEntity holdingsEntity : holdingsEntities) {
-                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
-                for (ItemEntity itemEntity : localItemEntityCopies) {
-                    itemIds.add(itemEntity.getItemId().toString());
-                    Item item = generateItemForIndex(itemEntity, holdingsEntity);
-                    items.add(item);
-                }
-            }
-        }
-        bib.setHoldingsIdList(holdingsIds);
-        bib.setBibItemIdList(itemIds);
-
-        map.put("Bib", Arrays.asList(bib));
-        map.put("Item", items);
-        return map;
+        return bib;
     }
 
-    private Item generateItemForIndex(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
-        Item item = new Item();
-        try {
-            Integer itemId = itemEntity.getItemId();
-            item.setItemId(itemId.toString());
-            item.setBarcode(itemEntity.getBarcode());
-            item.setDocType("Item");
-            item.setCustomerCode(itemEntity.getCustomerCode());
-            item.setUseRestriction(itemEntity.getUseRestrictions());
-            item.setVolumePartYear(itemEntity.getVolumePartYear());
-            item.setCallNumber(itemEntity.getCallNumber());
-            String bibId = itemEntity.getBibliographicId().toString();
-            List<String> bibIdList = new ArrayList<>();
-            bibIdList.add(bibId);
-            item.setItemBibIdList(bibIdList);
-            List<String> holdingsIds = new ArrayList<>();
-            holdingsIds.add(itemEntity.getHoldingsId().toString());
-            item.setHoldingsIdList(holdingsIds);
 
-            ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
-            if (itemStatusEntity != null) {
-                item.setAvailability(itemStatusEntity.getStatusCode());
-            }
-            CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
-            if (collectionGroupEntity != null) {
-                item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
-            }
-
-            String holdingsContent = holdingsEntity.getContent();
-            List<Record> records = convertMarcXmlToRecord(holdingsContent);
-            Record marcRecord = records.get(0);
-            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return item;
-    }
 }

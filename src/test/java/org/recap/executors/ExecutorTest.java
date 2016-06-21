@@ -17,6 +17,9 @@ public class ExecutorTest extends BaseTestCase {
     BibIndexExecutorService bibIndexExecutorService;
 
     @Autowired
+    BibItemIndexExecutorService bibItemIndexExecutorService;
+
+    @Autowired
     BibSolrCrudRepository bibCrudRepository;
 
     @Autowired
@@ -36,10 +39,26 @@ public class ExecutorTest extends BaseTestCase {
         solrIndexRequest.setOwningInstitutionId(null);
         unloadCores();
         bibCrudRepository.deleteAll();
-        itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         bibIndexExecutorService.index(solrIndexRequest);
+        stopWatch.stop();
+        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+
+    @Test
+    public void indexBibsAndItemsFromDB() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(null);
+        unloadCores();
+        bibCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        bibItemIndexExecutorService.index(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
@@ -52,10 +71,25 @@ public class ExecutorTest extends BaseTestCase {
         solrIndexRequest.setOwningInstitutionId(3);
         unloadCores();
         bibCrudRepository.deleteAll();
-        itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         bibIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
+        stopWatch.stop();
+        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void indexBibsAndItemsFromDBByOwningInstitutionId() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(3);
+        unloadCores();
+        bibCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        bibItemIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
@@ -66,6 +100,20 @@ public class ExecutorTest extends BaseTestCase {
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
         solrIndexRequest.setOwningInstitutionId(null);
+        itemCrudRepository.deleteAll();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        itemIndexExecutorService.index(solrIndexRequest);
+        stopWatch.stop();
+        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void indexItemsFromDBByOwningInstitutionId() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(3);
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();

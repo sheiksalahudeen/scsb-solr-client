@@ -1,5 +1,7 @@
 package org.recap.executors;
 
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,18 +14,18 @@ import java.util.concurrent.Callable;
 @Service
 public class ItemIndexExecutorService extends IndexExecutorService {
 
+    @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage) {
-        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage);
+        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository);
     }
 
     @Override
     protected Integer getTotalDocCount(Integer owningInstitutionId) {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(itemResourceURL + "/count", String.class);
-        Integer bibliographicCount = Integer.valueOf(response.getBody());
-        return bibliographicCount;
+        Long count = owningInstitutionId == null ? itemDetailsRepository.count() : itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        return count.intValue();
     }
 
     @Override
