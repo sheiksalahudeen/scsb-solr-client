@@ -15,18 +15,18 @@ public class BibliographicHoldingsEntity implements Serializable{
     @Column(name = "BIBLIOGRAPHIC_HOLDINGS_ID")
     private Integer bibliographicHoldingsId;
 
-    @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
+    @Column(name = "BIBLIOGRAPHIC_ID")
     private Integer bibliographicId;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "BIBLIOGRAPHIC_ID")
+    @JoinColumn(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private BibliographicEntity bibliographicEntity;
 
-    @Column(name = "HOLDINGS_ID", insertable = false, updatable = false)
+    @Column(name = "HOLDINGS_ID")
     private Integer holdingsId;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "HOLDINGS_ID")
+    @JoinColumn(name = "HOLDINGS_ID", insertable = false, updatable = false)
     private HoldingsEntity holdingsEntity;
 
     public Integer getBibliographicHoldingsId() {

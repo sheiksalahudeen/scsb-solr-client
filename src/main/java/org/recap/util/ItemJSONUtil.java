@@ -62,7 +62,7 @@ public class ItemJSONUtil extends MarcUtil{
         return item;
     }
 
-    public Item generateItemForIndex(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
+    public Item generateItemForIndex(ItemEntity itemEntity) {
         Item item = new Item();
         try {
             Integer itemId = itemEntity.getItemId();
@@ -94,7 +94,7 @@ public class ItemJSONUtil extends MarcUtil{
                 item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
             }
 
-            String holdingsContent = holdingsEntity.getContent();
+            String holdingsContent = itemEntity.getHoldingsEntity().getContent();
             List<Record> records = convertMarcXmlToRecord(holdingsContent);
             Record marcRecord = records.get(0);
             item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
