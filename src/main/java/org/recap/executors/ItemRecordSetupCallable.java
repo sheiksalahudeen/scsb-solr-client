@@ -13,17 +13,15 @@ import java.util.concurrent.Callable;
  */
 public class ItemRecordSetupCallable implements Callable {
 
-    private final HoldingsEntity holdingsEntity;
     private final ItemEntity itemEntity;
 
-    public ItemRecordSetupCallable(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
+    public ItemRecordSetupCallable(ItemEntity itemEntity) {
         this.itemEntity = itemEntity;
-        this.holdingsEntity = holdingsEntity;
     }
 
     @Override
     public Object call() throws Exception {
-        Item item = new ItemJSONUtil().generateItemForIndex(itemEntity, holdingsEntity);
+        Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
         return item;
     }
 }

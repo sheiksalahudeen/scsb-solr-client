@@ -3,10 +3,7 @@ package org.recap.util;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
@@ -65,7 +62,7 @@ public class ItemJSONUtil extends MarcUtil{
         return item;
     }
 
-    public Item generateItemForIndex(ItemEntity itemEntity, HoldingsEntity holdingsEntity) {
+    public Item generateItemForIndex(ItemEntity itemEntity) {
         Item item = new Item();
         try {
             Integer itemId = itemEntity.getItemId();
@@ -76,10 +73,14 @@ public class ItemJSONUtil extends MarcUtil{
             item.setUseRestriction(itemEntity.getUseRestrictions());
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumber(itemEntity.getCallNumber());
-            String bibId = itemEntity.getBibliographicId().toString();
+
             List<String> bibIdList = new ArrayList<>();
-            bibIdList.add(bibId);
+            List<BibliographicItemEntity> bibliographicItemEntities = itemEntity.getBibliographicItemEntities();
+            for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities){
+                bibIdList.add(bibliographicItemEntity.getBibliographicId().toString());
+            }
             item.setItemBibIdList(bibIdList);
+            
             List<String> holdingsIds = new ArrayList<>();
             holdingsIds.add(itemEntity.getHoldingsId().toString());
             item.setHoldingsIdList(holdingsIds);
@@ -93,7 +94,7 @@ public class ItemJSONUtil extends MarcUtil{
                 item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
             }
 
-            String holdingsContent = holdingsEntity.getContent();
+            String holdingsContent = itemEntity.getHoldingsEntity().getContent();
             List<Record> records = convertMarcXmlToRecord(holdingsContent);
             Record marcRecord = records.get(0);
             item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));

@@ -14,19 +14,15 @@ import java.util.concurrent.Callable;
  */
 public class BibItemRecordSetupCallable implements Callable {
 
-    private final List<HoldingsEntity> holdingsEntities;
-    private final List<ItemEntity> itemEntities;
     BibliographicEntity bibliographicEntity;
 
-    public BibItemRecordSetupCallable(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
+    public BibItemRecordSetupCallable(BibliographicEntity bibliographicEntity) {
         this.bibliographicEntity = bibliographicEntity;
-        this.holdingsEntities = holdingsEntities;
-        this.itemEntities = itemEntities;
     }
 
     @Override
     public Object call() throws Exception {
-        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, holdingsEntities, itemEntities);
+        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity);
         return stringListMap ;
     }
 }

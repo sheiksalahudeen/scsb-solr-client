@@ -1,12 +1,9 @@
 package org.recap.executors;
 
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.util.BibJSONUtil;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -14,19 +11,15 @@ import java.util.concurrent.Callable;
  */
 public class BibRecordSetupCallable implements Callable {
 
-    private final List<HoldingsEntity> holdingsEntities;
-    private final List<ItemEntity> itemEntities;
     BibliographicEntity bibliographicEntity;
 
-    public BibRecordSetupCallable(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
+    public BibRecordSetupCallable(BibliographicEntity bibliographicEntity) {
         this.bibliographicEntity = bibliographicEntity;
-        this.holdingsEntities = holdingsEntities;
-        this.itemEntities = itemEntities;
     }
 
     @Override
     public Object call() throws Exception {
-        Bib bib = new BibJSONUtil().generateBibForIndex(bibliographicEntity, holdingsEntities, itemEntities);
+        Bib bib = new BibJSONUtil().generateBibForIndex(bibliographicEntity);
         return bib ;
     }
 }

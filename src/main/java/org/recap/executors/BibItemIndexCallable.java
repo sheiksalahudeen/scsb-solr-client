@@ -63,23 +63,7 @@ public class BibItemIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while(iterator.hasNext()){
             BibliographicEntity bibliographicEntity = iterator.next();
-
-            List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
-
-            List<HoldingsEntity> holdingsEntities = new ArrayList<>();
-
-            List<ItemEntity> itemEntities = new ArrayList<>();
-
-            for (Iterator<BibliographicHoldingsEntity> bibliographicHoldingsEntityIterator = bibliographicHoldingsEntities.iterator(); bibliographicHoldingsEntityIterator.hasNext(); ) {
-                BibliographicHoldingsEntity bibliographicHoldingsEntity = bibliographicHoldingsEntityIterator.next();
-                HoldingsEntity holdingsEntity = bibliographicHoldingsEntity.getHoldingsEntity();
-                holdingsEntities.add(holdingsEntity);
-                for (Iterator<ItemEntity> itemEntityIterator = holdingsEntity.getItemEntities().iterator(); itemEntityIterator.hasNext(); ) {
-                    ItemEntity itemEntity = itemEntityIterator.next();
-                    itemEntities.add(itemEntity);
-                }
-            }
-            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, holdingsEntities, itemEntities));
+            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity));
             futures.add(submit);
         }
 

@@ -137,7 +137,7 @@ public class BibJSONUtil extends MarcUtil {
         return oclcNumbers;
     }
 
-    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
+    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
         Map map = new HashMap();
         List<Item> items = new ArrayList<>();
 
@@ -146,21 +146,17 @@ public class BibJSONUtil extends MarcUtil {
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
 
-        List<ItemEntity> localItemEntityCopies = new ArrayList<>();
-        for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
-            ItemEntity itemEntity = iterator.next();
-            localItemEntityCopies.add(SerializationUtils.clone(itemEntity));
+        List<BibliographicItemEntity> bibliographicItemEntities = bibliographicEntity.getBibliographicItemEntities();
+        for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities) {
+            itemIds.add(bibliographicItemEntity.getItemId().toString());
+            Item item = new ItemJSONUtil().generateItemForIndex(bibliographicItemEntity.getItemEntity());
+            items.add(item);
         }
-        if (!CollectionUtils.isEmpty(holdingsEntities)) {
-            for (HoldingsEntity holdingsEntity : holdingsEntities) {
-                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
-                for (ItemEntity itemEntity : localItemEntityCopies) {
-                    itemIds.add(itemEntity.getItemId().toString());
-                    Item item = new ItemJSONUtil().generateItemForIndex(itemEntity, holdingsEntity);
-                    items.add(item);
-                }
-            }
+        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
+        for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
+            holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
         }
+
         bib.setHoldingsIdList(holdingsIds);
         bib.setBibItemIdList(itemIds);
 
@@ -169,25 +165,21 @@ public class BibJSONUtil extends MarcUtil {
         return map;
     }
 
-    public Bib generateBibForIndex(BibliographicEntity bibliographicEntity, List<HoldingsEntity> holdingsEntities, List<ItemEntity> itemEntities) {
+    public Bib generateBibForIndex(BibliographicEntity bibliographicEntity) {
         Bib bib = generateBib(bibliographicEntity);
 
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
 
-        List<ItemEntity> localItemEntityCopies = new ArrayList<>();
-        for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
-            ItemEntity itemEntity = iterator.next();
-            localItemEntityCopies.add(SerializationUtils.clone(itemEntity));
+        List<BibliographicItemEntity> bibliographicItemEntities = bibliographicEntity.getBibliographicItemEntities();
+        for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities) {
+            itemIds.add(bibliographicItemEntity.getItemId().toString());
         }
-        if (!CollectionUtils.isEmpty(holdingsEntities)) {
-            for (HoldingsEntity holdingsEntity : holdingsEntities) {
-                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
-                for (ItemEntity itemEntity : localItemEntityCopies) {
-                    itemIds.add(itemEntity.getItemId().toString());
-                }
-            }
+        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
+        for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
+            holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
         }
+
         bib.setHoldingsIdList(holdingsIds);
         bib.setBibItemIdList(itemIds);
         return bib;

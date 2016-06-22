@@ -1,23 +1,16 @@
 package org.recap.executors;
 
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicHoldingsEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
-import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
-import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,28 +51,11 @@ public class BibIndexCallable implements Callable {
 
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
 
-
         ExecutorService executorService = Executors.newFixedThreadPool(50);
         List<Future> futures = new ArrayList<>();
         while(iterator.hasNext()){
             BibliographicEntity bibliographicEntity = iterator.next();
-
-            List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
-
-            List<HoldingsEntity> holdingsEntities = new ArrayList<>();
-
-            List<ItemEntity> itemEntities = new ArrayList<>();
-
-            for (Iterator<BibliographicHoldingsEntity> bibliographicHoldingsEntityIterator = bibliographicHoldingsEntities.iterator(); bibliographicHoldingsEntityIterator.hasNext(); ) {
-                BibliographicHoldingsEntity bibliographicHoldingsEntity = bibliographicHoldingsEntityIterator.next();
-                HoldingsEntity holdingsEntity = bibliographicHoldingsEntity.getHoldingsEntity();
-                holdingsEntities.add(holdingsEntity);
-                for (Iterator<ItemEntity> itemEntityIterator = holdingsEntity.getItemEntities().iterator(); itemEntityIterator.hasNext(); ) {
-                    ItemEntity itemEntity = itemEntityIterator.next();
-                    itemEntities.add(itemEntity);
-                }
-            }
-            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, holdingsEntities, itemEntities));
+            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity));
             futures.add(submit);
         }
 
