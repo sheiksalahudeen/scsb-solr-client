@@ -13,18 +13,14 @@ public class BibliographicItemEntity {
     @Column(name = "BIBLIOGRAPHIC_ITEM_ID")
     private Integer bibliographicItemId;
 
-    @Column(name = "BIBLIOGRAPHIC_ID")
-    private Integer bibliographicId;
-
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
+    @JoinColumns({@JoinColumn(name = "BIB_INST_ID", referencedColumnName = "OWNING_INST_ID"),
+            @JoinColumn(name = "OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID")})
     private BibliographicEntity bibliographicEntity;
 
-    @Column(name = "ITEM_ID")
-    private Integer itemId;
-
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)
+    @JoinColumns({@JoinColumn(name = "ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID"),
+            @JoinColumn(name = "OWNING_INST_ITEM_ID", referencedColumnName= "OWNING_INST_ITEM_ID")})
     private ItemEntity itemEntity;
 
     public Integer getBibliographicItemId() {
@@ -34,23 +30,6 @@ public class BibliographicItemEntity {
     public void setBibliographicItemId(Integer bibliographicItemId) {
         this.bibliographicItemId = bibliographicItemId;
     }
-
-    public Integer getBibliographicId() {
-        return bibliographicId;
-    }
-
-    public void setBibliographicId(Integer bibliographicId) {
-        this.bibliographicId = bibliographicId;
-    }
-
-    public Integer getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
-    }
-
     public BibliographicEntity getBibliographicEntity() {
         return bibliographicEntity;
     }

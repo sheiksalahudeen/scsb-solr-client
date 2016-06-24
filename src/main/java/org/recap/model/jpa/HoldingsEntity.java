@@ -21,9 +21,6 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "BIBLIOGRAPHIC_ID")
-    private Integer bibliographicId;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATED_DATE")
     private Date createdDate;
@@ -35,11 +32,15 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
 
-    @OneToMany(mappedBy="holdingsEntity")
-    private List<BibliographicHoldingsEntity> bibliographicHoldingsEntities;
+    @ManyToMany(mappedBy = "holdingsEntities")
+    private List<BibliographicEntity> bibliographicEntities;
 
     @OneToMany(mappedBy = "holdingsEntity", cascade = CascadeType.ALL)
     private List<ItemEntity> itemEntities;
+
+    public HoldingsEntity() {
+    }
+
 
     public Integer getHoldingsId() {
         return holdingsId;
@@ -55,14 +56,6 @@ public class HoldingsEntity implements Serializable{
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Integer getBibliographicId() {
-        return bibliographicId;
-    }
-
-    public void setBibliographicId(Integer bibliographicId) {
-        this.bibliographicId = bibliographicId;
     }
 
     public Date getCreatedDate() {
@@ -89,12 +82,12 @@ public class HoldingsEntity implements Serializable{
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
-    public List<BibliographicHoldingsEntity> getBibliographicHoldingsEntities() {
-        return bibliographicHoldingsEntities;
+    public List<BibliographicEntity> getBibliographicEntities() {
+        return bibliographicEntities;
     }
 
-    public void setBibliographicHoldingsEntities(List<BibliographicHoldingsEntity> bibliographicHoldingsEntities) {
-        this.bibliographicHoldingsEntities = bibliographicHoldingsEntities;
+    public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
+        this.bibliographicEntities = bibliographicEntities;
     }
 
     public List<ItemEntity> getItemEntities() {
