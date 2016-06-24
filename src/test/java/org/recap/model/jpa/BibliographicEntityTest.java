@@ -83,10 +83,11 @@ public class BibliographicEntityTest extends BaseTestCase {
             bibliographicDetailsRepository.delete(bibliographicEntity);
             bibliographicDetailsRepository.delete(bibliographicEntity1);
             bibliographicDetailsRepository.delete(bibliographicEntity2);
+        }else{
+            Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
+            assertNotNull(byInstitutionId);
+            assertTrue( byInstitutionId.getContent().size()== 3);
         }
-        Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
-        assertNotNull(byInstitutionId);
-        assertTrue( byInstitutionId.getContent().size()== 3);
     }
 
 
