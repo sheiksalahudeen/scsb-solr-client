@@ -75,15 +75,11 @@ public class ItemJSONUtil extends MarcUtil{
             item.setCallNumber(itemEntity.getCallNumber());
 
             List<String> bibIdList = new ArrayList<>();
-            List<BibliographicItemEntity> bibliographicItemEntities = itemEntity.getBibliographicItemEntities();
-            for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities){
-                bibIdList.add(bibliographicItemEntity.getBibliographicId().toString());
+            List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();
+            for (BibliographicEntity bibliographicEntity : bibliographicEntities){
+                bibIdList.add(bibliographicEntity.getBibliographicId().toString());
             }
             item.setItemBibIdList(bibIdList);
-            
-            List<String> holdingsIds = new ArrayList<>();
-            holdingsIds.add(itemEntity.getHoldingsId().toString());
-            item.setHoldingsIdList(holdingsIds);
 
             ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
             if (itemStatusEntity != null) {
@@ -94,10 +90,16 @@ public class ItemJSONUtil extends MarcUtil{
                 item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
             }
 
-            String holdingsContent = itemEntity.getHoldingsEntity().getContent();
-            List<Record> records = convertMarcXmlToRecord(holdingsContent);
-            Record marcRecord = records.get(0);
-            item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+            List<String> holdingsIds = new ArrayList<>();
+            HoldingsEntity holdingsEntity = itemEntity.getHoldingsEntity();
+            if(null != holdingsEntity) {
+                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                item.setHoldingsIdList(holdingsIds);
+                String holdingsContent = holdingsEntity.getContent();
+                List<Record> records = convertMarcXmlToRecord(holdingsContent);
+                Record marcRecord = records.get(0);
+                item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

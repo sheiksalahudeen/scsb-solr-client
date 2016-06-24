@@ -1,7 +1,5 @@
 package org.recap.model.jpa;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -13,10 +11,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "item_t", schema = "recap", catalog = "")
+@IdClass(ItemPK.class)
 public class ItemEntity implements Serializable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ITEM_ID")
+    @Column(name = "ITEM_ID", insertable = false,updatable = false)
     private Integer itemId;
 
     @Column(name = "BAR_CODE")
@@ -24,9 +21,6 @@ public class ItemEntity implements Serializable{
 
     @Column(name = "CUSTOMER_CODE")
     private String customerCode;
-
-    @Column(name = "HOLDINGS_ID")
-    private Integer holdingsId;
 
     @Column(name = "CALL_NUMBER")
     private String callNumber;
@@ -40,6 +34,7 @@ public class ItemEntity implements Serializable{
     @Column(name = "COPY_NUMBER")
     private Integer copyNumber;
 
+    @Id
     @Column(name = "OWNING_INST_ID")
     private Integer owningInstitutionId;
 
@@ -54,15 +49,13 @@ public class ItemEntity implements Serializable{
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
-    @Column(name = "BIBLIOGRAPHIC_ID")
-    private Integer bibliographicId;
-
     @Column(name = "USE_RESTRICTIONS")
     private String useRestrictions;
 
     @Column(name = "VOLUME_PART_YEAR")
     private String volumePartYear;
 
+    @Id
     @Column(name = "OWNING_INST_ITEM_ID")
     private String owningInstitutionItemId;
 
@@ -70,8 +63,7 @@ public class ItemEntity implements Serializable{
     private Integer notesId;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="HOLDINGS_ID", insertable=false, updatable=false)
-    @JsonIgnore
+    @JoinColumn(name="HOLDINGS_ID")
     private HoldingsEntity holdingsEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -86,8 +78,12 @@ public class ItemEntity implements Serializable{
     @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
     private InstitutionEntity institutionEntity;
 
-    @OneToMany(mappedBy="itemEntity")
-    private List<BibliographicItemEntity> bibliographicItemEntities;
+    @ManyToMany(mappedBy = "itemEntities")
+    private List<BibliographicEntity> bibliographicEntities;
+
+    public ItemEntity() {
+    }
+
 
     public Integer getItemId() {
         return itemId;
@@ -111,14 +107,6 @@ public class ItemEntity implements Serializable{
 
     public void setCustomerCode(String customerCode) {
         this.customerCode = customerCode;
-    }
-
-    public Integer getHoldingsId() {
-        return holdingsId;
-    }
-
-    public void setHoldingsId(Integer holdingsId) {
-        this.holdingsId = holdingsId;
     }
 
     public String getCallNumber() {
@@ -185,14 +173,6 @@ public class ItemEntity implements Serializable{
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    public Integer getBibliographicId() {
-        return bibliographicId;
-    }
-
-    public void setBibliographicId(Integer bibliographicId) {
-        this.bibliographicId = bibliographicId;
-    }
-
     public String getUseRestrictions() {
         return useRestrictions;
     }
@@ -257,11 +237,59 @@ public class ItemEntity implements Serializable{
         this.institutionEntity = institutionEntity;
     }
 
-    public List<BibliographicItemEntity> getBibliographicItemEntities() {
-        return bibliographicItemEntities;
+    public List<BibliographicEntity> getBibliographicEntities() {
+        return bibliographicEntities;
     }
 
-    public void setBibliographicItemEntities(List<BibliographicItemEntity> bibliographicItemEntities) {
-        this.bibliographicItemEntities = bibliographicItemEntities;
+    public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
+        this.bibliographicEntities = bibliographicEntities;
+    }
+}
+
+
+
+class ItemPK implements Serializable {
+    private Integer owningInstitutionId;
+    private String owningInstitutionItemId;
+
+
+    public ItemPK(){
+
+    }
+
+    public ItemPK(Integer owningInstitutionId, String owningInstitutionItemId) {
+        this.owningInstitutionId = owningInstitutionId;
+        this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    public Integer getOwningInstitutionId() {
+        return owningInstitutionId;
+    }
+
+    public void setOwningInstitutionId(Integer owningInstitutionId) {
+        this.owningInstitutionId = owningInstitutionId;
+    }
+
+    public String getOwningInstitutionItemId() {
+        return owningInstitutionItemId;
+    }
+
+    public void setOwningInstitutionItemId(String owningInstitutionItemId) {
+        this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionItemId);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        ItemPK itemPK  = (ItemPK) obj;
+        if(itemPK.getOwningInstitutionId().equals(owningInstitutionId) && itemPK.getOwningInstitutionItemId().equals(owningInstitutionItemId)){
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,12 +1,14 @@
 package org.recap.util;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
 import org.springframework.util.CollectionUtils;
@@ -146,15 +148,15 @@ public class BibJSONUtil extends MarcUtil {
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
 
-        List<BibliographicItemEntity> bibliographicItemEntities = bibliographicEntity.getBibliographicItemEntities();
-        for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities) {
-            itemIds.add(bibliographicItemEntity.getItemId().toString());
-            Item item = new ItemJSONUtil().generateItemForIndex(bibliographicItemEntity.getItemEntity());
+        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+        for (ItemEntity itemEntity : itemEntities) {
+            itemIds.add(itemEntity.getItemId().toString());
+            Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
             items.add(item);
         }
-        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
-        for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
-            holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
+        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        for (HoldingsEntity holdingsEntity : holdingsEntities) {
+            holdingsIds.add(holdingsEntity.getHoldingsId().toString());
         }
 
         bib.setHoldingsIdList(holdingsIds);
@@ -171,13 +173,13 @@ public class BibJSONUtil extends MarcUtil {
         List<String> holdingsIds = new ArrayList<>();
         List<String> itemIds = new ArrayList<>();
 
-        List<BibliographicItemEntity> bibliographicItemEntities = bibliographicEntity.getBibliographicItemEntities();
-        for (BibliographicItemEntity bibliographicItemEntity : bibliographicItemEntities) {
-            itemIds.add(bibliographicItemEntity.getItemId().toString());
+        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+        for (ItemEntity itemEntity : itemEntities) {
+            itemIds.add(itemEntity.getItemId().toString());
         }
-        List<BibliographicHoldingsEntity> bibliographicHoldingsEntities = bibliographicEntity.getBibliographicHoldingsEntities();
-        for (BibliographicHoldingsEntity bibliographicHoldingsEntity : bibliographicHoldingsEntities) {
-            holdingsIds.add(bibliographicHoldingsEntity.getHoldingsId().toString());
+        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        for (HoldingsEntity holdingsEntity : holdingsEntities) {
+            holdingsIds.add(holdingsEntity.getHoldingsId().toString());
         }
 
         bib.setHoldingsIdList(holdingsIds);
