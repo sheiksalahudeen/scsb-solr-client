@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class BibTest extends BaseTestCase {
@@ -60,28 +61,27 @@ public class BibTest extends BaseTestCase {
         Bib indexedBib = bibCrudRepository.save(bib);
         assertNotNull(indexedBib);
 
-        Bib searchBib = bibCrudRepository.findByBarcode(indexedBib.getBarcode());
-        assertNotNull(searchBib);
-        System.out.println("id -->"+searchBib.getId());
         assertTrue(indexedBib.getIssn().get(0).equals("0394469756"));
         assertTrue(indexedBib.getIsbn().get(0).equals("0394469755"));
         assertTrue(indexedBib.getOclcNumber().get(0).equals("00133182"));
-        Assert.assertTrue(indexedBib.getHoldingsIdList().equals(holdingsIdList));
-        Assert.assertTrue(indexedBib.getBibItemIdList().equals(itemIdList));
-        Assert.assertEquals(indexedBib.getBibId(),"101");
-        Assert.assertEquals(indexedBib.getDocType(),"Bibliographic");
-        Assert.assertEquals(indexedBib.getTitle(),"Test Bib 1");
-        Assert.assertEquals(indexedBib.getBarcode(),"1");
-        Assert.assertEquals(indexedBib.getTitle(),"Test Bib 1");
-        Assert.assertEquals(indexedBib.getAuthor(),"Hoepli, Nancy L");
-        Assert.assertEquals(indexedBib.getPublisher(),"McClelland & Stewart, limited");
-        Assert.assertEquals(indexedBib.getImprint(),"Toronto, McClelland & Stewart, limited [c1926]");
-        Assert.assertEquals(indexedBib.getPublicationDate(),"1960");
-        Assert.assertEquals(indexedBib.getMaterialType(),"Material Type 1");
-        Assert.assertEquals(indexedBib.getNotes(),"Bibliographical footnotes 1");
-        Assert.assertEquals(indexedBib.getOwningInstitution(),"PUL");
-        Assert.assertEquals(indexedBib.getSubject(),"Arab countries Politics and government.");
-        Assert.assertEquals(indexedBib.getPublicationPlace(),"Paris");
-        Assert.assertEquals(indexedBib.getLccn(),"71448228");
+        assertTrue(indexedBib.getHoldingsIdList().equals(holdingsIdList));
+        assertTrue(indexedBib.getBibItemIdList().equals(itemIdList));
+        assertEquals(indexedBib.getBibId(),"101");
+        assertEquals(indexedBib.getDocType(),"Bibliographic");
+        assertEquals(indexedBib.getTitle(),"Test Bib 1");
+        assertEquals(indexedBib.getBarcode(),"1");
+        assertEquals(indexedBib.getTitle(),"Test Bib 1");
+        assertEquals(indexedBib.getAuthor(),"Hoepli, Nancy L");
+        assertEquals(indexedBib.getPublisher(),"McClelland & Stewart, limited");
+        assertEquals(indexedBib.getImprint(),"Toronto, McClelland & Stewart, limited [c1926]");
+        assertEquals(indexedBib.getPublicationDate(),"1960");
+        assertEquals(indexedBib.getMaterialType(),"Material Type 1");
+        assertEquals(indexedBib.getNotes(),"Bibliographical footnotes 1");
+        assertEquals(indexedBib.getOwningInstitution(),"PUL");
+        assertEquals(indexedBib.getSubject(),"Arab countries Politics and government.");
+        assertEquals(indexedBib.getPublicationPlace(),"Paris");
+        assertEquals(indexedBib.getLccn(),"71448228");
     }
+
+
 }
