@@ -1,6 +1,8 @@
 package org.recap.controller;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
+import org.recap.admin.SolrAdmin;
 import org.recap.executors.BibItemIndexExecutorService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -36,6 +39,9 @@ public class SolrIndexController {
     @Autowired
     ItemCrudRepository itemCrudRepository;
 
+    @Autowired
+    SolrAdmin solrAdmin;
+
     @RequestMapping("/")
     public String solrIndexer(Model model){
         model.addAttribute("solrIndexRequest",new SolrIndexRequest());
@@ -50,10 +56,19 @@ public class SolrIndexController {
         Integer numberOfThread = solrIndexRequest.getNumberOfThreads();
         Integer numberOfDoc = solrIndexRequest.getNumberOfDocs();
         logger.info("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc);
+
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();
             itemCrudRepository.deleteAll();
+            try {
+                solrAdmin.unloadTempCores();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SolrServerException e) {
+                e.printStackTrace();
+            }
         }
+
         bibItemIndexExecutorService.index(solrIndexRequest);
         String totalTimeTaken = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
 

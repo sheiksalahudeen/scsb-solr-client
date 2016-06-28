@@ -1,19 +1,11 @@
 package org.recap.admin;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -36,6 +28,19 @@ public class SolrAdminTest extends BaseTestCase {
         assertNotNull(coreAdminResponse);
         assertTrue(coreAdminResponse.getStatus() == 0);
         System.out.println("Core created");
+
+    }
+
+    @Test
+    public void unloadTempCores() throws Exception {
+        solrAdmin.unloadTempCores();
+
+        CoreAdminRequest coreAdminRequest = solrAdmin.getCoreAdminRequest();
+
+        coreAdminRequest.setAction(CoreAdminParams.CoreAdminAction.STATUS);
+        CoreAdminResponse cores = coreAdminRequest.process(solrAdminClient);
+
+        System.out.println(cores.getStatus());
 
     }
 }

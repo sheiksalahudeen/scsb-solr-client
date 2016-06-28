@@ -4,6 +4,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.apache.solr.common.params.CoreAdminParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +111,24 @@ public class SolrAdmin {
             }
 
         }
+    }
+
+
+    public void unloadTempCores() throws IOException, SolrServerException {
+        CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
+
+        coreAdminRequest.setAction(CoreAdminParams.CoreAdminAction.STATUS);
+        CoreAdminResponse cores = coreAdminRequest.process(solrAdminClient);
+
+        List<String> coreList = new ArrayList<String>();
+        for (int i = 0; i < cores.getCoreStatus().size(); i++) {
+            String name = cores.getCoreStatus().getName(i);
+            if (name.contains("temp")) {
+                coreList.add(name);
+            }
+        }
+
+        unLoadCores(coreList);
     }
 
     public CoreAdminRequest.Create getCoreAdminCreateRequest() {
