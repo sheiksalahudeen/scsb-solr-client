@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.admin.SolrAdmin;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.*;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,24 @@ public class BaseTestCase {
 
     @Autowired
     public BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    public ItemDetailsRepository itemDetailsRepository;
+
+    @Autowired
+    public HoldingDetailRepository holdingDetailRepository;
+
+    @Autowired
+    public BibliographicHoldingDetailsRepository bibliographicHoldingDetailsRepository;
+
+    @Autowired
+    public ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Autowired
+    public InstitutionDetailRepository institutionDetailRepository;
+
+    @Autowired
+    public CollectionGroupDetailRepository collectionGroupDetailRepository;
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;

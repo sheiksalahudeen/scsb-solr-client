@@ -3,9 +3,11 @@ package org.recap.util;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by pvsubrah on 6/15/16.
@@ -124,8 +126,42 @@ public class MarcUtilTest {
         String title = marcUtil.getDataFieldValue(records.get(0), "245", null, null, "a");
         assertEquals("al-BahÌ£rayn :", title);
 
+    }
+
+    @Test
+    public void getDataFieldValue(){
+        MarcUtil marcUtil = new MarcUtil();
+
+        List<Record> records =
+                marcUtil.convertMarcXmlToRecord(marcXML);
+        List<Character> subFields = new ArrayList<>();
+        subFields.add('a');
+        subFields.add('h');
+
+        assertNotNull(records);
+        assertTrue(records.size() == 1);
+        String fieldVaule = marcUtil.getDataFieldValue(records.get(0),"9");
+        assertEquals(".b100000241 m a - ara le  3 1 *OFK 84-1944" , fieldVaule);
+        String subFieldValue = marcUtil.getDataFieldValue(records.get(0),"9",subFields);
+        assertEquals(".b100000241 3 *OFK 84-1944",subFieldValue);
+    }
+
+    @Test
+    public void getControlFieldValues(){
+        MarcUtil marcUtil = new MarcUtil();
+
+        List<Record> records =
+                marcUtil.convertMarcXmlToRecord(marcXML);
+
+        assertNotNull(records);
+        assertTrue(records.size() == 1);
+        String controlField = marcUtil.getControlFieldValue(records.get(0),"001");
+        assertEquals("NYPG001000011-B" , controlField);
+
 
     }
+
+
 
     @Test
     public void math() throws Exception {
