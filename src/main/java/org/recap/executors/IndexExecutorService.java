@@ -3,6 +3,8 @@ package org.recap.executors;
 import org.recap.admin.SolrAdmin;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
@@ -17,6 +19,9 @@ import java.util.concurrent.*;
  */
 
 public abstract class IndexExecutorService {
+
+    Logger logger = LoggerFactory.getLogger(IndexExecutorService.class);
+
     @Autowired
     SolrAdmin solrAdmin;
 
@@ -94,10 +99,10 @@ public abstract class IndexExecutorService {
                     mergeIndexCount = 0;
                 }
             }
-            System.out.println("Num futures executed: " + futureCount);
+            logger.info("Num futures executed: " + futureCount);
             solrAdmin.mergeCores(coreNames);
             stopWatch.stop();
-            System.out.println("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
+            logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
             solrAdmin.unLoadCores(coreNames);
             executorService.shutdown();
         } catch (Exception e) {
