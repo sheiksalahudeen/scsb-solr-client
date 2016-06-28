@@ -1,14 +1,13 @@
 package org.recap.controller;
 
 import org.recap.RecapConstants;
-import org.recap.executors.BibIndexExecutorService;
+import org.recap.executors.BibItemIndexExecutorService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +24,7 @@ import java.util.concurrent.ExecutorService;
 public class SolrIndexController {
 
     @Autowired
-    BibIndexExecutorService bibIndexExecutorService;
+    BibItemIndexExecutorService bibItemIndexExecutorService;
 
     @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;
@@ -51,8 +50,8 @@ public class SolrIndexController {
             bibSolrCrudRepository.deleteAll();
             itemCrudRepository.deleteAll();
         }
-        bibIndexExecutorService.index(solrIndexRequest);
-        String totalTimeTaken = bibIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
+        bibItemIndexExecutorService.index(solrIndexRequest);
+        String totalTimeTaken = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
 
         System.out.println("Total time taken:" + totalTimeTaken);
 
@@ -62,7 +61,7 @@ public class SolrIndexController {
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
     public String report() {
-        ExecutorService executorService = bibIndexExecutorService.getExecutorService();
+        ExecutorService executorService = bibItemIndexExecutorService.getExecutorService();
         String status = "Done";
         String processingTime = "";
         String timeString = "Total Time Taken";
@@ -71,11 +70,11 @@ public class SolrIndexController {
             if(!shutdown) {
                 status = "Running";
                 timeString = "Processing Time";
-                long startTime = bibIndexExecutorService.getStartTime();
+                long startTime = bibItemIndexExecutorService.getStartTime();
                 long currentTime = System.currentTimeMillis();
                 processingTime =(currentTime - startTime) / 1000 + " secs";
             } else {
-                processingTime = bibIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
+                processingTime = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
             }
         }
         long numOfDocProcessed = bibSolrCrudRepository.count();
