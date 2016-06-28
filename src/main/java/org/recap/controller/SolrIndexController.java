@@ -5,6 +5,8 @@ import org.recap.executors.BibItemIndexExecutorService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,8 @@ import java.util.concurrent.ExecutorService;
  */
 @Controller
 public class SolrIndexController {
+
+    Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
 
     @Autowired
     BibItemIndexExecutorService bibItemIndexExecutorService;
@@ -45,7 +49,7 @@ public class SolrIndexController {
                             Model model) {
         Integer numberOfThread = solrIndexRequest.getNumberOfThreads();
         Integer numberOfDoc = solrIndexRequest.getNumberOfDocs();
-        System.out.println("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc);
+        logger.info("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc);
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();
             itemCrudRepository.deleteAll();
@@ -53,7 +57,7 @@ public class SolrIndexController {
         bibItemIndexExecutorService.index(solrIndexRequest);
         String totalTimeTaken = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
 
-        System.out.println("Total time taken:" + totalTimeTaken);
+        logger.info("Total time taken:" + totalTimeTaken);
 
         return solrIndexer(model);
     }
