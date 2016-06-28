@@ -51,60 +51,64 @@ public abstract class IndexExecutorService {
 
             Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
-            int quotient = totalDocCount / (docsPerThread);
-            int remainder = totalDocCount % (docsPerThread);
+            if (totalDocCount > 0) {
+                int quotient = totalDocCount / (docsPerThread);
+                int remainder = totalDocCount % (docsPerThread);
 
-            loopCount = remainder == 0 ? quotient : quotient + 1;
+                loopCount = remainder == 0 ? quotient : quotient + 1;
 
-            List<String> coreNames = new ArrayList<>();
+                List<String> coreNames = new ArrayList<>();
 
-            setupCoreNames(numThreads, coreNames);
+                setupCoreNames(numThreads, coreNames);
 
-            solrAdmin.createSolrCores(coreNames);
+                solrAdmin.createSolrCores(coreNames);
 
-            mergeIndexInterval = Math.ceil(loopCount / 2);
+                mergeIndexInterval = Math.ceil(loopCount / 2);
 
-            int coreNum = 0;
-            List<Future> futures = new ArrayList<>();
+                int coreNum = 0;
+                List<Future> futures = new ArrayList<>();
 
-            for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId);
-                futures.add(executorService.submit(callable));
-                coreNum = coreNum < numThreads-1 ? coreNum + 1 : 0;
-            }
-
-            int mergeIndexCount = 0;
-            int totalBibsProcessed = 0;
-
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-
-            int futureCount=0;
-            for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
-                Future future = iterator.next();
-                try {
-                    future.get();
-                    futureCount++;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+                for (int pageNum = 0; pageNum < loopCount; pageNum++) {
+                    Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId);
+                    futures.add(executorService.submit(callable));
+                    coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
-                if (mergeIndexCount < mergeIndexInterval-1) {
-                    mergeIndexCount++;
-                } else {
-                    solrAdmin.mergeCores(coreNames);
-                    deleteTempIndexes(coreNames, solrUrl);
-                    mergeIndexCount = 0;
+                int mergeIndexCount = 0;
+                int totalBibsProcessed = 0;
+
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
+
+                int futureCount = 0;
+                for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+                    Future future = iterator.next();
+                    try {
+                        future.get();
+                        futureCount++;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (mergeIndexCount < mergeIndexInterval - 1) {
+                        mergeIndexCount++;
+                    } else {
+                        solrAdmin.mergeCores(coreNames);
+                        deleteTempIndexes(coreNames, solrUrl);
+                        mergeIndexCount = 0;
+                    }
                 }
+                logger.info("Num futures executed: " + futureCount);
+                solrAdmin.mergeCores(coreNames);
+                stopWatch.stop();
+                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
+                solrAdmin.unLoadCores(coreNames);
+                executorService.shutdown();
+            } else {
+                logger.info("No records found to index for the criteria");
             }
-            logger.info("Num futures executed: " + futureCount);
-            solrAdmin.mergeCores(coreNames);
-            stopWatch.stop();
-            logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds" );
-            solrAdmin.unLoadCores(coreNames);
-            executorService.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,7 +135,7 @@ public abstract class IndexExecutorService {
     }
 
     public StopWatch getStopWatch() {
-        if(null == stopWatch) {
+        if (null == stopWatch) {
             stopWatch = new StopWatch();
         }
         return stopWatch;
