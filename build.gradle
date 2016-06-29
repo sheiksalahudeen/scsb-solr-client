@@ -68,10 +68,6 @@ eclipse {
 	}
 }
 
-def files = subprojects.collect { new File(it.projectDir, '/build/cobertura/cobertura.ser') }
 cobertura {
 	coverageFormats = [ 'xml', 'html' ]
-	coverageSourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
-	coverageMergeDatafiles = files
 }
-test.dependsOn(subprojects.test)
