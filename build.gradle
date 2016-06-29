@@ -10,9 +10,21 @@ buildscript {
 	}
 }
 
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "net.saliman:gradle-cobertura-plugin:2.3.2"
+	}
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
+apply plugin: "net.saliman.cobertura"
 
 springBoot {
 	executable = true
@@ -55,3 +67,11 @@ eclipse {
 		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
 	}
 }
+
+def files = subprojects.collect { new File(it.projectDir, '/build/cobertura/cobertura.ser') }
+cobertura {
+	coverageFormats = [ 'xml', 'html' ]
+	coverageSourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+	coverageMergeDatafiles = files
+}
+test.dependsOn(subprojects.test)
