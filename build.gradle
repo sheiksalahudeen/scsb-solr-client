@@ -29,6 +29,10 @@ apply plugin: "net.saliman.cobertura"
 springBoot {
 	executable = true
 }
+//added to accept systemproperties while executing gradlew test cmd
+test {
+	systemProperties = System.properties
+}
 
 jar {
 	baseName = 'scsb-solr-client'
