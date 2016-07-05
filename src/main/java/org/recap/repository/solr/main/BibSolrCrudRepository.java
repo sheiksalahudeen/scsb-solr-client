@@ -10,5 +10,6 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 public interface BibSolrCrudRepository extends SolrCrudRepository<Bib, String> {
 
     Bib findByBarcode(String bibId);
+    Bib findByBibId(String bibId);
 
 }
