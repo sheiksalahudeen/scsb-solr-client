@@ -193,7 +193,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setBibId(bibliographicId.toString());
 
         bib.setDocType("Bib");
-        String bibContent = bibliographicEntity.getContent();
+        String bibContent = new String(bibliographicEntity.getContent());
         List<Record> records = convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
 

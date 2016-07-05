@@ -87,6 +87,6 @@ public class BibItemIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
         }
-        return bibliographicEntities.getSize();
+        return bibliographicEntities.getNumberOfElements();
     }
 }

@@ -95,7 +95,7 @@ public class ItemJSONUtil extends MarcUtil{
             if(null != holdingsEntity) {
                 holdingsIds.add(holdingsEntity.getHoldingsId().toString());
                 item.setHoldingsIdList(holdingsIds);
-                String holdingsContent = holdingsEntity.getContent();
+                String holdingsContent = new String(holdingsEntity.getContent());
                 List<Record> records = convertMarcXmlToRecord(holdingsContent);
                 Record marcRecord = records.get(0);
                 item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));

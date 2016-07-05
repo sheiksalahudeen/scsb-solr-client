@@ -103,13 +103,13 @@ public class DiacriticalMarks_UT extends BaseTestCase {
                 "                    </record>\n" +
                 "                </collection>\n";
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent(bibContent);
+        bibliographicEntity.setContent(bibContent.getBytes());
         bibliographicEntity.setOwningInstitutionId(2);
         bibliographicEntity.setOwningInstitutionBibId("288877");
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
-        String content = savedBibliographicEntity.getContent();
+        String content = new String(savedBibliographicEntity.getContent());
         MarcUtil marcUtil = new MarcUtil();
         List<Record> records = marcUtil.convertMarcXmlToRecord(content);
         diacriticalText = getText(records);

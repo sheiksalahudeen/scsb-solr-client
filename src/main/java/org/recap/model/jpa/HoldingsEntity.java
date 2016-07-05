@@ -19,7 +19,7 @@ public class HoldingsEntity implements Serializable{
 
     @Lob
     @Column(name = "CONTENT")
-    private String content;
+    private byte[] content;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATED_DATE")
@@ -50,11 +50,11 @@ public class HoldingsEntity implements Serializable{
         this.holdingsId = holdingsId;
     }
 
-    public String getContent() {
+    public byte[] getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 

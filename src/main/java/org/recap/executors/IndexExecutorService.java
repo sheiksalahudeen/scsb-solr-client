@@ -84,7 +84,8 @@ public abstract class IndexExecutorService {
                 for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                     Future future = iterator.next();
                     try {
-                        future.get();
+                        Integer entitiesCount = (Integer) future.get();
+                        totalBibsProcessed += entitiesCount;
                         futureCount++;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -120,7 +121,7 @@ public abstract class IndexExecutorService {
     }
 
     private ExecutorService getExecutorService(Integer numThreads) {
-        if (null == executorService) {
+        if (null == executorService || executorService.isShutdown()) {
             executorService = Executors.newFixedThreadPool(numThreads);
         }
         return executorService;
