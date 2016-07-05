@@ -47,7 +47,7 @@ public abstract class IndexExecutorService {
         Integer owningInstitutionId = solrIndexRequest.getOwningInstitutionId();
 
         try {
-            ExecutorService executorService = getExecutorService(numThreads);
+            ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
             Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
@@ -84,7 +84,8 @@ public abstract class IndexExecutorService {
                 for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
                     Future future = iterator.next();
                     try {
-                        future.get();
+                        Integer entitiesCount = (Integer) future.get();
+                        totalBibsProcessed += entitiesCount;
                         futureCount++;
                     } catch (InterruptedException e) {
                         e.printStackTrace();

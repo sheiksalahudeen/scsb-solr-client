@@ -11,4 +11,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface BibliographicDetailsRepository extends PagingAndSortingRepository<BibliographicEntity, Integer> {
     Long countByOwningInstitutionId(Integer institutionId);
     Page<BibliographicEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
+    BibliographicEntity findByOwningInstitutionIdAndOwningInstitutionBibId(Integer owningInstitutionId, String owningInstitutionBibId);
 }

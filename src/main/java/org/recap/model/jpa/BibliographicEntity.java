@@ -18,7 +18,7 @@ public class BibliographicEntity implements Serializable{
 
     @Lob
     @Column(name = "CONTENT")
-    private String content;
+    private byte[] content;
 
     @Id
     @Column(name = "OWNING_INST_ID")
@@ -67,11 +67,11 @@ public class BibliographicEntity implements Serializable{
         this.bibliographicId = bibliographicId;
     }
 
-    public String getContent() {
+    public byte[] getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 
