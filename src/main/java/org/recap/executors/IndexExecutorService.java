@@ -47,7 +47,7 @@ public abstract class IndexExecutorService {
         Integer owningInstitutionId = solrIndexRequest.getOwningInstitutionId();
 
         try {
-            ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+            ExecutorService executorService = getExecutorService(numThreads);
 
             Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
@@ -121,7 +121,7 @@ public abstract class IndexExecutorService {
     }
 
     private ExecutorService getExecutorService(Integer numThreads) {
-        if (null == executorService) {
+        if (null == executorService || executorService.isShutdown()) {
             executorService = Executors.newFixedThreadPool(numThreads);
         }
         return executorService;
