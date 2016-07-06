@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.solr.Bib;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by angelind on 22/6/16.
  */
+@Ignore
 public class SolrFindMatchingRecordsTest extends BaseTestCase {
 
     @Value("${solr.url}")

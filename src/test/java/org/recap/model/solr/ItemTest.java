@@ -1,17 +1,16 @@
 package org.recap.model.solr;
 
-import junit.framework.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+@Ignore
 public class ItemTest extends  BaseTestCase {
 
     @Before

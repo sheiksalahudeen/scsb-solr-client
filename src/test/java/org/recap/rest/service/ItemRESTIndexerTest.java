@@ -2,6 +2,7 @@ package org.recap.rest.service;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.solr.Item;
@@ -20,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by angelind on 16/6/16.
  */
+
+@Ignore
 public class ItemRESTIndexerTest extends BaseTestCase {
 
     @Test

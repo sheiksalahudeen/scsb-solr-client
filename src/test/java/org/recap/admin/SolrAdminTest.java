@@ -3,6 +3,7 @@ package org.recap.admin;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
@@ -15,6 +16,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/12/16.
  */
+
+@Ignore
 public class SolrAdminTest extends BaseTestCase {
     String tempCoreName1 = "temp0";
     String tempCoreName2 = "temp1";
