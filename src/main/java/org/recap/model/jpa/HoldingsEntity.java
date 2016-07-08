@@ -25,9 +25,15 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
+    @Column(name="CREATED_BY")
+    private String createdBy;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
+
+    @Column(name="LAST_UPDATED_BY")
+    private String lastUpdatedBy;
 
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
@@ -66,12 +72,28 @@ public class HoldingsEntity implements Serializable{
         this.createdDate = createdDate;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Date getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
     public void setLastUpdatedDate(Date lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     public String getOwningInstitutionHoldingsId() {

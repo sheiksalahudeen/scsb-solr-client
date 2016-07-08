@@ -41,6 +41,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setContent("Mock Bib Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random));
         bibliographicEntity.setOwningInstitutionId(3);
         BibliographicEntity entity = bibliographicDetailsRepository.save(bibliographicEntity);
@@ -64,6 +66,8 @@ public class BibliographicEntityTest extends BaseTestCase {
             bibliographicEntity.setContent("Mock Bib Content1".getBytes());
             bibliographicEntity.setCreatedDate(new Date());
             bibliographicEntity.setLastUpdatedDate(new Date());
+            bibliographicEntity.setCreatedBy("tst");
+            bibliographicEntity.setLastUpdatedBy("tst");
             bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random));
             bibliographicEntity.setOwningInstitutionId(3);
             BibliographicEntity entity1 = bibliographicDetailsRepository.save(bibliographicEntity);
@@ -74,6 +78,8 @@ public class BibliographicEntityTest extends BaseTestCase {
             bibliographicEntity1.setContent("Mock Bib Content2".getBytes());
             bibliographicEntity1.setCreatedDate(new Date());
             bibliographicEntity1.setLastUpdatedDate(new Date());
+            bibliographicEntity1.setCreatedBy("tst");
+            bibliographicEntity1.setLastUpdatedBy("tst");
             bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random1));
             bibliographicEntity1.setOwningInstitutionId(3);
             BibliographicEntity entity2 = bibliographicDetailsRepository.save(bibliographicEntity1);
@@ -84,6 +90,8 @@ public class BibliographicEntityTest extends BaseTestCase {
             bibliographicEntity2.setContent("Mock Bib Content3".getBytes());
             bibliographicEntity2.setCreatedDate(new Date());
             bibliographicEntity2.setLastUpdatedDate(new Date());
+            bibliographicEntity2.setCreatedBy("tst");
+            bibliographicEntity2.setLastUpdatedBy("tst");
             bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random2));
             bibliographicEntity2.setOwningInstitutionId(3);
             BibliographicEntity entity3 = bibliographicDetailsRepository.save(bibliographicEntity2);
@@ -112,6 +120,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedBibliographicEntity);
@@ -133,6 +143,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -141,6 +153,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
@@ -157,6 +171,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -165,6 +181,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity1.setContent("mock holdings".getBytes());
         holdingsEntity1.setCreatedDate(new Date());
         holdingsEntity1.setLastUpdatedDate(new Date());
+        holdingsEntity1.setCreatedBy("tst");
+        holdingsEntity1.setLastUpdatedBy("tst");
         holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
 
@@ -172,6 +190,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity2.setContent("mock holdings".getBytes());
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setLastUpdatedDate(new Date());
+        holdingsEntity2.setCreatedBy("tst");
+        holdingsEntity2.setLastUpdatedBy("tst");
         holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity1, holdingsEntity2));
@@ -189,6 +209,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setLastUpdatedDate(new Date());
+        bibliographicEntity1.setCreatedBy("tst");
+        bibliographicEntity1.setLastUpdatedBy("tst");
         bibliographicEntity1.setOwningInstitutionId(1);
         bibliographicEntity1.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -196,6 +218,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity2.setContent("mock Content".getBytes());
         bibliographicEntity2.setCreatedDate(new Date());
         bibliographicEntity2.setLastUpdatedDate(new Date());
+        bibliographicEntity2.setCreatedBy("tst");
+        bibliographicEntity2.setLastUpdatedBy("tst");
         bibliographicEntity2.setOwningInstitutionId(1);
         bibliographicEntity2.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -203,6 +227,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         bibliographicEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
@@ -219,6 +245,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -226,6 +254,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
@@ -238,13 +268,16 @@ public class BibliographicEntityTest extends BaseTestCase {
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("123");
         itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntity(holdingsEntity);
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
         assertNotNull(savedBibliographicEntity.getItemEntities());
@@ -258,6 +291,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
@@ -266,11 +301,15 @@ public class BibliographicEntityTest extends BaseTestCase {
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity1 = new ItemEntity();
         itemEntity1.setLastUpdatedDate(new Date());
         itemEntity1.setCreatedDate(new Date());
+        itemEntity1.setCreatedBy("tst");
+        itemEntity1.setLastUpdatedBy("tst");
         itemEntity1.setCustomerCode("1");
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
@@ -285,6 +324,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setLastUpdatedDate(new Date());
         itemEntity2.setCreatedDate(new Date());
+        itemEntity2.setCreatedBy("tst");
+        itemEntity2.setLastUpdatedBy("tst");
         itemEntity2.setItemAvailabilityStatusId(1);
         itemEntity2.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity2.setOwningInstitutionId(1);
@@ -319,6 +360,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
         assertNotNull(savedBibliographicEntity);
