@@ -8,6 +8,9 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,6 +29,8 @@ public class BibliographicEntityTest extends BaseTestCase {
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     public void findByInstitutionId() throws Exception {
@@ -108,7 +113,8 @@ public class BibliographicEntityTest extends BaseTestCase {
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
         BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
