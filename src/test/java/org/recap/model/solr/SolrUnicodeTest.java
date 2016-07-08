@@ -12,7 +12,10 @@ import org.recap.util.BibJSONUtil;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.solr.repository.SolrCrudRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,11 +35,16 @@ public class SolrUnicodeTest extends BaseTestCase {
 
     private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
 
+    private SolrCrudRepository solrCrudRepository;
+
     @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
     ItemCrudRepository itemCrudRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     public void fetchUnicodeBibRecordSaveAndMatchWithSolr() throws Exception {
@@ -50,9 +58,12 @@ public class SolrUnicodeTest extends BaseTestCase {
         String owningInstitutionBibId = String.valueOf(random.nextInt());
         bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedBy("tst");
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
         BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
@@ -67,9 +78,8 @@ public class SolrUnicodeTest extends BaseTestCase {
         assertNotNull(bibs);
         assertTrue(bibs.size() > 0);
 
-        bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);
-        bibCrudRepositoryMultiCoreSupport.save(bibs);
-
+        //bibSolrCrudRepository = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);
+        bibSolrCrudRepository.save(bibs);
         Bib solrBib = bibSolrCrudRepository.findByBibId(String.valueOf(fetchedBibliographicEntity.getBibliographicId()));
         assertNotNull(solrBib);
 
