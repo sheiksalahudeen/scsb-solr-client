@@ -19,7 +19,7 @@ public class CollectionGroupEntity implements Serializable{
     @Column(name = "COLLECTION_GROUP_CODE")
     private String collectionGroupCode;
 
-    @Column(name = "COLLECTIONT_GROUP_DESC")
+    @Column(name = "COLLECTION_GROUP_DESC")
     private String collectionGroupDescription;
 
     @Temporal(TemporalType.TIMESTAMP)
