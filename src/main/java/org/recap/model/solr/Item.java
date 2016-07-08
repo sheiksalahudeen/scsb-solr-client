@@ -15,7 +15,7 @@ public class Item {
     private String id;
 
     @Field("ItemId")
-    private String itemId;
+    private Integer itemId;
 
     @Field("Barcode")
     private String barcode;
@@ -45,10 +45,10 @@ public class Item {
     private String summaryHoldings;
 
     @Field("ItemBibId")
-    private List<String> itemBibIdList;
+    private List<Integer> itemBibIdList;
 
     @Field("HoldingsId")
-    private List<String> holdingsIdList;
+    private List<Integer> holdingsIdList;
 
     public String getId() {
         return id;
@@ -58,11 +58,11 @@ public class Item {
         this.id = id;
     }
 
-    public String getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
-    public void setItemId(String itemId) {
+    public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
 
@@ -138,19 +138,19 @@ public class Item {
         this.summaryHoldings = summaryHoldings;
     }
 
-    public List<String> getItemBibIdList() {
-        return itemBibIdList;
-    }
-
-    public void setItemBibIdList(List<String> itemBibIdList) {
-        this.itemBibIdList = itemBibIdList;
-    }
-
-    public List<String> getHoldingsIdList() {
+    public List<Integer> getHoldingsIdList() {
         return holdingsIdList;
     }
 
-    public void setHoldingsIdList(List<String> holdingsIdList) {
+    public void setHoldingsIdList(List<Integer> holdingsIdList) {
         this.holdingsIdList = holdingsIdList;
+    }
+
+    public List<Integer> getItemBibIdList() {
+        return itemBibIdList;
+    }
+
+    public void setItemBibIdList(List<Integer> itemBibIdList) {
+        this.itemBibIdList = itemBibIdList;
     }
 }

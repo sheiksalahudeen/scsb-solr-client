@@ -22,16 +22,16 @@ public class ItemTest extends  BaseTestCase {
     @Test
     public void indexItem() throws Exception {
 
-        List<String> itemBibIdList = new ArrayList<>();
-        List<String> holdingsIdList = new ArrayList<>();
-        itemBibIdList.add("101");
-        itemBibIdList.add("102");
-        holdingsIdList.add("201");
-        holdingsIdList.add("202");
+        List<Integer> itemBibIdList = new ArrayList<>();
+        List<Integer> holdingsIdList = new ArrayList<>();
+        itemBibIdList.add(101);
+        itemBibIdList.add(102);
+        holdingsIdList.add(201);
+        holdingsIdList.add(202);
 
         Item item = new Item();
         item.setBarcode("1");
-        item.setItemId("301");
+        item.setItemId(301);
         item.setDocType("Item");
         item.setAvailability("Available");
         item.setCallNumber("F864");
@@ -47,7 +47,7 @@ public class ItemTest extends  BaseTestCase {
 
 
         assertEquals(indexedItem.getBarcode(),"1");
-        assertEquals(indexedItem.getItemId(),"301");
+        assertEquals(indexedItem.getItemId(),new Integer(301));
         assertEquals(indexedItem.getDocType(),"Item");
         assertEquals(indexedItem.getAvailability(),"Available");
         assertEquals(indexedItem.getCallNumber(),"F864");

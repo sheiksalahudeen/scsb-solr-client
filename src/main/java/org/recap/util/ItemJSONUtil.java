@@ -19,17 +19,10 @@ public class ItemJSONUtil extends MarcUtil{
     public ItemJSONUtil() {
     }
 
-    public static ItemJSONUtil getInstance() {
-        if(null == itemJSONUtil) {
-            itemJSONUtil = new ItemJSONUtil();
-        }
-        return itemJSONUtil;
-    }
-
     public Item generateItemForIndex(JSONObject itemJSON, JSONObject holdingsJSON) {
         Item item = new Item();
         try {
-            String itemId = itemJSON.getString("itemId");
+            Integer itemId = itemJSON.getInt("itemId");
             item.setItemId(itemId);
             item.setBarcode(itemJSON.getString("barcode"));
             item.setDocType("Item");
@@ -37,12 +30,12 @@ public class ItemJSONUtil extends MarcUtil{
             item.setUseRestriction(itemJSON.getString("useRestrictions"));
             item.setVolumePartYear(itemJSON.getString("volumePartYear"));
             item.setCallNumber(itemJSON.getString("callNumber"));
-            String bibId = itemJSON.getString("bibliographicId");
-            List<String> bibIdList = new ArrayList<>();
+            Integer bibId = itemJSON.getInt("bibliographicId");
+            List<Integer> bibIdList = new ArrayList<>();
             bibIdList.add(bibId);
             item.setItemBibIdList(bibIdList);
-            List<String> holdingsIds = new ArrayList<>();
-            holdingsIds.add(itemJSON.getString("holdingsId"));
+            List<Integer> holdingsIds = new ArrayList<>();
+            holdingsIds.add(itemJSON.getInt("holdingsId"));
             item.setHoldingsIdList(holdingsIds);
 
             JSONObject itemAvailabilityStatus = itemJSON.getJSONObject("itemStatusEntity");
@@ -66,7 +59,7 @@ public class ItemJSONUtil extends MarcUtil{
         Item item = new Item();
         try {
             Integer itemId = itemEntity.getItemId();
-            item.setItemId(itemId.toString());
+            item.setItemId(itemId);
             item.setBarcode(itemEntity.getBarcode());
             item.setDocType("Item");
             item.setCustomerCode(itemEntity.getCustomerCode());
@@ -74,10 +67,10 @@ public class ItemJSONUtil extends MarcUtil{
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumber(itemEntity.getCallNumber());
 
-            List<String> bibIdList = new ArrayList<>();
+            List<Integer> bibIdList = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();
             for (BibliographicEntity bibliographicEntity : bibliographicEntities){
-                bibIdList.add(bibliographicEntity.getBibliographicId().toString());
+                bibIdList.add(bibliographicEntity.getBibliographicId());
             }
             item.setItemBibIdList(bibIdList);
 
@@ -90,10 +83,10 @@ public class ItemJSONUtil extends MarcUtil{
                 item.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
             }
 
-            List<String> holdingsIds = new ArrayList<>();
+            List<Integer> holdingsIds = new ArrayList<>();
             HoldingsEntity holdingsEntity = itemEntity.getHoldingsEntity();
             if(null != holdingsEntity) {
-                holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+                holdingsIds.add(holdingsEntity.getHoldingsId());
                 item.setHoldingsIdList(holdingsIds);
                 String holdingsContent = new String(holdingsEntity.getContent());
                 List<Record> records = convertMarcXmlToRecord(holdingsContent);

@@ -9,4 +9,6 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 public interface ItemCrudRepository extends SolrCrudRepository<Item, String> {
 
     Item findByBarcode(String barcode);
+
+    Item findByItemId(Integer itemId);
 }

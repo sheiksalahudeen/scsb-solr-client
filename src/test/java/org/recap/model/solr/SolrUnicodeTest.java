@@ -80,7 +80,7 @@ public class SolrUnicodeTest extends BaseTestCase {
 
         //bibSolrCrudRepository = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);
         bibSolrCrudRepository.save(bibs);
-        Bib solrBib = bibSolrCrudRepository.findByBibId(String.valueOf(fetchedBibliographicEntity.getBibliographicId()));
+        Bib solrBib = bibSolrCrudRepository.findByBibId(fetchedBibliographicEntity.getBibliographicId());
         assertNotNull(solrBib);
 
         String solrTitle = solrBib.getTitle();
