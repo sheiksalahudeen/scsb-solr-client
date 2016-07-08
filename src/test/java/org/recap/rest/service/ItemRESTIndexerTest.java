@@ -61,7 +61,7 @@ public class ItemRESTIndexerTest extends BaseTestCase {
             assertNotNull(itemId);
             assertNotNull(barcode);
 
-            itemsToIndex.add(ItemJSONUtil.getInstance().generateItemForIndex(jsonObject, null));
+            itemsToIndex.add(new ItemJSONUtil().generateItemForIndex(jsonObject, null));
         }
 
         itemCrudRepository.save(itemsToIndex);

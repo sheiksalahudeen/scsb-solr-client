@@ -16,7 +16,7 @@ public class Bib {
     private String id;
 
     @Field("BibId")
-    private String bibId;
+    private Integer bibId;
 
     @Field("DocType")
     private String docType;
@@ -67,10 +67,13 @@ public class Bib {
     private String imprint;
 
     @Field("HoldingsId")
-    private List<String> holdingsIdList;
+    private List<Integer> holdingsIdList;
 
     @Field("BibItemId")
-    private List<String> bibItemIdList;
+    private List<Integer> bibItemIdList;
+
+    @Field("OwningInstitutionBibId")
+    private String owningInstitutionBibId;
 
     public String getId() {
         return id;
@@ -80,11 +83,11 @@ public class Bib {
         this.id = id;
     }
 
-    public String getBibId() {
+    public Integer getBibId() {
         return bibId;
     }
 
-    public void setBibId(String bibId) {
+    public void setBibId(Integer bibId) {
         this.bibId = bibId;
     }
 
@@ -216,19 +219,27 @@ public class Bib {
         this.imprint = imprint;
     }
 
-    public List<String> getHoldingsIdList() {
+    public List<Integer> getHoldingsIdList() {
         return holdingsIdList;
     }
 
-    public void setHoldingsIdList(List<String> holdingsIdList) {
+    public void setHoldingsIdList(List<Integer> holdingsIdList) {
         this.holdingsIdList = holdingsIdList;
     }
 
-    public List<String> getBibItemIdList() {
+    public List<Integer> getBibItemIdList() {
         return bibItemIdList;
     }
 
-    public void setBibItemIdList(List<String> bibItemIdList) {
+    public void setBibItemIdList(List<Integer> bibItemIdList) {
         this.bibItemIdList = bibItemIdList;
+    }
+
+    public String getOwningInstitutionBibId() {
+        return owningInstitutionBibId;
+    }
+
+    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
+        this.owningInstitutionBibId = owningInstitutionBibId;
     }
 }

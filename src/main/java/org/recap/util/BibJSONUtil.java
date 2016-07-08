@@ -25,7 +25,7 @@ public class BibJSONUtil extends MarcUtil {
         Bib bib = new Bib();
         List<Item> items = new ArrayList<>();
         try {
-            String bibliographicId = jsonObject.getString("bibliographicId");
+            Integer bibliographicId = jsonObject.getInt("bibliographicId");
             bib.setBibId(bibliographicId);
             bib.setDocType("Bib");
             String bibContent = jsonObject.getString("content");
@@ -50,11 +50,11 @@ public class BibJSONUtil extends MarcUtil {
             bib.setLccn(getLCCNValue(marcRecord));
 
             JSONArray holdingsEntities = jsonObject.getJSONArray("holdingsEntities");
-            List<String> holdingsIds = new ArrayList<>();
-            List<String> itemIds = new ArrayList<>();
+            List<Integer> holdingsIds = new ArrayList<>();
+            List<Integer> itemIds = new ArrayList<>();
             for (int j = 0; j < holdingsEntities.length(); j++) {
                 JSONObject holdingsJSON = holdingsEntities.getJSONObject(j);
-                String holdingsId = holdingsJSON.getString("holdingsId");
+                Integer holdingsId = holdingsJSON.getInt("holdingsId");
                 holdingsIds.add(holdingsId);
 
                 JSONArray itemEntities = holdingsJSON.getJSONArray("itemEntities");
@@ -145,18 +145,18 @@ public class BibJSONUtil extends MarcUtil {
 
         Bib bib = generateBib(bibliographicEntity);
 
-        List<String> holdingsIds = new ArrayList<>();
-        List<String> itemIds = new ArrayList<>();
+        List<Integer> holdingsIds = new ArrayList<>();
+        List<Integer> itemIds = new ArrayList<>();
 
         List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
         for (ItemEntity itemEntity : itemEntities) {
-            itemIds.add(itemEntity.getItemId().toString());
+            itemIds.add(itemEntity.getItemId());
             Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
             items.add(item);
         }
         List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
-            holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+            holdingsIds.add(holdingsEntity.getHoldingsId());
         }
 
         bib.setHoldingsIdList(holdingsIds);
@@ -170,16 +170,16 @@ public class BibJSONUtil extends MarcUtil {
     public Bib generateBibForIndex(BibliographicEntity bibliographicEntity) {
         Bib bib = generateBib(bibliographicEntity);
 
-        List<String> holdingsIds = new ArrayList<>();
-        List<String> itemIds = new ArrayList<>();
+        List<Integer> holdingsIds = new ArrayList<>();
+        List<Integer> itemIds = new ArrayList<>();
 
         List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
         for (ItemEntity itemEntity : itemEntities) {
-            itemIds.add(itemEntity.getItemId().toString());
+            itemIds.add(itemEntity.getItemId());
         }
         List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
-            holdingsIds.add(holdingsEntity.getHoldingsId().toString());
+            holdingsIds.add(holdingsEntity.getHoldingsId());
         }
 
         bib.setHoldingsIdList(holdingsIds);
@@ -190,7 +190,7 @@ public class BibJSONUtil extends MarcUtil {
     private Bib generateBib(BibliographicEntity bibliographicEntity) {
         Bib bib = new Bib();
         Integer bibliographicId = bibliographicEntity.getBibliographicId();
-        bib.setBibId(bibliographicId.toString());
+        bib.setBibId(bibliographicId);
 
         bib.setDocType("Bib");
         String bibContent = new String(bibliographicEntity.getContent());
@@ -213,6 +213,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
         bib.setNotes(getDataFieldValue(marcRecord, "5"));
         bib.setLccn(getLCCNValue(marcRecord));
+        bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         return bib;
     }
 

@@ -27,19 +27,19 @@ public class BibTest extends BaseTestCase {
         List<String> issnList = new ArrayList<>();
         List<String>isbnList = new ArrayList<>();
         List<String> oclcNumberList = new ArrayList<>();
-        List<String> holdingsIdList = new ArrayList<>();
-        List<String> itemIdList = new ArrayList<>();
+        List<Integer> holdingsIdList = new ArrayList<>();
+        List<Integer> itemIdList = new ArrayList<>();
         issnList.add("0394469756");
         isbnList.add("0394469755");
         oclcNumberList.add("00133182");
         oclcNumberList.add("00440790");
-        holdingsIdList.add("201");
-        holdingsIdList.add("202");
-        itemIdList.add("301");
-        itemIdList.add("302");
+        holdingsIdList.add(201);
+        holdingsIdList.add(202);
+        itemIdList.add(301);
+        itemIdList.add(302);
 
         Bib bib = new Bib();
-        bib.setBibId("101");
+        bib.setBibId(101);
         bib.setDocType("Bibliographic");
         bib.setTitle("Middleware for ReCAP");
         bib.setBarcode("1");
@@ -67,7 +67,7 @@ public class BibTest extends BaseTestCase {
         assertTrue(indexedBib.getOclcNumber().get(0).equals("00133182"));
         assertTrue(indexedBib.getHoldingsIdList().equals(holdingsIdList));
         assertTrue(indexedBib.getBibItemIdList().equals(itemIdList));
-        assertEquals(indexedBib.getBibId(),"101");
+        assertEquals(indexedBib.getBibId(),new Integer(101));
         assertEquals(indexedBib.getDocType(),"Bibliographic");
         assertEquals(indexedBib.getTitle(),"Test Bib 1");
         assertEquals(indexedBib.getBarcode(),"1");
