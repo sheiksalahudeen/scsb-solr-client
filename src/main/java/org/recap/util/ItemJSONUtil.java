@@ -60,7 +60,6 @@ public class ItemJSONUtil extends MarcUtil{
     }
 
     public Item generateItemForIndex(ItemEntity itemEntity) {
-        logger.info("Inside the generateItemForIndex method.");
         Item item = new Item();
         try {
             Integer itemId = itemEntity.getItemId();
