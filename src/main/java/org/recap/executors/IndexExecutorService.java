@@ -51,11 +51,15 @@ public abstract class IndexExecutorService {
 
             Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
 
+            logger.info("Total Document Count From DB : " + totalDocCount);
+
             if (totalDocCount > 0) {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
 
                 loopCount = remainder == 0 ? quotient : quotient + 1;
+
+                logger.info("Loop Count Value : " +loopCount);
 
                 List<String> coreNames = new ArrayList<>();
 
@@ -73,6 +77,8 @@ public abstract class IndexExecutorService {
                     futures.add(executorService.submit(callable));
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
+
+                logger.info("No of Futures Added : " +futures.size());
 
                 int mergeIndexCount = 0;
                 int totalBibsProcessed = 0;
