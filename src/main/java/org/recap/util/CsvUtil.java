@@ -32,8 +32,7 @@ public class CsvUtil {
 
     Logger logger = LoggerFactory.getLogger(CsvUtil.class);
 
-    public void createFile() {
-        String fileName = "Matching_Algo_Phase1";
+    public void createFile(String fileName) {
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         File file = new File(reportDirectoryPath + File.separator + fileName + "_" + df.format(new Date()) + ".csv");
         boolean fileExists = file.exists();
