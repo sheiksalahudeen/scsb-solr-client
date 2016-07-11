@@ -9,6 +9,8 @@ import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +28,9 @@ import java.util.concurrent.Future;
  * Created by chenchulakshmig on 21/6/16.
  */
 public class BibItemIndexCallable implements Callable {
+
+    Logger logger = LoggerFactory.getLogger(BibItemIndexCallable.class);
+
     private final int pageNum;
     private final int docsPerPage;
     private String coreName;
@@ -53,6 +58,7 @@ public class BibItemIndexCallable implements Callable {
                 bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
                 bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
+        logger.info("No of Bibs Fetched : " + bibliographicEntities.getSize());
         List<Bib> bibsToIndex = new ArrayList<>();
         List<Item> itemsToIndex = new ArrayList<>();
 
@@ -67,6 +73,8 @@ public class BibItemIndexCallable implements Callable {
             futures.add(submit);
         }
 
+        logger.info("No of Future added to index : " + futures.size());
+
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
             Future future = futureIterator.next();
 
@@ -76,6 +84,9 @@ public class BibItemIndexCallable implements Callable {
             List items = stringListMap.get("Item");
             itemsToIndex.addAll(items);
         }
+
+        logger.info("No of Bibs to index : " + bibsToIndex.size());
+        logger.info("No of Items to index : " + itemsToIndex.size());
 
         executorService.shutdown();
 
