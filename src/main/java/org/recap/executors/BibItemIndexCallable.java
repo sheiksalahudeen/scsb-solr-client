@@ -58,7 +58,7 @@ public class BibItemIndexCallable implements Callable {
                 bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
                 bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
-        logger.info("No of Bibs Fetched : " + bibliographicEntities.getSize());
+        logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         List<Bib> bibsToIndex = new ArrayList<>();
         List<Item> itemsToIndex = new ArrayList<>();
 
@@ -73,7 +73,7 @@ public class BibItemIndexCallable implements Callable {
             futures.add(submit);
         }
 
-        logger.info("No of Future added to index : " + futures.size());
+        logger.info("Num futures to prepare Bib and Associated data : " + futures.size());
 
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
             Future future = futureIterator.next();
