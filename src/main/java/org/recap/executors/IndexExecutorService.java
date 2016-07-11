@@ -92,6 +92,7 @@ public abstract class IndexExecutorService {
                     try {
                         Integer entitiesCount = (Integer) future.get();
                         totalBibsProcessed += entitiesCount;
+                        logger.info("Num bibs fetched by thread : " + entitiesCount);
                         futureCount++;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
