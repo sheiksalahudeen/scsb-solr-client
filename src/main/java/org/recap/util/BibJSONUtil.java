@@ -11,6 +11,8 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -19,6 +21,8 @@ import java.util.*;
  * Created by pvsubrah on 6/15/16.
  */
 public class BibJSONUtil extends MarcUtil {
+
+    Logger logger = LoggerFactory.getLogger(BibJSONUtil.class);
 
     public Map<String, List> generateBibAndItemsForIndex(JSONObject jsonObject) {
         Map map = new HashMap();
@@ -140,6 +144,7 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
+        logger.info("Inside the generateBibAndItemsForIndex method.");
         Map map = new HashMap();
         List<Item> items = new ArrayList<>();
 
