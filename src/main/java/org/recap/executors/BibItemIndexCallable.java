@@ -75,14 +75,18 @@ public class BibItemIndexCallable implements Callable {
 
         logger.info("Num futures to prepare Bib and Associated data : " + futures.size());
 
-        for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
-            Future future = futureIterator.next();
+        try {
+            for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
+                Future future = futureIterator.next();
 
-            Map<String, List> stringListMap = (Map<String, List>) future.get();
-            List bibs = stringListMap.get("Bib");
-            bibsToIndex.addAll(bibs);
-            List items = stringListMap.get("Item");
-            itemsToIndex.addAll(items);
+                Map<String, List> stringListMap = (Map<String, List>) future.get();
+                List bibs = stringListMap.get("Bib");
+                bibsToIndex.addAll(bibs);
+                List items = stringListMap.get("Item");
+                itemsToIndex.addAll(items);
+            }
+        } catch (Exception e) {
+            logger.error("Exception  : " +e.getMessage());
         }
 
         logger.info("No of Bibs to index : " + bibsToIndex.size());

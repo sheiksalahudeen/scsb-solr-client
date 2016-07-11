@@ -5,6 +5,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
  * Created by angelind on 16/6/16.
  */
 public class ItemJSONUtil extends MarcUtil{
+
+    Logger logger = LoggerFactory.getLogger(ItemJSONUtil.class);
 
     private static ItemJSONUtil itemJSONUtil;
 
@@ -56,6 +60,7 @@ public class ItemJSONUtil extends MarcUtil{
     }
 
     public Item generateItemForIndex(ItemEntity itemEntity) {
+        logger.info("Inside the generateItemForIndex method.");
         Item item = new Item();
         try {
             Integer itemId = itemEntity.getItemId();
