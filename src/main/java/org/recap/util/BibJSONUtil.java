@@ -144,7 +144,6 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
-        logger.info("Inside the generateBibAndItemsForIndex method.");
         Map map = new HashMap();
         List<Item> items = new ArrayList<>();
 
