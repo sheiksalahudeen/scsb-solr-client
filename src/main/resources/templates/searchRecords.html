@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Records</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container col-xs-12">
+    <div class="page-header">
+        <h1 align="left" style="color: darkred; height: 20px; margin-top: -20px; margin-bottom: 15px;">RECAP</h1>
+    </div>
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a data-toggle="tab" href="#searchId">Search</a></li>
+        <li><a data-toggle="tab" href="#collectionId">Collection</a></li>
+        <li><a data-toggle="tab" href="#requestId">Request</a></li>
+        <li><a data-toggle="tab" href="#reportsId">Reports</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="searchId" name="searchPage" class="tab-pane fade in active">
+            <div th:include="search :: searchContent"></div>
+        </div>
+        <div id="collectionId" name="collectionPage" class="tab-pane fade">
+            <h3>Collection</h3>
+        </div>
+        <div id="requestId" name="requestPage" class="tab-pane fade">
+            <h3>Request</h3>
+        </div>
+        <div id="reportsId" name="reportsPage" class="tab-pane fade">
+            <h3>Reports</h3>
+        </div>
+    </div>
+</div>
+</body>
+</html>
