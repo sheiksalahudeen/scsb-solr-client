@@ -11,6 +11,7 @@ import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,5 +91,26 @@ public class MatchingAlgorithmHelperService {
         matchingRecordReport.setUseRestrictions(item.getUseRestriction());
         matchingRecordReport.setMatchPointTag(getMatchPointTag(fieldName));
         return matchingRecordReport;
+    }
+
+    public Map<String, List<MatchingRecordReport>> getMatchingReports(String fieldName, String fieldValue, List<Bib> bibs) {
+        Map<String, List<MatchingRecordReport>> owningInstitutionMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(bibs)) {
+            for (Bib bib : bibs) {
+                List<MatchingRecordReport> matchingRecordReports = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(bib.getBibItemIdList())) {
+                    for (Integer itemId : bib.getBibItemIdList()) {
+                        Item item = itemCrudRepository.findByItemId(itemId);
+                        if (item.getCollectionGroupDesignation().equalsIgnoreCase("Shared")) {
+                            matchingRecordReports.add(populateMatchingRecordReport(fieldValue, bib, item, fieldName));
+                        }
+                    }
+                }
+                if (!CollectionUtils.isEmpty(matchingRecordReports)) {
+                    owningInstitutionMap.put(bib.getOwningInstitution(), matchingRecordReports);
+                }
+            }
+        }
+        return owningInstitutionMap;
     }
 }

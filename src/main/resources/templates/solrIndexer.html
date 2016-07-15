@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" th:src="@{../js/solrIndexer.js}"></script>
 </head>
 
@@ -16,90 +17,153 @@
     <div class="jumbotron">
         <h1 align="center">SCSB Solr Admin</h1>
     </div>
-    <div class="row">
-        <div class="col-sm-4">
-            <div id="fullIndexingDiv">
-                <br/><br/>
-                <div class="container">
-                    <!-- Horizonatal Form -->
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <div th:fragment="index-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
-                                <form id="fullIndex-form" name="fullIndex-form" class="form-horizontal" action="#"
-                                      th:action="@{/solrIndexer/fullIndex}"
-                                      th:object="${solrIndexRequest}" method="post">
 
-                                    <fieldset>
-                                        <div class="form-group">
-                                            <label for="numberOfThreads" class="col-sm-4">Number of threads</label>
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a data-toggle="tab" href="#solrIndex">Solr Index</a></li>
+        <li><a data-toggle="tab" href="#matchingAlgorithm">Matching Algorithm</a></li>
+    </ul>
 
-                                            <div class="col-sm-4">
-                                                <input type="text" th:field="*{numberOfThreads}" class="form-control"
-                                                       id="numberOfThreads"
-                                                       placeholder="Number of threads"/>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <span id="numberOfThreadErrorMessage"></span>
-                                            </div>
+    <div class="tab-content">
+        <div id="solrIndex" class="tab-pane fade in active">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div id="fullIndexingDiv">
+                            <br/><br/>
+                            <div class="container">
+                                <!-- Horizonatal Form -->
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div th:fragment="index-form" xmlns:th="http://www.thymeleaf.org"
+                                             th:remove="tag">
+                                            <form id="fullIndex-form" name="fullIndex-form" class="form-horizontal"
+                                                  action="#"
+                                                  th:action="@{/solrIndexer/fullIndex}"
+                                                  th:object="${solrIndexRequest}" method="post">
+
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <label for="numberOfThreads" class="col-sm-4">Number of
+                                                            threads</label>
+
+                                                        <div class="col-sm-4">
+                                                            <input type="text" th:field="*{numberOfThreads}"
+                                                                   class="form-control"
+                                                                   id="numberOfThreads"
+                                                                   placeholder="Number of threads"/>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <span id="numberOfThreadErrorMessage"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="numberOfDocs" class="col-sm-4">Number of Documents
+                                                            to be
+                                                            processed per thread</label>
+
+                                                        <div class="col-sm-4">
+                                                            <input type="text" th:field="*{numberOfDocs}"
+                                                                   class="form-control bfh-number"
+                                                                   id="numberOfDocs"
+                                                                   placeholder="Number of Docs"/>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <span id="numberOfDocErrorMessage"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="institutionId" class="col-sm-4">Institution
+                                                            Id</label>
+
+                                                        <div class="col-sm-7">
+                                                            <select id="institutionId"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{owningInstitutionId}">
+                                                                <option value="">ALL</option>
+                                                                <option value="1">PUL</option>
+                                                                <option value="2">CUL</option>
+                                                                <option value="3">NYPL</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="col-sm-4">
+                                                            <label for="autoRefresh">Auto Refresh</label> &nbsp;&nbsp;
+                                                            <input type="checkbox" id="autoRefresh" name="autoRefresh"
+                                                                   value="autoRefresh" onclick="refresh();"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="col-sm-4">
+                                                            <label for="clean">Clean</label> &nbsp;&nbsp;
+                                                            <input type="checkbox" id="clean" name="clean"
+                                                                   th:field="*{doClean}"/>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <button id="submit" type="submit" name="fullIndex"
+                                                                    class="btn btn-info active  pull-right">Index
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                        <textarea class="form-control" id="fullIndexingStatus" rows="5"
+                                                  placeholder="Full Indexing Status" readonly="true"></textarea>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div id="matchingAlgorithm" class="tab-pane fade">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div id="matchingAlgoDiv">
+                            <br/><br/>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="numberOfDocs" class="col-sm-4">Number of Documents to be
-                                                processed per thread</label>
-
-                                            <div class="col-sm-4">
-                                                <input type="text" th:field="*{numberOfDocs}"
-                                                       class="form-control bfh-number"
-                                                       id="numberOfDocs"
-                                                       placeholder="Number of Docs"/>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <span id="numberOfDocErrorMessage"></span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="institutionId" class="col-sm-4">Institution Id</label>
-
-                                            <div class="col-sm-7">
-                                                <select id="institutionId"
+                                            <label for="institutionId" class="col-sm-4">Matching Criterias</label>
+                                            <div class="col-sm-8">
+                                                <select id="matchingCriteria"
                                                         class="form-control"
-                                                        style="width: 160px;"
-                                                        th:field="*{owningInstitutionId}">
-                                                    <option value="">ALL</option>
-                                                    <option value="1">PUL</option>
-                                                    <option value="2">CUL</option>
-                                                    <option value="3">NYPL</option>
+                                                        style="width: 160px;">
+                                                    <option value="ALL">ALL(OCLC,ISBN,ISSN,LCCN)</option>
+                                                    <option value="OCLC">OCLC</option>
+                                                    <option value="ISBN">ISBN</option>
+                                                    <option value="ISSN">ISSN</option>
+                                                    <option value="LCCN">LCCN</option>
                                                 </select>
                                             </div>
                                         </div>
-
+                                        <br/><br/><br/>
                                         <div class="form-group">
-                                            <div class="col-sm-4">
-                                                <label for="autoRefresh">Auto Refresh</label> &nbsp;&nbsp;
-                                                <input type="checkbox" id="autoRefresh" name="autoRefresh"
-                                                       value="autoRefresh" onclick="refresh();"/>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <div class="col-sm-4">
-                                                <label for="clean">Clean</label> &nbsp;&nbsp;
-                                                <input type="checkbox" id="clean" name="clean"
-                                                       th:field="*{doClean}"/>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <button id="submit" type="submit" name="fullIndex"
-                                                        class="btn btn-info active  pull-right">Index
+                                            <div class="col-sm-6">
+                                                <button id="generateReport" type="button" onclick="generateReport()"
+                                                        class="btn btn-info active  pull-right">Generate Report
                                                 </button>
                                             </div>
                                         </div>
-
-                                        <div class="form-group">
-                                        <textarea class="form-control" id="fullIndexingStatus" rows="5"
-                                                  placeholder="Full Indexing Status" readonly="true"></textarea>
+                                        <br/><br/><br/>
+                                        <div class="form-group col-sm-12">
+                                        <textarea class="form-control" id="matchingAlgorithmStatus" rows="5"
+                                                  placeholder="Matching Algorithm Status" readonly="true"></textarea>
                                         </div>
-                                    </fieldset>
-                                </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

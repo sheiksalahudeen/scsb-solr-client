@@ -50,3 +50,29 @@ function updateStatus() {
         document.getElementById("fullIndexingStatus").value = msg;
     });
 }
+
+function generateReport() {
+    document.getElementById("matchingAlgorithmStatus").value = '';
+    var criteria = $('#matchingCriteria').val();
+    var url = '';
+    if(criteria === 'ALL') {
+        url = "/matchingAlgorithm/full";
+    } else if(criteria === 'OCLC') {
+        url = "/matchingAlgorithm/oclc";
+    } else if(criteria === 'ISBN') {
+        url = "/matchingAlgorithm/isbn";
+    } else if(criteria === 'ISSN') {
+        url = "/matchingAlgorithm/issn";
+    } else if(criteria === 'LCCN') {
+        url = "/matchingAlgorithm/lccn";
+    }
+    if(url !== '') {
+        var request = $.ajax({
+            url: url,
+            type: 'post'
+        });
+        request.done(function (msg) {
+            document.getElementById("matchingAlgorithmStatus").value = msg;
+        })
+    }
+}
