@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
@@ -123,6 +125,9 @@ public class BibJSONUtil extends MarcUtil {
         } else {
             lccnValue = getDataFieldValue(record, "010", null, null, "a");
         }
+        if (lccnValue != null) {
+            lccnValue.trim();
+        }
         return lccnValue;
     }
 
@@ -218,8 +223,24 @@ public class BibJSONUtil extends MarcUtil {
         bib.setNotes(getDataFieldValue(marcRecord, "5"));
         bib.setLccn(getLCCNValue(marcRecord));
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
+        bib.setLeaderMaterialType(getLeaderMaterialType(marcRecord.getLeader()));
         return bib;
     }
 
+    private String getLeaderMaterialType(Leader leader) {
+        String leaderMaterialType = null;
+        String leaderFieldValue = leader != null ? leader.toString() : null;
+        if (StringUtils.isNotBlank(leaderFieldValue) && leaderFieldValue.length() > 7) {
+            char materialTypeChar = leaderFieldValue.charAt(7);
+            if ('m' == materialTypeChar) {
+                leaderMaterialType = RecapConstants.MONOGRAPH;
+            } else if ('s' == materialTypeChar) {
+                leaderMaterialType = RecapConstants.SERIAL;
+            } else {
+                leaderMaterialType = RecapConstants.OTHER;
+            }
+        }
+        return leaderMaterialType;
+    }
 
 }

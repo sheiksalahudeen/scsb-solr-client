@@ -150,11 +150,10 @@ public class SearchRecordsController {
 
         searchRecordsRequest.getAvailability().add("Available");
         searchRecordsRequest.getAvailability().add("Not Available");
-        searchRecordsRequest.getAvailability().add("Loaned");
 
         searchRecordsRequest.getMaterialTypes().add("Monograph");
-        searchRecordsRequest.getMaterialTypes().add("Serials");
-        searchRecordsRequest.getMaterialTypes().add("*");
+        searchRecordsRequest.getMaterialTypes().add("Serial");
+        searchRecordsRequest.getMaterialTypes().add("Other");
 
         searchRecordsRequest.setPageNumber(0);
         searchRecordsRequest.setPageSize(10);

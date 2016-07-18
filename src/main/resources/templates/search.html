@@ -97,9 +97,6 @@
                                     <li><input type="checkbox" id="notAvailable" name="notAvailable"
                                                value="Not Available" th:field="*{availability}"/><label
                                             for="notAvailable">Not Available</label></li>
-                                    <li><input type="checkbox" id="loaned" name="loaned" value="Loaned"
-                                               th:field="*{availability}"/><label
-                                            for="loaned">Loaned</label></li>
                                 </ul>
                             </div>
                             <div class="col-sm-3">
@@ -109,9 +106,9 @@
                                                value="Monograph" th:field="*{materialTypes}"/><label
                                             for="monograph">Monograph</label></li>
                                     <li><input type="checkbox" id="serials" name="serials"
-                                               value="Serials" th:field="*{materialTypes}"/><label
+                                               value="Serial" th:field="*{materialTypes}"/><label
                                             for="serials">Serials</label></li>
-                                    <li><input type="checkbox" id="others" name="others" value="*"
+                                    <li><input type="checkbox" id="others" name="others" value="Other"
                                                th:field="*{materialTypes}"/><label
                                             for="others">Others</label></li>
                                 </ul>
@@ -179,12 +176,8 @@
                                 <tr th:each="searchResult,searchResultStat : *{searchResultRows}">
                                     <td>
                                         <i class="fa fa-circle"
-                                           th:if="${searchResult.availability == 'Available'
-                                                                || searchResult.availability == 'Not Available'
-                                                                || searchResult.availability == 'Loaned'}"
-                                           th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;'
-                                                               : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;'
-                                                               : (${searchResult.availability == 'Loaned'} ? 'font-size: 20px; color: yellow;' : ''))"></i>
+                                           th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
+                                           th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
                                         <input type="checkbox" id="selected" name="selected"
                                                th:value="${searchResult.selected}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"

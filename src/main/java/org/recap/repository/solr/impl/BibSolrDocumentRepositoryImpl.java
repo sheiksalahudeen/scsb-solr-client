@@ -45,16 +45,22 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             query.addCriteria(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations()));
             query.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
 
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
+            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions()) || !CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
                 filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
+            }
+            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
                 filterQuery.addCriteria(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions()));
             }
-            //filterQuery.addCriteria(new Criteria(RecapConstants.MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
+            if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
+                filterQuery.addCriteria(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
+            }
         } else {
             if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
                 query.addCriteria(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions()));
             }
-            //query.addCriteria(new Criteria(RecapConstants.MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
+            if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
+                query.addCriteria(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
+            }
             if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) || !CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
                 filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
             }

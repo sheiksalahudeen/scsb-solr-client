@@ -21,5 +21,8 @@ public class RecapConstants {
     public static final String BARCODE = "Barcode";
     public static final String CALL_NUMBER = "CallNumber";
     public static final String NOTES = "Notes";
-    public static final String MATERIAL_TYPE = "MaterialType";
+    public static final String LEADER_MATERIAL_TYPE = "LeaderMaterialType";
+    public static final String MONOGRAPH = "Monograph";
+    public static final String SERIAL = "Serial";
+    public static final String OTHER = "Other";
 }
