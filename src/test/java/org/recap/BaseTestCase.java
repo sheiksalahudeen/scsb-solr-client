@@ -51,9 +51,6 @@ public class BaseTestCase {
     public HoldingDetailRepository holdingDetailRepository;
 
     @Autowired
-    public BibliographicHoldingDetailsRepository bibliographicHoldingDetailsRepository;
-
-    @Autowired
     public ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired

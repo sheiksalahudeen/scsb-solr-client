@@ -12,8 +12,8 @@ import java.util.List;
 @Entity
 @Table(name = "item_t", schema = "recap", catalog = "")
 @IdClass(ItemPK.class)
-public class ItemEntity implements Serializable{
-    @Column(name = "ITEM_ID", insertable = false,updatable = false)
+public class ItemEntity implements Serializable {
+    @Column(name = "ITEM_ID", insertable = false, updatable = false)
     private Integer itemId;
 
     @Column(name = "BAR_CODE")
@@ -45,14 +45,14 @@ public class ItemEntity implements Serializable{
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
-    @Column(name="CREATED_BY")
+    @Column(name = "CREATED_BY")
     private String createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
-    @Column(name="LAST_UPDATED_BY")
+    @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
     @Column(name = "USE_RESTRICTIONS")
@@ -65,20 +65,20 @@ public class ItemEntity implements Serializable{
     @Column(name = "OWNING_INST_ITEM_ID")
     private String owningInstitutionItemId;
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="HOLDINGS_ID")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "OWNING_INST_HOLDINGS_ID")
     private HoldingsEntity holdingsEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ITEM_AVAIL_STATUS_ID", insertable=false, updatable=false)
+    @JoinColumn(name = "ITEM_AVAIL_STATUS_ID", insertable = false, updatable = false)
     private ItemStatusEntity itemStatusEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "COLLECTION_GROUP_ID", insertable=false, updatable=false)
+    @JoinColumn(name = "COLLECTION_GROUP_ID", insertable = false, updatable = false)
     private CollectionGroupEntity collectionGroupEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
+    @JoinColumn(name = "OWNING_INST_ID", insertable = false, updatable = false)
     private InstitutionEntity institutionEntity;
 
     @ManyToMany(mappedBy = "itemEntities")
@@ -258,13 +258,12 @@ public class ItemEntity implements Serializable{
 }
 
 
-
 class ItemPK implements Serializable {
     private Integer owningInstitutionId;
     private String owningInstitutionItemId;
 
 
-    public ItemPK(){
+    public ItemPK() {
 
     }
 
@@ -291,13 +290,13 @@ class ItemPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionItemId);
+        return Integer.valueOf(owningInstitutionId.toString() + owningInstitutionItemId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        ItemPK itemPK  = (ItemPK) obj;
-        if(itemPK.getOwningInstitutionId().equals(owningInstitutionId) && itemPK.getOwningInstitutionItemId().equals(owningInstitutionItemId)){
+        ItemPK itemPK = (ItemPK) obj;
+        if (itemPK.getOwningInstitutionId().equals(owningInstitutionId) && itemPK.getOwningInstitutionItemId().equals(owningInstitutionItemId)) {
             return true;
         }
 

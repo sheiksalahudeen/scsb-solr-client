@@ -1,9 +1,9 @@
 package org.recap.model.jpa;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
 
 /**
  * Created by pvsubrah on 6/10/16.
@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
 @IdClass(BibliographicPK.class)
-public class BibliographicEntity implements Serializable{
+public class BibliographicEntity implements Serializable {
     @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
 
@@ -28,14 +28,14 @@ public class BibliographicEntity implements Serializable{
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
-    @Column(name="CREATED_BY")
+    @Column(name = "CREATED_BY")
     private String createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
-    @Column(name="LAST_UPDATED_BY")
+    @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
     @Id
@@ -43,23 +43,23 @@ public class BibliographicEntity implements Serializable{
     private String owningInstitutionBibId;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "OWNING_INST_ID", insertable=false, updatable=false)
+    @JoinColumn(name = "OWNING_INST_ID", insertable = false, updatable = false)
     private InstitutionEntity institutionEntity;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "bibliographic_holdings_t", joinColumns = {
-            @JoinColumn(name="OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
-            @JoinColumn(name="OWNING_INST_ID", referencedColumnName = "OWNING_INST_ID")},
-            inverseJoinColumns = @JoinColumn(name = "HOLDINGS_ID", referencedColumnName = "HOLDINGS_ID"))
+            @JoinColumn(name = "OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
+            @JoinColumn(name = "OWNING_INST_ID", referencedColumnName = "OWNING_INST_ID")},
+            inverseJoinColumns = @JoinColumn(name = "OWNING_INST_HOLDINGS_ID", referencedColumnName = "OWNING_INST_HOLDINGS_ID"))
     private List<HoldingsEntity> holdingsEntities;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "bibliographic_item_t", joinColumns = {
-            @JoinColumn(name="OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
-            @JoinColumn(name="BIB_INST_ID", referencedColumnName = "OWNING_INST_ID")},
+            @JoinColumn(name = "OWNING_INST_BIB_ID", referencedColumnName = "OWNING_INST_BIB_ID"),
+            @JoinColumn(name = "BIB_INST_ID", referencedColumnName = "OWNING_INST_ID")},
             inverseJoinColumns = {
-                    @JoinColumn(name="OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
-                    @JoinColumn(name="ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID") })
+                    @JoinColumn(name = "OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
+                    @JoinColumn(name = "ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID")})
     private List<ItemEntity> itemEntities;
 
     public BibliographicEntity() {
@@ -187,13 +187,13 @@ class BibliographicPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(owningInstitutionId.toString()+owningInstitutionBibId);
+        return Integer.valueOf(owningInstitutionId.toString() + owningInstitutionBibId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        BibliographicPK bibliographicPK  = (BibliographicPK) obj;
-        if(bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)){
+        BibliographicPK bibliographicPK = (BibliographicPK) obj;
+        if (bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)) {
             return true;
         }
 
