@@ -11,10 +11,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "holdings_t", schema = "recap", catalog = "")
-public class HoldingsEntity implements Serializable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "HOLDINGS_ID")
+public class HoldingsEntity implements Serializable {
+
+    @Column(name = "HOLDINGS_ID", insertable = false, updatable = false)
     private Integer holdingsId;
 
     @Lob
@@ -25,16 +24,17 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "CREATED_DATE")
     private Date createdDate;
 
-    @Column(name="CREATED_BY")
+    @Column(name = "CREATED_BY")
     private String createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATED_DATE")
     private Date lastUpdatedDate;
 
-    @Column(name="LAST_UPDATED_BY")
+    @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
+    @Id
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
 
@@ -118,5 +118,21 @@ public class HoldingsEntity implements Serializable{
 
     public void setItemEntities(List<ItemEntity> itemEntities) {
         this.itemEntities = itemEntities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HoldingsEntity holdingsEntity = (HoldingsEntity) o;
+
+        return owningInstitutionHoldingsId.equals(holdingsEntity.owningInstitutionHoldingsId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return owningInstitutionHoldingsId.hashCode();
     }
 }
