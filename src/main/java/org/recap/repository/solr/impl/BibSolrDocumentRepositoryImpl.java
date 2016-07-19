@@ -8,19 +8,18 @@ import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.Join;
 import org.springframework.data.solr.core.query.SimpleFilterQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.result.ScoredPage;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by rajeshbabuk on 8/7/16.
@@ -36,6 +35,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SimpleQuery query = new SimpleQuery();
         query.setPageRequest(page);
+        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE));
         query.addCriteria(getCriteriaForFieldName(searchRecordsRequest));
 
         SimpleFilterQuery filterQuery = new SimpleFilterQuery();
@@ -98,19 +98,24 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private List<BibItem> buildBibItems(Page results) {
         List<BibItem> bibItems = results.getContent();
-        List<Integer> itemIds = new ArrayList<>();
+        Set<Integer> itemIds = new HashSet<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
-                    if (bibItem.getBibItemIdList().size() == 1) {
                         itemIds.addAll(bibItem.getBibItemIdList());
-                    }
                 }
             }
         }
         Map<Integer, Item> itemMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(itemIds)) {
-            List<Item> items = solrTemplate.queryForPage(new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(itemIds)), Item.class).getContent();
+            SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(itemIds));
+            query.setRows(itemIds.size());
+            ScoredPage<Item> itemsPage = solrTemplate.queryForPage(query, Item.class);
+            if (itemsPage.getTotalElements() > itemIds.size()) {
+                query.setRows(Math.toIntExact(itemsPage.getTotalElements()));
+                itemsPage = solrTemplate.queryForPage(query, Item.class);
+            }
+            List<Item> items = itemsPage.getContent();
             if (!CollectionUtils.isEmpty(items)) {
                 for (Item item : items) {
                     itemMap.put(item.getItemId(), item);
@@ -120,11 +125,9 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
-                    if (bibItem.getBibItemIdList().size() == 1) {
                         for (Integer itemId : bibItem.getBibItemIdList()) {
                             bibItem.getItems().add(itemMap.get(itemId));
                         }
-                    }
                 }
             }
         }

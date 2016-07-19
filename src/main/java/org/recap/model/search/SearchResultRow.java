@@ -1,5 +1,8 @@
 package org.recap.model.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by rajeshbabuk on 11/7/16.
  */
@@ -16,7 +19,11 @@ public class SearchResultRow {
     private String barcode;
     private String summaryHoldings;
     private String availability;
+    private String leaderMaterialType;
     private boolean selected = false;
+    private boolean showItems = false;
+    private boolean selectAllItems = false;
+    private List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
 
     public String getTitle() {
         return title;
@@ -106,11 +113,43 @@ public class SearchResultRow {
         this.availability = availability;
     }
 
+    public String getLeaderMaterialType() {
+        return leaderMaterialType;
+    }
+
+    public void setLeaderMaterialType(String leaderMaterialType) {
+        this.leaderMaterialType = leaderMaterialType;
+    }
+
     public boolean isSelected() {
         return selected;
     }
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public boolean isShowItems() {
+        return showItems;
+    }
+
+    public void setShowItems(boolean showItems) {
+        this.showItems = showItems;
+    }
+
+    public List<SearchItemResultRow> getSearchItemResultRows() {
+        return searchItemResultRows;
+    }
+
+    public void setSearchItemResultRows(List<SearchItemResultRow> searchItemResultRows) {
+        this.searchItemResultRows = searchItemResultRows;
+    }
+
+    public boolean isSelectAllItems() {
+        return selectAllItems;
+    }
+
+    public void setSelectAllItems(boolean selectAllItems) {
+        this.selectAllItems = selectAllItems;
     }
 }

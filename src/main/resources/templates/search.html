@@ -146,12 +146,11 @@
                              data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}">
                             <span>No search results found. Please refine search results.</span>
                         </div>
-                        <div class="form-group col-sm-12"
+                        <div id="searchResultsDiv" class="form-group col-sm-12 table-responsive"
                              data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}">
-                            <table id="searchResults" name="searchResults"
-                                   class="table table-hover">
-                                <thead>
-                                <tr>
+                            <table id="searchResults" name="searchResults" class="table table-hover">
+                                <thead id="mainHead">
+                                <tr id="mainRow">
                                     <th>
                                         <label for="selectAll" style="width: 80px;">Select
                                             All</label><input type="checkbox" id="selectAll"
@@ -173,8 +172,8 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="searchResult,searchResultStat : *{searchResultRows}">
-                                    <td>
+                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" th:classappend="${searchResult.showItems} ? 'info' : ''" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
+                                    <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
                                            th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
@@ -183,19 +182,51 @@
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
                                                style="margin-left: 5px;"/>
                                     </td>
-                                    <td><span th:text="${searchResult.title}"></span></td>
-                                    <td><span th:text="${searchResult.author}"></span></td>
-                                    <td><span th:text="${searchResult.publisher}"></span></td>
-                                    <td><span th:text="${searchResult.publisherDate}"></span></td>
-                                    <td><span th:text="${searchResult.owningInstitution}"></span>
-                                    </td>
-                                    <td><span th:text="${searchResult.customerCode}"></span></td>
-                                    <td><span
-                                            th:text="${searchResult.collectionGroupDesignation}"></span>
-                                    </td>
-                                    <td><span th:text="${searchResult.useRestriction}"></span></td>
-                                    <td><span th:text="${searchResult.barcode}"></span></td>
-                                    <td><span th:text="${searchResult.summaryHoldings}"></span></td>
+                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:style="${searchResult.leaderMaterialType == 'Serial'} ? 'color: blue;' : ''" th:text="${searchResult.title}"></span></td>
+                                    <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span></td>
+                                    <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span></td>
+                                    <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span></td>
+                                    <td data-th-id="'searchResultsDataOwnInst-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataOwnInstS-'+ ${searchResultStat.index}" th:text="${searchResult.owningInstitution}"></span></td>
+                                    <td data-th-id="'searchResultsDataCustCode-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCustCodeS-'+ ${searchResultStat.index}" th:text="${searchResult.customerCode}"></span></td>
+                                    <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span></td>
+                                    <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
+                                    <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span></td>
+                                    <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span></td>
+                                        <tr  data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
+                                            <th></th>
+                                            <th></th>
+                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}">
+                                                <label for="selectAll" style="width: 80px;">Select
+                                                    All</label><input type="checkbox" id="selectAllItems"
+                                                                      name="selectAllItems"
+                                                                      th:field="*{searchResultRows[__${searchResultStat.index}__].selectAllItems}"
+                                                                      style="margin-left: 26px;"
+                                                                      onclick=""/>
+                                            </th>
+                                            <th data-th-id="'searchItemResultsCCHead-' + ${searchResultStat.index}">Call Number</th>
+                                            <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}">Chronology &amp; Enumeration</th>
+                                            <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}">Barcode</th>
+                                            <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}">Use Restriction</th>
+                                            <th data-th-id="'searchItemResultsCGDHead-' + ${searchResultStat.index}">Collection Group Designation</th>
+                                        </tr>
+                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:each="searchItemResult,searchItemResultStat : ${searchResult.searchItemResultRows}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
+                                            <td></td>
+                                            <td></td>
+                                            <td data-th-id="'searchItemResultsDataPlus-'+ ${searchItemResultStat.index}">
+                                                <i class="fa fa-circle"
+                                                   th:if="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'}"
+                                                   th:style="${searchItemResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchItemResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
+                                                <input type="checkbox" id="selectedItem" name="selectedItem"
+                                                       th:value="${searchItemResult.selectedItem}"
+                                                       th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchResultStat.index}__].selectedItem}"
+                                                       style="margin-left: 5px;"/>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.chronologyAndEnum}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataBarS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.barcode}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataCGD-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCGDS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.collectionGroupDesignation}"></span></td>
+                                        </tr>
                                 </tr>
                                 </tbody>
                             </table>
@@ -250,6 +281,10 @@
                                             style="margin-right: 10px;">Request Selected Records
                                     </button>
                                 </div>
+                            </div>
+                            <div class="col-md-12 form-group" style="margin-top: -40px;">
+                                <i class="fa fa-circle" style="font-size: 20px; color: green;"></i><span> Available</span>
+                                <i class="fa fa-circle" style="font-size: 20px; color: red; margin-left: 15px;"></i><span> Not Available</span>
                             </div>
                         </div>
                     </div>
