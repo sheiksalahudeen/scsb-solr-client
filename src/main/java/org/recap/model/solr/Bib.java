@@ -75,6 +75,9 @@ public class Bib {
     @Field("OwningInstitutionBibId")
     private String owningInstitutionBibId;
 
+    @Field("LeaderMaterialType")
+    private String leaderMaterialType;
+
     public String getId() {
         return id;
     }
@@ -241,5 +244,13 @@ public class Bib {
 
     public void setOwningInstitutionBibId(String owningInstitutionBibId) {
         this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    public String getLeaderMaterialType() {
+        return leaderMaterialType;
+    }
+
+    public void setLeaderMaterialType(String leaderMaterialType) {
+        this.leaderMaterialType = leaderMaterialType;
     }
 }

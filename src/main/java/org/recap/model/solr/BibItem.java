@@ -70,11 +70,22 @@ public class BibItem {
     @Field("OwningInstitutionBibId")
     private String owningInstitutionBibId;
 
+    @Field("LeaderMaterialType")
+    private String leaderMaterialType;
+
     @Field("BibItemId")
     private List<Integer> bibItemIdList;
 
     @Ignore
     private List<Item> items = new ArrayList<>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Integer getBibId() {
         return bibId;
@@ -218,6 +229,14 @@ public class BibItem {
 
     public void setOwningInstitutionBibId(String owningInstitutionBibId) {
         this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    public String getLeaderMaterialType() {
+        return leaderMaterialType;
+    }
+
+    public void setLeaderMaterialType(String leaderMaterialType) {
+        this.leaderMaterialType = leaderMaterialType;
     }
 
     public List<Integer> getBibItemIdList() {
