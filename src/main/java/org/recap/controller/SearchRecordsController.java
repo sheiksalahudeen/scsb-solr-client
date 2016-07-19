@@ -1,5 +1,7 @@
 package org.recap.controller;
 
+import org.recap.RecapConstants;
+import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.model.solr.BibItem;
@@ -150,11 +152,10 @@ public class SearchRecordsController {
 
         searchRecordsRequest.getAvailability().add("Available");
         searchRecordsRequest.getAvailability().add("Not Available");
-        searchRecordsRequest.getAvailability().add("Loaned");
 
         searchRecordsRequest.getMaterialTypes().add("Monograph");
-        searchRecordsRequest.getMaterialTypes().add("Serials");
-        searchRecordsRequest.getMaterialTypes().add("*");
+        searchRecordsRequest.getMaterialTypes().add("Serial");
+        searchRecordsRequest.getMaterialTypes().add("Other");
 
         searchRecordsRequest.setPageNumber(0);
         searchRecordsRequest.setPageSize(10);
@@ -178,7 +179,8 @@ public class SearchRecordsController {
                 searchResultRow.setPublisher(bibItem.getPublisher());
                 searchResultRow.setPublisherDate(bibItem.getPublicationDate());
                 searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
-                if (null != bibItem.getItems() && bibItem.getItems().size() == 1) {
+                searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
+                if (null != bibItem.getItems() && bibItem.getItems().size() == 1 && !RecapConstants.SERIAL.equals(bibItem.getLeaderMaterialType())) {
                     Item item = bibItem.getItems().get(0);
                     searchResultRow.setCustomerCode(item.getCustomerCode());
                     searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
@@ -186,6 +188,21 @@ public class SearchRecordsController {
                     searchResultRow.setBarcode(item.getBarcode());
                     searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                     searchResultRow.setAvailability(item.getAvailability());
+                } else {
+                    if (null != bibItem.getItems()) {
+                        List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
+                        for (Item item : bibItem.getItems()) {
+                            SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
+                            searchItemResultRow.setCallNumber(item.getCallNumber());
+                            searchItemResultRow.setBarcode(item.getBarcode());
+                            searchItemResultRow.setUseRestriction(item.getUseRestriction());
+                            searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
+                            searchItemResultRow.setAvailability(item.getAvailability());
+                            searchItemResultRows.add(searchItemResultRow);
+                        }
+                        searchResultRow.setShowItems(true);
+                        searchResultRow.setSearchItemResultRows(searchItemResultRows);
+                    }
                 }
                 searchResultRows.add(searchResultRow);
             }
