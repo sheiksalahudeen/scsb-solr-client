@@ -27,12 +27,12 @@
                         <input id="totalPageCount" name="totalPageCount" type="text"
                                th:field="*{totalPageCount}" hidden="hidden"/>
                         <div class="form-group">
-                            <div class="col-sm-8">
+                            <div id="fieldValueId" name="fieldValueName" class="col-sm-8">
                                 Search <input type="text" th:field="*{fieldValue}"
                                               class="form-control"
                                               id="fieldValue"/>
                             </div>
-                            <div class="col-sm-4">
+                            <div id="fieldNameId" name="fieldName" class="col-sm-4">
                                 <label></label>
                                 <select id="fieldName"
                                         class="form-control"
@@ -55,8 +55,8 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group col-sm-9">
-                            <div class="col-sm-3">
+                        <div id="checkBoxesId" name="checkBoxesName" class="form-group col-sm-9">
+                            <div id="ownInstId" name="ownInstName" class="col-sm-3">
                                 <label>Owning Institution</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="owningInstitutionNYPL"
@@ -73,7 +73,7 @@
                                             for="owningInstitutionPUL">Princeton</label></li>
                                 </ul>
                             </div>
-                            <div class="col-sm-3">
+                            <div id="cgdId" name="cgdName" class="col-sm-3">
                                 <label>Collection Group</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="shared" name="shared" value="Shared"
@@ -88,7 +88,7 @@
                                             for="open">Open</label></li>
                                 </ul>
                             </div>
-                            <div class="col-sm-3">
+                            <div id="availabilityId" name="availabilityName" class="col-sm-3">
                                 <label>Availability</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="available" name="available"
@@ -99,7 +99,7 @@
                                             for="notAvailable">Not Available</label></li>
                                 </ul>
                             </div>
-                            <div class="col-sm-3">
+                            <div id="materialTypeId" name="materialTypeName" class="col-sm-3">
                                 <label>Material Type</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="monograph" name="monograph"
@@ -182,7 +182,7 @@
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
                                                style="margin-left: 5px;"/>
                                     </td>
-                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:style="${searchResult.leaderMaterialType == 'Serial'} ? 'color: blue;' : ''" th:text="${searchResult.title}"></span></td>
+                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><a href="#" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:style="${searchResult.leaderMaterialType == 'Serial'} ? 'color: blue;' : ''" th:text="${searchResult.title}"></a></td>
                                     <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span></td>
                                     <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span></td>
                                     <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span></td>
