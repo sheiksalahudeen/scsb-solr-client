@@ -194,6 +194,7 @@ public class SearchRecordsController {
                         for (Item item : bibItem.getItems()) {
                             SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
                             searchItemResultRow.setCallNumber(item.getCallNumber());
+                            searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                             searchItemResultRow.setBarcode(item.getBarcode());
                             searchItemResultRow.setUseRestriction(item.getUseRestriction());
                             searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());

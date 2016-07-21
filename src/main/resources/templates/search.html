@@ -10,13 +10,13 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div th:fragment="searchContent">
-    <div th:fragment="search-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+<div id="searchContentId" name="searchContentName" th:fragment="searchContent">
+    <div id="searchFormDivId" name="searchFormDivName" th:fragment="search-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
         <form id="search-form" name="search-form" class="form-horizontal" action="#"
               th:action="@{/searchRecords}"
               th:object="${searchRecordsRequest}" method="post">
             <fieldset>
-                <div id="searchRecordsDiv">
+                <div id="searchRecordsDivId" name="searchRecordsDivName">
                     <div class="container">
                         <h3 style="color: dodgerblue">SCSB Search</h3>
                         <br/>
@@ -114,7 +114,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="form-group col-sm-9" style="margin-top: 25px;">
+                        <div id="buttonsDivId" name="buttonsDivName" class="form-group col-sm-9" style="margin-top: 25px;">
                             <div class="col-sm-3">
                                 <button id="search" type="submit" name="action" value="search"
                                         class="btn btn-info active  pull-right">Search
@@ -136,13 +136,13 @@
                         <hr style="border-top-width: 3px;"/>
                     </div>
                     <div data-th-if="*{showResults}">
-                        <div class="form-group col-sm-12" style="margin-top: -40px;"
+                        <div id="searchResultsHeadId" name="searchResultsHeadName" class="form-group col-sm-12" style="margin-top: -40px;"
                              data-th-if="*{showResults}">
                             <h3 align="left" style="color: dodgerblue">Search Results</h3>
                                                 <span class="pull-right" style="margin-top: -30px; font-weight: bold">Search Results Found: <span
                                                         th:text="*{totalRecordsCount}"></span></span>
                         </div>
-                        <div class="form-group col-sm-12"
+                        <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
                              data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}">
                             <span>No search results found. Please refine search results.</span>
                         </div>
@@ -172,7 +172,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" th:classappend="${searchResult.showItems} ? 'info' : ''" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
+                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
@@ -180,9 +180,9 @@
                                         <input type="checkbox" id="selected" name="selected"
                                                th:value="${searchResult.selected}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
-                                               style="margin-left: 5px;"/>
+                                               th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                     </td>
-                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><a href="#" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:style="${searchResult.leaderMaterialType == 'Serial'} ? 'color: blue;' : ''" th:text="${searchResult.title}"></a></td>
+                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><a href="#" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:text="${searchResult.title}"></a></td>
                                     <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span></td>
                                     <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span></td>
                                     <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span></td>
@@ -192,7 +192,7 @@
                                     <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
                                     <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span></td>
                                     <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span></td>
-                                        <tr  data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
+                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
                                             <th></th>
                                             <th></th>
                                             <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}">
@@ -219,7 +219,7 @@
                                                 <input type="checkbox" id="selectedItem" name="selectedItem"
                                                        th:value="${searchItemResult.selectedItem}"
                                                        th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchResultStat.index}__].selectedItem}"
-                                                       style="margin-left: 5px;"/>
+                                                       th:style="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                             </td>
                                             <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span></td>
                                             <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.chronologyAndEnum}"></span></td>
@@ -230,10 +230,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div class="col-md-12 form-group">
+                            <div id="paginationDivId" name="paginationDivName" class="col-md-12 form-group">
                                 <div class="pull-left" style="margin-top: -40px;"
                                      th:if="*{totalPageCount &gt; 1}">
-                                    <div class="pagination pagination-centered">
+                                    <div id="paginationId" name="paginationName" class="pagination pagination-centered">
                                         <ul class="pagination">
                                             <li th:class="*{pageNumber == 0} ? 'disabled' : ''">
                                                 <span th:if="*{pageNumber == 0}">First</span>
@@ -271,7 +271,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="pull-right">
+                                <div id="selectButtonsId" name="selectButtonsName" class="pull-right">
                                     <button id="export" type="button" name="action" value="export"
                                             class="btn btn-info active  pull-right">Export Selected
                                         Records
