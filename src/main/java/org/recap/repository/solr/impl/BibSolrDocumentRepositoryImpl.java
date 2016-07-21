@@ -37,7 +37,19 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         query.setPageRequest(page);
         query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE));
         query.addCriteria(getCriteriaForFieldName(searchRecordsRequest));
+        query.addFilterQuery(getFilterQueryForInputFields(searchRecordsRequest, query));
+        query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
 
+        Page results = solrTemplate.queryForPage(query, BibItem.class);
+
+        searchRecordsRequest.setPageNumber(results.getNumber());
+        searchRecordsRequest.setTotalPageCount(results.getTotalPages());
+        searchRecordsRequest.setTotalRecordsCount(results.getTotalElements());
+        List<BibItem> bibItems = buildBibItems(results);
+        return bibItems;
+    }
+
+    private SimpleFilterQuery getFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
         SimpleFilterQuery filterQuery = new SimpleFilterQuery();
         String fieldName = searchRecordsRequest.getFieldName();
         if (RecapConstants.NOTES.equals(fieldName) || RecapConstants.CALL_NUMBER.equals(fieldName) || RecapConstants.BARCODE.equals(fieldName)) {
@@ -71,16 +83,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 filterQuery.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
             }
         }
-
-        query.addFilterQuery(filterQuery);
-        query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
-
-        Page results = solrTemplate.queryForPage(query, BibItem.class);
-        searchRecordsRequest.setPageNumber(results.getNumber());
-        searchRecordsRequest.setTotalPageCount(results.getTotalPages());
-        searchRecordsRequest.setTotalRecordsCount(results.getTotalElements());
-        List<BibItem> bibItems = buildBibItems(results);
-        return bibItems;
+        return filterQuery;
     }
 
     private Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
