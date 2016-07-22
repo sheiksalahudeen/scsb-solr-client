@@ -12,8 +12,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@Ignore
-public class BibTest extends BaseTestCase {
+public class BibAT extends BaseTestCase {
 
     @Before
     public void setUp() throws Exception {

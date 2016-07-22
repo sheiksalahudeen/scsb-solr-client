@@ -10,8 +10,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Ignore
-public class ItemTest extends  BaseTestCase {
+public class ItemAT extends  BaseTestCase {
 
     @Before
     public void setUp() throws Exception {

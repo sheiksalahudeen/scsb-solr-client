@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  * Created by rajeshbabuk on 14/7/16.
  */
-public class BibSolrDocumentRepositoryTest extends BaseTestCase {
+public class BibSolrDocumentRepositoryAT extends BaseTestCase {
 
     @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;

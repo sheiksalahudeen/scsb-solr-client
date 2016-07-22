@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public class CollectionGroupEntityTest extends BaseTestCase{
+public class CollectionGroupEntityUT extends BaseTestCase{
 
     @Test
     public void collectionGroupEntity(){

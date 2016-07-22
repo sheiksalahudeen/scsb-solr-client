@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by pvsubrah on 6/20/16.
  */
-public class BibliographicEntityTest extends BaseTestCase {
+public class BibliographicEntityUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

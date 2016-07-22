@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class DiacriticalMarks_UT extends BaseTestCase {
+public class DiacriticalMarksUT extends BaseTestCase {
 
     @Test
     public void getXmlContent() throws Exception{

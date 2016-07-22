@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by angelind on 4/7/16.
  */
-public class MatchingAlgorithmTest extends BaseTestCase {
+public class MatchingAlgorithmAT extends BaseTestCase {
 
     @Value("${solr.report.directory}")
     String reportDirectoryPath;
