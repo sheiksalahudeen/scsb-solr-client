@@ -88,13 +88,24 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
         Criteria criteria = null;
-        String fieldValue = StringUtils.isBlank(searchRecordsRequest.getFieldValue()) ? RecapConstants.ALL : searchRecordsRequest.getFieldValue();
-        if (StringUtils.isBlank(searchRecordsRequest.getFieldName())) {
+        String fieldName = searchRecordsRequest.getFieldName();
+        String fieldValue = searchRecordsRequest.getFieldValue();
+
+        if (StringUtils.isBlank(fieldName) && StringUtils.isBlank(fieldValue)) {
+            criteria = new Criteria().expression(RecapConstants.ALL);
+        } else if (StringUtils.isBlank(fieldName)) {
             criteria = new Criteria().is(fieldValue);
-        } else if (RecapConstants.TITLE_STARTS_WITH.equals(searchRecordsRequest.getFieldName())) {
-            criteria = new Criteria(RecapConstants.TITLE).startsWith(fieldValue);
+        } else if (StringUtils.isBlank(fieldValue)) {
+            if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
+                fieldName = RecapConstants.TITLE;
+            }
+            criteria = new Criteria(fieldName).expression(RecapConstants.ALL);
         } else {
-            criteria = new Criteria(searchRecordsRequest.getFieldName()).is(fieldValue);
+            if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
+                criteria = new Criteria(RecapConstants.TITLE).startsWith(fieldValue);
+            } else {
+                criteria = new Criteria(fieldName).is(fieldValue);
+            }
         }
         return criteria;
     }
