@@ -10,7 +10,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Ignore
 public class ItemAT extends  BaseTestCase {
 
     @Before

@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
  * Created by angelind on 16/6/16.
  */
 
-@Ignore
 public class ItemRESTIndexerAT extends BaseTestCase {
 
     @Test

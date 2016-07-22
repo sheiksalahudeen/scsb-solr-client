@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by chenchulakshmig on 6/15/16.
  */
-@Ignore
 public class BibRESTIndexerAT extends BaseTestCase {
 
     @Test

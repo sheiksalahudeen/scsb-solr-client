@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
  * Created by pvsubrah on 6/12/16.
  */
 
-@Ignore
 public class SolrAdminAT extends BaseTestCase {
     String tempCoreName1 = "temp0";
     String tempCoreName2 = "temp1";
