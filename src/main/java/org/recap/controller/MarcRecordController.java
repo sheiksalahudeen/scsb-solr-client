@@ -28,7 +28,7 @@ public class MarcRecordController {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @RequestMapping("/openMarcRecord")
-    public String searchRecords(@Valid @ModelAttribute("bibId") Integer bibId, Model model) {
+    public String openMarcRecord(@Valid @ModelAttribute("bibId") Integer bibId, Model model) {
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
         String bibContent = new String(bibliographicEntity.getContent());
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
