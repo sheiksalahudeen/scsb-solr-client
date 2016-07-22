@@ -12,6 +12,7 @@ import org.recap.util.BibJSONUtil;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import javax.persistence.EntityManager;
@@ -36,6 +37,9 @@ public class SolrUnicodeAT extends BaseTestCase {
     private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
 
     private SolrCrudRepository solrCrudRepository;
+
+    @Autowired
+    SolrTemplate solrTemplate;
 
     @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;
@@ -80,6 +84,7 @@ public class SolrUnicodeAT extends BaseTestCase {
 
         //bibSolrCrudRepository = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);
         bibSolrCrudRepository.save(bibs);
+        solrTemplate.softCommit();
         Bib solrBib = bibSolrCrudRepository.findByBibId(fetchedBibliographicEntity.getBibliographicId());
         assertNotNull(solrBib);
 

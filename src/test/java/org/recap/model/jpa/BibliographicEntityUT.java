@@ -159,7 +159,8 @@ public class BibliographicEntityUT extends BaseTestCase {
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
     }
@@ -196,7 +197,8 @@ public class BibliographicEntityUT extends BaseTestCase {
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity1, holdingsEntity2));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
         assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(1).getHoldingsId());
