@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class SearchResultRow {
 
+    private Integer bibId;
     private String title;
     private String author;
     private String publisher;
@@ -24,6 +25,14 @@ public class SearchResultRow {
     private boolean showItems = false;
     private boolean selectAllItems = false;
     private List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
+
+    public Integer getBibId() {
+        return bibId;
+    }
+
+    public void setBibId(Integer bibId) {
+        this.bibId = bibId;
+    }
 
     public String getTitle() {
         return title;

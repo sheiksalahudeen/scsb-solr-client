@@ -81,7 +81,7 @@ public class BibJSONUtil extends MarcUtil {
         return map;
     }
 
-    private String getPublisherValue(Record record) {
+    public String getPublisherValue(Record record) {
         String publisherValue = null;
         List<String> publisherDataFields = Arrays.asList("260", "261", "262", "264");
         for (String publisherDataField : publisherDataFields) {
@@ -105,7 +105,7 @@ public class BibJSONUtil extends MarcUtil {
         return null;
     }
 
-    private String getPublicationDateValue(Record record) {
+    public String getPublicationDateValue(Record record) {
         String publicationDateValue = null;
         List<String> publicationDateDataFields = Arrays.asList("260", "261", "262", "264");
         for (String publicationDateDataField : publicationDateDataFields) {
@@ -210,8 +210,8 @@ public class BibJSONUtil extends MarcUtil {
         String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
 
         bib.setOwningInstitution(institutionCode);
-        bib.setTitle(getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b')));
-        bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
+        bib.setTitle(getTitle(marcRecord));
+        bib.setAuthor(getAuthor(marcRecord));
         bib.setPublisher(getPublisherValue(marcRecord));
         bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
         bib.setPublicationDate(getPublicationDateValue(marcRecord));
@@ -241,6 +241,14 @@ public class BibJSONUtil extends MarcUtil {
             }
         }
         return leaderMaterialType;
+    }
+
+    public String getTitle(Record marcRecord) {
+        return getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b'));
+    }
+
+    public String getAuthor(Record marcRecord) {
+        return getDataFieldValue(marcRecord, "100", null, null, "a");
     }
 
 }

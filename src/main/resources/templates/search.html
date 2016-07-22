@@ -172,7 +172,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
+                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" data-toggle="collapse" th:title="${searchResult.bibId}" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
@@ -182,7 +182,9 @@
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
                                                th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                     </td>
-                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}"><a href="#" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:text="${searchResult.title}"></a></td>
+                                    <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}">
+                                        <a th:href="@{/openMarcRecord(bibId=${searchResult.bibId})}" target="_blank" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:text="${searchResult.title}"></a>
+                                    </td>
                                     <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span></td>
                                     <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span></td>
                                     <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span></td>
