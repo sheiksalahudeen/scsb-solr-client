@@ -13,4 +13,5 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     Long countByOwningInstitutionId(Integer institutionId);
     Page<BibliographicEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
     BibliographicEntity findByOwningInstitutionIdAndOwningInstitutionBibId(Integer owningInstitutionId, String owningInstitutionBibId);
+    BibliographicEntity findByBibliographicId(Integer bibId);
 }
