@@ -188,6 +188,7 @@ public class SearchRecordsController {
                     searchResultRow.setBarcode(item.getBarcode());
                     searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                     searchResultRow.setAvailability(item.getAvailability());
+                    searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                 } else {
                     if (null != bibItem.getItems()) {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
