@@ -5,45 +5,49 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
-import org.recap.util.ItemJSONUtil;
+import org.recap.util.BibJSONUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by angelind on 16/6/16.
+ * Created by chenchulakshmig on 6/15/16.
  */
-
 @Ignore
-public class ItemRESTIndexerTest extends BaseTestCase {
+public class BibRESTIndexerAT extends BaseTestCase {
 
     @Test
     public void countFromRESTCall() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response =
-                restTemplate.getForEntity(itemResourceURL + "/count", String.class);
-        Long itemCount = Long.valueOf(response.getBody());
-        System.out.println("Item count " + itemCount);
+                restTemplate.getForEntity(bibResourceURL + "/count", String.class);
+        Long bibliographicCount = Long.valueOf(response.getBody());
+        System.out.println("Bibliographic count " + bibliographicCount);
     }
+
+
 
     @Test
     public void indexRESTCallResponseFindByRangeOfIdsRESTCall() throws Exception {
 
+        bibCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
 
         Integer fromId = 2;
         Integer toId = 3;
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response =
-                restTemplate.getForEntity(itemResourceURL + "/findByRangeOfIds?fromId=" + fromId + "&toId=" + toId, String.class);
+                restTemplate.getForEntity(bibResourceURL + "/findByRangeOfIds?fromId=" + fromId + "&toId=" + toId, String.class);
 
 
         HttpStatus statusCode = response.getStatusCode();
@@ -51,22 +55,31 @@ public class ItemRESTIndexerTest extends BaseTestCase {
 
         JSONArray jsonArray = new JSONArray(response.getBody());
 
-        List<Item> itemsToIndex = new ArrayList<Item>();
+        List<Bib> bibsToIndex = new ArrayList<Bib>();
+        List<Item> itemsToIndex = new ArrayList<>();
 
         for (int i =0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String itemId = jsonObject.getString("itemId");
-            String barcode = jsonObject.getString("barcode");
+            String bibliographicId = jsonObject.getString("bibliographicId");
+            String content = jsonObject.getString("content");
 
-            assertNotNull(itemId);
-            assertNotNull(barcode);
+            assertNotNull(bibliographicId);
+            assertNotNull(content);
 
-            itemsToIndex.add(new ItemJSONUtil().generateItemForIndex(jsonObject, null));
+            Map<String, List> map = new BibJSONUtil().generateBibAndItemsForIndex(jsonObject);
+            Bib bib = (Bib) map.get("Bib");
+            bibsToIndex.add(bib);
+
+            List<Item> items = map.get("Item");
+            itemsToIndex.addAll(items);
         }
 
-        itemCrudRepository.save(itemsToIndex);
-        long count = itemCrudRepository.count();
+        bibCrudRepository.save(bibsToIndex);
+        long count = bibCrudRepository.count();
         assertEquals(2, count);
+
+        itemCrudRepository.save(itemsToIndex);
+        assertEquals(4, itemCrudRepository.count());
 
     }
 }

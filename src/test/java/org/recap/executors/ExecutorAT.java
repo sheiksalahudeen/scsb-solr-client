@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @Ignore
-public class ExecutorTest extends BaseTestCase {
+public class ExecutorAT extends BaseTestCase {
 
     @Autowired
     BibIndexExecutorService bibIndexExecutorService;

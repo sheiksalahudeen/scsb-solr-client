@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by pvsubrah on 6/15/16.
  */
-public class MarcUtilTest {
+public class MarcUtilUT {
 
     private String marcXML = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
             "          <record>\n" +

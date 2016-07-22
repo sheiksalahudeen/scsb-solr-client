@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public class InstitutionEntityTest extends BaseTestCase {
+public class InstitutionEntityUT extends BaseTestCase {
 
     @Test
     public void institutionEntity(){

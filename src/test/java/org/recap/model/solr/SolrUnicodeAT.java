@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by rajeshbabuk on 5/7/16.
  */
-public class SolrUnicodeTest extends BaseTestCase {
+public class SolrUnicodeAT extends BaseTestCase {
 
     @Value("${solr.url}")
     String solrUrl;

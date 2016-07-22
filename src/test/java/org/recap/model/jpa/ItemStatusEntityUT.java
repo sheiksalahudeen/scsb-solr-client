@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public class ItemStatusEntityTest extends BaseTestCase {
+public class ItemStatusEntityUT extends BaseTestCase {
 
     @Test
     public void itemStatus(){
