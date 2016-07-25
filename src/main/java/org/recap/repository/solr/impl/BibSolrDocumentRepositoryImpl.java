@@ -52,7 +52,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     private SimpleFilterQuery getFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
         SimpleFilterQuery filterQuery = new SimpleFilterQuery();
         String fieldName = searchRecordsRequest.getFieldName();
-        if (RecapConstants.NOTES.equals(fieldName) || RecapConstants.CALL_NUMBER.equals(fieldName) || RecapConstants.BARCODE.equals(fieldName)) {
+        if (RecapConstants.CALL_NUMBER.equals(fieldName) || RecapConstants.BARCODE.equals(fieldName)) {
             query.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
             query.addCriteria(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations()));
             query.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));

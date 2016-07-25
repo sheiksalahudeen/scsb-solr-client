@@ -10,6 +10,7 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div th:replace="recapHeader :: #recapPageHeaderId"></div>
 <div id="marcRecordViewDivId" name="marcRecordViewDivName" th:fragment="marcRecordContent">
     <div id="marcRecordFormDivId" name="marcRecordFormDivName" th:fragment="marcRecord-form"
          xmlns:th="http://www.thymeleaf.org"
@@ -25,19 +26,46 @@
                         </div>
                         <br/>
                         <div class="form-group">
-                            <span style="font-weight: bold;">Author : </span><span th:text="${bibliographicMarcRecord.author}"></span>
+                            <span style="font-weight: bold;">Author : </span><span th:text="${bibliographicMarcRecord.author}"></span><br/>
+                            <span style="font-weight: bold;">Publisher : </span><span th:text="${bibliographicMarcRecord.publisher}"></span><br/>
+                            <span style="font-weight: bold;">Published Date : </span><span th:text="${bibliographicMarcRecord.publishedDate}"></span><br/>
+                            <span style="font-weight: bold;">Owning Institution : </span><span th:text="${bibliographicMarcRecord.owningInstitution}"></span><br/>
                         </div>
                         <div class="form-group">
-                            <span style="font-weight: bold;">Publisher : </span><span th:text="${bibliographicMarcRecord.publisher}"></span>
+                            <span style="font-weight: bold;">Marc Content : </span>
                         </div>
                         <div class="form-group">
-                            <span style="font-weight: bold;">Published Date : </span><span th:text="${bibliographicMarcRecord.publishedDate}"></span>
-                        </div>
-                        <div class="form-group">
-                            <span style="font-weight: bold;">Owning Institution : </span><span th:text="${bibliographicMarcRecord.owningInstitution}"></span>
-                        </div>
-                        <div class="form-group">
-                            <span style="font-weight: bold;">Marc Content : </span><br/><span th:text="${bibliographicMarcRecord.content}"></span>
+                            <table class="col-sm-12">
+                                <colgroup>
+                                    <col style="width:20%"/>
+                                    <col style="width:80%"/>
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <td><span>tag000</span></td>
+                                    <td><span th:text="${bibliographicMarcRecord.tag000}"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><span>Control Number (001)</span></td>
+                                    <td><span th:text="${bibliographicMarcRecord.controlNumber001}"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><span>Date and Time (005)</span></td>
+                                    <td><span th:text="${bibliographicMarcRecord.controlNumber005}"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><span>Fixed Length Data Element (008)</span></td>
+                                    <td><span th:text="${bibliographicMarcRecord.controlNumber008}"></span></td>
+                                </tr>
+                                <tr th:each="bibDataField : *{bibDataFields}">
+                                    <td>
+                                        <span style="margin-left: 30px;" th:text="${bibDataField.dataFieldTag}"></span>
+                                        <span th:inline="text">[[${bibDataField.indicator1}]][[${bibDataField.indicator2}]]</span>
+                                    </td>
+                                    <td><span th:text="${bibDataField.dataFieldValue}"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

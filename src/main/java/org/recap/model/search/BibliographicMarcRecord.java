@@ -1,5 +1,8 @@
 package org.recap.model.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by rajeshbabuk on 22/7/16.
  */
@@ -16,6 +19,7 @@ public class BibliographicMarcRecord {
     private String controlNumber005;
     private String controlNumber008;
     private String content;
+    private List<BibDataField> bibDataFields = new ArrayList<>();
 
     public Integer getBibId() {
         return bibId;
@@ -103,5 +107,13 @@ public class BibliographicMarcRecord {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<BibDataField> getBibDataFields() {
+        return bibDataFields;
+    }
+
+    public void setBibDataFields(List<BibDataField> bibDataFields) {
+        this.bibDataFields = bibDataFields;
     }
 }
