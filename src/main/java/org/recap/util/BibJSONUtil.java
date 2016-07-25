@@ -251,4 +251,8 @@ public class BibJSONUtil extends MarcUtil {
         return getDataFieldValue(marcRecord, "100", null, null, "a");
     }
 
+    public String getLeader(Record marcRecord) {
+        return marcRecord.getLeader() != null ? marcRecord.getLeader().toString() : null;
+    }
+
 }
