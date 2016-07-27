@@ -2,6 +2,7 @@ package org.recap.model.jpa;
 
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -46,11 +47,21 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random));
         bibliographicEntity.setOwningInstitutionId(3);
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionId(1);
+        institutionEntity.setInstitutionCode("PUL");
+        institutionEntity.setInstitutionName("New York Public Library");
+        bibliographicEntity.setInstitutionEntity(institutionEntity);
         BibliographicEntity entity = bibliographicDetailsRepository.save(bibliographicEntity);
         assertNotNull(entity);
         assertEquals(new String(entity.getContent()), "Mock Bib Content");
         assertEquals(entity.getOwningInstitutionId().toString(), "3");
         assertEquals(entity.getCreatedDate().toString(),new Date().toString());
+        assertEquals(entity.getCreatedBy(),"tst");
+        assertEquals(entity.getLastUpdatedDate().toString(),new Date().toString());
+        assertEquals(entity.getLastUpdatedBy(),"tst");
+        assertEquals(entity.getInstitutionEntity().getInstitutionCode(),"PUL");
+
         System.out.println("owning institution bibId-->" + entity.getOwningInstitutionBibId());
         Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionId(3);
         assertTrue((beforeSaveCount + 1) == afterSave);
