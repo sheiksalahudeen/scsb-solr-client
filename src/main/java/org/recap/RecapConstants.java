@@ -5,7 +5,7 @@ package org.recap;
  */
 public class RecapConstants {
     public static final String PATH_SEPARATOR = "/";
-    public static String PROCESSSED_RECORDS = "processedRecords";
+    public static final String PROCESSSED_RECORDS = "processedRecords";
 
     public static final String ALL = "*";
     public static final String DOCTYPE = "DocType";

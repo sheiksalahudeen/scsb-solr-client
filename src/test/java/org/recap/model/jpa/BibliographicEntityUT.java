@@ -2,6 +2,7 @@ package org.recap.model.jpa;
 
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -15,6 +16,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
@@ -38,6 +41,8 @@ public class BibliographicEntityUT extends BaseTestCase {
         Long beforeSaveCount = bibliographicDetailsRepository.countByOwningInstitutionId(3);
         assertNotNull(beforeSaveCount);
         Random random = new Random();
+        Date today = new Date();
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("Mock Bib Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
@@ -46,10 +51,27 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random));
         bibliographicEntity.setOwningInstitutionId(3);
-        BibliographicEntity entity = bibliographicDetailsRepository.save(bibliographicEntity);
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionId(1);
+        institutionEntity.setInstitutionCode("NYPL");
+        institutionEntity.setInstitutionName("New York Public Library");
+        bibliographicEntity.setInstitutionEntity(institutionEntity);
+        BibliographicEntity entity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(entity);
         assertNotNull(entity);
+
+        String fetchedCreatedDate = df.format(entity.getCreatedDate());
+        String fetchedLastUpdatedDate = df.format(entity.getLastUpdatedDate());
+        String todayStringDate = df.format(today);
+
         assertEquals(new String(entity.getContent()), "Mock Bib Content");
         assertEquals(entity.getOwningInstitutionId().toString(), "3");
+        assertEquals(fetchedCreatedDate,todayStringDate);
+        assertEquals(entity.getCreatedBy(),"tst");
+        assertEquals(fetchedLastUpdatedDate,todayStringDate);
+        assertEquals(entity.getLastUpdatedBy(),"tst");
+        assertEquals(entity.getInstitutionEntity().getInstitutionCode(),"NYPL");
+
         System.out.println("owning institution bibId-->" + entity.getOwningInstitutionBibId());
         Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionId(3);
         assertTrue((beforeSaveCount + 1) == afterSave);
@@ -140,6 +162,8 @@ public class BibliographicEntityUT extends BaseTestCase {
     @Test
     public void saveBibSingleHoldings() throws Exception {
         Random random = new Random();
+        Date today = new Date();
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
@@ -150,10 +174,11 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
 
+
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedDate(today);
+        holdingsEntity.setLastUpdatedDate(today);
         holdingsEntity.setCreatedBy("tst");
         holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
@@ -164,6 +189,12 @@ public class BibliographicEntityUT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
+        assertEquals(new String(savedBibliographicEntity.getHoldingsEntities().get(0).getContent()),"mock holdings");
+        String fetchedCreatedDate = df.format(savedBibliographicEntity.getHoldingsEntities().get(0).getCreatedDate());
+        String fetchedLastUpdatedDate = df.format(savedBibliographicEntity.getHoldingsEntities().get(0).getLastUpdatedDate());
+        String todayStringDate = df.format(today);
+        assertEquals(fetchedCreatedDate,todayStringDate);
+        assertEquals(fetchedLastUpdatedDate,todayStringDate);
     }
 
     @Test
