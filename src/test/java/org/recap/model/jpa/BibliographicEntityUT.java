@@ -50,6 +50,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         assertNotNull(entity);
         assertEquals(new String(entity.getContent()), "Mock Bib Content");
         assertEquals(entity.getOwningInstitutionId().toString(), "3");
+        assertEquals(entity.getCreatedDate().toString(),new Date().toString());
         System.out.println("owning institution bibId-->" + entity.getOwningInstitutionBibId());
         Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionId(3);
         assertTrue((beforeSaveCount + 1) == afterSave);
