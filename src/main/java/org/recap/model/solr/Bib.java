@@ -69,6 +69,9 @@ public class Bib {
     @Field("HoldingsId")
     private List<Integer> holdingsIdList;
 
+    @Field("OwningInstHoldingsId")
+    private List<Integer> owningInstHoldingsIdList;
+
     @Field("BibItemId")
     private List<Integer> bibItemIdList;
 
@@ -228,6 +231,14 @@ public class Bib {
 
     public void setHoldingsIdList(List<Integer> holdingsIdList) {
         this.holdingsIdList = holdingsIdList;
+    }
+
+    public List<Integer> getOwningInstHoldingsIdList() {
+        return owningInstHoldingsIdList;
+    }
+
+    public void setOwningInstHoldingsIdList(List<Integer> owningInstHoldingsIdList) {
+        this.owningInstHoldingsIdList = owningInstHoldingsIdList;
     }
 
     public List<Integer> getBibItemIdList() {
