@@ -93,10 +93,10 @@
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="available" name="available"
                                                value="Available" th:field="*{availability}"/><label
-                                            for="available">Available</label></li>
+                                            for="available">In ReCAP</label></li>
                                     <li><input type="checkbox" id="notAvailable" name="notAvailable"
                                                value="Not Available" th:field="*{availability}"/><label
-                                            for="notAvailable">Not Available</label></li>
+                                            for="notAvailable">Out</label></li>
                                 </ul>
                             </div>
                             <div id="materialTypeId" name="materialTypeName" class="col-sm-3">
@@ -152,32 +152,29 @@
                                 <thead id="mainHead" style="background-color: grey; color: white;">
                                 <tr id="mainRow">
                                     <th>
-                                        <label for="selectAll" style="width: 80px;">Select
-                                            All</label><input type="checkbox" id="selectAll"
-                                                              name="selectAll"
-                                                              th:field="*{selectAll}"
-                                                              style="margin-left: 26px;"
-                                                              onclick=""/>
+                                        <label for="selectAll" style="width: 80px;">Select All</label>
+                                        <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" onclick=""/>
                                     </th>
                                     <th>Title</th>
                                     <th>Author</th>
                                     <th>Publisher</th>
                                     <th>Publisher Date</th>
-                                    <th>Owning Institution</th>
-                                    <th>Customer Code</th>
-                                    <th>Collection Group Designation</th>
+                                    <th>OI</th>
+                                    <th>CC</th>
+                                    <th>CGD</th>
                                     <th>Use Restriction</th>
                                     <th>Barcode</th>
-                                    <th>Summary Holdings</th>
+                                    <th>SH</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" class="clickable" data-toggle="collapse" th:title="${searchResult.bibId}" th:attr="data-target='.row' + ${searchResultStat.index}" th:each="searchResult,searchResultStat : *{searchResultRows}">
+                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" th:title="${searchResult.bibId}" th:each="searchResult,searchResultStat : *{searchResultRows}">
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
                                            th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
                                         <input type="checkbox" id="selected" name="selected"
+                                               th:unless="${searchResult.showItems}"
                                                th:value="${searchResult.selected}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
                                                th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
@@ -192,12 +189,17 @@
                                     <td data-th-id="'searchResultsDataCustCode-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCustCodeS-'+ ${searchResultStat.index}" th:text="${searchResult.customerCode}"></span></td>
                                     <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span></td>
                                     <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
-                                    <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span></td>
+                                    <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
+                                        <a class="btn" th:if="${searchResult.showItems}" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}">
+                                            <i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
+                                        </a>
+                                        <span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span>
+                                    </td>
                                     <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span></td>
                                         <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
                                             <th></th>
                                             <th></th>
-                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}">
+                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">
                                                 <label for="selectAll" style="width: 80px;">Select
                                                     All</label><input type="checkbox" id="selectAllItems"
                                                                       name="selectAllItems"
@@ -205,11 +207,12 @@
                                                                       style="margin-left: 26px;"
                                                                       onclick=""/>
                                             </th>
-                                            <th data-th-id="'searchItemResultsCCHead-' + ${searchResultStat.index}">Call Number</th>
-                                            <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}">Chronology &amp; Enumeration</th>
-                                            <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}">Barcode</th>
-                                            <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}">Use Restriction</th>
-                                            <th data-th-id="'searchItemResultsCGDHead-' + ${searchResultStat.index}">Collection Group Designation</th>
+                                            <th data-th-id="'searchItemResultsCNHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Call Number</th>
+                                            <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Chronology &amp; Enumeration</th>
+                                            <th data-th-id="'searchItemResultsCCHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">CC</th>
+                                            <th data-th-id="'searchItemResultsCGDHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">CGD</th>
+                                            <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Use Restriction</th>
+                                            <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Barcode</th>
                                         </tr>
                                         <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:each="searchItemResult,searchItemResultStat : ${searchResult.searchItemResultRows}" class="collapse" th:classappend="'row' + ${searchResultStat.index}">
                                             <td></td>
@@ -223,11 +226,12 @@
                                                        th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchResultStat.index}__].selectedItem}"
                                                        th:style="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                             </td>
-                                            <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataCN-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCNS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span></td>
                                             <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.chronologyAndEnum}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataBarS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.barcode}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.customerCode}"></span></td>
                                             <td data-th-id="'searchItemResultsDataCGD-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCGDS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.collectionGroupDesignation}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataBarS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.barcode}"></span></td>
                                         </tr>
                                 </tr>
                                 </tbody>
@@ -275,18 +279,21 @@
                                 </div>
                                 <div id="selectButtonsId" name="selectButtonsName" class="pull-right">
                                     <button id="export" type="button" name="action" value="export"
-                                            class="btn btn-info active  pull-right">Export Selected
+                                            class="btn btn-info active  pull-right" disabled="disabled">Export Selected
                                         Records
                                     </button>
                                     <button id="request" type="button" name="action" value="request"
                                             class="btn btn-info active  pull-right"
-                                            style="margin-right: 10px;">Request Selected Records
+                                            style="margin-right: 10px;" disabled="disabled">Request Selected Items(s)
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-12 form-group" style="margin-top: -40px;">
-                                <i class="fa fa-circle" style="font-size: 20px; color: green;"></i><span> Available</span>
-                                <i class="fa fa-circle" style="font-size: 20px; color: red; margin-left: 15px;"></i><span> Not Available</span>
+                            <div class="col-md-12 form-group" style="margin-top: -50px;">
+                                <span>OI - Owning Institution, CC - Customer Code, CGD - Collection Group Designation, SH - Summary Holdings</span>
+                            </div>
+                            <div class="col-md-12 form-group" style="margin-top: -20px;">
+                                <i class="fa fa-circle" style="font-size: 20px; color: green;"></i><span> In ReCAP </span>
+                                <i class="fa fa-circle" style="font-size: 20px; color: red; margin-left: 15px;"></i><span> Out </span>
                             </div>
                         </div>
                     </div>

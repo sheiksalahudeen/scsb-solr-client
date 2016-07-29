@@ -7,6 +7,7 @@ public class SearchItemResultRow {
 
     private String callNumber;
     private String chronologyAndEnum;
+    private String customerCode;
     private String barcode;
     private String useRestriction;
     private String collectionGroupDesignation;
@@ -27,6 +28,14 @@ public class SearchItemResultRow {
 
     public void setChronologyAndEnum(String chronologyAndEnum) {
         this.chronologyAndEnum = chronologyAndEnum;
+    }
+
+    public String getCustomerCode() {
+        return customerCode;
+    }
+
+    public void setCustomerCode(String customerCode) {
+        this.customerCode = customerCode;
     }
 
     public String getBarcode() {
