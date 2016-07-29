@@ -191,18 +191,20 @@ public class SearchRecordsController {
                     searchResultRow.setAvailability(item.getAvailability());
                     searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                 } else {
-                    if (null != bibItem.getItems()) {
+                    if (!CollectionUtils.isEmpty(bibItem.getItems())) {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
                         for (Item item : bibItem.getItems()) {
                             SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
                             searchItemResultRow.setCallNumber(item.getCallNumber());
                             searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
+                            searchItemResultRow.setCustomerCode(item.getCustomerCode());
                             searchItemResultRow.setBarcode(item.getBarcode());
                             searchItemResultRow.setUseRestriction(item.getUseRestriction());
                             searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                             searchItemResultRow.setAvailability(item.getAvailability());
                             searchItemResultRows.add(searchItemResultRow);
                         }
+                        searchResultRow.setSummaryHoldings(bibItem.getItems().get(0).getSummaryHoldings());
                         searchResultRow.setShowItems(true);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);
                     }
