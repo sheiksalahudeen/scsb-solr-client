@@ -90,6 +90,7 @@ public class MatchingAlgorithmHelperService {
         matchingRecordReport.setBarcode(item.getBarcode());
         matchingRecordReport.setUseRestrictions(item.getUseRestriction());
         matchingRecordReport.setMatchPointTag(getMatchPointTag(fieldName));
+        matchingRecordReport.setSummaryHoldings(item.getSummaryHoldings());
         return matchingRecordReport;
     }
 

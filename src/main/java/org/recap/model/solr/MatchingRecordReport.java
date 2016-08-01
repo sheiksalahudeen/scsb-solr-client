@@ -12,6 +12,7 @@ public class MatchingRecordReport {
     private String barcode;
     private String institutionId;
     private String useRestrictions;
+    private String summaryHoldings;
 
     public String getMatchPointTag() {
         return matchPointTag;
@@ -67,5 +68,13 @@ public class MatchingRecordReport {
 
     public void setUseRestrictions(String useRestrictions) {
         this.useRestrictions = useRestrictions;
+    }
+
+    public String getSummaryHoldings() {
+        return summaryHoldings;
+    }
+
+    public void setSummaryHoldings(String summaryHoldings) {
+        this.summaryHoldings = summaryHoldings;
     }
 }
