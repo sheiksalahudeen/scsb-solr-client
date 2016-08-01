@@ -1,10 +1,6 @@
 package org.recap;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.request.CoreAdminRequest;
-import org.apache.solr.client.solrj.response.CoreAdminResponse;
-import org.apache.solr.common.params.CoreAdminParams;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.admin.SolrAdmin;
@@ -48,16 +44,16 @@ public class BaseTestCase {
     public ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    public HoldingDetailRepository holdingDetailRepository;
+    public HoldingsDetailsRepository holdingDetailRepository;
 
     @Autowired
     public ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
-    public InstitutionDetailRepository institutionDetailRepository;
+    public InstitutionDetailsRepository institutionDetailRepository;
 
     @Autowired
-    public CollectionGroupDetailRepository collectionGroupDetailRepository;
+    public CollectionGroupDetailsRepository collectionGroupDetailRepository;
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;

@@ -8,7 +8,7 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.search.BibDataField;
 import org.recap.model.search.BibliographicMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.BibJSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class MarcRecordController {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    InstitutionDetailRepository institutionDetailRepository;
+    InstitutionDetailsRepository institutionDetailRepository;
 
     @RequestMapping("/openMarcRecord")
     public String openMarcRecord(@Valid @ModelAttribute("bibId") Integer bibId, Model model) {
