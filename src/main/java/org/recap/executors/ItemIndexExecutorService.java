@@ -30,4 +30,8 @@ public class ItemIndexExecutorService extends IndexExecutorService {
     protected String getResourceURL() {
         return itemResourceURL;
     }
+
+    public void setItemDetailsRepository(ItemDetailsRepository itemDetailsRepository) {
+        this.itemDetailsRepository = itemDetailsRepository;
+    }
 }
