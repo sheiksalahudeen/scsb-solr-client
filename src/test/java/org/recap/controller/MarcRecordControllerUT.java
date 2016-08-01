@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by hemalathas on 1/8/16.
  */
-public class MarcRecordControllerUT extends BaseTestCase {
+public class MarcRecordControllerUT extends BaseControllerUT {
 
     @PersistenceContext
     private EntityManager entityManager;
