@@ -175,6 +175,8 @@ public class BibItemRecordSetupCallableUT {
         List<Item> item = (List<Item>)bibItem.get("Item");
         assertNotNull(bib);
         assertNotNull(item);
+        assertNotNull(bib.get(0));
+        assertNotNull(item.get(0));
         assertEquals(new Integer(1),new Integer(bib.get(0).getBibId()));
         assertEquals(new Integer(1),new Integer(item.get(0).getItemId()));
     }
