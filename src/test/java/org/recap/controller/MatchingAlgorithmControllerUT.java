@@ -49,5 +49,11 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         assertTrue(response.contains("Done"));
     }
 
-
+    @Test
+    public void testMatchingAlgorithmBasedOnISBN() throws Exception{
+        MvcResult savedResult = this.mockMvc.perform(post("/matchingAlgorithm/isbn"))
+                .andReturn();
+        String response = savedResult.getResponse().getContentAsString();
+        assertTrue(response.contains("Done"));
+    }
 }
