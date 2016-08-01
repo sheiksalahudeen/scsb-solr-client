@@ -62,6 +62,7 @@ public class CsvUtil {
                     csvOutput.write("Barcode");
                     csvOutput.write("Institution ID");
                     csvOutput.write("Use Restrictions");
+                    csvOutput.write("Summary Holdings");
                     csvOutput.endRecord();
                     headerExists = true;
                 }
@@ -74,6 +75,8 @@ public class CsvUtil {
                     csvOutput.write(matchingRecordReport.getInstitutionId());
                     String useRestrictions = matchingRecordReport.getUseRestrictions();
                     csvOutput.write(StringUtils.isNotBlank(useRestrictions) ? useRestrictions : "null");
+                    String summaryHoldings = matchingRecordReport.getSummaryHoldings();
+                    csvOutput.write(StringUtils.isNotBlank(summaryHoldings) ? summaryHoldings : "null");
                     csvOutput.endRecord();
                 }
             } catch (Exception e) {
