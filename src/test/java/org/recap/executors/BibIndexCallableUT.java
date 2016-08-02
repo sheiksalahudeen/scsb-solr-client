@@ -4,11 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.solr.core.query.result.ScoredPage;
 import org.springframework.data.solr.core.query.result.SolrResultPage;
 
 import java.util.ArrayList;
@@ -36,7 +32,6 @@ public class BibIndexCallableUT extends BaseTestCase {
         assertEquals(new Integer(1),bibliographicEntitieList.getContent().get(0).getBibliographicId());
         assertEquals("1",bibliographicEntitieList.getContent().get(0).getOwningInstitutionBibId());
         assertEquals(new Integer(1),bibliographicEntitieList.getContent().get(0).getOwningInstitutionId());
-
     }
 
     private List<BibliographicEntity> getBibliographicEntityList(){
