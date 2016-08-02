@@ -46,6 +46,8 @@ public class SearchResultRowUT {
         item.setCallNumber("123");
         item.setVolumePartYear("V1");
         item.setCustomerCode("NA");
+        item.setSummaryHoldings("Summary holding");
+        item.setAvailability("Available");
         items.add(item);
         bibItem.setItems(items);
         bibItems.add(bibItem);
@@ -53,6 +55,8 @@ public class SearchResultRowUT {
 
         assertNotNull(searchRecordsRequest.getSearchResultRows());
         assertNotNull(searchRecordsRequest.getSearchResultRows().get(0));
+
+        assertNotNull("1",searchRecordsRequest.getSearchResultRows().get(0).getBibId());
         assertNotNull("Title1",searchRecordsRequest.getSearchResultRows().get(0).getTitle());
         assertNotNull("Author1",searchRecordsRequest.getSearchResultRows().get(0).getAuthor());
         assertNotNull("BC234",searchRecordsRequest.getSearchResultRows().get(0).getBarcode());
@@ -60,6 +64,8 @@ public class SearchResultRowUT {
         assertNotNull("1998",searchRecordsRequest.getSearchResultRows().get(0).getPublisherDate());
         assertNotNull("PUL",searchRecordsRequest.getSearchResultRows().get(0).getOwningInstitution());
         assertNotNull("1",searchRecordsRequest.getSearchResultRows().get(0).getOwningInstitution());
+        assertNotNull("Summary holding",searchRecordsRequest.getSearchResultRows().get(0).getSummaryHoldings());
+        assertNotNull("Available",searchRecordsRequest.getSearchResultRows().get(0).getAvailability());
     }
 
     private void buildResults(SearchRecordsRequest searchRecordsRequest, List<BibItem> bibItems) {
