@@ -12,6 +12,8 @@ import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 
 import java.util.concurrent.Callable;
 
+import static junit.framework.TestCase.assertEquals;
+
 /**
  * Created by pvsubrah on 6/19/16.
  */
@@ -48,6 +50,7 @@ public class BibExecutorServiceUT {
         solrIndexRequest.setNumberOfDocs(1000);
         solrIndexRequest.setOwningInstitutionId(null);
         bibIndexExecutorService.index(solrIndexRequest);
+        assertEquals(1000,mockBibIndexCallable.call());
     }
 
     private class MockBibIndexExecutorService extends BibIndexExecutorService {
