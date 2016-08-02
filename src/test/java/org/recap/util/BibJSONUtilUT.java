@@ -4,11 +4,13 @@ package org.recap.util;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
+import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 /**
@@ -22,7 +24,7 @@ public class BibJSONUtilUT extends BaseTestCase{
             "                    <controlfield tag=\"005\">20001116192424.2</controlfield>\n"+
             "                    <controlfield tag=\"008\">850225r19731907nyu b 001 0 ara</controlfield>\n"+
             "                    <datafield ind1=\" \" ind2=\" \" tag=\"010\">\n"+
-            "                        <subfield code=\"a\">77173005</subfield>\n"+
+            "                        <subfield code=\"a\">   77173005  </subfield>\n"+
             "                    </datafield>\n"+
             "                    <datafield ind1=\" \" ind2=\" \" tag=\"040\">\n"+
             "                        <subfield code=\"c\">NN</subfield>\n"+
@@ -178,5 +180,14 @@ public class BibJSONUtilUT extends BaseTestCase{
         Map<String, List> bibItemMap = bibJSONUtil.generateBibAndItemsForIndex(bibJsonObject);
         assertNotNull(bibItemMap);
 
+    }
+
+    @Test
+    public void testLccnTrimValue() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        String lccnValue = bibJSONUtil.getLCCNValue(marcRecord);
+        assertEquals(lccnValue, "77173005");
     }
 }
