@@ -117,7 +117,7 @@ public class BibJSONUtil extends MarcUtil {
         return null;
     }
 
-    private String getLCCNValue(Record record) {
+    public String getLCCNValue(Record record) {
         String lccnValue = null;
         String leaderFieldValue = record.getLeader() != null ? record.getLeader().toString() : null;
         if (StringUtils.isNotBlank(leaderFieldValue) && leaderFieldValue.length() > 7 && leaderFieldValue.charAt(7) == 's') {
@@ -126,7 +126,7 @@ public class BibJSONUtil extends MarcUtil {
             lccnValue = getDataFieldValue(record, "010", null, null, "a");
         }
         if (lccnValue != null) {
-            lccnValue.trim();
+            lccnValue = lccnValue.trim();
         }
         return lccnValue;
     }
