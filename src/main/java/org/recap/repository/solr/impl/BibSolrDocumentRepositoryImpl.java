@@ -1,6 +1,7 @@
 package org.recap.repository.solr.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.marc4j.util.JsonParser;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.solr.BibItem;
@@ -86,7 +87,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return filterQuery;
     }
 
-    private Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
+    public Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
         Criteria criteria = null;
         String fieldName = searchRecordsRequest.getFieldName();
         String fieldValue = searchRecordsRequest.getFieldValue();

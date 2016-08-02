@@ -1,16 +1,20 @@
 package org.recap.repository.solr.main;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.BibItem;
+import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.Criteria;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -35,6 +39,9 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
 
     @Autowired
     BibSolrDocumentRepository bibSolrDocumentRepository;
+
+    @Autowired
+    BibSolrDocumentRepositoryImpl bibSolrDocumentRepositoryImpl;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -88,6 +95,25 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
     public File getUnicodeContentFile() throws URISyntaxException {
         URL resource = getClass().getResource("BibContent.xml");
         return new File(resource.toURI());
+    }
+
+    @Test
+    public void buildCriteriaForTitleStartsWithField() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName(RecapConstants.TITLE_STARTS_WITH);
+        searchRecordsRequest.setFieldValue("Semiznachnye tabli︠t︡sy");
+        Criteria criteria = bibSolrDocumentRepositoryImpl.getCriteriaForFieldName(searchRecordsRequest);
+        assertNotNull(criteria);
+    }
+
+    @Test
+    public void searchBibItemsBasedOnTitleStartsWithField() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName(RecapConstants.TITLE_STARTS_WITH);
+        searchRecordsRequest.setFieldValue("Semiznachnye tabli︠t︡sy");
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 10));
+        assertNotNull(bibItems);
+        Assert.assertTrue(bibItems.size() > 0);
     }
 
 }
