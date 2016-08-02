@@ -18,7 +18,7 @@ public class SearchRecordsRequestUT {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         setSearchRecordsRequest(searchRecordsRequest);
         assertNotNull(searchRecordsRequest);
-        assertEquals(true,searchRecordsRequest.getSearchResultRows());
+        assertEquals("Title1",searchRecordsRequest.getSearchResultRows().get(0).getTitle());
         assertEquals("Available",searchRecordsRequest.getAvailability());
     }
 
