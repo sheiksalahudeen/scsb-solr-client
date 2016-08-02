@@ -1,14 +1,9 @@
 package org.recap.model.search;
 
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
-import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
-import org.marc4j.marc.Subfield;
 import org.recap.util.BibJSONUtil;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
@@ -17,7 +12,7 @@ import static junit.framework.TestCase.assertNotNull;
 /**
  * Created by premkb on 2/8/16.
  */
-public class BibDataFieldUT {
+public class BibliographicMarcRecordUT {
 
     private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
             "                <record>\n"+
@@ -44,13 +39,12 @@ public class BibDataFieldUT {
             "                        <subfield code=\"a\">910.031/767</subfield>\n"+
             "                    </datafield>\n"+
             "                    <datafield ind1=\"1\" ind2=\" \" tag=\"100\">\n"+
-            "                        <subfield code=\"a\">Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,</subfield>\n"+
+            "                        <subfield code=\"a\">Ibn Jubayr</subfield>\n"+
             "                        <subfield code=\"d\">1145-1217.</subfield>\n"+
             "                    </datafield>\n"+
             "                    <datafield ind1=\"1\" ind2=\"0\" tag=\"245\">\n"+
-            "                        <subfield code=\"a\">RihÌ£lat</subfield>\n"+
-            "                        <subfield code=\"b\">AbÄ« al-Husayn Muhammad ibn Ahmad ibn Jubayr al-KinÄ\u0081nÄ« al-AndalusÄ«\n"+
-            "                            al-BalinsÄ«.\n"+
+            "                        <subfield code=\"a\">Rih</subfield>\n"+
+            "                        <subfield code=\"b\">Husayn Muhammad\n"+
             "                        </subfield>\n"+
             "                    </datafield>\n"+
             "                    <datafield ind1=\" \" ind2=\" \" tag=\"250\">\n"+
@@ -126,12 +120,14 @@ public class BibDataFieldUT {
         Record marcRecord = records.get(0);
         BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
         assertNotNull(bibliographicMarcRecord);
-        assertNotNull(bibliographicMarcRecord.getBibDataFields());
-        assertEquals("010",bibliographicMarcRecord.getBibDataFields().get(0).getDataFieldTag());
-        assertEquals("_",String.valueOf(bibliographicMarcRecord.getBibDataFields().get(0).getIndicator1()));
-        assertEquals("_",String.valueOf(bibliographicMarcRecord.getBibDataFields().get(0).getIndicator2()));
-        assertEquals("|a 77173005 ",bibliographicMarcRecord.getBibDataFields().get(0).getDataFieldValue());
-
+        assertEquals("Rih Husayn Muhammad",bibliographicMarcRecord.getTitle());
+        assertEquals("Ibn Jubayr Wright, William,",bibliographicMarcRecord.getAuthor());
+        assertEquals("AMS Press,",bibliographicMarcRecord.getPublisher());
+        assertEquals("1973] 1907.",bibliographicMarcRecord.getPublishedDate());
+        assertEquals("01814cam a2200409 450000",bibliographicMarcRecord.getTag000());
+        assertEquals("NYPG002000036-B",bibliographicMarcRecord.getControlNumber001());
+        assertEquals("20001116192424.2",bibliographicMarcRecord.getControlNumber005());
+        assertEquals("850225r19731907nyu b 001 0 ara",bibliographicMarcRecord.getControlNumber008());
     }
 
     private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
@@ -144,39 +140,6 @@ public class BibDataFieldUT {
         bibliographicMarcRecord.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
         bibliographicMarcRecord.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));
         bibliographicMarcRecord.setControlNumber008(bibJSONUtil.getControlFieldValue(marcRecord, "008"));
-        bibliographicMarcRecord.setBibDataFields(buildBibDataFields(marcRecord));
         return bibliographicMarcRecord;
-    }
-
-    private List<BibDataField> buildBibDataFields(Record marcRecord) {
-        List<BibDataField> bibDataFields = new ArrayList<>();
-        List<DataField> marcDataFields = marcRecord.getDataFields();
-        if (!CollectionUtils.isEmpty(marcDataFields)) {
-            for (DataField marcDataField : marcDataFields) {
-                BibDataField bibDataField = new BibDataField();
-                bibDataField.setDataFieldTag(marcDataField.getTag());
-                if (Character.isWhitespace(marcDataField.getIndicator1())) {
-                    bibDataField.setIndicator1('_');
-                } else {
-                    bibDataField.setIndicator1(marcDataField.getIndicator1());
-                }
-                if (Character.isWhitespace(marcDataField.getIndicator2())) {
-                    bibDataField.setIndicator2('_');
-                } else {
-                    bibDataField.setIndicator2(marcDataField.getIndicator2());
-                }
-                List<Subfield> subfields = marcDataField.getSubfields();
-                if (!CollectionUtils.isEmpty(subfields)) {
-                    StringBuffer buffer = new StringBuffer();
-                    for (Subfield subfield : subfields) {
-                        buffer.append("|").append(subfield.getCode());
-                        buffer.append(" ").append(subfield.getData()).append(" ");
-                    }
-                    bibDataField.setDataFieldValue(buffer.toString());
-                }
-                bibDataFields.add(bibDataField);
-            }
-        }
-        return bibDataFields;
     }
 }
