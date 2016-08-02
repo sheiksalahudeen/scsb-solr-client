@@ -262,7 +262,6 @@ public class BibJSONUtil extends MarcUtil {
         authorMap.put("730", "a");
 
         for (Map.Entry<String, String> entry : authorMap.entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
             fieldValue = getDataFieldValue(marcRecord, entry.getKey(), null, null, entry.getValue());
             if (StringUtils.isNotBlank(fieldValue)) {
                 author.append(fieldValue);
