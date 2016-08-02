@@ -96,7 +96,7 @@ public class SolrUnicodeAT extends BaseTestCase {
         assertNotNull(records);
         assertTrue(records.size() > 0);
 
-        String sourceTitle = marcUtil.getDataFieldValue(records.get(0), "24", Arrays.asList('a', 'b'));
+        String sourceTitle = marcUtil.getDataFieldValueStartsWith(records.get(0), "24", Arrays.asList('a', 'b'));
         assertNotNull(sourceTitle);
 
         assertEquals(sourceTitle, solrTitle);

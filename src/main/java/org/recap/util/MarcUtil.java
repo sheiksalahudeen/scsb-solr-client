@@ -30,7 +30,7 @@ public class MarcUtil {
         return records;
     }
 
-    public String getDataFieldValue(Record record, String dataFieldStartTag) {
+    public String getDataFieldValueStartsWith(Record record, String dataFieldStartTag) {
         StringBuffer fieldValue = new StringBuffer();
         if (record != null) {
             List<VariableField> variableFields = record.getVariableFields();
@@ -52,7 +52,7 @@ public class MarcUtil {
         return fieldValue.toString().trim();
     }
 
-    public String getDataFieldValue(Record record, String dataFieldStartTag, List<Character> subFieldTags) {
+    public String getDataFieldValueStartsWith(Record record, String dataFieldStartTag, List<Character> subFieldTags) {
         StringBuffer fieldValue = new StringBuffer();
         if (record != null) {
             List<VariableField> variableFields = record.getVariableFields();

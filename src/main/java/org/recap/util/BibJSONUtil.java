@@ -42,17 +42,17 @@ public class BibJSONUtil extends MarcUtil {
             String institutionCode = null != institutionEntity ? institutionEntity.getString("institutionCode") : "";
             bib.setOwningInstitution(institutionCode);
 
-            bib.setTitle(getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b')));
+            bib.setTitle(getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b')));
             bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
             bib.setPublisher(getPublisherValue(marcRecord));
             bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
             bib.setPublicationDate(getPublicationDateValue(marcRecord));
-            bib.setSubject(getDataFieldValue(marcRecord, "6"));
+            bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
             bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
             bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
             bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode));
             bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
-            bib.setNotes(getDataFieldValue(marcRecord, "5"));
+            bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
             bib.setLccn(getLCCNValue(marcRecord));
 
             JSONArray holdingsEntities = jsonObject.getJSONArray("holdingsEntities");
@@ -215,12 +215,12 @@ public class BibJSONUtil extends MarcUtil {
         bib.setPublisher(getPublisherValue(marcRecord));
         bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
         bib.setPublicationDate(getPublicationDateValue(marcRecord));
-        bib.setSubject(getDataFieldValue(marcRecord, "6"));
+        bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
         bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
         bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
         bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode.toString()));
         bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
-        bib.setNotes(getDataFieldValue(marcRecord, "5"));
+        bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
         bib.setLccn(getLCCNValue(marcRecord));
         bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
         bib.setLeaderMaterialType(getLeaderMaterialType(marcRecord.getLeader()));
@@ -244,11 +244,32 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public String getTitle(Record marcRecord) {
-        return getDataFieldValue(marcRecord, "24", Arrays.asList('a', 'b'));
+        return getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b'));
     }
 
     public String getAuthor(Record marcRecord) {
-        return getDataFieldValue(marcRecord, "100", null, null, "a");
+        StringBuffer author = new StringBuffer();
+        String fieldValue = null;
+
+        Map<String, String> authorMap = new HashMap<>();
+        authorMap.put("100", "a");
+        authorMap.put("110", "a");
+        authorMap.put("111", "a");
+        authorMap.put("130", "1");
+        authorMap.put("700", "a");
+        authorMap.put("710", "a");
+        authorMap.put("711", "a");
+        authorMap.put("730", "a");
+
+        for (Map.Entry<String, String> entry : authorMap.entrySet()) {
+            System.out.println(entry.getKey() + "/" + entry.getValue());
+            fieldValue = getDataFieldValue(marcRecord, entry.getKey(), null, null, entry.getValue());
+            if (StringUtils.isNotBlank(fieldValue)) {
+                author.append(fieldValue);
+                author.append(" ");
+            }
+        }
+        return author.toString().trim();
     }
 
     public String getLeader(Record marcRecord) {

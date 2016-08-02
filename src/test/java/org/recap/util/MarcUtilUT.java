@@ -140,9 +140,9 @@ public class MarcUtilUT {
 
         assertNotNull(records);
         assertTrue(records.size() == 1);
-        String fieldVaule = marcUtil.getDataFieldValue(records.get(0),"9");
+        String fieldVaule = marcUtil.getDataFieldValueStartsWith(records.get(0),"9");
         assertEquals(".b100000241 m a - ara le  3 1 *OFK 84-1944" , fieldVaule);
-        String subFieldValue = marcUtil.getDataFieldValue(records.get(0),"9",subFields);
+        String subFieldValue = marcUtil.getDataFieldValueStartsWith(records.get(0),"9",subFields);
         assertEquals(".b100000241 3 *OFK 84-1944",subFieldValue);
     }
 
