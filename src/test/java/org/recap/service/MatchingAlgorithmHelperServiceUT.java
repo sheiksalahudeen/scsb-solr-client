@@ -6,12 +6,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.model.solr.Bib;
+import org.recap.model.solr.Item;
+import org.recap.model.solr.MatchingRecordReport;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -35,6 +37,7 @@ public class MatchingAlgorithmHelperServiceUT {
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
         when(bibCrudRepository.findByOclcNumber("00 1 614-793-8682")).thenReturn(getBibs());
+        when(itemCrudRepository.findByItemId(1)).thenReturn(getItem());
     }
 
     @Test
@@ -49,6 +52,16 @@ public class MatchingAlgorithmHelperServiceUT {
         assertEquals("Imprint",bibs.get(0).getImprint());
     }
 
+    @Test
+    public void testGetMatchingReports(){
+        Map<String, List<MatchingRecordReport>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports("OCLCNumber","00 1 614-793-8682",getBibs());
+        assertNotNull(owningInstitutionMap);
+        assertNotNull("035",owningInstitutionMap.get("PUL").get(0).getMatchPointTag());
+        assertNotNull("00 1 614-793-8682",owningInstitutionMap.get("PUL").get(0).getMatchPointTag());
+        assertNotNull("1",owningInstitutionMap.get("PUL").get(0).getBibId());
+        assertNotNull("SampleTitle",owningInstitutionMap.get("PUL").get(0).getTitle());
+        assertNotNull("BA352",owningInstitutionMap.get("PUL").get(0).getBarcode());
+    }
 
 
     private List<Bib> getBibs(){
@@ -64,7 +77,22 @@ public class MatchingAlgorithmHelperServiceUT {
         List<Integer> owningInstHoldingsIdList = new ArrayList<>();
         owningInstHoldingsIdList.add(1);
         bib.setOwningInstHoldingsIdList(owningInstHoldingsIdList);
+        List<Integer> bibItemIdList = new ArrayList<>();
+        bibItemIdList.add(1);
+        bib.setBibItemIdList(bibItemIdList);
         bibs.add(bib);
         return bibs;
+    }
+
+    private Item getItem(){
+        Item item = new Item();
+        item.setId("1");
+        item.setItemId(1);
+        item.setBarcode("BA352");
+        item.setAvailability("Available");
+        item.setUseRestriction("Allowed");
+        item.setSummaryHoldings("Summary Holding");
+        item.setCollectionGroupDesignation("Shared");
+        return item;
     }
 }
