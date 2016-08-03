@@ -20,6 +20,15 @@ public class SearchRecordsRequestUT {
         assertNotNull(searchRecordsRequest);
         assertEquals("Title1",searchRecordsRequest.getSearchResultRows().get(0).getTitle());
         assertEquals("Available",searchRecordsRequest.getAvailability().get(0));
+        assertEquals("245",searchRecordsRequest.getFieldName());
+        assertEquals("Stay Hungry",searchRecordsRequest.getFieldValue());
+        assertEquals("NYPL",searchRecordsRequest.getOwningInstitutions().get(0));
+        assertEquals("Shared",searchRecordsRequest.getCollectionGroupDesignations().get(0));
+        assertEquals("Monograph",searchRecordsRequest.getMaterialTypes().get(0));
+        assertEquals(new Integer(1),searchRecordsRequest.getTotalPageCount());
+        assertEquals(new Long(1),searchRecordsRequest.getTotalRecordsCount());
+        assertEquals(new Integer(1),searchRecordsRequest.getIndex());
+
     }
 
     private void setSearchRecordsRequest(SearchRecordsRequest searchRecordsRequest){
@@ -33,7 +42,20 @@ public class SearchRecordsRequestUT {
         List<String> availability = new ArrayList<>();
         availability.add("Available");
         searchRecordsRequest.setAvailability(availability);
-
-
+        searchRecordsRequest.setFieldName("245");
+        searchRecordsRequest.setFieldValue("Stay Hungry");
+        List<String> owningInstitutions = new ArrayList<>();
+        owningInstitutions.add("NYPL");
+        searchRecordsRequest.setOwningInstitutions(owningInstitutions);
+        List<String> collectionGroupDesignations = new ArrayList<>();
+        collectionGroupDesignations.add("Shared");
+        searchRecordsRequest.setCollectionGroupDesignations(collectionGroupDesignations);
+        List<String> materialTypes = new ArrayList<>();
+        materialTypes.add("Monograph");
+        searchRecordsRequest.setMaterialTypes(materialTypes);
+        searchRecordsRequest.setTotalPageCount(1);
+        searchRecordsRequest.setTotalRecordsCount(new Long(1));
+        searchRecordsRequest.setSelectAll(false);
+        searchRecordsRequest.setIndex(1);
     }
 }
