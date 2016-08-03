@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.recap.admin.SolrAdmin;
 import org.recap.repository.jpa.*;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +58,9 @@ public class BaseTestCase {
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;
+
+    @Autowired
+    BibSolrDocumentRepository bibSolrDocumentRepository;
 
     @Value("${bib.rest.url}")
     public String bibResourceURL;

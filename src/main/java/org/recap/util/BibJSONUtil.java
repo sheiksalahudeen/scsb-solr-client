@@ -118,13 +118,7 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public String getLCCNValue(Record record) {
-        String lccnValue = null;
-        String leaderFieldValue = record.getLeader() != null ? record.getLeader().toString() : null;
-        if (StringUtils.isNotBlank(leaderFieldValue) && leaderFieldValue.length() > 7 && leaderFieldValue.charAt(7) == 's') {
-            lccnValue = getDataFieldValue(record, "010", null, null, "z");
-        } else {
-            lccnValue = getDataFieldValue(record, "010", null, null, "a");
-        }
+        String lccnValue = getDataFieldValue(record, "010", null, null, "a");
         if (lccnValue != null) {
             lccnValue = lccnValue.trim();
         }
@@ -211,6 +205,7 @@ public class BibJSONUtil extends MarcUtil {
 
         bib.setOwningInstitution(institutionCode);
         bib.setTitle(getTitle(marcRecord));
+        bib.setTitleDisplay(getTitleDisplay(marcRecord));
         bib.setAuthor(getAuthor(marcRecord));
         bib.setPublisher(getPublisherValue(marcRecord));
         bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
@@ -245,6 +240,10 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getTitle(Record marcRecord) {
         return getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b'));
+    }
+
+    public String getTitleDisplay(Record marcRecord) {
+        return getDataFieldValue(marcRecord, "245", null, null, "a");
     }
 
     public String getAuthor(Record marcRecord) {

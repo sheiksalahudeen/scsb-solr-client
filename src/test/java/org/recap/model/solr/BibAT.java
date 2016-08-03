@@ -1,18 +1,36 @@
 package org.recap.model.solr;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.util.BibJSONUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class BibAT extends BaseTestCase {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    SolrTemplate solrTemplate;
 
     @Before
     public void setUp() throws Exception {
@@ -81,6 +99,89 @@ public class BibAT extends BaseTestCase {
         assertEquals(indexedBib.getSubject(),"Arab countries Politics and government.");
         assertEquals(indexedBib.getPublicationPlace(),"Paris");
         assertEquals(indexedBib.getLccn(),"71448228");
+    }
+
+    @Test
+    public void saveBibAndIndex() throws Exception {
+        Random random = new Random();
+        File bibContentFile = getUnicodeContentFile();
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setOwningInstitutionId(1);
+        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedBy("tst");
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        String barcode = "123";
+        itemEntity.setBarcode(barcode);
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("1");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntity(holdingsEntity);
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity);
+
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        assertNotNull(fetchedBibliographicEntity);
+        assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
+
+        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity);
+        List<Bib> bibs = stringListMap.get("Bib");
+        assertNotNull(bibs);
+        assertTrue(bibs.size() == 1);
+
+        List<Item> items = stringListMap.get("Item");
+        assertNotNull(items);
+        assertTrue(items.size() == 1);
+
+        bibCrudRepository.save(bibs);
+        itemCrudRepository.save(items);
+        solrTemplate.softCommit();
+
+        Integer bibId = bibs.get(0).getBibId();
+        Bib bib = bibCrudRepository.findByBibId(bibId);
+        assertNotNull(bib);
+        assertEquals(owningInstitutionBibId, bib.getOwningInstitutionBibId());
+
+        Integer itemId = bib.getBibItemIdList().get(0);
+        Item item = itemCrudRepository.findByItemId(itemId);
+        assertNotNull(item);
+        assertEquals(barcode, item.getBarcode());
+        assertNull(item.getUseRestriction());
+        solrTemplate.rollback();
+    }
+
+    public File getUnicodeContentFile() throws URISyntaxException {
+        URL resource = getClass().getResource("BibContent.xml");
+        return new File(resource.toURI());
     }
 
 
