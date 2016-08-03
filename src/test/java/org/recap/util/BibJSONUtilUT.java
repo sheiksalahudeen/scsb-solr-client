@@ -6,11 +6,14 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 
 /**
@@ -131,55 +134,55 @@ public class BibJSONUtilUT extends BaseTestCase{
             "          </collection>";
     @Test
     public void generateBibAndItemsForIndex()throws Exception {
-        JSONObject bibJsonObject = new JSONObject();
-        bibJsonObject.put("bibliographicId",1);
-        bibJsonObject.put("content",bibContent);
+        Random random = new Random();
 
-        JSONObject institutionEntityJsonObject = new JSONObject();
-        institutionEntityJsonObject.put("institutionCode","PUL");
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(bibContent.getBytes());
+        bibliographicEntity.setOwningInstitutionId(1);
+        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedBy("tst");
 
-        bibJsonObject.put("institutionEntity",institutionEntityJsonObject);
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
-        JSONArray holdingsEntitiesJsonArray = new JSONArray();
-        JSONObject holdingsEntityJsonObject = new JSONObject();
-        holdingsEntityJsonObject.put("holdingsId",1);
-        holdingsEntityJsonObject.put("content",holdingContent);
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedBy("etl");
+        String barcode = "1234";
+        itemEntity.setBarcode(barcode);
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("1");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntity(holdingsEntity);
 
-
-        JSONArray itemEntitiesJsonArray = new JSONArray();
-        JSONObject itemJSON = new JSONObject();
-        itemJSON.put("itemId",1);
-        itemJSON.put("bibliographicId",1);
-        itemJSON.put("holdingsId",1);
-        itemJSON.put("barcode","CU54519993");
-        itemJSON.put("availability","Available");
-        itemJSON.put("collectionGroupDesignation","Shared");
-        itemJSON.put("docType","Item");
-        itemJSON.put("customerCode","NA");
-        itemJSON.put("useRestrictions","In Library Use");
-        itemJSON.put("volumePartYear","Bd. 1, Lfg. 7-10");
-        itemJSON.put("callNumber","JFN 73-43");
-        JSONObject itemStatusEntity = new JSONObject();
-        itemStatusEntity.put("itemStatusId",1);
-        itemStatusEntity.put("statusCode","Available");
-        itemStatusEntity.put("statusDescription","Available");
-        itemJSON.put("itemStatusEntity",itemStatusEntity);
-        JSONObject collectionGroupEntity = new JSONObject();
-        collectionGroupEntity.put("collectionGroupId",1);
-        collectionGroupEntity.put("collectionGroupCode","Shared");
-        collectionGroupEntity.put("collectionGroupDescription","Shared");
-        itemJSON.put("collectionGroupEntity",collectionGroupEntity);
-
-        itemEntitiesJsonArray.put(itemJSON);
-        holdingsEntityJsonObject.put("itemEntities",itemEntitiesJsonArray);
-        holdingsEntitiesJsonArray.put(holdingsEntityJsonObject);
-
-        bibJsonObject.put("holdingsEntities",holdingsEntitiesJsonArray);
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        Map<String, List> bibItemMap = bibJSONUtil.generateBibAndItemsForIndex(bibJsonObject);
+        Map<String, List> bibItemMap = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity);
         assertNotNull(bibItemMap);
-
+        List bibs = bibItemMap.get("Bib");
+        List items = bibItemMap.get("Item");
+        assertNotNull(bibs);
+        assertEquals(bibs.size(), 1);
+        assertNotNull(items);
+        assertEquals(items.size(), 1);
     }
 
     @Test
@@ -198,5 +201,28 @@ public class BibJSONUtilUT extends BaseTestCase{
         Record marcRecord = records.get(0);
         String titleDisplay = bibJSONUtil.getTitleDisplay(marcRecord);
         assertEquals(titleDisplay, "RihÌ£lat");
+    }
+
+    @Test
+    public void testAuthorDisplayValue() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        String authorDisplayValue = bibJSONUtil.getAuthorDisplayValue(marcRecord);
+        assertEquals(authorDisplayValue, "Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,");
+    }
+
+    @Test
+    public void testAuthorSearchValue() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        List<String> authorSearchValue = bibJSONUtil.getAuthorSearchValue(marcRecord);
+        assertNotNull(authorSearchValue);
+        assertEquals(authorSearchValue.size(), 4);
+        assertTrue(authorSearchValue.contains("Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,"));
+        assertTrue(authorSearchValue.contains("Wright, William,"));
+        assertTrue(authorSearchValue.contains("Travels of Ibn Jubayr."));
+        assertTrue(authorSearchValue.contains("Travels of Ibn Jubayr."));
     }
 }
