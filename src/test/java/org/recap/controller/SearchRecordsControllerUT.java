@@ -103,21 +103,28 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
 
     @Test
     public void clear() throws Exception{
-        ModelAndView modelAndView = searchRecordsController.searchLast(getSearchRecordsRequest(),bindingResult,model);
+        ModelAndView modelAndView = searchRecordsController.clear(getSearchRecordsRequest(),bindingResult,model);
         assertNotNull(modelAndView);
         assertEquals("searchRecords",modelAndView.getViewName());
     }
 
     @Test
     public void newSearch() throws Exception{
-        ModelAndView modelAndView = searchRecordsController.searchLast(getSearchRecordsRequest(),bindingResult,model);
+        ModelAndView modelAndView = searchRecordsController.newSearch(getSearchRecordsRequest(),bindingResult,model);
         assertNotNull(modelAndView);
         assertEquals("searchRecords",modelAndView.getViewName());
     }
 
     @Test
     public void requestRecords() throws Exception{
-        ModelAndView modelAndView = searchRecordsController.searchLast(getSearchRecordsRequest(),bindingResult,model);
+        ModelAndView modelAndView = searchRecordsController.requestRecords(getSearchRecordsRequest(),bindingResult,model);
+        assertNotNull(modelAndView);
+        assertEquals("searchRecords",modelAndView.getViewName());
+    }
+
+    @Test
+    public void exportRecords() throws Exception{
+        ModelAndView modelAndView = searchRecordsController.exportRecords(getSearchRecordsRequest(),bindingResult,model);
         assertNotNull(modelAndView);
         assertEquals("searchRecords",modelAndView.getViewName());
     }
