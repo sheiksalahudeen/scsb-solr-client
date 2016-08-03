@@ -23,42 +23,6 @@ public class ItemJSONUtil extends MarcUtil{
     public ItemJSONUtil() {
     }
 
-    public Item generateItemForIndex(JSONObject itemJSON, JSONObject holdingsJSON) {
-        Item item = new Item();
-        try {
-            Integer itemId = itemJSON.getInt("itemId");
-            item.setItemId(itemId);
-            item.setBarcode(itemJSON.getString("barcode"));
-            item.setDocType("Item");
-            item.setCustomerCode(itemJSON.getString("customerCode"));
-            item.setUseRestriction(itemJSON.getString("useRestrictions"));
-            item.setVolumePartYear(itemJSON.getString("volumePartYear"));
-            item.setCallNumber(itemJSON.getString("callNumber"));
-            Integer bibId = itemJSON.getInt("bibliographicId");
-            List<Integer> bibIdList = new ArrayList<>();
-            bibIdList.add(bibId);
-            item.setItemBibIdList(bibIdList);
-            List<Integer> holdingsIds = new ArrayList<>();
-            holdingsIds.add(itemJSON.getInt("holdingsId"));
-            item.setHoldingsIdList(holdingsIds);
-
-            JSONObject itemAvailabilityStatus = itemJSON.getJSONObject("itemStatusEntity");
-            item.setAvailability(null != itemAvailabilityStatus ? itemAvailabilityStatus.getString("statusCode") : "");
-            JSONObject collectionGroup = itemJSON.getJSONObject("collectionGroupEntity");
-            item.setCollectionGroupDesignation(null != collectionGroup ? collectionGroup.getString("collectionGroupCode") : "");
-
-            if (holdingsJSON != null) {
-                String holdingsContent = holdingsJSON.getString("content");
-                List<Record> records = convertMarcXmlToRecord(holdingsContent);
-                Record marcRecord = records.get(0);
-                item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return item;
-    }
-
     public Item generateItemForIndex(ItemEntity itemEntity) {
         Item item = new Item();
         try {

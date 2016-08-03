@@ -26,59 +26,6 @@ public class ItemJSONUtilUT extends BaseTestCase {
     Logger logger = LoggerFactory.getLogger(ItemJSONUtilUT.class);
 
     @Test
-    public void generateItemForIndexFromJsonObject()throws Exception{
-        JSONObject itemJSON = new JSONObject();
-        itemJSON.put("itemId",1);
-        itemJSON.put("bibliographicId",1);
-        itemJSON.put("holdingsId",1);
-        itemJSON.put("barcode","CU54519993");
-        itemJSON.put("availability","Available");
-        itemJSON.put("collectionGroupDesignation","Shared");
-        itemJSON.put("docType","Item");
-        itemJSON.put("customerCode","NA");
-        itemJSON.put("useRestrictions","In Library Use");
-        itemJSON.put("volumePartYear","Bd. 1, Lfg. 7-10");
-        itemJSON.put("callNumber","JFN 73-43");
-        JSONObject itemStatusEntity = new JSONObject();
-        itemStatusEntity.put("itemStatusId",1);
-        itemStatusEntity.put("statusCode","Available");
-        itemStatusEntity.put("statusDescription","Available");
-        itemJSON.put("itemStatusEntity",itemStatusEntity);
-
-        JSONObject collectionGroupEntity = new JSONObject();
-        collectionGroupEntity.put("collectionGroupId",1);
-        collectionGroupEntity.put("collectionGroupCode","Shared");
-        collectionGroupEntity.put("collectionGroupDescription","Shared");
-        itemJSON.put("collectionGroupEntity",collectionGroupEntity);
-
-        JSONObject holdingsJSON = new JSONObject();
-        holdingsJSON.put("content","<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
-                "            <record>\n" +
-                "              <datafield tag=\"852\" ind1=\"0\" ind2=\"1\">\n" +
-                "                <subfield code=\"b\">off,che</subfield>\n" +
-                "                <subfield code=\"h\">TA434 .S15</subfield>\n" +
-                "              </datafield>\n" +
-                "              <datafield tag=\"866\" ind1=\"0\" ind2=\"0\">\n" +
-                "                <subfield code=\"a\">v.1-16         </subfield>\n" +
-                "              </datafield>\n" +
-                "            </record>\n" +
-                "          </collection>\n");
-        ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
-        Item item = itemJSONUtil.generateItemForIndex(itemJSON,holdingsJSON);
-        assertNotNull(item);
-        assertEquals(new Integer(1),item.getItemId());
-        assertEquals("CU54519993",item.getBarcode());
-        assertEquals("Available",item.getAvailability());
-        assertEquals("Shared",item.getCollectionGroupDesignation());
-        assertEquals("Item",item.getDocType());
-        assertEquals("NA",item.getCustomerCode());
-        assertEquals("In Library Use",item.getUseRestriction());
-        assertEquals("Bd. 1, Lfg. 7-10",item.getVolumePartYear());
-        assertEquals("JFN 73-43",item.getCallNumber());
-
-    }
-
-    @Test
     public void generateItemForIndex(){
 
         ItemEntity itemEntity = new ItemEntity();

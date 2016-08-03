@@ -1,10 +1,8 @@
 package org.recap.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.marc4j.marc.*;
+import org.marc4j.marc.Leader;
+import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -24,61 +22,6 @@ import java.util.*;
 public class BibJSONUtil extends MarcUtil {
 
     Logger logger = LoggerFactory.getLogger(BibJSONUtil.class);
-
-    public Map<String, List> generateBibAndItemsForIndex(JSONObject jsonObject) {
-        Map map = new HashMap();
-        Bib bib = new Bib();
-        List<Item> items = new ArrayList<>();
-        try {
-            Integer bibliographicId = jsonObject.getInt("bibliographicId");
-            bib.setBibId(bibliographicId);
-            bib.setDocType("Bib");
-            String bibContent = jsonObject.getString("content");
-            List<Record> records = convertMarcXmlToRecord(bibContent);
-            Record marcRecord = records.get(0);
-
-            JSONObject institutionEntity = jsonObject.getJSONObject("institutionEntity");
-            String institutionCode = null != institutionEntity ? institutionEntity.getString("institutionCode") : "";
-            bib.setOwningInstitution(institutionCode);
-
-            bib.setTitle(getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b')));
-            bib.setAuthorDisplay(getDataFieldValue(marcRecord, "100", null, null, "a"));
-            bib.setPublisher(getPublisherValue(marcRecord));
-            bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
-            bib.setPublicationDate(getPublicationDateValue(marcRecord));
-            bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
-            bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
-            bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
-            bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode));
-            bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
-            bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
-            bib.setLccn(getLCCNValue(marcRecord));
-
-            JSONArray holdingsEntities = jsonObject.getJSONArray("holdingsEntities");
-            List<Integer> holdingsIds = new ArrayList<>();
-            List<Integer> itemIds = new ArrayList<>();
-            for (int j = 0; j < holdingsEntities.length(); j++) {
-                JSONObject holdingsJSON = holdingsEntities.getJSONObject(j);
-                Integer holdingsId = holdingsJSON.getInt("holdingsId");
-                holdingsIds.add(holdingsId);
-
-                JSONArray itemEntities = holdingsJSON.getJSONArray("itemEntities");
-                for (int i = 0; i < itemEntities.length(); i++) {
-                    JSONObject itemJSON = itemEntities.getJSONObject(i);
-                    Item item = new ItemJSONUtil().generateItemForIndex(itemJSON, holdingsJSON);
-                    items.add(item);
-                    itemIds.add(item.getItemId());
-                }
-            }
-            bib.setHoldingsIdList(holdingsIds);
-            bib.setBibItemIdList(itemIds);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        map.put("Bib", bib);
-        map.put("Item", items);
-        return map;
-    }
 
     public String getPublisherValue(Record record) {
         String publisherValue = null;
