@@ -1,0 +1,15 @@
+table.tablesorter thead tr .sortHead {
+    background-image: url(../images/metro-unsorted.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+table.tablesorter thead tr .tablesorter-headerAsc {
+    background-image: url(../images/metro-white-asc.png);
+}
+table.tablesorter thead tr .tablesorter-headerDesc {
+    background-image: url(../images/metro-white-desc.png);
+}
+table.tablesorter thead tr .tablesorter-headerDesc, table.tablesorter thead tr .tablesorter-headerAsc {
+    background-color: dimgrey;
+}

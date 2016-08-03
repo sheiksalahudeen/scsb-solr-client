@@ -155,8 +155,8 @@
                                         <label for="selectAll" style="width: 80px;">Select All</label>
                                         <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" onclick=""/>
                                     </th>
-                                    <th id="TitleHeadId" th:onclick="'javascript:sortHeader()'">Title</th>
-                                    <th id="AuthorHeadId" th:onclick="'javascript:sortHeader()'">Author</th>
+                                    <th class="sortHead" id="TitleHeadId" th:onclick="'javascript:sortHeader()'">Title</th>
+                                    <th class="sortHead" id="AuthorHeadId" th:onclick="'javascript:sortHeader()'">Author</th>
                                     <th data-sorter="false">Publisher</th>
                                     <th data-sorter="false">Publisher Date</th>
                                     <th data-sorter="false">OI</th>
