@@ -42,7 +42,7 @@ public class MatchingAlgorithmHelperServiceUT {
         List<Bib> bibs =  matchingAlgorithmHelperService.getBibs("OCLCNumber","00 1 614-793-8682");
         assertNotNull(bibs);
         assertEquals(1,bibs.size());
-        assertEquals(1,bibs.get(0).getId());
+        assertEquals("1",bibs.get(0).getId());
         assertEquals("SampleTitle",bibs.get(0).getTitle());
         assertEquals("PUL",bibs.get(0).getOwningInstitution());
         assertEquals("BA342",bibs.get(0).getBarcode());
