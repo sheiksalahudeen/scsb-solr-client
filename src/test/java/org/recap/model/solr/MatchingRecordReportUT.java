@@ -5,6 +5,9 @@ import org.recap.BaseTestCase;
 import org.recap.service.MatchingAlgorithmHelperService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
@@ -25,6 +28,11 @@ public class MatchingRecordReportUT extends BaseTestCase{
         bib.setOwningInstitutionBibId("1");
         bib.setTitle("SampleTitle");
         bib.setOwningInstitution("PUL");
+        bib.setBarcode("BA342");
+        bib.setImprint("Imprint");
+        List<Integer> owningInstHoldingsIdList = new ArrayList<>();
+        owningInstHoldingsIdList.add(1);
+        bib.setOwningInstHoldingsIdList(owningInstHoldingsIdList);
 
         Item item = new Item();
         item.setItemId(1);
