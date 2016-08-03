@@ -121,7 +121,7 @@ public class BibliographicMarcRecordUT {
         BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
         assertNotNull(bibliographicMarcRecord);
         assertEquals("Rih Husayn Muhammad",bibliographicMarcRecord.getTitle());
-        assertEquals("Ibn Jubayr Wright, William,",bibliographicMarcRecord.getAuthor());
+        assertEquals("Ibn Jubayr",bibliographicMarcRecord.getAuthor());
         assertEquals("AMS Press,",bibliographicMarcRecord.getPublisher());
         assertEquals("1973] 1907.",bibliographicMarcRecord.getPublishedDate());
         assertEquals("01814cam a2200409 450000",bibliographicMarcRecord.getTag000());
@@ -133,7 +133,7 @@ public class BibliographicMarcRecordUT {
     private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
         BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
         bibliographicMarcRecord.setTitle(bibJSONUtil.getTitle(marcRecord));
-        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthor(marcRecord));
+        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
         bibliographicMarcRecord.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
         bibliographicMarcRecord.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
         bibliographicMarcRecord.setTag000(bibJSONUtil.getLeader(marcRecord));

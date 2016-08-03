@@ -26,7 +26,7 @@ public class SearchRecordsRequestUT {
         assertEquals("Shared",searchRecordsRequest.getCollectionGroupDesignations().get(0));
         assertEquals("Monograph",searchRecordsRequest.getMaterialTypes().get(0));
         assertEquals(new Integer(1),searchRecordsRequest.getTotalPageCount());
-        assertEquals(new Long(1),searchRecordsRequest.getTotalRecordsCount());
+        assertEquals("1",searchRecordsRequest.getTotalRecordsCount());
         assertEquals(new Integer(1),searchRecordsRequest.getIndex());
 
     }
@@ -54,7 +54,7 @@ public class SearchRecordsRequestUT {
         materialTypes.add("Monograph");
         searchRecordsRequest.setMaterialTypes(materialTypes);
         searchRecordsRequest.setTotalPageCount(1);
-        searchRecordsRequest.setTotalRecordsCount(new Long(1));
+        searchRecordsRequest.setTotalRecordsCount("1");
         searchRecordsRequest.setSelectAll(false);
         searchRecordsRequest.setIndex(1);
     }

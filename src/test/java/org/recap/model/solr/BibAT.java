@@ -57,11 +57,12 @@ public class BibAT extends BaseTestCase {
 
         Bib bib = new Bib();
         bib.setBibId(101);
-        bib.setDocType("Bibliographic");
+        bib.setDocType("Bib");
         bib.setTitle("Middleware for ReCAP");
         bib.setBarcode("1");
         bib.setTitle("Test Bib 1");
-        bib.setAuthor("Hoepli, Nancy L");
+        bib.setAuthorDisplay("Hoepli, Nancy L");
+        bib.setAuthorSearch(Arrays.asList("Hoepli, Nancy L", "Ibn Jubayr"));
         bib.setPublisher("McClelland & Stewart, limited");
         bib.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
         bib.setIssn(issnList);
@@ -85,11 +86,13 @@ public class BibAT extends BaseTestCase {
         assertTrue(indexedBib.getHoldingsIdList().equals(holdingsIdList));
         assertTrue(indexedBib.getBibItemIdList().equals(itemIdList));
         assertEquals(indexedBib.getBibId(),new Integer(101));
-        assertEquals(indexedBib.getDocType(),"Bibliographic");
+        assertEquals(indexedBib.getDocType(),"Bib");
         assertEquals(indexedBib.getTitle(),"Test Bib 1");
         assertEquals(indexedBib.getBarcode(),"1");
         assertEquals(indexedBib.getTitle(),"Test Bib 1");
-        assertEquals(indexedBib.getAuthor(),"Hoepli, Nancy L");
+        assertEquals(indexedBib.getAuthorDisplay(),"Hoepli, Nancy L");
+        assertEquals(indexedBib.getAuthorSearch().get(0),"Hoepli, Nancy L");
+        assertEquals(indexedBib.getAuthorSearch().get(1),"Ibn Jubayr");
         assertEquals(indexedBib.getPublisher(),"McClelland & Stewart, limited");
         assertEquals(indexedBib.getImprint(),"Toronto, McClelland & Stewart, limited [c1926]");
         assertEquals(indexedBib.getPublicationDate(),"1960");

@@ -30,8 +30,11 @@ public class Bib {
     @Field("Title_display")
     private String titleDisplay;
 
-    @Field("Author")
-    private String author;
+    @Field("Author_display")
+    private String authorDisplay;
+
+    @Field("Author_search")
+    private List<String> authorSearch;
 
     @Field("OwningInstitution")
     private String owningInstitution;
@@ -132,12 +135,20 @@ public class Bib {
         this.titleDisplay = titleDisplay;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getAuthorDisplay() {
+        return authorDisplay;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorDisplay(String authorDisplay) {
+        this.authorDisplay = authorDisplay;
+    }
+
+    public List<String> getAuthorSearch() {
+        return authorSearch;
+    }
+
+    public void setAuthorSearch(List<String> authorSearch) {
+        this.authorSearch = authorSearch;
     }
 
     public String getOwningInstitution() {
