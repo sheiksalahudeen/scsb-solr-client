@@ -31,7 +31,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     public void matchingAlgorithmFullTest() throws Exception{
 
         doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReport();
-        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISBN();
+        String response = matchingAlgorithmController.matchingAlgorithmFull();
         assertTrue(response.contains("Status  : Done"));
     }
 
