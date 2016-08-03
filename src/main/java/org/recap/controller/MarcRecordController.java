@@ -56,7 +56,7 @@ public class MarcRecordController {
 
     private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
         BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
-        bibliographicMarcRecord.setTitle(bibJSONUtil.getTitle(marcRecord));
+        bibliographicMarcRecord.setTitle(bibJSONUtil.getTitleDisplay(marcRecord));
         bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthor(marcRecord));
         bibliographicMarcRecord.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
         bibliographicMarcRecord.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));

@@ -175,7 +175,7 @@ public class SearchRecordsController {
             for (BibItem bibItem : bibItems) {
                 SearchResultRow searchResultRow = new SearchResultRow();
                 searchResultRow.setBibId(bibItem.getBibId());
-                searchResultRow.setTitle(bibItem.getTitle());
+                searchResultRow.setTitle(bibItem.getTitleDisplay());
                 searchResultRow.setAuthor(bibItem.getAuthor());
                 searchResultRow.setPublisher(bibItem.getPublisher());
                 searchResultRow.setPublisherDate(bibItem.getPublicationDate());

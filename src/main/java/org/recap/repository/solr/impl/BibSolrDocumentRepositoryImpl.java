@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -45,7 +46,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         searchRecordsRequest.setPageNumber(results.getNumber());
         searchRecordsRequest.setTotalPageCount(results.getTotalPages());
-        searchRecordsRequest.setTotalRecordsCount(results.getTotalElements());
+        String totalCount = NumberFormat.getNumberInstance().format(results.getTotalElements());
+        searchRecordsRequest.setTotalRecordsCount(totalCount);
         List<BibItem> bibItems = buildBibItems(results);
         return bibItems;
     }

@@ -190,4 +190,13 @@ public class BibJSONUtilUT extends BaseTestCase{
         String lccnValue = bibJSONUtil.getLCCNValue(marcRecord);
         assertEquals(lccnValue, "77173005");
     }
+
+    @Test
+    public void testTitleDisplayValue() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        String titleDisplay = bibJSONUtil.getTitleDisplay(marcRecord);
+        assertEquals(titleDisplay, "RihÌ£lat");
+    }
 }

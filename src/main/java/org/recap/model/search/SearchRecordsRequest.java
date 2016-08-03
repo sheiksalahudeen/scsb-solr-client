@@ -17,7 +17,7 @@ public class SearchRecordsRequest {
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
     private Integer totalPageCount = 0;
-    private Long totalRecordsCount;
+    private String totalRecordsCount;
     private Integer pageNumber;
     private Integer pageSize;
 
@@ -121,11 +121,11 @@ public class SearchRecordsRequest {
         this.pageSize = pageSize;
     }
 
-    public Long getTotalRecordsCount() {
+    public String getTotalRecordsCount() {
         return totalRecordsCount;
     }
 
-    public void setTotalRecordsCount(Long totalRecordsCount) {
+    public void setTotalRecordsCount(String totalRecordsCount) {
         this.totalRecordsCount = totalRecordsCount;
     }
 

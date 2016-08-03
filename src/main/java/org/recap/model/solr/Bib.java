@@ -24,8 +24,11 @@ public class Bib {
     @Field("Barcode")
     private String barcode;
 
-    @Field("Title")
+    @Field("Title_search")
     private String title;
+
+    @Field("Title_display")
+    private String titleDisplay;
 
     @Field("Author")
     private String author;
@@ -119,6 +122,14 @@ public class Bib {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getTitleDisplay() {
+        return titleDisplay;
+    }
+
+    public void setTitleDisplay(String titleDisplay) {
+        this.titleDisplay = titleDisplay;
     }
 
     public String getAuthor() {

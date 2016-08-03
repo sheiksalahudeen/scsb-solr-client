@@ -16,7 +16,7 @@ public class RecapConstants {
     public static final String OWNING_INSTITUTION = "OwningInstitution";
     public static final String COLLECTION_GROUP_DESIGNATION = "CollectionGroupDesignation";
     public static final String AVAILABILITY = "Availability";
-    public static final String TITLE = "Title";
+    public static final String TITLE = "Title_search";
     public static final String TITLE_STARTS_WITH= "TitleStartsWith";
     public static final String BARCODE = "Barcode";
     public static final String CALL_NUMBER = "CallNumber";
