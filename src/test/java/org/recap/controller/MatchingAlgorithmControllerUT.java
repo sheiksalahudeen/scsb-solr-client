@@ -2,68 +2,65 @@ package org.recap.controller;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.recap.MatchingAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created by hemalathas on 1/8/16.
  */
 public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
-    @Autowired
-    MatchingAlgorithmController mockMatchingAlgorithmController;
+    @InjectMocks
+    MatchingAlgorithmController matchingAlgorithmController= new MatchingAlgorithmController();
 
-    @Autowired
-    MatchingAlgorithm matchingAlgorithm;
+    @Mock
+    MatchingAlgorithm mockMatchingAlgorithm;
 
     @Before
     public void setup()throws Exception{
-        mockMatchingAlgorithmController = mock(MatchingAlgorithmController.class);
-        matchingAlgorithm = mock(MatchingAlgorithm.class);
-        StringBuilder responseString = new StringBuilder();
-        responseString.append("Status  : Done");
-        responseString.append("Total Time Taken  : 8.568");
-        when(mockMatchingAlgorithmController.matchingAlgorithmFull()).thenReturn(responseString.toString());
-        when(mockMatchingAlgorithmController.matchingAlgorithmBasedOnISBN()).thenReturn(responseString.toString());
-        when(mockMatchingAlgorithmController.matchingAlgorithmBasedOnLCCN()).thenReturn(responseString.toString());
-        when(mockMatchingAlgorithmController.matchingAlgorithmBasedOnISSN()).thenReturn(responseString.toString());
-        when(mockMatchingAlgorithmController.matchingAlgorithmBasedOnOCLC()).thenReturn(responseString.toString());
-    }
-    @Test
-    public void matchingAlgorithmFullTest() throws Exception{
-        String response = mockMatchingAlgorithmController.matchingAlgorithmFull();
-        assertTrue(response.contains("Status  : Done"));
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testMatchingAlgorithmBasedOnOCLC() throws Exception{
-        String response = mockMatchingAlgorithmController.matchingAlgorithmBasedOnOCLC();
+    public void matchingAlgorithmFullTest() throws Exception{
+
+        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReport();
+        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISBN();
         assertTrue(response.contains("Status  : Done"));
+    }
+
+   @Test
+    public void testMatchingAlgorithmBasedOnOCLC() throws Exception{
+       doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForOclc();
+        String response = matchingAlgorithmController.matchingAlgorithmBasedOnOCLC();
+        assertTrue(response.contains("Status  : Done"));assertTrue(response.contains("Status  : Done"));
     }
 
 
     @Test
     public void testMatchingAlgorithmBasedOnISSN() throws Exception{
-        String response = mockMatchingAlgorithmController.matchingAlgorithmBasedOnISSN();
+        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForIssn();
+        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISSN();
         assertTrue(response.contains("Status  : Done"));;
     }
 
 
     @Test
     public void testMatchingAlgorithmBasedOnLCCN() throws Exception{
-        String response = mockMatchingAlgorithmController.matchingAlgorithmBasedOnLCCN();
+        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForLccn();
+        String response = matchingAlgorithmController.matchingAlgorithmBasedOnLCCN();
         assertTrue(response.contains("Status  : Done"));
     }
-
     @Test
     public void testMatchingAlgorithmBasedOnISBN() throws Exception{
-        String response = mockMatchingAlgorithmController.matchingAlgorithmBasedOnISBN();
+        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForIsbn();
+        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISBN();
         assertTrue(response.contains("Status  : Done"));
     }
 }
