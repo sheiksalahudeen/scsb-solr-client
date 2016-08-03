@@ -75,6 +75,31 @@ public class MarcUtil {
         return fieldValue.toString().trim();
     }
 
+    public List<String> getListOfDataFieldValuesStartsWith(Record record, String dataFieldStartTag, List<Character> subFieldTags) {
+        List<String> fieldValues = new ArrayList<>();
+        if (record != null) {
+            List<VariableField> variableFields = record.getVariableFields();
+            if (!CollectionUtils.isEmpty(variableFields)) {
+                Subfield subfield;
+                for (VariableField variableField : variableFields) {
+                    if (variableField != null && StringUtils.isNotBlank(variableField.getTag()) && variableField.getTag().startsWith(dataFieldStartTag)) {
+                        DataField dataField = (DataField) variableField;
+                        for (Character subFieldTag : subFieldTags){
+                            subfield = dataField.getSubfield(subFieldTag);
+                            if (subfield != null) {
+                                String data = subfield.getData();
+                                if (StringUtils.isNotBlank(data)){
+                                    fieldValues.add(data);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return fieldValues;
+    }
+
     public String getDataFieldValue(Record marcRecord, String field, String ind1, String ind2, String subField) {
         List<String> strings = resolveValue(marcRecord, field, ind1, ind2, subField);
         return CollectionUtils.isEmpty(strings)? "" : strings.get(0);

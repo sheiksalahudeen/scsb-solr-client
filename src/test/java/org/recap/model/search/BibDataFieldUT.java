@@ -137,7 +137,7 @@ public class BibDataFieldUT {
     private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
         BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
         bibliographicMarcRecord.setTitle(bibJSONUtil.getTitle(marcRecord));
-        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthor(marcRecord));
+        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
         bibliographicMarcRecord.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
         bibliographicMarcRecord.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
         bibliographicMarcRecord.setTag000(bibJSONUtil.getLeader(marcRecord));

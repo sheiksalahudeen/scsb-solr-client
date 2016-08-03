@@ -4,8 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.marc4j.marc.Leader;
-import org.marc4j.marc.Record;
+import org.marc4j.marc.*;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -43,7 +42,7 @@ public class BibJSONUtil extends MarcUtil {
             bib.setOwningInstitution(institutionCode);
 
             bib.setTitle(getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b')));
-            bib.setAuthor(getDataFieldValue(marcRecord, "100", null, null, "a"));
+            bib.setAuthorDisplay(getDataFieldValue(marcRecord, "100", null, null, "a"));
             bib.setPublisher(getPublisherValue(marcRecord));
             bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
             bib.setPublicationDate(getPublicationDateValue(marcRecord));
@@ -206,7 +205,8 @@ public class BibJSONUtil extends MarcUtil {
         bib.setOwningInstitution(institutionCode);
         bib.setTitle(getTitle(marcRecord));
         bib.setTitleDisplay(getTitleDisplay(marcRecord));
-        bib.setAuthor(getAuthor(marcRecord));
+        bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
+        bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
         bib.setPublisher(getPublisherValue(marcRecord));
         bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
         bib.setPublicationDate(getPublicationDateValue(marcRecord));
@@ -246,28 +246,25 @@ public class BibJSONUtil extends MarcUtil {
         return getDataFieldValue(marcRecord, "245", null, null, "a");
     }
 
-    public String getAuthor(Record marcRecord) {
-        StringBuffer author = new StringBuffer();
-        String fieldValue = null;
+    public String getAuthorDisplayValue(Record marcRecord) {
+        return getDataFieldValueStartsWith(marcRecord, "1", Arrays.asList('a', 'b'));
+    }
 
-        Map<String, String> authorMap = new HashMap<>();
-        authorMap.put("100", "a");
-        authorMap.put("110", "a");
-        authorMap.put("111", "a");
-        authorMap.put("130", "1");
-        authorMap.put("700", "a");
-        authorMap.put("710", "a");
-        authorMap.put("711", "a");
-        authorMap.put("730", "a");
+    public List<String> getAuthorSearchValue(Record marcRecord) {
+        List<String> authorSearchValues = new ArrayList<>();
+        List<String> fieldValues = null;
 
-        for (Map.Entry<String, String> entry : authorMap.entrySet()) {
-            fieldValue = getDataFieldValue(marcRecord, entry.getKey(), null, null, entry.getValue());
-            if (StringUtils.isNotBlank(fieldValue)) {
-                author.append(fieldValue);
-                author.append(" ");
+        Map<String, List<Character>> authorMap = new HashMap<>();
+        authorMap.put("1", Arrays.asList('a', 'b'));
+        authorMap.put("7", Arrays.asList('a', 'b'));
+
+        for (Map.Entry<String, List<Character>> entry : authorMap.entrySet()) {
+            fieldValues = getListOfDataFieldValuesStartsWith(marcRecord, entry.getKey(), entry.getValue());
+            if (!CollectionUtils.isEmpty(fieldValues)) {
+                authorSearchValues.addAll(fieldValues);
             }
         }
-        return author.toString().trim();
+        return authorSearchValues;
     }
 
     public String getLeader(Record marcRecord) {

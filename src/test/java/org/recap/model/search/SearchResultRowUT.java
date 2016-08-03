@@ -23,7 +23,7 @@ public class SearchResultRowUT {
         BibItem bibItem = new BibItem();
         bibItem.setBibId(1);
         bibItem.setTitle("Title1");
-        bibItem.setAuthor("Author1");
+        bibItem.setAuthorDisplay("Author1");
         bibItem.setBarcode("BC234");
         bibItem.setDocType("Bib");
         bibItem.setImprint("sample imprint");
@@ -77,7 +77,7 @@ public class SearchResultRowUT {
                 SearchResultRow searchResultRow = new SearchResultRow();
                 searchResultRow.setBibId(bibItem.getBibId());
                 searchResultRow.setTitle(bibItem.getTitle());
-                searchResultRow.setAuthor(bibItem.getAuthor());
+                searchResultRow.setAuthor(bibItem.getAuthorDisplay());
                 searchResultRow.setPublisher(bibItem.getPublisher());
                 searchResultRow.setPublisherDate(bibItem.getPublicationDate());
                 searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
