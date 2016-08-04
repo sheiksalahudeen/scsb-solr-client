@@ -99,13 +99,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         } else if (StringUtils.isBlank(fieldName)) {
             criteria = new Criteria().is(fieldValue);
         } else if (StringUtils.isBlank(fieldValue)) {
-            if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
-                fieldName = RecapConstants.TITLE;
-            }
             criteria = new Criteria(fieldName).expression(RecapConstants.ALL);
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
-                criteria = new Criteria(RecapConstants.TITLE).startsWith(fieldValue);
+                String[] splitedTitle = fieldValue.split(" ");
+                criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith("^"+splitedTitle[0]);
             } else {
                 criteria = new Criteria(fieldName).is(fieldValue);
             }

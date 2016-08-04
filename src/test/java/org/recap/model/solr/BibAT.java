@@ -2,14 +2,17 @@ package org.recap.model.solr;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.search.SearchRecordsRequest;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import javax.persistence.EntityManager;
@@ -32,10 +35,14 @@ public class BibAT extends BaseTestCase {
     @Autowired
     SolrTemplate solrTemplate;
 
+    @Autowired
+    BibSolrDocumentRepository bibSolrDocumentRepository;
+
+
     @Before
     public void setUp() throws Exception {
-        assertNotNull(bibCrudRepository);
-        bibCrudRepository.deleteAll();
+        assertNotNull(this.bibSolrCrudRepository);
+        this.bibSolrCrudRepository.deleteAll();
     }
 
     @Test
@@ -77,7 +84,7 @@ public class BibAT extends BaseTestCase {
         bib.setLccn("71448228");
         bib.setHoldingsIdList(holdingsIdList);
         bib.setBibItemIdList(itemIdList);
-        Bib indexedBib = bibCrudRepository.save(bib);
+        Bib indexedBib = this.bibSolrCrudRepository.save(bib);
         assertNotNull(indexedBib);
 
         assertTrue(indexedBib.getIssn().get(0).equals("0394469756"));
@@ -165,12 +172,12 @@ public class BibAT extends BaseTestCase {
         assertNotNull(items);
         assertTrue(items.size() == 1);
 
-        bibCrudRepository.save(bibs);
+        this.bibSolrCrudRepository.save(bibs);
         itemCrudRepository.save(items);
         solrTemplate.softCommit();
 
         Integer bibId = bibs.get(0).getBibId();
-        Bib bib = bibCrudRepository.findByBibId(bibId);
+        Bib bib = this.bibSolrCrudRepository.findByBibId(bibId);
         assertNotNull(bib);
         assertEquals(owningInstitutionBibId, bib.getOwningInstitutionBibId());
 
@@ -180,6 +187,94 @@ public class BibAT extends BaseTestCase {
         assertEquals(barcode, item.getBarcode());
         assertNull(item.getUseRestriction());
         solrTemplate.rollback();
+    }
+
+    @Test
+    public void testTitleStartsWith()throws Exception{
+
+        List<String> issnList = new ArrayList<>();
+        List<String>isbnList = new ArrayList<>();
+        List<String> oclcNumberList = new ArrayList<>();
+        List<Integer> holdingsIdList = new ArrayList<>();
+        List<Integer> itemIdList = new ArrayList<>();
+        issnList.add("0394469756");
+        isbnList.add("0394469755");
+        oclcNumberList.add("00133182");
+        oclcNumberList.add("00440790");
+        holdingsIdList.add(201);
+        holdingsIdList.add(202);
+        itemIdList.add(301);
+        itemIdList.add(302);
+
+        Bib bib = new Bib();
+        bib.setBibId(101);
+        bib.setDocType("Bib");
+        bib.setTitle("Test Bib 1");
+        bib.setBarcode("1");
+        String[] titleTokened = bib.getTitle().split(" ");
+        bib.setTitleStartsWith("^"+titleTokened[0]);
+        bib.setAuthorDisplay("Nancy L");
+        bib.setPublisher("McClelland & Stewart, limited");
+        bib.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib.setIssn(issnList);
+        bib.setIsbn(isbnList);
+        bib.setOclcNumber(oclcNumberList);
+        bib.setPublicationDate("1960");
+        bib.setMaterialType("Material Type 1");
+        bib.setNotes("Bibliographical footnotes 1");
+        bib.setOwningInstitution("PUL");
+        bib.setSubject("Arab countries Politics and government.");
+        bib.setPublicationPlace("Paris");
+        bib.setLccn("71448228");
+        bib.setHoldingsIdList(holdingsIdList);
+        bib.setBibItemIdList(itemIdList);
+
+        Bib bib1 = new Bib();
+        bib1.setBibId(102);
+        bib1.setDocType("Bib");
+        bib1.setTitle("Bib Test 1");
+        bib1.setBarcode("1");
+        String[] titleTokened1 = bib1.getTitle().split(" ");
+        bib1.setTitleStartsWith("^"+titleTokened1[0]);
+        bib1.setAuthorDisplay("Hoepli");
+        bib1.setPublisher("Tata, limited");
+        bib1.setImprint("Tata, limited [c1926]");
+        bib1.setIssn(issnList);
+        bib1.setIsbn(isbnList);
+        bib1.setOclcNumber(oclcNumberList);
+        bib1.setPublicationDate("1960");
+        bib1.setMaterialType("Material Type 1");
+        bib1.setNotes("Bibliographical footnotes 1");
+        bib1.setOwningInstitution("PUL");
+        bib1.setSubject("Politics.");
+        bib1.setPublicationPlace("London");
+        bib1.setLccn("43435");
+        bib1.setHoldingsIdList(holdingsIdList);
+        bib1.setBibItemIdList(itemIdList);
+        List<Bib> bibs = new ArrayList<>();
+        bibs.add(bib);
+        bibs.add(bib1);
+        Iterable<Bib> indexedBibs = bibSolrCrudRepository.save(bibs);
+        solrTemplate.softCommit();
+        int count = 0;
+        for(Bib indexedBib: indexedBibs){
+            if(count==0){
+                assertEquals("Test Bib 1",indexedBib.getTitle());
+                assertEquals("Nancy L",indexedBib.getAuthorDisplay());
+            }else{
+                assertEquals("Bib Test 1",indexedBib.getTitle());
+                assertEquals("Hoepli",indexedBib.getAuthorDisplay());
+            }
+            count++;
+        }
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+
+        searchRecordsRequest.setFieldName("TitleStartsWith");
+        String searchFieldValue = "Test";
+        searchRecordsRequest.setFieldValue(searchFieldValue.split(" ")[0]);
+
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        assertNotNull(bibItems.get(0));
     }
 
     public File getUnicodeContentFile() throws URISyntaxException {

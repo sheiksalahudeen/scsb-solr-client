@@ -82,6 +82,9 @@ public class BibItem {
     @Field("BibItemId")
     private List<Integer> bibItemIdList;
 
+    @Field("TitleStartsWith")
+    private String titleStartsWith;
+
     @Ignore
     private List<Item> items = new ArrayList<>();
 
@@ -275,6 +278,14 @@ public class BibItem {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public String getTitleStartsWith() {
+        return titleStartsWith;
+    }
+
+    public void setTitleStartsWith(String titleStartsWith) {
+        this.titleStartsWith = titleStartsWith;
     }
 }
 
