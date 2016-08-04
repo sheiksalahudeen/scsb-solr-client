@@ -148,6 +148,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setOwningInstitution(institutionCode);
         bib.setTitle(getTitle(marcRecord));
         bib.setTitleDisplay(getTitleDisplay(marcRecord));
+        bib.setTitleStartsWith(getTitleStartsWith(marcRecord));
         bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
         bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
         bib.setPublisher(getPublisherValue(marcRecord));
@@ -183,6 +184,16 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getTitle(Record marcRecord) {
         return getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b'));
+    }
+
+    private String getTitleStartsWith(Record marcRecord){
+        String title = getTitle(marcRecord);
+        String titleStartsWith = null;
+        if(title!=null){
+            String[] splitedTitle = getTitle(marcRecord).split(" ");
+            titleStartsWith = "^"+splitedTitle[0];
+        }
+        return titleStartsWith;
     }
 
     public String getTitleDisplay(Record marcRecord) {

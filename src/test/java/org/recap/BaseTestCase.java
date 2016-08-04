@@ -36,7 +36,7 @@ public class BaseTestCase {
     public SolrClient solrAdminClient;
 
     @Autowired
-    public BibSolrCrudRepository bibCrudRepository;
+    public BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
     public BibliographicDetailsRepository bibliographicDetailsRepository;

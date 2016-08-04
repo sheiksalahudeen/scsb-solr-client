@@ -1,6 +1,7 @@
 package org.recap.util;
 
 
+import junit.framework.TestCase;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.solr.Bib;
 
 import java.util.*;
 
@@ -136,6 +138,7 @@ public class BibJSONUtilUT extends BaseTestCase{
     public void generateBibAndItemsForIndex()throws Exception {
         Random random = new Random();
 
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent(bibContent.getBytes());
         bibliographicEntity.setOwningInstitutionId(1);
@@ -147,7 +150,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedBy("tst");
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setContent(holdingContent.getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -171,8 +174,11 @@ public class BibJSONUtilUT extends BaseTestCase{
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntity(holdingsEntity);
 
+
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntities.add(bibliographicEntity);
+        itemEntity.setBibliographicEntities(bibliographicEntities);
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         Map<String, List> bibItemMap = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity);
@@ -180,6 +186,8 @@ public class BibJSONUtilUT extends BaseTestCase{
         List bibs = bibItemMap.get("Bib");
         List items = bibItemMap.get("Item");
         assertNotNull(bibs);
+        Bib bib = (Bib)bibs.get(0);
+        assertEquals("^RihÌ£lat",bib.getTitleStartsWith());
         assertEquals(bibs.size(), 1);
         assertNotNull(items);
         assertEquals(items.size(), 1);
