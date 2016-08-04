@@ -10,6 +10,3 @@ table.tablesorter thead tr .tablesorter-headerAsc {
 table.tablesorter thead tr .tablesorter-headerDesc {
     background-image: url(../images/metro-white-desc.png);
 }
-table.tablesorter thead tr .tablesorter-headerDesc, table.tablesorter thead tr .tablesorter-headerAsc {
-    background-color: dimgrey;
-}

@@ -14,6 +14,7 @@ public class BibliographicMarcRecord {
     private String publisher;
     private String publishedDate;
     private String owningInstitution;
+    private String callNumber;
     private String tag000;
     private String controlNumber001;
     private String controlNumber005;
@@ -67,6 +68,14 @@ public class BibliographicMarcRecord {
 
     public void setOwningInstitution(String owningInstitution) {
         this.owningInstitution = owningInstitution;
+    }
+
+    public String getCallNumber() {
+        return callNumber;
+    }
+
+    public void setCallNumber(String callNumber) {
+        this.callNumber = callNumber;
     }
 
     public String getTag000() {

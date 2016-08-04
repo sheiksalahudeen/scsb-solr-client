@@ -50,6 +50,9 @@ public class MarcRecordController {
         if (null != institutionEntity) {
             bibliographicMarcRecord.setOwningInstitution(institutionEntity.getInstitutionCode());
         }
+        if (!CollectionUtils.isEmpty(bibliographicEntity.getItemEntities())) {
+            bibliographicMarcRecord.setCallNumber(bibliographicEntity.getItemEntities().get(0).getCallNumber());
+        }
         model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
         return "marcRecordView";
     }

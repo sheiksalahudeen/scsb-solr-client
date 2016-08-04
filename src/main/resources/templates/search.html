@@ -4,10 +4,6 @@
     <title>Search</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div id="searchContentId" name="searchContentName" th:fragment="searchContent">
@@ -151,7 +147,7 @@
                             <table id="searchResults" name="searchResults" class="table table-hover tablesorter">
                                 <thead id="mainHead" style="background-color: grey; color: white;">
                                 <tr id="mainRow">
-                                    <th data-sorter="false">
+                                    <th data-sorter="false" style="width: 40px">
                                         <label for="selectAll" style="width: 80px;">Select All</label>
                                         <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" onclick=""/>
                                     </th>
@@ -190,8 +186,9 @@
                                     <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span></td>
                                     <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
                                     <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
+                                        <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" type="hidden" th:value="false"/>
                                         <a class="btn" th:if="${searchResult.showItems}" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:onclick="'javascript:showItems('+${searchResultStat.index}+')'">
-                                            <i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
+                                            <i data-th-id="'showItemsIcon-'+ ${searchResultStat.index}" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
                                         </a>
                                         <span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span>
                                     </td>
@@ -199,7 +196,7 @@
                                         <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse childrow" th:classappend="'row' + ${searchResultStat.index}">
                                             <th></th>
                                             <th></th>
-                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">
+                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white; width: 40px;">
                                                 <label for="selectAll" style="width: 80px;">Select
                                                     All</label><input type="checkbox" id="selectAllItems"
                                                                       name="selectAllItems"

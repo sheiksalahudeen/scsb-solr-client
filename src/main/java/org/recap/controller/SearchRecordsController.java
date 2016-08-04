@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -187,7 +188,6 @@ public class SearchRecordsController {
                     searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                     searchResultRow.setUseRestriction(item.getUseRestriction());
                     searchResultRow.setBarcode(item.getBarcode());
-                    searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                     searchResultRow.setAvailability(item.getAvailability());
                     searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
                 } else {
@@ -206,6 +206,7 @@ public class SearchRecordsController {
                         }
                         searchResultRow.setSummaryHoldings(bibItem.getItems().get(0).getSummaryHoldings());
                         searchResultRow.setShowItems(true);
+                        Collections.sort(searchItemResultRows);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);
                     }
                 }

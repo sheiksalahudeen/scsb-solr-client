@@ -1,9 +1,11 @@
 package org.recap.model.search;
 
+import java.util.Comparator;
+
 /**
  * Created by rajesh on 18-Jul-16.
  */
-public class SearchItemResultRow {
+public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
 
     private String callNumber;
     private String chronologyAndEnum;
@@ -76,5 +78,10 @@ public class SearchItemResultRow {
 
     public void setSelectedItem(boolean selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    @Override
+    public int compareTo(SearchItemResultRow searchItemResultRow) {
+        return this.getChronologyAndEnum().compareTo(searchItemResultRow.getChronologyAndEnum());
     }
 }
