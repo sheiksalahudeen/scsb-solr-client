@@ -1,22 +1,39 @@
 package org.recap.executors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.solr.Bib;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -39,6 +56,15 @@ public class ExecutorAT extends BaseTestCase {
 
     @Autowired
     ItemCrudRepository itemCrudRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Value("${solr.url}")
+    String solrUrl;
+
+    @Autowired
+    SolrTemplate solrTemplate;
 
     private int numThreads = 5;
     private int docsPerThread = 1000;
@@ -157,6 +183,80 @@ public class ExecutorAT extends BaseTestCase {
         itemIndexExecutorService.index(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+    //Added for ReCAP-111 jira, test will be failing until duplicate issue is fixed.
+    @Test
+    public void testDuplicateRecordsIndexed() throws Exception {
+        bibCrudRepository.deleteAll();
+        URL resource = getClass().getResource("BibContentToCheckDuplicateRecords.xml");
+        File bibContentFile = new File(resource.toURI());
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setOwningInstitutionId(3);
+        String owningInstitutionBibId = "001";
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedBy("tst");
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity);
+
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3, owningInstitutionBibId);
+        assertNotNull(fetchedBibliographicEntity);
+        assertNotNull(fetchedBibliographicEntity.getContent());
+
+        performIndex(fetchedBibliographicEntity);
+
+        Integer bibliographicId = fetchedBibliographicEntity.getBibliographicId();
+
+        Long countOnSingleIndex = bibCrudRepository.countByBibId(bibliographicId);
+        assertEquals(countOnSingleIndex, new Long(1));
+
+        Thread.sleep(1000);
+
+        performIndex(fetchedBibliographicEntity);
+
+        Long countOnDoubleIndex = bibCrudRepository.countByBibId(bibliographicId);
+        assertEquals(countOnDoubleIndex, new Long(1));
+
+    }
+
+    private void performIndex(BibliographicEntity bibliographicEntity) throws Exception {
+        List<String> coreNames = new ArrayList<>();
+        coreNames.add("temp0");
+        solrAdmin.createSolrCores(coreNames);
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        List<Future> futures = new ArrayList<>();
+        Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity));
+        futures.add(submit);
+        List<Bib> bibsToIndex = new ArrayList<>();
+
+        for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
+            Future future = futureIterator.next();
+
+            Bib bib = (Bib) future.get();
+            bibsToIndex.add(bib);
+        }
+
+        BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreNames.get(0), solrUrl);
+
+        if (!CollectionUtils.isEmpty(bibsToIndex)) {
+            bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
+            solrTemplate.setSolrCore(coreNames.get(0));
+            Thread.sleep(5000);
+            solrTemplate.commit();
+        }
+        Thread.sleep(15000);
+        solrAdmin.mergeCores(coreNames);
+        Thread.sleep(15000);
+        bibCrudRepositoryMultiCoreSupport.deleteAll();
+        solrAdmin.unLoadCores(coreNames);
+        executorService.shutdown();
     }
 
 }
