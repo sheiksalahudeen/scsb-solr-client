@@ -25,6 +25,27 @@ function toggleIcon(resultRowIndex) {
 }
 
 function sortHeader() {
-    $("tr.childrow").removeClass('in');
+    $("tr.childRow").removeClass('in');
+    $('[name=showItemsInput]').val("false");
+    $('[name=showItemsIcon]').removeClass("fa-minus-circle");
+    $('[name=showItemsIcon]').addClass("fa-plus-circle");
+}
+
+function selectAllParentRows() {
+    var selectAllFlag = $('#selectAll').is(":checked");
+    if (selectAllFlag) {
+        $("tr.parentRow #selected").prop('checked', true);
+    } else {
+        $("tr.parentRow #selected").prop('checked', false);
+    }
+}
+
+function selectAllChildRows(childRowIndex) {
+    var selectAllFlag = $('#selectAllItems-' + childRowIndex).is(":checked");
+    if (selectAllFlag) {
+        $("tr.row" + childRowIndex + " #selectedItem").prop('checked', true);
+    } else {
+        $("tr.row" + childRowIndex + " #selectedItem").prop('checked', false);
+    }
 }
 

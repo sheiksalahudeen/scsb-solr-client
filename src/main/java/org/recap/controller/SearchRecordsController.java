@@ -171,6 +171,7 @@ public class SearchRecordsController {
     private void buildResults(SearchRecordsRequest searchRecordsRequest, List<BibItem> bibItems) {
         searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.setShowResults(true);
+        searchRecordsRequest.setSelectAll(false);
         if (!CollectionUtils.isEmpty(bibItems)) {
             List<SearchResultRow> searchResultRows = new ArrayList<>();
             for (BibItem bibItem : bibItems) {
