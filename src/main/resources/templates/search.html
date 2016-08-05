@@ -18,10 +18,13 @@
                         <br/>
                         <input id="pageNumber" name="pageNumber" type="text"
                                th:field="*{pageNumber}" hidden="hidden"/>
-                        <input id="pageSize" name="pageSize" type="text" th:field="*{pageSize}"
-                               hidden="hidden"/>
                         <input id="totalPageCount" name="totalPageCount" type="text"
                                th:field="*{totalPageCount}" hidden="hidden"/>
+                        <input id="totalRecordsCount" name="totalRecordsCount" type="text"
+                               th:field="*{totalRecordsCount}" hidden="hidden"/>
+                        <button id="pageSizeChangeButtonId" type="submit"
+                                name="action" value="pageSizeChange"
+                                hidden="hidden"></button>
                         <div class="form-group">
                             <div id="fieldValueId" name="fieldValueName" class="col-sm-8">
                                 Search <input type="text" th:field="*{fieldValue}"
@@ -132,18 +135,31 @@
                         <hr style="border-top-width: 3px;"/>
                     </div>
                     <div data-th-if="*{showResults}">
-                        <div id="searchResultsHeadId" name="searchResultsHeadName" class="form-group col-sm-12" style="margin-top: -40px;"
+                        <div id="searchResultsHeadId" name="searchResultsHeadName" class="form-group col-sm-2" style="margin-top: -40px;"
                              data-th-if="*{showResults}">
                             <h3 align="left" style="color: dodgerblue">Search Results</h3>
-                                                <span class="pull-right" style="margin-top: -30px; font-weight: bold">Search Results Found: <span
-                                                        th:text="*{totalRecordsCount}"></span></span>
+                        </div>
+                        <div class="form-group col-sm-4" data-th-if="*{searchResultRows.size() &gt; 0 &amp;&amp; showResults}">
+                            <label class="col-sm-5" for="numOfRecordsId" style="margin-top: -15px;">No. of records to show</label>
+                            <select id="numOfRecordsId" name="numOfRecordsName"
+                                    class="form-control col-sm-2"
+                                    style="width: 100px; margin-top: -25px;"
+                                    th:field="*{pageSize}" onchange="document.getElementById('pageSizeChangeButtonId').click()">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-12">
+                            <span align="right" class="pull-right" style="margin-top: -45px; font-weight: bold">Search Results Found: <span th:text="*{totalRecordsCount}"></span></span>
                         </div>
                         <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
-                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}">
+                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}" style="margin-top: -20px;">
                             <span>No search results found. Please refine search results.</span>
                         </div>
                         <div id="searchResultsDiv" class="form-group col-sm-12 table-responsive"
-                             data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}">
+                             data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -20px;">
                             <table id="searchResults" name="searchResults" class="table table-hover tablesorter">
                                 <thead id="mainHead" style="background-color: grey; color: white;">
                                 <tr id="mainRow">
