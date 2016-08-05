@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class SearchRecordsController {
     public ModelAndView search(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 10));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, searchRecordsRequest.getPageSize()));
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
@@ -137,6 +138,22 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         return new ModelAndView("searchRecords");
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/searchRecords", method = RequestMethod.POST, params = "action=pageSizeChange")
+    public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
+                                         BindingResult result,
+                                         Model model) throws Exception {
+        int totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalRecordsCount()).intValue();
+        int totalPagesCount = (int) Math.ceil((double) totalRecordsCount / (double) searchRecordsRequest.getPageSize());
+        Integer pageNumber = searchRecordsRequest.getPageNumber();
+        if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
+            pageNumber = totalPagesCount - 1;
+        }
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(pageNumber, searchRecordsRequest.getPageSize()));
+        buildResults(searchRecordsRequest, bibItems);
+        return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
     private void setDefaultsToSearchRecordsRequest(SearchRecordsRequest searchRecordsRequest) {

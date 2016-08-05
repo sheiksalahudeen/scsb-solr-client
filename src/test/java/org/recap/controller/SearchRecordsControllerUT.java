@@ -129,6 +129,13 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
         assertEquals("searchRecords",modelAndView.getViewName());
     }
 
+    @Test
+    public void onPageSizeChange() throws Exception{
+        ModelAndView modelAndView = searchRecordsController.onPageSizeChange(getSearchRecordsRequest(),bindingResult,model);
+        assertNotNull(modelAndView);
+        assertEquals("searchRecords",modelAndView.getViewName());
+    }
+
     private SearchRecordsRequest getSearchRecordsRequest(){
         searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setShowResults(true);
