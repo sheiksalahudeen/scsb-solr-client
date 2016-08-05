@@ -149,7 +149,7 @@
                                 <tr id="mainRow">
                                     <th data-sorter="false" style="width: 40px">
                                         <label for="selectAll" style="width: 80px;">Select All</label>
-                                        <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" onclick=""/>
+                                        <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" th:onclick="'javascript:selectAllParentRows()'"/>
                                     </th>
                                     <th class="sortHead" id="TitleHeadId" th:onclick="'javascript:sortHeader()'">Title</th>
                                     <th class="sortHead" id="AuthorHeadId" th:onclick="'javascript:sortHeader()'">Author</th>
@@ -164,14 +164,13 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" th:title="${searchResult.bibId}" th:each="searchResult,searchResultStat : *{searchResultRows}">
+                                <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" th:title="${searchResult.bibId}" th:each="searchResult,searchResultStat : *{searchResultRows}" class="parentRow">
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
                                            th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
                                         <input type="checkbox" id="selected" name="selected"
                                                th:unless="${searchResult.showItems}"
-                                               th:value="${searchResult.selected}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
                                                th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                     </td>
@@ -186,23 +185,23 @@
                                     <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span></td>
                                     <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
                                     <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
-                                        <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" type="hidden" th:value="false"/>
+                                        <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" name="showItemsInput" type="hidden" th:value="false"/>
                                         <a class="btn" th:if="${searchResult.showItems}" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:onclick="'javascript:showItems('+${searchResultStat.index}+')'">
-                                            <i data-th-id="'showItemsIcon-'+ ${searchResultStat.index}" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
+                                            <i data-th-id="'showItemsIcon-'+ ${searchResultStat.index}" name="showItemsIcon" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
                                         </a>
                                         <span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span>
                                     </td>
                                     <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span></td>
-                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse childrow" th:classappend="'row' + ${searchResultStat.index}">
+                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse childRow" th:classappend="'row' + ${searchResultStat.index}">
                                             <th></th>
                                             <th></th>
                                             <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white; width: 40px;">
-                                                <label for="selectAll" style="width: 80px;">Select
-                                                    All</label><input type="checkbox" id="selectAllItems"
-                                                                      name="selectAllItems"
-                                                                      th:field="*{searchResultRows[__${searchResultStat.index}__].selectAllItems}"
-                                                                      style="margin-left: 26px;"
-                                                                      onclick=""/>
+                                                <label for="selectAll" style="width: 80px;">Select All</label>
+                                                <input data-th-id="'selectAllItems-' + ${searchResultStat.index}" type="checkbox"
+                                                       name="selectAllItems"
+                                                       th:field="*{searchResultRows[__${searchResultStat.index}__].selectAllItems}"
+                                                       style="margin-left: 26px;"
+                                                       th:onclick="'javascript:selectAllChildRows('+${searchResultStat.index}+')'"/>
                                             </th>
                                             <th data-th-id="'searchItemResultsCNHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Call Number</th>
                                             <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Chronology &amp; Enumeration</th>
@@ -211,7 +210,7 @@
                                             <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Use Restriction</th>
                                             <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Barcode</th>
                                         </tr>
-                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:each="searchItemResult,searchItemResultStat : ${searchResult.searchItemResultRows}" class="collapse childrow" th:classappend="'row' + ${searchResultStat.index}">
+                                        <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:each="searchItemResult,searchItemResultStat : ${searchResult.searchItemResultRows}" class="collapse childRow" th:classappend="'row' + ${searchResultStat.index}">
                                             <td></td>
                                             <td></td>
                                             <td data-th-id="'searchItemResultsDataPlus-'+ ${searchItemResultStat.index}">
