@@ -21,10 +21,24 @@ buildscript {
 	}
 }
 
+plugins {
+	id "org.sonarqube" version "2.0.1"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 apply plugin: "net.saliman.cobertura"
+
+sonarqube {
+	properties {
+		property "systemProp.sonar.host.url", "http://174.129.129.28:9000"
+		property "systemProp.sonar.jdbc.url", "jdbc:mysql://scsb-mysql:3306/sonar"
+		property "systemProp.sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
+		property "systemProp.sonar.jdbc.username", "sonar"
+		property "systemProp.sonar.jdbc.password", "sonar"
+	}
+}
 
 springBoot {
 	executable = true
