@@ -25,6 +25,7 @@ public class SearchRecordsRequest {
     private boolean selectAll = false;
 
     private Integer index;
+    private String errorMessage;
 
     public String getFieldValue() {
         return fieldValue;
@@ -151,5 +152,13 @@ public class SearchRecordsRequest {
 
     public void setIndex(Integer index) {
         this.index = index;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
