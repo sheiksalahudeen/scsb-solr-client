@@ -130,6 +130,12 @@
                                 </button>
                             </div>
                         </div>
+                        <div  class="form-group col-sm-6" style="margin-top: 10px;" data-th-if="*{errorMessage ne null}">
+                            <div class="alert alert-info">
+                                <span style="font-weight: bold"><span th:text="*{errorMessage}"></span></span>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="form-group col-sm-12" style="margin-top: 40px;">
                         <hr style="border-top-width: 3px;"/>

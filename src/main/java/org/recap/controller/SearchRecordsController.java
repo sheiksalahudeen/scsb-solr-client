@@ -53,8 +53,12 @@ public class SearchRecordsController {
     public ModelAndView search(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, searchRecordsRequest.getPageSize()));
-        buildResults(searchRecordsRequest, bibItems);
+        if(!isEmptySearch(searchRecordsRequest)){
+            List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, searchRecordsRequest.getPageSize()));
+            buildResults(searchRecordsRequest, bibItems);
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
+        }
+        searchRecordsRequest.setErrorMessage("At least one Search Facet Box needs to be checked to get results.");
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -232,5 +236,14 @@ public class SearchRecordsController {
             }
             searchRecordsRequest.setSearchResultRows(searchResultRows);
         }
+    }
+
+    private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {
+        boolean emptySearch = false;
+        if (searchRecordsRequest.getMaterialTypes().size() == 0 && searchRecordsRequest.getAvailability().size() == 0 &&
+                searchRecordsRequest.getCollectionGroupDesignations().size() == 0 && searchRecordsRequest.getOwningInstitutions().size() == 0) {
+            emptySearch = true;
+        }
+        return emptySearch;
     }
 }
