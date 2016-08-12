@@ -14,7 +14,6 @@
             <fieldset>
                 <div id="searchRecordsDivId" name="searchRecordsDivName">
                     <div class="container">
-                        <h3 style="color: dodgerblue">SCSB Search</h3>
                         <br/>
                         <input id="pageNumber" name="pageNumber" type="text"
                                th:field="*{pageNumber}" hidden="hidden"/>
@@ -26,13 +25,12 @@
                                 name="action" value="pageSizeChange"
                                 hidden="hidden"></button>
                         <div class="form-group">
-                            <div id="fieldValueId" name="fieldValueName" class="col-sm-8">
-                                Search <input type="text" th:field="*{fieldValue}"
-                                              class="form-control"
-                                              id="fieldValue"/>
+                            <div id="fieldValueId" name="fieldValueName" class="col-sm-9">
+                                <input type="text" th:field="*{fieldValue}"
+                                       class="form-control"
+                                       id="fieldValue"/>
                             </div>
-                            <div id="fieldNameId" name="fieldName" class="col-sm-4">
-                                <label></label>
+                            <div id="fieldNameId" name="fieldName" class="col-sm-2">
                                 <select id="fieldName"
                                         class="form-control"
                                         style="width: 160px;"
@@ -52,6 +50,12 @@
                                     <option value="CallNumber">Call Number</option>
                                     <option value="Barcode">Barcode</option>
                                 </select>
+                            </div>
+                            <div id="searchButtonDivId" name="searchButtonDivName" class="col-sm-1">
+                                <button id="search" type="submit" name="action" value="search"
+                                        class="btn btn-info active">
+                                    <i class="fa fa-search" aria-hidden="true"> Search</i>
+                                </button>
                             </div>
                         </div>
                         <div id="checkBoxesId" name="checkBoxesName" class="form-group col-sm-9">
@@ -113,20 +117,15 @@
                                 </ul>
                             </div>
                         </div>
-                        <div id="buttonsDivId" name="buttonsDivName" class="form-group col-sm-9" style="margin-top: 25px;">
-                            <div class="col-sm-3">
-                                <button id="search" type="submit" name="action" value="search"
-                                        class="btn btn-info active  pull-right">Search
-                                </button>
-                            </div>
+                        <div id="buttonsDivId" name="buttonsDivName" class="form-group col-sm-12" style="margin-top: 25px;">
                             <div class="col-sm-3">
                                 <button id="clear" type="submit" name="action" value="clear"
-                                        class="btn btn-info active  pull-right">Clear
+                                        class="btn btn-info active  pull-right">Clear Boxes
                                 </button>
                             </div>
                             <div class="col-sm-3">
                                 <button id="newSearch" type="submit" name="action" value="newSearch"
-                                        class="btn btn-info active  pull-right">New Search
+                                        class="btn btn-info active  pull-right">Reset Search
                                 </button>
                             </div>
                         </div>
@@ -145,12 +144,11 @@
                             <h3 align="left" style="color: dodgerblue">Search Results</h3>
                         </div>
                         <div class="form-group col-sm-4" data-th-if="*{searchResultRows.size() &gt; 0 &amp;&amp; showResults}">
-                            <label class="col-sm-5" for="numOfRecordsId" style="margin-top: -15px;">No. of records to show</label>
+                            <label class="col-sm-2" for="numOfRecordsId" style="margin-top: -15px;">Show</label>
                             <select id="numOfRecordsId" name="numOfRecordsName"
                                     class="form-control col-sm-2"
                                     style="width: 100px; margin-top: -25px;"
                                     th:field="*{pageSize}" onchange="document.getElementById('pageSizeChangeButtonId').click()">
-                                <option value="10">10</option>
                                 <option value="25">25</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
@@ -161,7 +159,7 @@
                         </div>
                         <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
                              data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}" style="margin-top: -20px;">
-                            <span>No search results found. Please refine search results.</span>
+                            <span>No search results found. Please refine search conditions.</span>
                         </div>
                         <div id="searchResultsDiv" class="form-group col-sm-12 table-responsive"
                              data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -20px;">
