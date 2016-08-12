@@ -8,12 +8,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
+import org.recap.util.CsvUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,6 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,11 +43,17 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
     @Mock
     BindingResult bindingResult;
 
-    @InjectMocks
-    private SearchRecordsController searchRecordsController=new SearchRecordsController();
+    @Mock
+    HttpServletResponse httpServletResponse;
+
+    @Autowired
+    private SearchRecordsController searchRecordsController;
 
     @Mock
     private BibSolrDocumentRepository bibSolrDocumentRepository;
+
+    @Mock
+    private CsvUtil csvUtil;
 
     SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
     @Before
@@ -123,10 +133,9 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
     }
 
     @Test
-    public void exportRecords() throws Exception{
-        ModelAndView modelAndView = searchRecordsController.exportRecords(getSearchRecordsRequest(),bindingResult,model);
-        assertNotNull(modelAndView);
-        assertEquals("searchRecords",modelAndView.getViewName());
+    public void exportRecords() throws Exception {
+        byte[] fileContent = searchRecordsController.exportRecords(buildRequestWithResultRows(), httpServletResponse, bindingResult, model);
+        assertNotNull(fileContent);
     }
 
     @Test
@@ -148,7 +157,7 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
         List<String> availability = new ArrayList<>();
         availability.add("Available");
         searchRecordsRequest.setAvailability(availability);
-        searchRecordsRequest.setFieldName("245");
+        searchRecordsRequest.setFieldName("Title_search");
         searchRecordsRequest.setFieldValue("Stay Hungry");
         List<String> owningInstitutions = new ArrayList<>();
         owningInstitutions.add("NYPL");
@@ -168,8 +177,41 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
         return searchRecordsRequest;
     }
 
+    private SearchRecordsRequest buildRequestWithResultRows() {
+        searchRecordsRequest = new SearchRecordsRequest();
+        List<SearchResultRow> searchResultRows = new ArrayList<>();
+        SearchResultRow searchResultRow1 = new SearchResultRow();
+        searchResultRow1.setTitle("Title1");
+        searchResultRow1.setAuthor("Author1");
+        searchResultRow1.setPublisher("publisher1");
+        searchResultRow1.setOwningInstitution("NYPL");
+        searchResultRow1.setCollectionGroupDesignation("Shared");
+        searchResultRow1.setSelected(true);
 
+        SearchResultRow searchResultRow2 = new SearchResultRow();
+        searchResultRow2.setTitle("Title2");
+        searchResultRow2.setAuthor("Author2");
+        searchResultRow2.setPublisher("publisher2");
+        searchResultRow2.setOwningInstitution("NYPL");
+        searchResultRow2.setCollectionGroupDesignation("Shared");
+        searchResultRow2.setSelectAllItems(true);
 
+        List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
+        SearchItemResultRow searchItemResultRow1 = new SearchItemResultRow();
+        searchItemResultRow1.setCallNumber("call number1");
+        searchItemResultRow1.setChronologyAndEnum("Chn Enum1");
+        searchItemResultRow1.setCustomerCode("Code 1");
+        searchItemResultRow1.setBarcode("1");
+        searchItemResultRow1.setUseRestriction("In Library use");
+        searchItemResultRow1.setCollectionGroupDesignation("Shared");
+        searchItemResultRow1.setAvailability("Available");
+        searchItemResultRows.add(searchItemResultRow1);
+        searchResultRow2.setSearchItemResultRows(searchItemResultRows);
 
+        searchResultRows.add(searchResultRow1);
+        searchResultRows.add(searchResultRow2);
+        searchRecordsRequest.setSearchResultRows(searchResultRows);
+        return searchRecordsRequest;
+    }
 
 }

@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
@@ -8,6 +9,7 @@ import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +47,9 @@ public class SearchRecordsController {
 
     @Autowired
     ItemCrudRepository itemCrudRepository;
+
+    @Autowired
+    private CsvUtil csvUtil;
 
     @RequestMapping("/search")
     public String searchRecords(Model model) {
@@ -138,10 +149,16 @@ public class SearchRecordsController {
 
     @ResponseBody
     @RequestMapping(value = "/searchRecords", method = RequestMethod.POST, params = "action=export")
-    public ModelAndView exportRecords(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
+    public byte[] exportRecords(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest, HttpServletResponse response,
                                   BindingResult result,
-                                  Model model) {
-        return new ModelAndView("searchRecords");
+                                  Model model) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String fileNameWithExtension = "ExportRecords_" + dateFormat.format(new Date()) + ".csv";
+        File csvFile = csvUtil.writeSearchResultsToCsv(searchRecordsRequest.getSearchResultRows(), fileNameWithExtension);
+        byte[] fileContent = IOUtils.toByteArray(new FileInputStream(csvFile));
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileNameWithExtension + "\"");
+        response.setContentLength(fileContent.length);
+        return fileContent;
     }
 
     @ResponseBody

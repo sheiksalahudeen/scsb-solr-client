@@ -135,7 +135,6 @@
                                 <span style="font-weight: bold"><span th:text="*{errorMessage}"></span></span>
                             </div>
                         </div>
-
                     </div>
                     <div class="form-group col-sm-12" style="margin-top: 40px;">
                         <hr style="border-top-width: 3px;"/>
@@ -168,7 +167,7 @@
                              data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -20px;">
                             <table id="searchResults" name="searchResults" class="table table-hover tablesorter">
                                 <thead id="mainHead" style="background-color: grey; color: white;">
-                                <tr id="mainRow">
+                                <tr id="mainRow" class="parentRow">
                                     <th data-sorter="false" style="width: 40px">
                                         <label for="selectAll" style="width: 80px;">Select All</label>
                                         <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" th:onclick="'javascript:selectAllParentRows()'"/>
@@ -187,6 +186,9 @@
                                 </thead>
                                 <tbody>
                                 <tr data-th-id="'searchResults-'+ ${searchResultStat.index}" th:title="${searchResult.bibId}" th:each="searchResult,searchResultStat : *{searchResultRows}" class="parentRow">
+                                    <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].bibId}"/>
+                                    <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].availability}"/>
+                                    <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].leaderMaterialType}"/>
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
@@ -197,27 +199,53 @@
                                                th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                     </td>
                                     <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].title}"/>
                                         <a th:href="@{/openMarcRecord(bibId=${searchResult.bibId})}" target="_blank" data-th-id="'searchResultsDataTitleS-'+ ${searchResultStat.index}" th:text="${searchResult.title}"></a>
                                     </td>
-                                    <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span></td>
-                                    <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span></td>
-                                    <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span></td>
-                                    <td data-th-id="'searchResultsDataOwnInst-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataOwnInstS-'+ ${searchResultStat.index}" th:text="${searchResult.owningInstitution}"></span></td>
-                                    <td data-th-id="'searchResultsDataCustCode-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCustCodeS-'+ ${searchResultStat.index}" th:text="${searchResult.customerCode}"></span></td>
-                                    <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span></td>
-                                    <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span></td>
+                                    <td data-th-id="'searchResultsDataAuthor-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].author}"/>
+                                        <span data-th-id="'searchResultsDataAuthorS-'+ ${searchResultStat.index}" th:text="${searchResult.author}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataPub-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].publisher}"/>
+                                        <span data-th-id="'searchResultsDataPubS-'+ ${searchResultStat.index}" th:text="${searchResult.publisher}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataPubDate-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].publisherDate}"/>
+                                        <span data-th-id="'searchResultsDataPubDateS-'+ ${searchResultStat.index}" th:text="${searchResult.publisherDate}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataOwnInst-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].owningInstitution}"/>
+                                        <span data-th-id="'searchResultsDataOwnInstS-'+ ${searchResultStat.index}" th:text="${searchResult.owningInstitution}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataCustCode-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].customerCode}"/>
+                                        <span data-th-id="'searchResultsDataCustCodeS-'+ ${searchResultStat.index}" th:text="${searchResult.customerCode}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataCGD-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].collectionGroupDesignation}"/>
+                                        <span data-th-id="'searchResultsDataCGDS-'+ ${searchResultStat.index}" th:text="${searchResult.collectionGroupDesignation}"></span>
+                                    </td>
+                                    <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].useRestriction}"/>
+                                        <span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span>
+                                    </td>
                                     <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
                                         <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" name="showItemsInput" type="hidden" th:value="false"/>
                                         <a class="btn" th:if="${searchResult.showItems}" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:onclick="'javascript:showItems('+${searchResultStat.index}+')'">
                                             <i data-th-id="'showItemsIcon-'+ ${searchResultStat.index}" name="showItemsIcon" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
                                         </a>
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].barcode}"/>
                                         <span data-th-id="'searchResultsDataBarS-'+ ${searchResultStat.index}" th:text="${searchResult.barcode}"></span>
                                     </td>
-                                    <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}"><span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span></td>
+                                    <td data-th-id="'searchResultsDataSH-'+ ${searchResultStat.index}">
+                                        <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].summaryHoldings}"/>
+                                        <span data-th-id="'searchResultsDataSHS-'+ ${searchResultStat.index}" th:text="${searchResult.summaryHoldings}"></span>
+                                    </td>
                                         <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index}" class="collapse childRow" th:classappend="'row' + ${searchResultStat.index}">
                                             <th></th>
                                             <th></th>
-                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white; width: 40px;">
+                                            <th data-th-id="'searchItemResultsSelectHead-' + ${searchResultStat.index}" style="background-color: grey; color: white; width: 20px;">
                                                 <label for="selectAll" style="width: 80px;">Select All</label>
                                                 <input data-th-id="'selectAllItems-' + ${searchResultStat.index}" type="checkbox"
                                                        name="selectAllItems"
@@ -241,15 +269,33 @@
                                                    th:style="${searchItemResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchItemResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
                                                 <input type="checkbox" id="selectedItem" name="selectedItem"
                                                        th:value="${searchItemResult.selectedItem}"
-                                                       th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchResultStat.index}__].selectedItem}"
+                                                       th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].selectedItem}"
                                                        th:style="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
                                             </td>
-                                            <td data-th-id="'searchItemResultsDataCN-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCNS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.chronologyAndEnum}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.customerCode}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataCGD-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataCGDS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.collectionGroupDesignation}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span></td>
-                                            <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}"><span data-th-id="'searchItemResultsDataBarS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.barcode}"></span></td>
+                                            <td data-th-id="'searchItemResultsDataCN-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].callNumber}"/>
+                                                <span data-th-id="'searchItemResultsDataCNS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].chronologyAndEnum}"/>
+                                                <span data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.chronologyAndEnum}"></span>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataCC-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].customerCode}"/>
+                                                <span data-th-id="'searchItemResultsDataCCS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.customerCode}"></span>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataCGD-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].collectionGroupDesignation}"/>
+                                                <span data-th-id="'searchItemResultsDataCGDS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.collectionGroupDesignation}"></span>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].useRestriction}"/>
+                                                <span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span>
+                                            </td>
+                                            <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].barcode}"/>
+                                                <span data-th-id="'searchItemResultsDataBarS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.barcode}"></span>
+                                            </td>
                                         </tr>
                                 </tr>
                                 </tbody>
@@ -296,8 +342,8 @@
                                     </div>
                                 </div>
                                 <div id="selectButtonsId" name="selectButtonsName" class="pull-right">
-                                    <button id="export" type="button" name="action" value="export"
-                                            class="btn btn-info active  pull-right" disabled="disabled">Export Selected
+                                    <button id="export" type="submit" name="action" value="export"
+                                            class="btn btn-info active  pull-right">Export Selected
                                         Records
                                     </button>
                                     <button id="request" type="button" name="action" value="request"
