@@ -103,24 +103,20 @@ public class CsvUtil {
                 for (SearchResultRow searchResultRow : searchResultRows) {
                     if (searchResultRow.isSelected()) {
                         writeMainDataRow(searchResultRow);
-                    } else {
-                        if (!CollectionUtils.isEmpty(searchResultRow.getSearchItemResultRows())) {
-                            if (searchResultRow.isSelectAllItems()) {
-                                writeMainDataRow(searchResultRow);
-                            } else {
-                                if (isAnyItemSelected(searchResultRow.getSearchItemResultRows())) {
-                                    writeMainDataRow(searchResultRow);
+                    } else if (!CollectionUtils.isEmpty(searchResultRow.getSearchItemResultRows())) {
+                        if (searchResultRow.isSelectAllItems()) {
+                            writeMainDataRow(searchResultRow);
+                        } else if (isAnyItemSelected(searchResultRow.getSearchItemResultRows())) {
+                            writeMainDataRow(searchResultRow);
+                        }
+                        boolean isHeaderExists = false;
+                        for (SearchItemResultRow searchItemResultRow : searchResultRow.getSearchItemResultRows()) {
+                            if (searchItemResultRow.isSelectedItem()) {
+                                if (!isHeaderExists) {
+                                    writeChildHeaderRow();
+                                    isHeaderExists = true;
                                 }
-                            }
-                            boolean isHeaderExists = false;
-                            for (SearchItemResultRow searchItemResultRow : searchResultRow.getSearchItemResultRows()) {
-                                if (searchItemResultRow.isSelectedItem()) {
-                                    if (!isHeaderExists) {
-                                        writeChildHeaderRow();
-                                        isHeaderExists = true;
-                                    }
-                                    writeChildDataRow(searchItemResultRow);
-                                }
+                                writeChildDataRow(searchItemResultRow);
                             }
                         }
                     }
