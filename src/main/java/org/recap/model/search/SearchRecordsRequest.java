@@ -19,7 +19,7 @@ public class SearchRecordsRequest {
     private Integer totalPageCount = 0;
     private String totalRecordsCount;
     private Integer pageNumber = 0;
-    private Integer pageSize = 10;
+    private Integer pageSize = 25;
 
     private boolean showResults = false;
     private boolean selectAll = false;

@@ -197,7 +197,7 @@ public class SearchRecordsController {
         searchRecordsRequest.getMaterialTypes().add("Other");
 
         searchRecordsRequest.setPageNumber(0);
-        searchRecordsRequest.setPageSize(10);
+        searchRecordsRequest.setPageSize(25);
         searchRecordsRequest.setShowResults(false);
     }
 
