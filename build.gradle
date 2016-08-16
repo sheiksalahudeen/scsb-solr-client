@@ -35,6 +35,7 @@ sonarqube {
 		property "systemProp.sonar.host.url", "http://174.129.129.28:9000"
 		property "systemProp.sonar.jdbc.url", "jdbc:mysql://scsb-mysql:3306/sonar"
 		property "systemProp.sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
+		property "sonar.projectName", "scsb-solr-client"
 		property "systemProp.sonar.jdbc.username", "sonar"
 		property "systemProp.sonar.jdbc.password", "sonar"
 	}
