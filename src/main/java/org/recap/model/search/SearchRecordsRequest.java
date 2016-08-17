@@ -17,7 +17,7 @@ public class SearchRecordsRequest {
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
     private Integer totalPageCount = 0;
-    private String totalRecordsCount;
+    private String totalRecordsCount = "0";
     private Integer pageNumber = 0;
     private Integer pageSize = 25;
 
