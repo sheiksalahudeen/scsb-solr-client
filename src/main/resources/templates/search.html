@@ -9,7 +9,7 @@
 <div id="searchContentId" name="searchContentName" th:fragment="searchContent">
     <div id="searchFormDivId" name="searchFormDivName" th:fragment="search-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
         <form id="search-form" name="search-form" class="form-horizontal" action="#"
-              th:action="@{/searchRecords}"
+              th:action="@{/search}"
               th:object="${searchRecordsRequest}" method="post">
             <fieldset>
                 <div id="searchRecordsDivId" name="searchRecordsDivName">
