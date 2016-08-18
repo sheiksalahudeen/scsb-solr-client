@@ -223,27 +223,34 @@ public class SearchRecordsController {
                 searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
                 if (null != bibItem.getItems() && bibItem.getItems().size() == 1 && !RecapConstants.SERIAL.equals(bibItem.getLeaderMaterialType())) {
                     Item item = bibItem.getItems().get(0);
-                    searchResultRow.setCustomerCode(item.getCustomerCode());
-                    searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                    searchResultRow.setUseRestriction(item.getUseRestriction());
-                    searchResultRow.setBarcode(item.getBarcode());
-                    searchResultRow.setAvailability(item.getAvailability());
-                    searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
+                    if (null != item) {
+                        searchResultRow.setCustomerCode(item.getCustomerCode());
+                        searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
+                        searchResultRow.setUseRestriction(item.getUseRestriction());
+                        searchResultRow.setBarcode(item.getBarcode());
+                        searchResultRow.setAvailability(item.getAvailability());
+                        searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
+                    }
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
                         for (Item item : bibItem.getItems()) {
-                            SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
-                            searchItemResultRow.setCallNumber(item.getCallNumber());
-                            searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
-                            searchItemResultRow.setCustomerCode(item.getCustomerCode());
-                            searchItemResultRow.setBarcode(item.getBarcode());
-                            searchItemResultRow.setUseRestriction(item.getUseRestriction());
-                            searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                            searchItemResultRow.setAvailability(item.getAvailability());
-                            searchItemResultRows.add(searchItemResultRow);
+                            if (null != item) {
+                                SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
+                                searchItemResultRow.setCallNumber(item.getCallNumber());
+                                searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
+                                searchItemResultRow.setCustomerCode(item.getCustomerCode());
+                                searchItemResultRow.setBarcode(item.getBarcode());
+                                searchItemResultRow.setUseRestriction(item.getUseRestriction());
+                                searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
+                                searchItemResultRow.setAvailability(item.getAvailability());
+                                searchItemResultRows.add(searchItemResultRow);
+                            }
                         }
-                        searchResultRow.setSummaryHoldings(bibItem.getItems().get(0).getSummaryHoldings());
+                        Item firstItem = bibItem.getItems().get(0);
+                        if (null != firstItem) {
+                            searchResultRow.setSummaryHoldings(firstItem.getSummaryHoldings());
+                        }
                         searchResultRow.setShowItems(true);
                         Collections.sort(searchItemResultRows);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);
