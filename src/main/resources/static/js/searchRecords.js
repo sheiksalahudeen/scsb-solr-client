@@ -40,6 +40,20 @@ function selectAllParentRows() {
     }
 }
 
+function enableExportSelectedRecordButton(){
+    var innerCheckBox = $(".selectInnerCBClass").is(":checked");
+    var outerCheckBox = $(".selectOuterCBClass").is(":checked");
+    var outerselectAll = $(".outerSelectAllCBClass").is(":checked");
+    var innerselectAll = $(".innerSelectAllCBClass").is(":checked");
+    if (outerCheckBox || innerCheckBox || outerselectAll || innerselectAll){
+        document.getElementById("export").disabled = false;
+    }else{
+        document.getElementById("export").disabled = true;
+    }
+}
+
+
+
 function selectAllChildRows(childRowIndex) {
     var selectAllFlag = $('#selectAllItems-' + childRowIndex).is(":checked");
     if (selectAllFlag) {

@@ -168,7 +168,7 @@
                                 <tr id="mainRow" class="parentRow">
                                     <th data-sorter="false" style="width: 40px">
                                         <label for="selectAll" style="width: 80px;">Select All</label>
-                                        <input type="checkbox" id="selectAll" name="selectAll" th:field="*{selectAll}" style="margin-left: 26px;" th:onclick="'javascript:selectAllParentRows()'"/>
+                                        <input type="checkbox" id="selectAll" name="selectAll" class="outerSelectAllCBClass" th:field="*{selectAll}" style="margin-left: 26px;" th:onclick="'javascript:selectAllParentRows();enableExportSelectedRecordButton()'"/>
                                     </th>
                                     <th class="sortHead" id="TitleHeadId" th:onclick="'javascript:sortHeader()'">Title</th>
                                     <th class="sortHead" id="AuthorHeadId" th:onclick="'javascript:sortHeader()'">Author</th>
@@ -191,10 +191,11 @@
                                         <i class="fa fa-circle"
                                            th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
                                            th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
-                                        <input type="checkbox" id="selected" name="selected"
+                                        <input type="checkbox" id="selected" name="selected" class="selectOuterCBClass"
                                                th:unless="${searchResult.showItems}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
-                                               th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
+                                               th:style="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"
+                                               onclick="enableExportSelectedRecordButton()"/>
                                     </td>
                                     <td data-th-id="'searchResultsDataTitle-'+ ${searchResultStat.index}">
                                         <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].title}"/>
@@ -247,9 +248,11 @@
                                                 <label for="selectAll" style="width: 80px;">Select All</label>
                                                 <input data-th-id="'selectAllItems-' + ${searchResultStat.index}" type="checkbox"
                                                        name="selectAllItems"
+                                                       class="innerSelectAllCBClass"
                                                        th:field="*{searchResultRows[__${searchResultStat.index}__].selectAllItems}"
                                                        style="margin-left: 26px;"
-                                                       th:onclick="'javascript:selectAllChildRows('+${searchResultStat.index}+')'"/>
+                                                       th:onclick="'javascript:selectAllChildRows('+${searchResultStat.index}+');enableExportSelectedRecordButton()'"
+                                                       />
                                             </th>
                                             <th data-th-id="'searchItemResultsCNHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Call Number</th>
                                             <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Chronology &amp; Enumeration</th>
@@ -265,10 +268,11 @@
                                                 <i class="fa fa-circle"
                                                    th:if="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'}"
                                                    th:style="${searchItemResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchItemResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
-                                                <input type="checkbox" id="selectedItem" name="selectedItem"
+                                                <input type="checkbox" id="selectedItem" name="selectedItem" class="selectInnerCBClass"
                                                        th:value="${searchItemResult.selectedItem}"
                                                        th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].selectedItem}"
-                                                       th:style="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"/>
+                                                       th:style="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'} ? 'margin-left: 5px;' : 'margin-left: 25px;'"
+                                                       onclick="enableExportSelectedRecordButton()"/>
                                             </td>
                                             <td data-th-id="'searchItemResultsDataCN-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
                                                 <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].callNumber}"/>
@@ -341,7 +345,7 @@
                                 </div>
                                 <div id="selectButtonsId" name="selectButtonsName" class="pull-right">
                                     <button id="export" type="submit" name="action" value="export"
-                                            class="btn btn-info active  pull-right">Export Selected
+                                            class="btn btn-info active  pull-right" disabled="disabled">Export Selected
                                         Records
                                     </button>
                                     <button id="request" type="button" name="action" value="request"
