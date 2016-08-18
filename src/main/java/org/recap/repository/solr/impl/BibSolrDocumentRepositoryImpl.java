@@ -1,7 +1,6 @@
 package org.recap.repository.solr.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.marc4j.util.JsonParser;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.solr.BibItem;
@@ -55,36 +54,24 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     private SimpleFilterQuery getFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
         SimpleFilterQuery filterQuery = new SimpleFilterQuery();
         String fieldName = searchRecordsRequest.getFieldName();
-        if (RecapConstants.CALL_NUMBER.equals(fieldName) || RecapConstants.BARCODE.equals(fieldName)) {
-            query.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
-            query.addCriteria(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations()));
-            query.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
 
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions()) || !CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
-                filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
-                filterQuery.addCriteria(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions()));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
-                filterQuery.addCriteria(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
-            }
-        } else {
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
-                query.addCriteria(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions()));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
-                query.addCriteria(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) || !CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
-                filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations())) {
-                filterQuery.addCriteria(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations()));
-            }
-            if (!CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
-                filterQuery.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
-            }
+        if (!isEmptySearch(searchRecordsRequest) || StringUtils.isBlank(fieldName)) {
+            query.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
+            query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions())));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
+            query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes())));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) || !CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
+            filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations())) {
+            filterQuery.addCriteria(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations()));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
+            filterQuery.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
         }
         return filterQuery;
     }
@@ -103,7 +90,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
                 String[] splitedTitle = fieldValue.split(" ");
-                criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith("^"+splitedTitle[0]);
+                criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith("^" + splitedTitle[0]);
             } else {
                 criteria = new Criteria(fieldName).is(fieldValue);
             }
@@ -117,7 +104,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
-                        itemIds.addAll(bibItem.getBibItemIdList());
+                    itemIds.addAll(bibItem.getBibItemIdList());
                 }
             }
         }
@@ -140,12 +127,21 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
-                        for (Integer itemId : bibItem.getBibItemIdList()) {
-                            bibItem.getItems().add(itemMap.get(itemId));
-                        }
+                    for (Integer itemId : bibItem.getBibItemIdList()) {
+                        bibItem.getItems().add(itemMap.get(itemId));
+                    }
                 }
             }
         }
         return bibItems;
+    }
+
+    private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {
+        boolean emptySearch = false;
+        if (CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions()) && CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes()) &&
+                CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) && CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
+            emptySearch = true;
+        }
+        return emptySearch;
     }
 }
