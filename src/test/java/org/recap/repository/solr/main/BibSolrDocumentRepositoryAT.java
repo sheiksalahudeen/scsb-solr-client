@@ -1,5 +1,6 @@
 package org.recap.repository.solr.main;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,8 +18,11 @@ import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.solr.core.RequestMethod;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.result.ScoredPage;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -268,6 +272,33 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntity(holdingsEntity);
         return itemEntity;
+    }
+
+    @Test(expected = Exception.class)
+    public void testSolrQueryMaxParameters() {
+        List<Integer> itemIds = new ArrayList<>();
+        for (int i = 1; i <= 2000; i++) {
+            itemIds.add(i);
+        }
+        SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(itemIds));
+        query.setRows(itemIds.size());
+        solrTemplate.queryForPage(query, Item.class, RequestMethod.POST);
+    }
+
+    @Test
+    public void testSolrQueryMaxParametersByPartitioning() {
+        Random random = new Random();
+        List<Integer> itemIds = new ArrayList<>();
+        for (int i = 1; i <= 2000; i++) {
+            itemIds.add(random.nextInt());
+        }
+        List<List<Integer>> partitions = Lists.partition(new ArrayList<Integer>(itemIds), 1000);
+        for (List<Integer> partitionItemIds : partitions) {
+            SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(partitionItemIds));
+            query.setRows(partitionItemIds.size());
+            ScoredPage<Item> itemsPage = solrTemplate.queryForPage(query, Item.class, RequestMethod.POST);
+            assertNotNull(itemsPage);
+        }
     }
 
 }
