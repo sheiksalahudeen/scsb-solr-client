@@ -1,5 +1,6 @@
 package org.recap.repository.solr.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
@@ -9,6 +10,7 @@ import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.solr.core.RequestMethod;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.Join;
@@ -110,17 +112,20 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         }
         Map<Integer, Item> itemMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(itemIds)) {
-            SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(itemIds));
-            query.setRows(itemIds.size());
-            ScoredPage<Item> itemsPage = solrTemplate.queryForPage(query, Item.class);
-            if (itemsPage.getTotalElements() > itemIds.size()) {
-                query.setRows(Math.toIntExact(itemsPage.getTotalElements()));
-                itemsPage = solrTemplate.queryForPage(query, Item.class);
-            }
-            List<Item> items = itemsPage.getContent();
-            if (!CollectionUtils.isEmpty(items)) {
-                for (Item item : items) {
-                    itemMap.put(item.getItemId(), item);
+            List<List<Integer>> partitions = Lists.partition(new ArrayList<Integer>(itemIds), 1000);
+            for (List<Integer> partitionItemIds : partitions) {
+                SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.ITEM_ID).in(partitionItemIds));
+                query.setRows(partitionItemIds.size());
+                ScoredPage<Item> itemsPage = solrTemplate.queryForPage(query, Item.class, RequestMethod.POST);
+                if (itemsPage.getTotalElements() > partitionItemIds.size()) {
+                    query.setRows(Math.toIntExact(itemsPage.getTotalElements()));
+                    itemsPage = solrTemplate.queryForPage(query, Item.class, RequestMethod.POST);
+                }
+                List<Item> items = itemsPage.getContent();
+                if (!CollectionUtils.isEmpty(items)) {
+                    for (Item item : items) {
+                        itemMap.put(item.getItemId(), item);
+                    }
                 }
             }
         }
