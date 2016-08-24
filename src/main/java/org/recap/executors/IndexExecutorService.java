@@ -33,9 +33,12 @@ public abstract class IndexExecutorService {
 
     @Value("${item.rest.url}")
     public String itemResourceURL;
+
+    @Value("${merge.indexes.interval}")
+    public Integer mergeIndexesInterval;
+
     private ExecutorService executorService;
     private Integer loopCount;
-    private double mergeIndexInterval;
     private long startTime;
     private StopWatch stopWatch;
 
@@ -67,8 +70,6 @@ public abstract class IndexExecutorService {
 
                 solrAdmin.createSolrCores(coreNames);
 
-                mergeIndexInterval = Math.ceil(loopCount / 2);
-
                 int coreNum = 0;
                 List<Future> futures = new ArrayList<>();
 
@@ -80,7 +81,7 @@ public abstract class IndexExecutorService {
 
                 logger.info("No of Futures Added : " +futures.size());
 
-                int mergeIndexCount = 0;
+                int mergeIndexCount = mergeIndexesInterval;
                 int totalBibsProcessed = 0;
 
                 StopWatch stopWatch = new StopWatch();
@@ -100,12 +101,11 @@ public abstract class IndexExecutorService {
                         e.printStackTrace();
                     }
 
-                    if (mergeIndexCount < mergeIndexInterval - 1) {
-                        mergeIndexCount++;
-                    } else {
+                    if (totalBibsProcessed == mergeIndexCount) {
+                        logger.info("Total Bibs Processed : " + totalBibsProcessed);
                         solrAdmin.mergeCores(coreNames);
                         deleteTempIndexes(coreNames, solrUrl);
-                        mergeIndexCount = 0;
+                        mergeIndexCount += mergeIndexesInterval;
                     }
                 }
                 logger.info("Num futures executed: " + futureCount);
