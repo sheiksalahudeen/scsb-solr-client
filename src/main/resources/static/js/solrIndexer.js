@@ -8,6 +8,10 @@ jQuery(document).ready(function ($) {
         event.preventDefault();
         fullIndex();
     });
+
+    $('#dateFrom').datetimepicker({
+        format: "dd-mm-yyyy hh:ii"
+    });
 });
 
 

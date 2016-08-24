@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.codehaus.plexus.util.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
 import org.recap.executors.BibItemIndexExecutorService;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -52,10 +55,16 @@ public class SolrIndexController {
     @RequestMapping(value = "/solrIndexer/fullIndex", method = RequestMethod.POST)
     public String fullIndex(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
                             BindingResult result,
-                            Model model) {
+                            Model model) throws Exception {
         Integer numberOfThread = solrIndexRequest.getNumberOfThreads();
         Integer numberOfDoc = solrIndexRequest.getNumberOfDocs();
-        logger.info("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc);
+        logger.info("Number of Threads : " + numberOfThread + "   Number of Docs :" + numberOfDoc + " From Date : " + solrIndexRequest.getDateFrom());
+
+        Date fromDate = null;
+        if (StringUtils.isNotBlank(solrIndexRequest.getDateFrom())) {
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.INCREMENTAL_DATE_FORMAT);
+            fromDate = dateFormatter.parse(solrIndexRequest.getDateFrom());
+        }
 
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();

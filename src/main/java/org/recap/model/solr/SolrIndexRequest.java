@@ -8,6 +8,7 @@ public class SolrIndexRequest {
     private Integer numberOfDocs;
     private Integer owningInstitutionId;
     private boolean doClean;
+    private String dateFrom;
 
     public Integer getNumberOfThreads() {
         return numberOfThreads;
@@ -39,5 +40,13 @@ public class SolrIndexRequest {
 
     public void setDoClean(boolean doClean) {
         this.doClean = doClean;
+    }
+
+    public String getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(String dateFrom) {
+        this.dateFrom = dateFrom;
     }
 }

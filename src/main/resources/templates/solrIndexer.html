@@ -5,8 +5,10 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{../css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{../css/bootstrap-datetimepicker.css}"/>
     <script th:src="@{../js/jquery.min.js}"></script>
     <script th:src="@{../js/bootstrap.min.js}"></script>
+    <script th:src="@{../js/bootstrap-datetimepicker.js}"></script>
     <script type="text/javascript" th:src="@{../js/solrIndexer.js}"></script>
 </head>
 
@@ -86,6 +88,21 @@
                                                                 <option value="2">CUL</option>
                                                                 <option value="3">NYPL</option>
                                                             </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="dateFrom" class="col-sm-4">Date From</label>
+
+                                                        <div class="col-sm-4">
+                                                            <input type="text" th:field="*{dateFrom}"
+                                                                   class="form-control date"
+                                                                   id="dateFrom"
+                                                                   placeholder="Date From"/>
+                                                            <span class="add-on">
+                                                                <i data-time-icon="icon-time"
+                                                                   data-date-icon="icon-calendar"></i>
+                                                                </span>
                                                         </div>
                                                     </div>
 
