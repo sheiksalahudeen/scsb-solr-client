@@ -1,5 +1,7 @@
 package org.recap.model.solr;
 
+import java.util.Date;
+
 /**
  * Created by SheikS on 6/18/2016.
  */
@@ -9,6 +11,11 @@ public class SolrIndexRequest {
     private Integer owningInstitutionId;
     private boolean doClean;
     private String dateFrom;
+
+    private String matchingCriteria;
+    private String reportType;
+    private String transmissionType;
+    private Date createdDate;
 
     public Integer getNumberOfThreads() {
         return numberOfThreads;
@@ -40,6 +47,38 @@ public class SolrIndexRequest {
 
     public void setDoClean(boolean doClean) {
         this.doClean = doClean;
+    }
+
+    public String getMatchingCriteria() {
+        return matchingCriteria;
+    }
+
+    public void setMatchingCriteria(String matchingCriteria) {
+        this.matchingCriteria = matchingCriteria;
+    }
+
+    public String getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
+    }
+
+    public String getTransmissionType() {
+        return transmissionType;
+    }
+
+    public void setTransmissionType(String transmissionType) {
+        this.transmissionType = transmissionType;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getDateFrom() {

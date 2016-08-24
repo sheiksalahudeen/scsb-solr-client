@@ -1,22 +1,16 @@
 package org.recap.util;
 
 import com.csvreader.CsvWriter;
-import org.apache.commons.lang3.StringUtils;
 import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchResultRow;
-import org.recap.model.solr.MatchingRecordReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,68 +19,7 @@ import java.util.List;
 @Component
 public class CsvUtil {
 
-    @Value("${solr.report.directory}")
-    private String reportDirectoryPath;
-
-    private CsvWriter csvOutput;
-
-    private boolean headerExists;
-
     Logger logger = LoggerFactory.getLogger(CsvUtil.class);
-
-    public void createFile(String fileName) {
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        File file = new File(reportDirectoryPath + File.separator + fileName + "_" + df.format(new Date()) + ".csv");
-        boolean fileExists = file.exists();
-        headerExists = false;
-        try {
-            if (!fileExists) {
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdir();
-                }
-            }
-            // Use FileWriter constructor that specifies open for appending
-            csvOutput = new CsvWriter(new FileWriter(file), ',');
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void writeMatchingAlgorithmReportToCsv(List<MatchingRecordReport> matchingRecordReports) {
-        if (!CollectionUtils.isEmpty(matchingRecordReports)) {
-            try {
-                //Create Header for CSV
-                if (!headerExists) {
-                    csvOutput.write("Match Point Tag");
-                    csvOutput.write("Match Point Content");
-                    csvOutput.write("Bib ID");
-                    csvOutput.write("245 $a");
-                    csvOutput.write("Barcode");
-                    csvOutput.write("Institution ID");
-                    csvOutput.write("Use Restrictions");
-                    csvOutput.write("Summary Holdings");
-                    csvOutput.endRecord();
-                    headerExists = true;
-                }
-                for (MatchingRecordReport matchingRecordReport : matchingRecordReports) {
-                    csvOutput.write(matchingRecordReport.getMatchPointTag());
-                    csvOutput.write(matchingRecordReport.getMatchPointContent());
-                    csvOutput.write(matchingRecordReport.getBibId());
-                    csvOutput.write(matchingRecordReport.getTitle());
-                    csvOutput.write(matchingRecordReport.getBarcode());
-                    csvOutput.write(matchingRecordReport.getInstitutionId());
-                    String useRestrictions = matchingRecordReport.getUseRestrictions();
-                    csvOutput.write(StringUtils.isNotBlank(useRestrictions) ? useRestrictions : "null");
-                    String summaryHoldings = matchingRecordReport.getSummaryHoldings();
-                    csvOutput.write(StringUtils.isNotBlank(summaryHoldings) ? summaryHoldings : "null");
-                    csvOutput.endRecord();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-
-        }
-    }
 
     /**
      * Generates a csv file for the selected search result rows.
@@ -96,27 +29,28 @@ public class CsvUtil {
      */
     public File writeSearchResultsToCsv(List<SearchResultRow> searchResultRows, String fileNameWithExtension) {
         File file = new File(fileNameWithExtension);
+        CsvWriter csvOutput = null;
         if (!CollectionUtils.isEmpty(searchResultRows)) {
             try {
                 csvOutput = new CsvWriter(new FileWriter(file), ',');
-                writeMainHeaderRow();
+                writeMainHeaderRow(csvOutput);
                 for (SearchResultRow searchResultRow : searchResultRows) {
                     if (searchResultRow.isSelected()) {
-                        writeMainDataRow(searchResultRow);
+                        writeMainDataRow(searchResultRow, csvOutput);
                     } else if (!CollectionUtils.isEmpty(searchResultRow.getSearchItemResultRows())) {
                         if (searchResultRow.isSelectAllItems()) {
-                            writeMainDataRow(searchResultRow);
+                            writeMainDataRow(searchResultRow, csvOutput);
                         } else if (isAnyItemSelected(searchResultRow.getSearchItemResultRows())) {
-                            writeMainDataRow(searchResultRow);
+                            writeMainDataRow(searchResultRow, csvOutput);
                         }
                         boolean isHeaderExists = false;
                         for (SearchItemResultRow searchItemResultRow : searchResultRow.getSearchItemResultRows()) {
                             if (searchItemResultRow.isSelectedItem()) {
                                 if (!isHeaderExists) {
-                                    writeChildHeaderRow();
+                                    writeChildHeaderRow(csvOutput);
                                     isHeaderExists = true;
                                 }
-                                writeChildDataRow(searchItemResultRow);
+                                writeChildDataRow(searchItemResultRow, csvOutput);
                             }
                         }
                     }
@@ -131,7 +65,7 @@ public class CsvUtil {
         return file;
     }
 
-    private void writeMainHeaderRow() throws IOException {
+    private void writeMainHeaderRow(CsvWriter csvOutput) throws IOException {
         csvOutput.write("Title");
         csvOutput.write("Author");
         csvOutput.write("Publisher");
@@ -145,7 +79,7 @@ public class CsvUtil {
         csvOutput.endRecord();
     }
 
-    private void writeMainDataRow(SearchResultRow searchResultRow) throws IOException {
+    private void writeMainDataRow(SearchResultRow searchResultRow, CsvWriter csvOutput) throws IOException {
         csvOutput.write(searchResultRow.getTitle());
         csvOutput.write(searchResultRow.getAuthor());
         csvOutput.write(searchResultRow.getPublisher());
@@ -159,7 +93,7 @@ public class CsvUtil {
         csvOutput.endRecord();
     }
 
-    private void writeChildHeaderRow() throws IOException {
+    private void writeChildHeaderRow(CsvWriter csvOutput) throws IOException {
         csvOutput.write("");
         csvOutput.write("");
         csvOutput.write("");
@@ -172,7 +106,7 @@ public class CsvUtil {
         csvOutput.endRecord();
     }
 
-    private void writeChildDataRow(SearchItemResultRow searchItemResultRow) throws IOException {
+    private void writeChildDataRow(SearchItemResultRow searchItemResultRow, CsvWriter csvOutput) throws IOException {
         csvOutput.write("");
         csvOutput.write("");
         csvOutput.write("");
@@ -192,10 +126,5 @@ public class CsvUtil {
             }
         }
         return false;
-    }
-
-    public void closeFile() {
-        csvOutput.flush();
-        csvOutput.close();
     }
 }

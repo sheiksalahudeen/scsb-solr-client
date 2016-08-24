@@ -5,9 +5,11 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{../css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{../css/datepicker.css}"/>
     <link rel="stylesheet" th:href="@{../css/bootstrap-datetimepicker.css}"/>
     <script th:src="@{../js/jquery.min.js}"></script>
     <script th:src="@{../js/bootstrap.min.js}"></script>
+    <script th:src="@{../js/bootstrap-datepicker.js}"></script>
     <script th:src="@{../js/bootstrap-datetimepicker.js}"></script>
     <script type="text/javascript" th:src="@{../js/solrIndexer.js}"></script>
 </head>
@@ -22,7 +24,8 @@
 
     <ul class="nav nav-tabs nav-justified">
         <li class="active"><a data-toggle="tab" href="#solrIndex">Solr Index</a></li>
-        <li><a data-toggle="tab" href="#matchingAlgorithm">Matching Algorithm</a></li>
+        <li><a data-toggle="tab" href="#matchingAlgorithmSaveReport">Matching Algorithm Save Reports</a></li>
+        <li><a data-toggle="tab" href="#matchingAlgorithmGenerateReports">Matching Algorithm Generate Reports</a></li>
     </ul>
 
     <div class="tab-content">
@@ -143,7 +146,7 @@
             </div>
         </div>
 
-        <div id="matchingAlgorithm" class="tab-pane fade">
+        <div id="matchingAlgorithmSaveReport" class="tab-pane fade">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-4">
@@ -153,7 +156,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="institutionId" class="col-sm-4">Matching Criterias</label>
+                                            <label for="matchingCriteria" class="col-sm-4">Matching Criterias</label>
                                             <div class="col-sm-8">
                                                 <select id="matchingCriteria"
                                                         class="form-control"
@@ -169,8 +172,8 @@
                                         <br/><br/><br/>
                                         <div class="form-group">
                                             <div class="col-sm-6">
-                                                <button id="generateReport" type="button" onclick="generateReport()"
-                                                        class="btn btn-info active  pull-right">Generate Report
+                                                <button id="saveReport" type="button" onclick="saveReport()"
+                                                        class="btn btn-info active  pull-right">Save Report
                                                 </button>
                                             </div>
                                         </div>
@@ -178,6 +181,104 @@
                                         <div class="form-group col-sm-12">
                                         <textarea class="form-control" id="matchingAlgorithmStatus" rows="5"
                                                   placeholder="Matching Algorithm Status" readonly="true"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="matchingAlgorithmGenerateReports" class="tab-pane fade">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div id="reportsDiv">
+                            <br/><br/>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div th:fragment="matchingReports-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+                                            <form id="matchingReports-form" name="matchingReports-form" class="form-horizontal" action="#"
+                                                  th:action="@{/matchingAlgorithm/generateReports}"
+                                                  th:object="${solrIndexRequest}" method="post" enctype="multipart/form-data">
+
+                                                <fieldset>
+
+                                                    <div class="form-group">
+                                                        <label for="matchingCriteriaForReports" class="col-sm-4">Matching Criterias</label>
+                                                        <div class="col-sm-8">
+                                                            <select id="matchingCriteriaForReports"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{matchingCriteria}">
+                                                                <option value="ALL">ALL(OCLC,ISBN,ISSN,LCCN)</option>
+                                                                <option value="OCLC">OCLC</option>
+                                                                <option value="ISBN">ISBN</option>
+                                                                <option value="ISSN">ISSN</option>
+                                                                <option value="LCCN">LCCN</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="reportType" class="col-sm-4">Report Type</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="reportType"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{reportType}">
+                                                                <option value="Matching">Matching</option>
+                                                                <option value="Exception">Exception</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="transmissionType" class="col-sm-4">Transmission Type</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="transmissionType"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{transmissionType}">
+                                                                <option value="FileSystem">File System</option>
+                                                                <option value="FTP">FTP</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="createdDate" class="col-sm-4">Date</label>
+
+                                                        <div class="col-sm-4">
+                                                            <input type="text" th:field="*{createdDate}"
+                                                                   class="form-control bfh-number"
+                                                                   id="createdDate"
+                                                                   placeholder="Date"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4"></label>
+                                                        <div class="col-sm-4">
+                                                            <button id="report" type="submit" name="report"
+                                                                    class="btn btn-info active">Generate Report
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <br/><br/><br/>
+                                                    <div class="form-group col-sm-12">
+                                                        <textarea class="form-control" id="matchingAlgorithmReportStatus" rows="5"
+                                                            placeholder="Matching Algorithm Status" readonly="true"></textarea>
+                                                    </div>
+
+                                                </fieldset>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

@@ -297,4 +297,27 @@ public class Bib {
     public void setTitleStartsWith(String titleStartsWith) {
         this.titleStartsWith = titleStartsWith;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Bib bib = (Bib) o;
+
+        if (!id.equals(bib.id)) return false;
+        if (!bibId.equals(bib.bibId)) return false;
+        if (!owningInstitution.equals(bib.owningInstitution)) return false;
+        return owningInstitutionBibId.equals(bib.owningInstitutionBibId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + bibId.hashCode();
+        result = 31 * result + owningInstitution.hashCode();
+        result = 31 * result + owningInstitutionBibId.hashCode();
+        return result;
+    }
 }

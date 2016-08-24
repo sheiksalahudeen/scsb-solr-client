@@ -12,6 +12,10 @@ jQuery(document).ready(function ($) {
     $('#dateFrom').datetimepicker({
         format: "dd-mm-yyyy hh:ii"
     });
+
+    $('#createdDate').datepicker({
+        format: "yyyy/mm/dd"
+    });
 });
 
 
@@ -55,7 +59,7 @@ function updateStatus() {
     });
 }
 
-function generateReport() {
+function saveReport() {
     document.getElementById("matchingAlgorithmStatus").value = '';
     var criteria = $('#matchingCriteria').val();
     var url = '';

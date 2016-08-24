@@ -6,7 +6,6 @@ import org.recap.BaseTestCase;
 import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
-import org.recap.model.solr.MatchingRecordReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -31,17 +30,6 @@ public class CsvUtilUT extends BaseTestCase {
 
     @Autowired
     private CsvUtil csvUtil;
-
-    @Test
-    public void createFile() {
-        String fileName = "testcsv";
-        csvUtil.createFile(fileName);
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        File file = new File(reportDirectoryPath + File.separator + fileName + "_" + df.format(new Date()) + ".csv");
-        boolean fileExists = file.exists();
-        assertTrue(fileExists);
-        file.delete();
-    }
 
     @Test
     public void writeSearchResultsToCsv() throws Exception {
