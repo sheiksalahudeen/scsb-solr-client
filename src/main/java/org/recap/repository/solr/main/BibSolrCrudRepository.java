@@ -22,4 +22,12 @@ public interface BibSolrCrudRepository extends SolrCrudRepository<Bib, String> {
     List<Bib> findByLccn(String lccn);
 
     Long countByBibId(Integer bibId);
+
+    List<Bib> findByTitleDisplayAndOclcNumber(String titleDisplay, String oclcNumber);
+
+    List<Bib> findByTitleDisplayAndIsbn(String titleDisplay, String isbn);
+
+    List<Bib> findByTitleDisplayAndIssn(String titleDisplay, String issn);
+
+    List<Bib> findByTitleDisplayAndLccn(String titleDisplay, String lccn);
 }

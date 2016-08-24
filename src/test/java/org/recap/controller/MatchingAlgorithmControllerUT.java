@@ -5,11 +5,10 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.recap.MatchingAlgorithm;
+import org.recap.matchingAlgorithm.MatchingAlgorithmSaveReport;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doNothing;
 
 /**
  * Created by hemalathas on 1/8/16.
@@ -20,7 +19,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     MatchingAlgorithmController matchingAlgorithmController= new MatchingAlgorithmController();
 
     @Mock
-    MatchingAlgorithm mockMatchingAlgorithm;
+    MatchingAlgorithmSaveReport mockMatchingAlgorithmSaveReport;
 
     @Before
     public void setup()throws Exception{
@@ -30,14 +29,14 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     @Test
     public void matchingAlgorithmFullTest() throws Exception{
 
-        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReport();
+        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReports();
         String response = matchingAlgorithmController.matchingAlgorithmFull();
         assertTrue(response.contains("Status  : Done"));
     }
 
    @Test
     public void testMatchingAlgorithmBasedOnOCLC() throws Exception{
-       doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForOclc();
+       doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForOclc();
         String response = matchingAlgorithmController.matchingAlgorithmBasedOnOCLC();
         assertTrue(response.contains("Status  : Done"));assertTrue(response.contains("Status  : Done"));
     }
@@ -45,7 +44,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     @Test
     public void testMatchingAlgorithmBasedOnISSN() throws Exception{
-        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForIssn();
+        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForIssn();
         String response = matchingAlgorithmController.matchingAlgorithmBasedOnISSN();
         assertTrue(response.contains("Status  : Done"));;
     }
@@ -53,13 +52,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     @Test
     public void testMatchingAlgorithmBasedOnLCCN() throws Exception{
-        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForLccn();
+        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForLccn();
         String response = matchingAlgorithmController.matchingAlgorithmBasedOnLCCN();
         assertTrue(response.contains("Status  : Done"));
     }
     @Test
     public void testMatchingAlgorithmBasedOnISBN() throws Exception{
-        doNothing().when(mockMatchingAlgorithm).generateMatchingAlgorithmReportForIsbn();
+        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForIsbn();
         String response = matchingAlgorithmController.matchingAlgorithmBasedOnISBN();
         assertTrue(response.contains("Status  : Done"));
     }

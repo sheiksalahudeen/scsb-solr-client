@@ -1,4 +1,4 @@
-package org.recap.service;
+package org.recap.matchingAlgorithm.service;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,13 +7,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
-import org.recap.model.solr.MatchingRecordReport;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -54,13 +51,14 @@ public class MatchingAlgorithmHelperServiceUT {
 
     @Test
     public void testGetMatchingReports(){
-        Map<String, List<MatchingRecordReport>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports("OCLCNumber","00 1 614-793-8682",getBibs());
+        Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports("OCLCNumber","00 1 614-793-8682", getBibs(), new HashSet<>());
         assertNotNull(owningInstitutionMap);
-        assertNotNull("035",owningInstitutionMap.get("PUL").get(0).getMatchPointTag());
-        assertNotNull("00 1 614-793-8682",owningInstitutionMap.get("PUL").get(0).getMatchPointTag());
-        assertNotNull("1",owningInstitutionMap.get("PUL").get(0).getBibId());
-        assertNotNull("SampleTitle",owningInstitutionMap.get("PUL").get(0).getTitle());
-        assertNotNull("BA352",owningInstitutionMap.get("PUL").get(0).getBarcode());
+        Set<Bib> bibSet = owningInstitutionMap.get("PUL");
+        Bib bib = bibSet.iterator().next();
+        assertNotNull("00 1 614-793-8682", bib.getOclcNumber());
+        assertNotNull("1", bib.getId());
+        assertNotNull("SampleTitle", bib.getTitle());
+        assertNotNull("BA352", bib.getBarcode());
     }
 
 

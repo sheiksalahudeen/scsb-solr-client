@@ -1,28 +1,30 @@
-package org.recap;
+package org.recap.matchingAlgorithm;
 
-import org.recap.model.solr.Bib;
-import org.recap.model.solr.MatchingRecordReport;
-import org.recap.service.MatchingAlgorithmHelperService;
 import org.codehaus.jettison.json.JSONObject;
-import org.recap.util.CsvUtil;
+import org.recap.RecapConstants;
+import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.model.solr.Bib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by angelind on 12/7/16.
  */
 @Component
-public class MatchingAlgorithm {
+public class MatchingAlgorithmSaveReport {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithm.class);
+    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmSaveReport.class);
 
     @Value("${solr.url}")
     String solrUrl;
@@ -31,12 +33,9 @@ public class MatchingAlgorithm {
     String solrParentCore;
 
     @Autowired
-    CsvUtil csvUtil;
-
-    @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
-    public void generateMatchingAlgorithmReport() throws Exception {
+    public void saveMatchingAlgorithmReports() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.field=ISBN&facet.field=ISSN&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
@@ -44,20 +43,18 @@ public class MatchingAlgorithm {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());
             JSONObject facetJsonObject = responseJsonObject.getJSONObject("facet_counts");
             JSONObject resultJsonObject = facetJsonObject.getJSONObject("facet_fields");
-            Map<String, Integer> duplicateOCLCMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "OCLCNumber");
-            Map<String, Integer> duplicateISBNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "ISBN");
-            Map<String, Integer> duplicateISSNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "ISSN");
-            Map<String, Integer> duplicateLCCNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "LCCN");
-            csvUtil.createFile("Matching_Algo_Phase1");
-            getMatchingList(duplicateOCLCMap, "OCLCNumber");
-            getMatchingList(duplicateISBNMap, "ISBN");
-            getMatchingList(duplicateISSNMap, "ISSN");
-            getMatchingList(duplicateLCCNMap, "LCCN");
-            csvUtil.closeFile();
+            Map<String, Integer> duplicateOCLCMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, RecapConstants.MATCH_POINT_FIELD_OCLC);
+            Map<String, Integer> duplicateISBNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, RecapConstants.MATCH_POINT_FIELD_ISBN);
+            Map<String, Integer> duplicateISSNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, RecapConstants.MATCH_POINT_FIELD_ISSN);
+            Map<String, Integer> duplicateLCCNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, RecapConstants.MATCH_POINT_FIELD_LCCN);
+            getMatchingList(duplicateOCLCMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.EXCEPTION_REPORT_FILE_NAME);
+            getMatchingList(duplicateISBNMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.EXCEPTION_REPORT_FILE_NAME);
+            getMatchingList(duplicateISSNMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.EXCEPTION_REPORT_FILE_NAME);
+            getMatchingList(duplicateLCCNMap, RecapConstants.MATCH_POINT_FIELD_LCCN, RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.EXCEPTION_REPORT_FILE_NAME);
         }
     }
 
-    public void generateMatchingAlgorithmReportForOclc() throws Exception {
+    public void saveMatchingAlgorithmReportForOclc() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
@@ -66,13 +63,11 @@ public class MatchingAlgorithm {
             JSONObject facetJsonObject = responseJsonObject.getJSONObject("facet_counts");
             JSONObject resultJsonObject = facetJsonObject.getJSONObject("facet_fields");
             Map<String, Integer> duplicateISBNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "OCLCNumber");
-            csvUtil.createFile("Matching_Algo_OCLC");
-            getMatchingList(duplicateISBNMap, "OCLCNumber");
-            csvUtil.closeFile();
+            getMatchingList(duplicateISBNMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME);
         }
     }
 
-    public void generateMatchingAlgorithmReportForIsbn() throws Exception {
+    public void saveMatchingAlgorithmReportForIsbn() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISBN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
@@ -81,13 +76,11 @@ public class MatchingAlgorithm {
             JSONObject facetJsonObject = responseJsonObject.getJSONObject("facet_counts");
             JSONObject resultJsonObject = facetJsonObject.getJSONObject("facet_fields");
             Map<String, Integer> duplicateISSNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "ISBN");
-            csvUtil.createFile("Matching_Algo_ISBN");
-            getMatchingList(duplicateISSNMap, "ISBN");
-            csvUtil.closeFile();
+            getMatchingList(duplicateISSNMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME);
         }
     }
 
-    public void generateMatchingAlgorithmReportForIssn() throws Exception {
+    public void saveMatchingAlgorithmReportForIssn() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISSN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
@@ -96,13 +89,11 @@ public class MatchingAlgorithm {
             JSONObject facetJsonObject = responseJsonObject.getJSONObject("facet_counts");
             JSONObject resultJsonObject = facetJsonObject.getJSONObject("facet_fields");
             Map<String, Integer> duplicateLCCNMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "ISSN");
-            csvUtil.createFile("Matching_Algo_ISSN");
-            getMatchingList(duplicateLCCNMap, "ISSN");
-            csvUtil.closeFile();
+            getMatchingList(duplicateLCCNMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME);
         }
     }
 
-    public void generateMatchingAlgorithmReportForLccn() throws Exception {
+    public void saveMatchingAlgorithmReportForLccn() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
@@ -111,28 +102,42 @@ public class MatchingAlgorithm {
             JSONObject facetJsonObject = responseJsonObject.getJSONObject("facet_counts");
             JSONObject resultJsonObject = facetJsonObject.getJSONObject("facet_fields");
             Map<String, Integer> duplicateOCLCMap = matchingAlgorithmHelperService.getBibListUsingFacet(resultJsonObject, "LCCN");
-            csvUtil.createFile("Matching_Algo_LCCN");
-            getMatchingList(duplicateOCLCMap, "LCCN");
-            csvUtil.closeFile();
+            getMatchingList(duplicateOCLCMap, RecapConstants.MATCH_POINT_FIELD_LCCN, RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME);
         }
     }
 
-    public void getMatchingList(Map<String, Integer> matchingFieldList, String fieldName) {
-        Integer matchingBibsCount = 0;
+    public void getMatchingList(Map<String, Integer> matchingFieldList, String fieldName, String matchingFileName, String exceptionReportFileName) {
         for (String fieldValue : matchingFieldList.keySet()) {
+            Set<Bib> matchingExceptionSet = new HashSet<>();
             try {
                 List<Bib> bibs = matchingAlgorithmHelperService.getBibs(fieldName, fieldValue);
-                Map<String, List<MatchingRecordReport>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports(fieldName, fieldValue, bibs);
+                Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports(fieldName, fieldValue, bibs, matchingExceptionSet);
                 if (owningInstitutionMap.size() > 1) {
-                    matchingBibsCount = matchingBibsCount + bibs.size();
                     for (String owningInstitution : owningInstitutionMap.keySet()) {
-                        csvUtil.writeMatchingAlgorithmReportToCsv(owningInstitutionMap.get(owningInstitution));
+                        Set<Bib> bibSet = owningInstitutionMap.get(owningInstitution);
+                        for(Bib bib : bibSet) {
+                            matchingAlgorithmHelperService.populateAndSaveReportEntity(fieldName, fieldValue, bib, matchingFileName, RecapConstants.MATCHING_TYPE);
+                        }
                     }
                 }
+                generateExceptionReport(fieldName, fieldValue, matchingExceptionSet, exceptionReportFileName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        logger.info("Total Matching Bibs Found Based on " + fieldName + " : " + matchingBibsCount);
+    }
+
+    public void generateExceptionReport(String fieldName, String fieldValue, Set<Bib> matchingExceptionSet, String exceptionReportFileName) {
+        if(!CollectionUtils.isEmpty(matchingExceptionSet)) {
+            Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getBibsForOwningInstitution(matchingExceptionSet);
+            if(owningInstitutionMap.size() > 1) {
+                for(String owningInstitution : owningInstitutionMap.keySet()) {
+                    Set<Bib> bibSet = owningInstitutionMap.get(owningInstitution);
+                    for(Bib bib : bibSet) {
+                        matchingAlgorithmHelperService.populateAndSaveReportEntity(fieldName, fieldValue, bib, exceptionReportFileName, RecapConstants.EXCEPTION_TYPE);
+                    }
+                }
+            }
+        }
     }
 }

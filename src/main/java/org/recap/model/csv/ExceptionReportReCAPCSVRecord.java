@@ -1,25 +1,42 @@
-package org.recap.model.solr;
+package org.recap.model.csv;
+
+import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
+import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 /**
- * Created by angelind on 1/7/16.
+ * Created by angelind on 23/8/16.
  */
-public class MatchingRecordReport {
 
-    private String matchPointTag;
+@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
+public class ExceptionReportReCAPCSVRecord implements Comparable<ExceptionReportReCAPCSVRecord>{
+
+    @DataField(pos = 1)
+    private String matchingPointTag;
+    @DataField(pos = 2)
     private String matchPointContent;
+    @DataField(pos = 3)
     private String bibId;
+    @DataField(pos = 4)
     private String title;
+    @DataField(pos = 5)
     private String barcode;
+    @DataField(pos = 6)
     private String institutionId;
+    @DataField(pos = 7)
     private String useRestrictions;
+    @DataField(pos = 8)
     private String summaryHoldings;
 
-    public String getMatchPointTag() {
-        return matchPointTag;
+    @Ignore
+    private String localBibId;
+
+    public String getMatchingPointTag() {
+        return matchingPointTag;
     }
 
-    public void setMatchPointTag(String matchPointTag) {
-        this.matchPointTag = matchPointTag;
+    public void setMatchingPointTag(String matchingPointTag) {
+        this.matchingPointTag = matchingPointTag;
     }
 
     public String getMatchPointContent() {
@@ -76,5 +93,17 @@ public class MatchingRecordReport {
 
     public void setSummaryHoldings(String summaryHoldings) {
         this.summaryHoldings = summaryHoldings;
+    }
+
+    public String getLocalBibId() {
+        return localBibId;
+    }
+
+    public void setLocalBibId(String localBibId) {
+        this.localBibId = localBibId;
+    }
+
+    public int compareTo(ExceptionReportReCAPCSVRecord exceptionReportReCAPCSVRecord) {
+        return title.compareToIgnoreCase(exceptionReportReCAPCSVRecord.getTitle());
     }
 }
