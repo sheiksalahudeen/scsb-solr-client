@@ -94,7 +94,11 @@ public class RecapConstants {
 
     public static final String SHARED_CGD = "Shared";
     public static final String OCLC_CRITERIA = "OCLC";
+
     public static final String ISBN_CRITERIA = "ISBN";
     public static final String ISSN_CRITERIA = "ISSN";
     public static final String LCCN_CRITERIA = "LCCN";
+
+    //Error Message
+    public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";
 }

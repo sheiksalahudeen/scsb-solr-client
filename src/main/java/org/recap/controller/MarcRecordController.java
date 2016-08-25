@@ -3,6 +3,7 @@ package org.recap.controller;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.Subfield;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.search.BibDataField;
@@ -31,30 +32,49 @@ public class MarcRecordController {
 
     Logger logger = LoggerFactory.getLogger(MarcRecordController.class);
 
+    private String errorMessage;
+
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
     InstitutionDetailsRepository institutionDetailRepository;
 
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     @RequestMapping("/openMarcRecord")
     public String openMarcRecord(@Valid @ModelAttribute("bibId") Integer bibId, Model model) {
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
-        String bibContent = new String(bibliographicEntity.getContent());
-        BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
-        Record marcRecord = records.get(0);
-        BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
-        bibliographicMarcRecord.setContent(bibContent);
-        InstitutionEntity institutionEntity = institutionDetailRepository.findByInstitutionId(bibliographicEntity.getOwningInstitutionId());
-        if (null != institutionEntity) {
-            bibliographicMarcRecord.setOwningInstitution(institutionEntity.getInstitutionCode());
+        if(null != bibliographicEntity){
+            BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
+            bibliographicMarcRecord.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
+            model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
+            return "marcRecordErrorMessage";
+
+        }else {
+            String bibContent = new String(bibliographicEntity.getContent());
+            BibJSONUtil bibJSONUtil = new BibJSONUtil();
+            List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+            Record marcRecord = records.get(0);
+            BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
+            bibliographicMarcRecord.setContent(bibContent);
+            InstitutionEntity institutionEntity = institutionDetailRepository.findByInstitutionId(bibliographicEntity.getOwningInstitutionId());
+            if (null != institutionEntity) {
+                bibliographicMarcRecord.setOwningInstitution(institutionEntity.getInstitutionCode());
+            }
+            if (!CollectionUtils.isEmpty(bibliographicEntity.getItemEntities())) {
+                bibliographicMarcRecord.setCallNumber(bibliographicEntity.getItemEntities().get(0).getCallNumber());
+            }
+            model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
+            return "marcRecordView";
         }
-        if (!CollectionUtils.isEmpty(bibliographicEntity.getItemEntities())) {
-            bibliographicMarcRecord.setCallNumber(bibliographicEntity.getItemEntities().get(0).getCallNumber());
-        }
-        model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
-        return "marcRecordView";
     }
 
     private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
