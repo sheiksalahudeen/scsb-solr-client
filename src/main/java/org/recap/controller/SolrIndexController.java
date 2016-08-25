@@ -89,29 +89,6 @@ public class SolrIndexController {
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
     public String report() {
-        ExecutorService executorService = bibItemIndexExecutorService.getExecutorService();
-        String status = "Done";
-        String processingTime = "";
-        String timeString = "Total Time Taken";
-        if (null != executorService) {
-            boolean shutdown = executorService.isShutdown();
-            if(!shutdown) {
-                status = "Running";
-                timeString = "Processing Time";
-                long startTime = bibItemIndexExecutorService.getStartTime();
-                long currentTime = System.currentTimeMillis();
-                processingTime =(currentTime - startTime) / 1000 + " secs";
-            } else {
-                processingTime = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
-            }
-        }
-        long numOfDocProcessed = bibSolrCrudRepository.count();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Status  : " + status).append("\n");
-        stringBuilder.append(RecapConstants.PROCESSSED_RECORDS + " : " + numOfDocProcessed).append("\n");
-        stringBuilder.append(timeString + " : " + processingTime).append("\n");
-
-        return stringBuilder.toString();
+        return "Index process initiated!";
     }
 }

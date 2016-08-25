@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.recap.admin.SolrAdmin;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public abstract class IndexExecutorService {
 
                 loopCount = remainder == 0 ? quotient : quotient + 1;
 
-                logger.info("Loop Count Value : " +loopCount);
+                logger.info("Loop Count Value : " + loopCount);
 
                 List<String> coreNames = new ArrayList<>();
 
@@ -71,15 +72,25 @@ public abstract class IndexExecutorService {
                 solrAdmin.createSolrCores(coreNames);
 
                 int coreNum = 0;
-                List<Future> futures = new ArrayList<>();
-
+                List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
                     Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId);
-                    futures.add(executorService.submit(callable));
+                    callables.add(callable);
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
-                logger.info("No of Futures Added : " +futures.size());
+                List<Future<Integer>> futures = executorService.invokeAll(callables);
+                futures
+                        .stream()
+                        .map(future -> {
+                            try {
+                                return future.get();
+                            } catch (Exception e) {
+                                throw new IllegalStateException(e);
+                            }
+                        });
+
+                logger.info("No of Futures Added : " + futures.size());
 
                 int mergeIndexCount = mergeIndexesInterval;
                 int totalBibsProcessed = 0;
@@ -88,7 +99,7 @@ public abstract class IndexExecutorService {
                 stopWatch.start();
 
                 int futureCount = 0;
-                for (Iterator<Future> iterator = futures.iterator(); iterator.hasNext(); ) {
+                for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
                     Future future = iterator.next();
                     try {
                         Integer entitiesCount = (Integer) future.get();
