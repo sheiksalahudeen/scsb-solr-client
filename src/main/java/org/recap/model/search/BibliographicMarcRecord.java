@@ -21,6 +21,7 @@ public class BibliographicMarcRecord {
     private String controlNumber008;
     private String content;
     private List<BibDataField> bibDataFields = new ArrayList<>();
+    private String errorMessage;
 
     public Integer getBibId() {
         return bibId;
@@ -124,5 +125,13 @@ public class BibliographicMarcRecord {
 
     public void setBibDataFields(List<BibDataField> bibDataFields) {
         this.bibDataFields = bibDataFields;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
