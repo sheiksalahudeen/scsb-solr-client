@@ -52,12 +52,11 @@ public class MarcRecordController {
     @RequestMapping("/openMarcRecord")
     public String openMarcRecord(@Valid @ModelAttribute("bibId") Integer bibId, Model model) {
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
-        if(null != bibliographicEntity){
+        if(null == bibliographicEntity){
             BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
             bibliographicMarcRecord.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
             model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
             return "marcRecordErrorMessage";
-
         }else {
             String bibContent = new String(bibliographicEntity.getContent());
             BibJSONUtil bibJSONUtil = new BibJSONUtil();
