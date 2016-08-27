@@ -132,16 +132,12 @@ public class SolrAdmin {
     }
 
     public CoreAdminRequest.Create getCoreAdminCreateRequest() {
-        if (null == coreAdminCreateRequest) {
-            coreAdminCreateRequest = new CoreAdminRequest.Create();
-        }
+        coreAdminCreateRequest = new CoreAdminRequest.Create();
         return coreAdminCreateRequest;
     }
 
     public CoreAdminRequest.Unload getCoreAdminUnloadRequest() {
-        if (null == coreAdminUnloadRequest) {
-            coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
-        }
+        coreAdminUnloadRequest = new CoreAdminRequest.Unload(true);
         return coreAdminUnloadRequest;
     }
 
@@ -150,5 +146,19 @@ public class SolrAdmin {
             coreAdminRequest = new CoreAdminRequest();
         }
         return coreAdminRequest;
+    }
+
+    public Integer getCoresStatus() {
+        CoreAdminRequest coreAdminRequest = getCoreAdminCreateRequest();
+        coreAdminRequest.setAction(CoreAdminParams.CoreAdminAction.STATUS);
+        try {
+            CoreAdminResponse coresStatusResponse = coreAdminRequest.process(solrAdminClient);
+            return coresStatusResponse.getStatus();
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
