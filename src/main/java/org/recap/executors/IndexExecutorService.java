@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import com.google.common.collect.Lists;
 import org.recap.admin.SolrAdmin;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.SolrIndexRequest;
@@ -40,6 +41,7 @@ public abstract class IndexExecutorService {
 
     private ExecutorService executorService;
     private Integer loopCount;
+    private Integer callableCountByMergeInterval;
     private long startTime;
     private StopWatch stopWatch;
 
@@ -60,16 +62,23 @@ public abstract class IndexExecutorService {
             if (totalDocCount > 0) {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
-
                 loopCount = remainder == 0 ? quotient : quotient + 1;
-
                 logger.info("Loop Count Value : " + loopCount);
 
+                logger.info("Merge Indexes Interval : " + mergeIndexesInterval);
+
+                callableCountByMergeInterval = mergeIndexesInterval / (docsPerThread);
+                if (callableCountByMergeInterval == 0) {
+                    callableCountByMergeInterval = 1;
+                }
+                logger.info("Number of callables to execute to merge indexes : " + callableCountByMergeInterval);
+
                 List<String> coreNames = new ArrayList<>();
-
                 setupCoreNames(numThreads, coreNames);
-
                 solrAdmin.createSolrCores(coreNames);
+
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
 
                 int coreNum = 0;
                 List<Callable<Integer>> callables = new ArrayList<>();
@@ -79,48 +88,45 @@ public abstract class IndexExecutorService {
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
-                List<Future<Integer>> futures = executorService.invokeAll(callables);
-                futures
-                        .stream()
-                        .map(future -> {
-                            try {
-                                return future.get();
-                            } catch (Exception e) {
-                                throw new IllegalStateException(e);
-                            }
-                        });
-
-                logger.info("No of Futures Added : " + futures.size());
-
-                int mergeIndexCount = mergeIndexesInterval;
-                int totalBibsProcessed = 0;
-
-                StopWatch stopWatch = new StopWatch();
-                stopWatch.start();
-
                 int futureCount = 0;
-                for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
-                    Future future = iterator.next();
-                    try {
-                        Integer entitiesCount = (Integer) future.get();
-                        totalBibsProcessed += entitiesCount;
-                        logger.info("Num bibs fetched by thread : " + entitiesCount);
-                        futureCount++;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                int totalBibsProcessed = 0;
+                List<List<Callable<Integer>>> partitions = Lists.partition(new ArrayList<Callable<Integer>>(callables), callableCountByMergeInterval);
+                for (List<Callable<Integer>> partitionCallables : partitions) {
+                    List<Future<Integer>> futures = executorService.invokeAll(partitionCallables);
+                    futures
+                            .stream()
+                            .map(future -> {
+                                try {
+                                    return future.get();
+                                } catch (Exception e) {
+                                    throw new IllegalStateException(e);
+                                }
+                            });
+                    logger.info("No of Futures Added : " + futures.size());
 
-                    if (totalBibsProcessed == mergeIndexCount) {
-                        logger.info("Total Bibs Processed : " + totalBibsProcessed);
-                        solrAdmin.mergeCores(coreNames);
-                        deleteTempIndexes(coreNames, solrUrl);
-                        mergeIndexCount += mergeIndexesInterval;
+                    int numOfBibsProcessed = 0;
+                    for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                        Future future = iterator.next();
+                        try {
+                            Integer entitiesCount = (Integer) future.get();
+                            numOfBibsProcessed += entitiesCount;
+                            totalBibsProcessed += entitiesCount;
+                            logger.info("Num of bibs fetched by thread : " + entitiesCount);
+                            futureCount++;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    solrAdmin.mergeCores(coreNames);
+                    deleteTempIndexes(coreNames, solrUrl);
+                    logger.info("Num of Bibs Processed and merged to main core on merge interval : " + numOfBibsProcessed);
+                    logger.info("Total Num of Bibs Processed and merged to main core : " + totalBibsProcessed);
                 }
-                logger.info("Num futures executed: " + futureCount);
-                solrAdmin.mergeCores(coreNames);
+
+                logger.info("Total futures executed: " + futureCount);
+                logger.info("Total Bibs Processed : " + totalBibsProcessed);
                 stopWatch.stop();
                 logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
                 solrAdmin.unLoadCores(coreNames);
