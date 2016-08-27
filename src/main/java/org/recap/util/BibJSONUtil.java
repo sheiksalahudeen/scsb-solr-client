@@ -187,11 +187,11 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     private String getTitleStartsWith(Record marcRecord){
-        String title = getTitle(marcRecord);
+        String title = getTitleDisplay(marcRecord);
         String titleStartsWith = null;
         if(title!=null){
-            String[] splitedTitle = getTitle(marcRecord).split(" ");
-            titleStartsWith = "^"+splitedTitle[0];
+            String[] splitedTitle = title.split(" ");
+            titleStartsWith = splitedTitle[0];
         }
         return titleStartsWith;
     }
