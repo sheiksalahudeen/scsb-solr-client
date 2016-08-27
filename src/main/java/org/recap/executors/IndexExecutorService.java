@@ -120,6 +120,10 @@ public abstract class IndexExecutorService {
                         }
                     }
                     solrAdmin.mergeCores(coreNames);
+                    logger.info("Solr core status : " + solrAdmin.getCoresStatus());
+                    while (solrAdmin.getCoresStatus() != 0) {
+                        logger.info("Solr core status : " + solrAdmin.getCoresStatus());
+                    }
                     deleteTempIndexes(coreNames, solrUrl);
                     logger.info("Num of Bibs Processed and merged to main core on merge interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and merged to main core : " + totalBibsProcessed);
