@@ -1,9 +1,6 @@
 package org.recap.util;
 
 
-import junit.framework.TestCase;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -23,106 +20,6 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class BibJSONUtilUT extends BaseTestCase{
 
-    private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
-            "                <record>\n"+
-            "                    <controlfield tag=\"001\">NYPG002000036-B</controlfield>\n"+
-            "                    <controlfield tag=\"005\">20001116192424.2</controlfield>\n"+
-            "                    <controlfield tag=\"008\">850225r19731907nyu b 001 0 ara</controlfield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"010\">\n"+
-            "                        <subfield code=\"a\">   77173005  </subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"040\">\n"+
-            "                        <subfield code=\"c\">NN</subfield>\n"+
-            "                        <subfield code=\"d\">NN</subfield>\n"+
-            "                        <subfield code=\"d\">CStRLIN</subfield>\n"+
-            "                        <subfield code=\"d\">WaOLN</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"043\">\n"+
-            "                        <subfield code=\"a\">ff-----</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"0\" ind2=\"0\" tag=\"050\">\n"+
-            "                        <subfield code=\"a\">DS36.6</subfield>\n"+
-            "                        <subfield code=\"b\">.I26 1973</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"0\" ind2=\"0\" tag=\"082\">\n"+
-            "                        <subfield code=\"a\">910.031/767</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"1\" ind2=\" \" tag=\"100\">\n"+
-            "                        <subfield code=\"a\">Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,</subfield>\n"+
-            "                        <subfield code=\"d\">1145-1217.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"1\" ind2=\"0\" tag=\"245\">\n"+
-            "                        <subfield code=\"a\">RihÌ£lat</subfield>\n"+
-            "                        <subfield code=\"b\">AbÄ« al-Husayn Muhammad ibn Ahmad ibn Jubayr al-KinÄ\u0081nÄ« al-AndalusÄ«\n"+
-            "                            al-BalinsÄ«.\n"+
-            "                        </subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"250\">\n"+
-            "                        <subfield code=\"a\">2d ed.</subfield>\n"+
-            "                        <subfield code=\"b\">rev. by M. J. de Goeje and printed for the Trustees of the \"E. J. W. Gibb\n"+
-            "                            memorial\"\n"+
-            "                        </subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"260\">\n"+
-            "                        <subfield code=\"a\">[New York,</subfield>\n"+
-            "                        <subfield code=\"b\">AMS Press,</subfield>\n"+
-            "                        <subfield code=\"c\">1973] 1907.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"300\">\n"+
-            "                        <subfield code=\"a\">363, 53 p.</subfield>\n"+
-            "                        <subfield code=\"c\">23 cm.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"500\">\n"+
-            "                        <subfield code=\"a\">Added t.p.: The travels of Ibn Jubayr. Edited from a ms. in the University\n"+
-            "                            Library of Leyden by William Wright.\n"+
-            "                        </subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"500\">\n"+
-            "                        <subfield code=\"a\">Original ed. issued as v. 5 of \"E.J.W. Gibb memorial\" series.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"504\">\n"+
-            "                        <subfield code=\"a\">Includes bibliographical references and index.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\"0\" tag=\"651\">\n"+
-            "                        <subfield code=\"a\">Islamic Empire</subfield>\n"+
-            "                        <subfield code=\"x\">Description and travel.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"1\" ind2=\" \" tag=\"700\">\n"+
-            "                        <subfield code=\"a\">Wright, William,</subfield>\n"+
-            "                        <subfield code=\"d\">1830-1889.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"1\" ind2=\" \" tag=\"700\">\n"+
-            "                        <subfield code=\"a\">Goeje, M. J. de</subfield>\n"+
-            "                        <subfield code=\"q\">(Michael Jan),</subfield>\n"+
-            "                        <subfield code=\"d\">1836-1909.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\"0\" ind2=\" \" tag=\"740\">\n"+
-            "                        <subfield code=\"a\">Travels of Ibn Jubayr.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\"0\" tag=\"830\">\n"+
-            "                        <subfield code=\"a\">\"E.J.W. Gibb memorial\" series ;</subfield>\n"+
-            "                        <subfield code=\"v\">v.5.</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"907\">\n"+
-            "                        <subfield code=\"a\">.b100006279</subfield>\n"+
-            "                        <subfield code=\"c\">m</subfield>\n"+
-            "                        <subfield code=\"d\">a</subfield>\n"+
-            "                        <subfield code=\"e\">-</subfield>\n"+
-            "                        <subfield code=\"f\">ara</subfield>\n"+
-            "                        <subfield code=\"g\">nyu</subfield>\n"+
-            "                        <subfield code=\"h\">0</subfield>\n"+
-            "                        <subfield code=\"i\">3</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"952\">\n"+
-            "                        <subfield code=\"h\">*OAC (\"E. J. W. Gibb memorial\" series. v. 5)</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <datafield ind1=\" \" ind2=\" \" tag=\"952\">\n"+
-            "                        <subfield code=\"h\">*OFV 87-659</subfield>\n"+
-            "                    </datafield>\n"+
-            "                    <leader>01814cam a2200409 450000</leader>\n"+
-            "                </record>\n"+
-            "            </collection>";
-
     private String holdingContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
             "            <record>\n" +
             "              <datafield tag=\"852\" ind1=\"0\" ind2=\"1\">\n" +
@@ -134,6 +31,108 @@ public class BibJSONUtilUT extends BaseTestCase{
             "              </datafield>\n" +
             "            </record>\n" +
             "          </collection>";
+
+    private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
+            "          <record>\n" +
+            "            <controlfield tag=\"001\">NYPG001000011-B</controlfield>\n" +
+            "            <controlfield tag=\"005\">20001116192418.8</controlfield>\n" +
+            "            <controlfield tag=\"008\">841106s1976    le       b    000 0 arax </controlfield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"010\">\n" +
+            "              <subfield code=\"a\">79971032</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"035\">\n" +
+            "              <subfield code=\"a\">NNSZ00100011</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"035\">\n" +
+            "              <subfield code=\"a\">(WaOLN)nyp0200023</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"040\">\n" +
+            "              <subfield code=\"c\">NN</subfield>\n" +
+            "              <subfield code=\"d\">NN</subfield>\n" +
+            "              <subfield code=\"d\">WaOLN</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"043\">\n" +
+            "              <subfield code=\"a\">a-ba---</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\"0\" ind2=\"0\" tag=\"050\">\n" +
+            "              <subfield code=\"a\">DS247.B28</subfield>\n" +
+            "              <subfield code=\"b\">R85</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\"1\" ind2=\" \" tag=\"100\">\n" +
+            "              <subfield code=\"a\">Rumayḥī, Muḥammad Ghānim.</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\" \" tag=\"110\">\n" +
+            "              <subfield code=\"a\">Rumayḥī, Muḥammad</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\" \" tag=\"111\">\n" +
+            "              <subfield code=\"a\">Rumayḥī</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\" \" tag=\"700\">\n" +
+            "              <subfield code=\"a\">Yūsuf, Ṣābir.</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\" \" tag=\"710\">\n" +
+            "              <subfield code=\"a\">Yūsuf,</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\" \" tag=\"711\">\n" +
+            "              <subfield code=\"a\">YūsufṢābir.</subfield>\n" +
+            "            </datafield>\t\n" +
+            "            <datafield ind1=\"1\" ind2=\"3\" tag=\"245\">\n" +
+            "              <subfield code=\"a\">al-Baḥrayn :</subfield>\n" +
+            "              <subfield code=\"b\">mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /</subfield>\n" +
+            "              <subfield code=\"c\">Muḥammad al-Rumayḥī.</subfield>\n" +
+            "            </datafield>\n" +
+            "    <datafield ind1=\"1\" ind2=\"3\" tag=\"130\">\n" +
+            "              <subfield code=\"1\">al-Baḥrayn :</subfield>\n" +
+            "            </datafield>\n" +
+            "   <datafield ind1=\"1\" ind2=\"3\" tag=\"730\">\n" +
+            "              <subfield code=\"a\">Muḥammad al-Rumayḥī.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"250\">\n" +
+            "              <subfield code=\"a\">al-Ṭabʻah 1.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"260\">\n" +
+            "              <subfield code=\"a\">[Bayrūt] :</subfield>\n" +
+            "              <subfield code=\"b\">Dār Ibn Khaldūn,</subfield>\n" +
+            "              <subfield code=\"c\">1976.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"300\">\n" +
+            "              <subfield code=\"a\">264 p. ;</subfield>\n" +
+            "              <subfield code=\"c\">24 cm.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"504\">\n" +
+            "              <subfield code=\"a\">Includes bibliographies.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"546\">\n" +
+            "              <subfield code=\"a\">In Arabic.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\"0\" tag=\"651\">\n" +
+            "              <subfield code=\"a\">Bahrain</subfield>\n" +
+            "              <subfield code=\"x\">History</subfield>\n" +
+            "              <subfield code=\"y\">20th century.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\"0\" tag=\"651\">\n" +
+            "              <subfield code=\"a\">Bahrain</subfield>\n" +
+            "              <subfield code=\"x\">Economic conditions.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\"0\" tag=\"651\">\n" +
+            "              <subfield code=\"a\">Bahrain</subfield>\n" +
+            "              <subfield code=\"x\">Social conditions.</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"907\">\n" +
+            "              <subfield code=\"a\">.b100000241</subfield>\n" +
+            "              <subfield code=\"c\">m</subfield>\n" +
+            "              <subfield code=\"d\">a</subfield>\n" +
+            "              <subfield code=\"e\">-</subfield>\n" +
+            "              <subfield code=\"f\">ara</subfield>\n" +
+            "              <subfield code=\"g\">le </subfield>\n" +
+            "              <subfield code=\"h\">3</subfield>\n" +
+            "              <subfield code=\"i\">1</subfield>\n" +
+            "            </datafield>\n" +
+            "            <datafield ind1=\" \" ind2=\" \" tag=\"952\">\n" +
+            "              <subfield code=\"h\">*OFK 84-1944</subfield>\n" +
+            "            </datafield>\n" +
+            "          </record>\n" +
+            "        </collection>";
     @Test
     public void generateBibAndItemsForIndex()throws Exception {
         Random random = new Random();
@@ -187,7 +186,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List items = bibItemMap.get("Item");
         assertNotNull(bibs);
         Bib bib = (Bib)bibs.get(0);
-        assertEquals("^RihÌ£lat",bib.getTitleStartsWith());
+        assertEquals("al-Baḥrayn",bib.getTitleStartsWith());
         assertEquals(bibs.size(), 1);
         assertNotNull(items);
         assertEquals(items.size(), 1);
@@ -199,7 +198,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String lccnValue = bibJSONUtil.getLCCNValue(marcRecord);
-        assertEquals(lccnValue, "77173005");
+        assertEquals(lccnValue, "79971032");
     }
 
     @Test
@@ -208,7 +207,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String titleDisplay = bibJSONUtil.getTitleDisplay(marcRecord);
-        assertEquals(titleDisplay, "RihÌ£lat");
+        assertEquals(titleDisplay, "al-Baḥrayn :");
     }
 
     @Test
@@ -217,7 +216,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String authorDisplayValue = bibJSONUtil.getAuthorDisplayValue(marcRecord);
-        assertEquals(authorDisplayValue, "Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,");
+        assertEquals(authorDisplayValue, "Rumayḥī, Muḥammad Ghānim.Rumayḥī, Muḥammad Rumayḥī");
     }
 
     @Test
@@ -227,10 +226,22 @@ public class BibJSONUtilUT extends BaseTestCase{
         Record marcRecord = records.get(0);
         List<String> authorSearchValue = bibJSONUtil.getAuthorSearchValue(marcRecord);
         assertNotNull(authorSearchValue);
-        assertEquals(authorSearchValue.size(), 4);
-        assertTrue(authorSearchValue.contains("Ibn Jubayr, MuhÌ£ammad ibn AhÌ£mad,"));
-        assertTrue(authorSearchValue.contains("Wright, William,"));
-        assertTrue(authorSearchValue.contains("Travels of Ibn Jubayr."));
-        assertTrue(authorSearchValue.contains("Travels of Ibn Jubayr."));
+        assertEquals(authorSearchValue.size(), 6);
+        assertTrue(authorSearchValue.contains("Rumayḥī, Muḥammad Ghānim."));
+        assertTrue(authorSearchValue.contains("Rumayḥī, Muḥammad"));
+        assertTrue(authorSearchValue.contains("Rumayḥī"));
+        assertTrue(authorSearchValue.contains("Yūsuf, Ṣābir."));
+        assertTrue(authorSearchValue.contains("Yūsuf,"));
+        assertTrue(authorSearchValue.contains("YūsufṢābir."));
+    }
+
+    @Test
+    public void testTitles() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        String titles = bibJSONUtil.getTitle(marcRecord);
+        assertNotNull(titles);
+        assertEquals(titles,"al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /al-Baḥrayn :Muḥammad al-Rumayḥī.");
     }
 }
