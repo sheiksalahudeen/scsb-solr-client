@@ -129,6 +129,8 @@ public class MatchingAlgorithmController {
     public String generateReports(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
                             BindingResult result,
                             Model model) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         String matchingCriteria = solrIndexRequest.getMatchingCriteria();
         Date createdDate = solrIndexRequest.getCreatedDate();
         if(createdDate == null) {
@@ -159,7 +161,7 @@ public class MatchingAlgorithmController {
             } else if(RecapConstants.LCCN_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
                 generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
             }
-        } else {
+        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
             if(RecapConstants.ALL_INST.equalsIgnoreCase(matchingCriteria)) {
                 generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
             } else if(RecapConstants.OCLC_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
@@ -171,8 +173,22 @@ public class MatchingAlgorithmController {
             } else if(RecapConstants.LCCN_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
                 generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
             }
+        } else {
+            if(RecapConstants.ALL_INST.equalsIgnoreCase(matchingCriteria)) {
+                generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
+            } else if(RecapConstants.OCLC_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
+                generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
+            } else if(RecapConstants.ISBN_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
+                generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
+            } else if(RecapConstants.ISSN_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
+                generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
+            } else if(RecapConstants.LCCN_CRITERIA.equalsIgnoreCase(matchingCriteria)) {
+                generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, reportType, solrIndexRequest.getTransmissionType(), from, to);
+            }
         }
         String status = "The Generated Report File Name : " + generatedReportFileName;
+        stopWatch.stop();
+        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
         return status;
     }
 

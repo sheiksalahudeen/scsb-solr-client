@@ -17,11 +17,9 @@ import java.util.List;
  */
 public class ReCAPCSVMatchingRecordGenerator {
 
-    public MatchingReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity) {
+    public MatchingReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
-
-        MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = new MatchingReportReCAPCSVRecord();
 
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();

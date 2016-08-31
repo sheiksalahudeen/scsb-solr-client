@@ -1,6 +1,8 @@
 package org.recap.matchingAlgorithm.report;
 
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -17,28 +19,32 @@ import java.util.List;
 @Component
 public class ReportGenerator {
 
+    Logger logger = LoggerFactory.getLogger(ReportGenerator.class);
+
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
     List<ReportGeneratorInterface> reportGenerators;
 
     @Autowired
-    CSVExceptionReportGenerator csvExceptionReportGenerator;
+    CSVMatchingAndExceptionReportGenerator csvMatchingAndExceptionReportGenerator;
 
     @Autowired
-    CSVMatchingReportGenerator csvMatchingReportGenerator;
+    FTPMatchingAndExceptionReportGenerator ftpMatchingAndExceptionReportGenerator;
 
     @Autowired
-    FTPExceptionReportGenerator ftpExceptionReportGenerator;
+    CSVSummaryReportGenerator csvSummaryReportGenerator;
 
     @Autowired
-    FTPMatchingReportGenerator ftpMatchingReportGenerator;
+    FTPSummaryReportGenerator ftpSummaryReportGenerator;
 
     public String generateReport(String fileName, String reportType, String transmissionType, Date from, Date to) {
+
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
                 String generatedFileName = reportGeneratorInterface.generateReport(fileName, reportType, from, to);
+                logger.info("The Generated File Name is : " + generatedFileName);
                 return generatedFileName;
             }
         }
@@ -49,10 +55,10 @@ public class ReportGenerator {
     public List<ReportGeneratorInterface> getReportGenerators() {
         if(CollectionUtils.isEmpty(reportGenerators)) {
             reportGenerators = new ArrayList<>();
-            reportGenerators.add(csvExceptionReportGenerator);
-            reportGenerators.add(csvMatchingReportGenerator);
-            reportGenerators.add(ftpExceptionReportGenerator);
-            reportGenerators.add(ftpMatchingReportGenerator);
+            reportGenerators.add(csvMatchingAndExceptionReportGenerator);
+            reportGenerators.add(ftpMatchingAndExceptionReportGenerator);
+            reportGenerators.add(csvSummaryReportGenerator);
+            reportGenerators.add(ftpSummaryReportGenerator);
         }
         return reportGenerators;
     }
