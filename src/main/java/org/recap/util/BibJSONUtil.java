@@ -183,7 +183,13 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public String getTitle(Record marcRecord) {
-        return getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b'));
+        StringBuilder title=new StringBuilder();
+        title.append(getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b')));
+        title.append(getDataFieldValueStartsWith(marcRecord, "13", Arrays.asList('1')));
+        title.append(getDataFieldValueStartsWith(marcRecord, "73", Arrays.asList('a')));
+        title.append(getDataFieldValueStartsWith(marcRecord, "74", Arrays.asList('a')));
+        title.append(getDataFieldValueStartsWith(marcRecord, "83", Arrays.asList('a')));
+        return title.toString();
     }
 
     private String getTitleStartsWith(Record marcRecord){
@@ -201,7 +207,10 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     public String getAuthorDisplayValue(Record marcRecord) {
-        return getDataFieldValueStartsWith(marcRecord, "1", Arrays.asList('a', 'b'));
+        StringBuilder author = new StringBuilder();
+        author.append(getDataFieldValueStartsWith(marcRecord, "10", Arrays.asList('a')));
+        author.append(getDataFieldValueStartsWith(marcRecord, "11", Arrays.asList('a')));
+        return author.toString();
     }
 
     public List<String> getAuthorSearchValue(Record marcRecord) {
@@ -209,8 +218,10 @@ public class BibJSONUtil extends MarcUtil {
         List<String> fieldValues = null;
 
         Map<String, List<Character>> authorMap = new HashMap<>();
-        authorMap.put("1", Arrays.asList('a', 'b'));
-        authorMap.put("7", Arrays.asList('a', 'b'));
+        authorMap.put("10", Arrays.asList('a'));
+        authorMap.put("11", Arrays.asList('a'));
+        authorMap.put("70", Arrays.asList('a'));
+        authorMap.put("71", Arrays.asList('a'));
 
         for (Map.Entry<String, List<Character>> entry : authorMap.entrySet()) {
             fieldValues = getListOfDataFieldValuesStartsWith(marcRecord, entry.getKey(), entry.getValue());
