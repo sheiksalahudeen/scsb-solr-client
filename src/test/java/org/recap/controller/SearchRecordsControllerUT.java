@@ -2,18 +2,13 @@ package org.recap.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
-import org.recap.model.solr.Bib;
 import org.recap.model.solr.BibItem;
-import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.util.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +41,11 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
     @Mock
     HttpServletResponse httpServletResponse;
 
+    @InjectMocks
+    SearchRecordsController searchRecordsController = new SearchRecordsController();
+
     @Autowired
-    private SearchRecordsController searchRecordsController;
+    private SearchRecordsController recordsController;
 
     @Mock
     private BibSolrDocumentRepository bibSolrDocumentRepository;
@@ -134,7 +132,7 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
 
     @Test
     public void exportRecords() throws Exception {
-        byte[] fileContent = searchRecordsController.exportRecords(buildRequestWithResultRows(), httpServletResponse, bindingResult, model);
+        byte[] fileContent = recordsController.exportRecords(buildRequestWithResultRows(), httpServletResponse, bindingResult, model);
         assertNotNull(fileContent);
     }
 
