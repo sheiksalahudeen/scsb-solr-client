@@ -34,6 +34,9 @@ public class HoldingsEntity implements Serializable {
     @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
+    @Column(name = "OWNING_INST_ID")
+    private Integer owningInstitutionId;
+
     @Id
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
@@ -94,6 +97,14 @@ public class HoldingsEntity implements Serializable {
 
     public void setLastUpdatedBy(String lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Integer getOwningInstitutionId() {
+        return owningInstitutionId;
+    }
+
+    public void setOwningInstitutionId(Integer owningInstitutionId) {
+        this.owningInstitutionId = owningInstitutionId;
     }
 
     public String getOwningInstitutionHoldingsId() {
