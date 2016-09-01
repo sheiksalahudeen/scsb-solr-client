@@ -7,10 +7,12 @@ import org.recap.RecapConstants;
 import org.recap.model.csv.SummaryReportReCAPCSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by angelind on 31/8/16.
  */
+@Component
 public class FTPSummaryRecordRouteBuilder {
 
     @Autowired
