@@ -25,6 +25,9 @@ public class MatchingAlgorithmSaveReport {
 
     Logger logger = LoggerFactory.getLogger(MatchingAlgorithmSaveReport.class);
 
+    @Value("${solr.server.protocol}")
+    String solrServerProtocol;
+
     @Value("${solr.url}")
     String solrUrl;
 
@@ -40,7 +43,7 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         RestTemplate restTemplate = new RestTemplate();
-        String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.field=ISBN&facet.field=ISSN&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
+        String url = solrServerProtocol + solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.field=ISBN&facet.field=ISSN&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         if(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK")) {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());
@@ -72,7 +75,7 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         RestTemplate restTemplate = new RestTemplate();
-        String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.mincount=2&facet.limit=-1";
+        String url = solrServerProtocol + solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=OCLCNumber&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         if(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK")) {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());
@@ -99,7 +102,7 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         RestTemplate restTemplate = new RestTemplate();
-        String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISBN&facet.mincount=2&facet.limit=-1";
+        String url = solrServerProtocol + solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISBN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         if(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK")) {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());
@@ -126,7 +129,7 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         RestTemplate restTemplate = new RestTemplate();
-        String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISSN&facet.mincount=2&facet.limit=-1";
+        String url = solrServerProtocol + solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=ISSN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         if(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK")) {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());
@@ -153,7 +156,7 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         RestTemplate restTemplate = new RestTemplate();
-        String url = solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
+        String url = solrServerProtocol + solrUrl + "/" + solrParentCore + "/" + "query?q=DocType:Bib&wt=json&facet=true&facet.field=LCCN&facet.mincount=2&facet.limit=-1";
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         if(responseEntity.getStatusCode().getReasonPhrase().equalsIgnoreCase("OK")) {
             JSONObject responseJsonObject = new JSONObject(responseEntity.getBody());

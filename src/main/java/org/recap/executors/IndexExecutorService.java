@@ -30,6 +30,9 @@ public abstract class IndexExecutorService {
     @Value("${solr.url}")
     String solrUrl;
 
+    @Value("${solr.parent.core}")
+    String solrCore;
+
     @Value("${bib.rest.url}")
     public String bibResourceURL;
 
@@ -73,17 +76,13 @@ public abstract class IndexExecutorService {
                 }
                 logger.info("Number of callables to execute to merge indexes : " + callableCountByMergeInterval);
 
-                List<String> coreNames = new ArrayList<>();
-                setupCoreNames(numThreads, coreNames);
-                solrAdmin.createSolrCores(coreNames);
-
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
 
                 int coreNum = 0;
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                    Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId);
+                    Callable callable = getCallable(solrCore, pageNum, docsPerThread, owningInstitutionId);
                     callables.add(callable);
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
@@ -119,21 +118,14 @@ public abstract class IndexExecutorService {
                             e.printStackTrace();
                         }
                     }
-                    solrAdmin.mergeCores(coreNames);
-                    logger.info("Solr core status : " + solrAdmin.getCoresStatus());
-                    while (solrAdmin.getCoresStatus() != 0) {
-                        logger.info("Solr core status : " + solrAdmin.getCoresStatus());
-                    }
-                    deleteTempIndexes(coreNames, solrUrl);
-                    logger.info("Num of Bibs Processed and merged to main core on merge interval : " + numOfBibsProcessed);
-                    logger.info("Total Num of Bibs Processed and merged to main core : " + totalBibsProcessed);
+                    logger.info("Num of Bibs Processed and indexed to core on merge interval : " + numOfBibsProcessed);
+                    logger.info("Total Num of Bibs Processed and indexed to core : " + totalBibsProcessed);
                 }
 
                 logger.info("Total futures executed: " + futureCount);
                 logger.info("Total Bibs Processed : " + totalBibsProcessed);
                 stopWatch.stop();
                 logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
-                solrAdmin.unLoadCores(coreNames);
                 executorService.shutdown();
             } else {
                 logger.info("No records found to index for the criteria");

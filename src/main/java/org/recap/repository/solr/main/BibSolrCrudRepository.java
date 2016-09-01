@@ -30,4 +30,6 @@ public interface BibSolrCrudRepository extends SolrCrudRepository<Bib, String> {
     List<Bib> findByTitleDisplayAndIssn(String titleDisplay, String issn);
 
     List<Bib> findByTitleDisplayAndLccn(String titleDisplay, String lccn);
+
+    Long countByDocType(String docType);
 }
