@@ -15,4 +15,6 @@ public interface ItemCrudRepository extends SolrCrudRepository<Item, String> {
     Item findByItemId(Integer itemId);
 
     List<Item> findByCollectionGroupDesignationAndItemIdIn(String collectionGroupDesignation, List<Integer> itemIds);
+
+    Long countByItemId(Integer itemId);
 }

@@ -11,8 +11,6 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.SolrIndexRequest;
-import org.recap.repository.solr.main.BibSolrCrudRepository;
-import org.recap.repository.solr.main.ItemCrudRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,16 +47,13 @@ public class ExecutorAT extends BaseTestCase {
     BibItemIndexExecutorService bibItemIndexExecutorService;
 
     @Autowired
-    BibSolrCrudRepository bibCrudRepository;
-
-    @Autowired
     ItemIndexExecutorService itemIndexExecutorService;
-
-    @Autowired
-    ItemCrudRepository itemCrudRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${solr.server.protocol}")
+    String solrServerProtocol;
 
     @Value("${solr.url}")
     String solrUrl;
@@ -67,9 +62,9 @@ public class ExecutorAT extends BaseTestCase {
     SolrTemplate solrTemplate;
 
     private int numThreads = 5;
-    private int docsPerThread = 1000;
+    private int docsPerThread = 10000;
 
-    @Before
+
     public void unloadCores() throws Exception {
 
         CoreAdminRequest coreAdminRequest = solrAdmin.getCoreAdminRequest();
@@ -101,7 +96,7 @@ public class ExecutorAT extends BaseTestCase {
         solrIndexRequest.setNumberOfDocs(docsPerThread);
         solrIndexRequest.setOwningInstitutionId(null);
         unloadCores();
-        bibCrudRepository.deleteAll();
+        bibSolrCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         bibIndexExecutorService.index(solrIndexRequest);
@@ -117,7 +112,7 @@ public class ExecutorAT extends BaseTestCase {
         solrIndexRequest.setNumberOfDocs(docsPerThread);
         solrIndexRequest.setOwningInstitutionId(null);
         unloadCores();
-        bibCrudRepository.deleteAll();
+        bibSolrCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -133,7 +128,7 @@ public class ExecutorAT extends BaseTestCase {
         solrIndexRequest.setNumberOfDocs(docsPerThread);
         solrIndexRequest.setOwningInstitutionId(3);
         unloadCores();
-        bibCrudRepository.deleteAll();
+        bibSolrCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         bibIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
@@ -146,15 +141,10 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(3);
-        unloadCores();
-        bibCrudRepository.deleteAll();
+        solrIndexRequest.setOwningInstitutionId(2);
+        bibSolrCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        bibItemIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
-        stopWatch.stop();
-        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+        indexDocuments(solrIndexRequest);
     }
 
     @Test
@@ -188,7 +178,7 @@ public class ExecutorAT extends BaseTestCase {
     //Added for ReCAP-111 jira, test will be failing until duplicate issue is fixed.
     @Test
     public void testDuplicateRecordsIndexed() throws Exception {
-        bibCrudRepository.deleteAll();
+        bibSolrCrudRepository.deleteAll();
         URL resource = getClass().getResource("BibContentToCheckDuplicateRecords.xml");
         File bibContentFile = new File(resource.toURI());
         String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
@@ -214,14 +204,14 @@ public class ExecutorAT extends BaseTestCase {
 
         Integer bibliographicId = fetchedBibliographicEntity.getBibliographicId();
 
-        Long countOnSingleIndex = bibCrudRepository.countByBibId(bibliographicId);
+        Long countOnSingleIndex = bibSolrCrudRepository.countByBibId(bibliographicId);
         assertEquals(countOnSingleIndex, new Long(1));
 
         Thread.sleep(1000);
 
         performIndex(fetchedBibliographicEntity);
 
-        Long countOnDoubleIndex = bibCrudRepository.countByBibId(bibliographicId);
+        Long countOnDoubleIndex = bibSolrCrudRepository.countByBibId(bibliographicId);
         assertEquals(countOnDoubleIndex, new Long(1));
 
     }
@@ -243,7 +233,7 @@ public class ExecutorAT extends BaseTestCase {
             bibsToIndex.add(bib);
         }
 
-        BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreNames.get(0), solrUrl);
+        BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreNames.get(0), solrServerProtocol + solrUrl);
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
@@ -257,6 +247,31 @@ public class ExecutorAT extends BaseTestCase {
         bibCrudRepositoryMultiCoreSupport.deleteAll();
         solrAdmin.unLoadCores(coreNames);
         executorService.shutdown();
+    }
+
+    @Test
+    public void testUpdateIndexes() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setOwningInstitutionId(3);
+        bibSolrCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
+        indexDocuments(solrIndexRequest);
+        Thread.sleep(2000);
+        long firstCount = bibSolrCrudRepository.countByDocType("Bib");
+        indexDocuments(solrIndexRequest);
+        Thread.sleep(2000);
+        long secondCount = bibSolrCrudRepository.countByDocType("Bib");
+        assertEquals(firstCount, secondCount);
+    }
+
+    private void indexDocuments(SolrIndexRequest solrIndexRequest) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        bibItemIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
+        stopWatch.stop();
+        System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
 
 }

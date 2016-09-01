@@ -19,6 +19,9 @@ import java.io.File;
 @EnableSolrRepositories(value = "org.recap.repository.solr.main", multicoreSupport = true)
 public class Main {
 
+	@Value("${solr.server.protocol}")
+	String solrServerProtocol;
+
 	@Value("${solr.url}")
 	String solrUrl;
 
@@ -30,12 +33,12 @@ public class Main {
 
 	@Bean
 	public SolrClient solrAdminClient() {
-		return new HttpSolrClient(solrUrl);
+		return new HttpSolrClient(solrServerProtocol + solrUrl);
 	}
 
 	@Bean
 	public SolrClient solrClient() {
-		String baseURLForParentCore = solrUrl + File.separator + solrParentCore;
+		String baseURLForParentCore = solrServerProtocol + solrUrl + File.separator + solrParentCore;
 		return new HttpSolrClient(baseURLForParentCore);
 	}
 

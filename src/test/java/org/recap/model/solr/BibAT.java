@@ -282,5 +282,112 @@ public class BibAT extends BaseTestCase {
         return new File(resource.toURI());
     }
 
+    @Test
+    public void testBoundWithSolrDocs() throws Exception {
+        Random random = new Random();
+        List<Bib> bibs = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        List<String> issnList = new ArrayList<>();
+        List<String>isbnList = new ArrayList<>();
+        List<String> oclcNumberList = new ArrayList<>();
+        issnList.add("0394469756");
+        isbnList.add("0394469755");
+        oclcNumberList.add("00133182");
+        oclcNumberList.add("00440790");
+
+        Integer bibId1 = random.nextInt();
+        Integer itemId1 = random.nextInt();
+
+        Bib bib1 = new Bib();
+        bib1.setBibId(bibId1);
+        bib1.setDocType("Bib");
+        bib1.setTitle("Test Bib Doc 1");
+        String[] titleTokened1 = bib1.getTitle().split(" ");
+        bib1.setTitleStartsWith("^"+titleTokened1[0]);
+        bib1.setAuthorDisplay("Nancy L");
+        bib1.setPublisher("McClelland & Stewart, limited");
+        bib1.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib1.setIssn(issnList);
+        bib1.setIsbn(isbnList);
+        bib1.setOclcNumber(oclcNumberList);
+        bib1.setPublicationDate("1960");
+        bib1.setMaterialType("Material Type 1");
+        bib1.setNotes("Bibliographical footnotes 1");
+        bib1.setOwningInstitution("CUL");
+        bib1.setSubject("Arab countries Politics and government.");
+        bib1.setPublicationPlace("Paris");
+        bib1.setLccn("71448228");
+        bib1.setHoldingsIdList(Arrays.asList(201));
+        bib1.setBibItemIdList(Arrays.asList(itemId1));
+
+        Integer bibId2 = random.nextInt();
+
+        Bib bib2 = new Bib();
+        bib2.setBibId(bibId2);
+        bib2.setDocType("Bib");
+        bib2.setTitle("Test Bib Doc 2");
+        String[] titleTokened2 = bib2.getTitle().split(" ");
+        bib2.setTitleStartsWith("^"+titleTokened2[0]);
+        bib2.setAuthorDisplay("Nancy L");
+        bib2.setPublisher("McClelland & Stewart, limited");
+        bib2.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib2.setIssn(issnList);
+        bib2.setIsbn(isbnList);
+        bib2.setOclcNumber(oclcNumberList);
+        bib2.setPublicationDate("1960");
+        bib2.setMaterialType("Material Type 2");
+        bib2.setNotes("Bibliographical footnotes 2");
+        bib2.setOwningInstitution("CUL");
+        bib2.setSubject("Arab countries Politics and government.");
+        bib2.setPublicationPlace("Paris");
+        bib2.setLccn("71448229");
+        bib2.setHoldingsIdList(Arrays.asList(202));
+        bib2.setBibItemIdList(Arrays.asList(itemId1));
+
+        Item item1 = new Item();
+        item1.setItemId(itemId1);
+        item1.setDocType("Item");
+        item1.setBarcode("1201");
+        item1.setAvailability("Available");
+        item1.setCollectionGroupDesignation("Shared");
+        item1.setCallNumber("H3");
+        item1.setCustomerCode("Test Cust Code");
+        item1.setSummaryHoldings("test SH");
+        item1.setUseRestriction("In Library Use");
+        item1.setVolumePartYear("V.1 1982");
+        item1.setItemBibIdList(Arrays.asList(bibId1, bibId2));
+        item1.setHoldingsIdList(Arrays.asList(201, 202));
+
+        Item item2 = new Item();
+        item2.setItemId(itemId1);
+        item2.setDocType("Item");
+        item2.setBarcode("1201");
+        item2.setAvailability("Available");
+        item2.setCollectionGroupDesignation("Shared");
+        item2.setCallNumber("H3");
+        item2.setCustomerCode("Test Cust Code");
+        item2.setSummaryHoldings("test SH");
+        item2.setUseRestriction("In Library Use");
+        item2.setVolumePartYear("V.1 1982");
+        item2.setItemBibIdList(Arrays.asList(bibId1, bibId2));
+        item2.setHoldingsIdList(Arrays.asList(201, 202));
+
+
+        bibs.add(bib1);
+        bibs.add(bib2);
+        items.add(item1);
+        items.add(item2);
+
+        bibSolrCrudRepository.save(bib1);
+        itemCrudRepository.save(item1);
+        bibSolrCrudRepository.save(bib2);
+        itemCrudRepository.save(item2);
+        solrTemplate.commit();
+        Thread.sleep(2000);
+
+        Long countByItemId = itemCrudRepository.countByItemId(itemId1);
+        assertNotNull(countByItemId);
+        assertEquals("1", String.valueOf(countByItemId));
+    }
 
 }
