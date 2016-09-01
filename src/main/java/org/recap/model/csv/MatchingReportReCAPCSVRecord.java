@@ -4,12 +4,14 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
+import java.io.Serializable;
+
 /**
  * Created by angelind on 22/8/16.
  */
 
-@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
-public class MatchingReportReCAPCSVRecord implements Comparable<MatchingReportReCAPCSVRecord>{
+@CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
+public class MatchingReportReCAPCSVRecord implements Serializable{
 
     @DataField(pos = 1)
     private String bibId;
@@ -123,7 +125,7 @@ public class MatchingReportReCAPCSVRecord implements Comparable<MatchingReportRe
         this.localBibId = localBibId;
     }
 
-    public int compareTo(MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
+    /*public int compareTo(MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
         return title.compareToIgnoreCase(matchingReportReCAPCSVRecord.getTitle());
-    }
+    }*/
 }

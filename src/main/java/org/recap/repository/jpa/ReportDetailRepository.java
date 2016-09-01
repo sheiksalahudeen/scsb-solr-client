@@ -34,13 +34,4 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
 
     @Query(value = "select * from report_t where INSTITUTION_NAME=?1 and TYPE=?2 and CREATED_DATE >= ?3 and CREATED_DATE <= ?4", nativeQuery = true)
     List<ReportEntity> findByInstitutionAndTypeAndDateRange(String institutionName, String type, Date from, Date to);
-
-    @Query(value = "select HEADER_VALUE from REPORT_DATA_T where HEADER_NAME=?1 group by HEADER_VALUE having count(HEADER_VALUE) > 1", nativeQuery = true)
-    List<String> groupByHeaderValueHavingCountMoreThanOne(String headerName);
-
-    @Query(value = "select HEADER_VALUE from REPORT_DATA_T where HEADER_NAME=?1 group by HEADER_VALUE having count(HEADER_VALUE) = 1", nativeQuery = true)
-    List<String> groupByHeaderValueHavingCountEqualsOne(String headerName);
-
-    @Query(value = "select * from report_t where FILE_NAME=?1 and type=?2 and created_date between ?3 and ?4 and RECORD_NUM in (select RECORD_NUM from report_data_t where HEADER_NAME=?5 and HEADER_VALUE=?6)" , nativeQuery = true)
-    List<ReportEntity> fetchReportEntityBasedOnHeaderValue(String fileName, String type, Date from, Date to, String headerName, String headerValue);
 }

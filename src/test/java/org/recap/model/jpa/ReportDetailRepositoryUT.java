@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by SheikS on 8/8/2016.
@@ -225,51 +223,6 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         List<ReportEntity> reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
         assertNotNull(reportEntities.get(0));
-    }
-
-    @Test
-    public void testGroupByHeaderValueHavingCountMoreThanOne() throws Exception {
-        ReportEntity reportEntity1 = saveReportEntity();
-        ReportEntity reportEntity2 = saveReportEntity();
-        ReportEntity reportEntity3 = saveReportEntity();
-
-        List<String> barcodeList = reportDetailRepository.groupByHeaderValueHavingCountMoreThanOne(RecapConstants.MATCHING_BARCODE);
-        assertNotNull(barcodeList);
-        assertTrue(barcodeList.size() > 1);
-    }
-
-    @Test
-    public void testGroupByHeaderValueHavingCountEqualsOne() throws Exception {
-        ReportEntity reportEntity1 = saveReportEntity();
-
-        List<String> barcodeList = reportDetailRepository.groupByHeaderValueHavingCountEqualsOne(RecapConstants.MATCHING_BARCODE);
-        assertNotNull(barcodeList);
-        assertNotNull(barcodeList.get(0));
-    }
-
-    @Test
-    public void testFetchReportEntityBasedOnHeaderValue() throws Exception {
-        ReportEntity reportEntity1 = saveReportEntity();
-        ReportEntity reportEntity2 = saveReportEntity();
-
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity1.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity1.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
-
-        List<ReportEntity> reportEntities = reportDetailRepository.fetchReportEntityBasedOnHeaderValue(reportEntity1.getFileName(), reportEntity1.getType(), from, to, RecapConstants.MATCHING_BARCODE, "103");
-        assertNotNull(reportEntities);
-        assertEquals(reportEntities.size(), 2);
-
     }
 
 }

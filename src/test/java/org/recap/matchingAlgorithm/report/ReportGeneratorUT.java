@@ -1,6 +1,5 @@
 package org.recap.matchingAlgorithm.report;
 
-import org.springframework.util.StopWatch;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
@@ -9,6 +8,7 @@ import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StopWatch;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         reportDataEntities.add(reportDataEntity3);
 
         ReportDataEntity reportDataEntity4 = new ReportDataEntity();
-        reportDataEntity4.setHeaderName(RecapConstants.MATCH_POINT_CONTENT);
+        reportDataEntity4.setHeaderName(RecapConstants.MATCHING_OCLC);
         reportDataEntity4.setHeaderValue("213654");
         reportDataEntities.add(reportDataEntity4);
 

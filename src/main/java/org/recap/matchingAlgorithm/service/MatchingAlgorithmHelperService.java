@@ -1,23 +1,27 @@
 package org.recap.matchingAlgorithm.service;
 
+import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.recap.RecapConstants;
-import org.recap.model.csv.MatchingReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
-import org.recap.util.ReCAPCSVMatchingRecordGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 
 import java.util.*;
 
@@ -27,6 +31,8 @@ import java.util.*;
 @Service
 public class MatchingAlgorithmHelperService {
 
+    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmHelperService.class);
+
     @Autowired
     public BibSolrCrudRepository bibCrudRepository;
 
@@ -35,6 +41,12 @@ public class MatchingAlgorithmHelperService {
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
+
+    @Autowired
+    public BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    public ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
     ProducerTemplate producer;
@@ -53,7 +65,7 @@ public class MatchingAlgorithmHelperService {
         return bibs;
     }
 
-    private String getTitleToMatch(String title) {
+    public String getTitleToMatch(String title) {
         String titleToMatch = "";
         if(StringUtils.isNotBlank(title)) {
             String[] titleArray = title.split(" ");
@@ -173,8 +185,8 @@ public class MatchingAlgorithmHelperService {
         return owningInstitutionMap;
     }
 
-    public void populateAndSaveReportEntity(String fieldName, String fieldValue, Bib bib, String fileName, String type) {
-        List<ReportEntity> reportEntities = new ArrayList<>();
+    public Map<String, ReportEntity> populateReportEntity(String fieldName, String fieldValue, Bib bib, String fileName, String type) {
+        Map<String, ReportEntity> reportEntityMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bib.getBibItemIdList())) {
             List<Item> itemList = itemCrudRepository.findByCollectionGroupDesignationAndItemIdIn(RecapConstants.SHARED_CGD, bib.getBibItemIdList());
             for (Item item : itemList) {
@@ -193,10 +205,12 @@ public class MatchingAlgorithmHelperService {
                         owningInstBibIdReportDataEntity.setHeaderValue(bib.getOwningInstitutionBibId());
                         reportDataEntities.add(owningInstBibIdReportDataEntity);
                     }
-                    if(StringUtils.isNotBlank(bib.getTitle())) {
+                    String titleDisplay = bib.getTitleDisplay();
+                    if(StringUtils.isNotBlank(titleDisplay)) {
                         ReportDataEntity titleReportDataEntity = new ReportDataEntity();
                         titleReportDataEntity.setHeaderName(RecapConstants.MATCHING_TITLE);
-                        titleReportDataEntity.setHeaderValue(bib.getTitleDisplay());
+                        String headerValue = checkAndTruncateHeaderValue(titleDisplay);
+                        titleReportDataEntity.setHeaderValue(headerValue);
                         reportDataEntities.add(titleReportDataEntity);
                     }
                     if(StringUtils.isNotBlank(item.getBarcode())) {
@@ -217,100 +231,148 @@ public class MatchingAlgorithmHelperService {
                         useRestrictionsReportDataEntity.setHeaderValue(item.getUseRestriction());
                         reportDataEntities.add(useRestrictionsReportDataEntity);
                     }
-                    if(StringUtils.isNotBlank(item.getSummaryHoldings())) {
+                    String summaryHoldings = item.getSummaryHoldings();
+                    if(StringUtils.isNotBlank(summaryHoldings)) {
                         ReportDataEntity summaryHoldingsReportDataEntity = new ReportDataEntity();
                         summaryHoldingsReportDataEntity.setHeaderName(RecapConstants.MATCHING_SUMMARY_HOLDINGS);
-                        summaryHoldingsReportDataEntity.setHeaderValue(item.getSummaryHoldings());
+                        String headerValue = checkAndTruncateHeaderValue(summaryHoldings);
+                        summaryHoldingsReportDataEntity.setHeaderValue(headerValue);
                         reportDataEntities.add(summaryHoldingsReportDataEntity);
                     }
-                    if(type.equals(RecapConstants.EXCEPTION_TYPE)) {
-                        ReportDataEntity matchingPointReportDataEntity = getMatchPointTagEntity(fieldName, fieldValue);
-                        reportDataEntities.add(matchingPointReportDataEntity);
-                        ReportDataEntity matchingContentReportDataEntity = new ReportDataEntity();
-                        matchingContentReportDataEntity.setHeaderName(RecapConstants.MATCH_POINT_CONTENT);
-                        matchingContentReportDataEntity.setHeaderValue(fieldValue);
-                        reportDataEntities.add(matchingContentReportDataEntity);
-                    } else {
-                        ReportDataEntity matchingFieldReportDataEntity = getMatchingFieldEntity(fieldName, fieldValue);
-                        reportDataEntities.add(matchingFieldReportDataEntity);
-                    }
+                    ReportDataEntity matchingFieldReportDataEntity = getMatchingFieldEntity(fieldName, fieldValue);
+                    reportDataEntities.add(matchingFieldReportDataEntity);
                     reportEntity.setFileName(fileName);
                     reportEntity.setInstitutionName(RecapConstants.ALL_INST);
                     reportEntity.setType(type);
                     reportEntity.setCreatedDate(new Date());
                     reportEntity.setReportDataEntities(reportDataEntities);
-                    reportEntities.add(reportEntity);
+                    reportEntityMap.put(item.getBarcode(), reportEntity);
                 }
             }
         }
+        return reportEntityMap;
+    }
+
+    private String checkAndTruncateHeaderValue(String headerValue) {
+        if(headerValue.length() > 7999) {
+            String headerValueSubString = headerValue.substring(0, 7996);
+            headerValueSubString = headerValueSubString.concat("...");
+            return headerValueSubString;
+        }
+        return headerValue;
+    }
+
+    public void saveExceptionReportEntity(Map<Integer, Map<String, ReportEntity>> exceptionReportEntityMap) {
+        saveMatchingAndExceptionReportEntity(exceptionReportEntityMap);
+    }
+
+    public void saveMatchingReportEntity(Map<Integer, Map<String, ReportEntity>> matchingReportEntityMap) {
+        saveMatchingAndExceptionReportEntity(matchingReportEntityMap);
+    }
+
+    public void saveMatchingAndExceptionReportEntity(Map<Integer, Map<String, ReportEntity>> reportEntityMap) {
+        List<ReportEntity> reportEntities = new ArrayList<>();
+        for(Integer bibId : reportEntityMap.keySet()) {
+            Map<String, ReportEntity> barcodeReportEntityMap = reportEntityMap.get(bibId);
+            for(String barcode : barcodeReportEntityMap.keySet()) {
+                reportEntities.add(barcodeReportEntityMap.get(barcode));
+            }
+        }
+
         if(!CollectionUtils.isEmpty(reportEntities)) {
-            producer.sendBody(RecapConstants.MATCHING_ALGO_Q, reportEntities);
+            int size = reportEntities.size();
+            logger.info("Total Num of Report Entities : " + size);
+            List<List<ReportEntity>> reportEntityPartitions = Lists.partition(reportEntities, 1000);
+
+            for(List<ReportEntity> reportEntityList : reportEntityPartitions) {
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
+                saveReportEntities(reportEntityList);
+                stopWatch.stop();
+                logger.info("Total time taken to save 1000 reportEntities : " + stopWatch.getTotalTimeSeconds());
+            }
         }
     }
 
-    private ReportDataEntity getMatchPointTagEntity(String fieldName, String fieldValue) {
-        ReportDataEntity reportDataEntity = new ReportDataEntity();
-        reportDataEntity.setHeaderName(RecapConstants.MATCH_POINT_TAG);
+    public void saveReportEntities(List<ReportEntity> reportEntityList) {
+        try{
+            reportDetailRepository.save(reportEntityList);
+        } catch (Exception ex) {
+            for(ReportEntity reportEntity : reportEntityList) {
+                try {
+                    reportDetailRepository.save(reportEntity);
+                } catch (Exception e) {
+                    ReportEntity exceptionReportEntity = new ReportEntity();
+                    exceptionReportEntity.setType(RecapConstants.MATCHING_EXCEPTION_OCCURED);
+                    exceptionReportEntity.setCreatedDate(new Date());
+                    exceptionReportEntity.setInstitutionName(RecapConstants.ALL_INST);
+                    exceptionReportEntity.setFileName(RecapConstants.MATCHING_EXCEPTION_OCCURED);
+
+                    ReportDataEntity reportDataEntity = new ReportDataEntity();
+                    reportDataEntity.setHeaderName(RecapConstants.EXCEPTION_MSG);
+                    reportDataEntity.setHeaderValue(e.getCause().getCause().getMessage());
+                    exceptionReportEntity.setReportDataEntities(Arrays.asList(reportDataEntity));
+                    reportDetailRepository.save(exceptionReportEntity);
+                }
+            }
+        }
+    }
+
+    public void saveSummaryReportEntity(Map<String, Integer> oclcCountMap, Map<String, Integer> isbnCountMap, Map<String, Integer> issnCountMap, Map<String, Integer> lccnCountMap) {
+        List<ReportEntity> reportEntities = new ArrayList<>();
+        reportEntities.add(getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_FILE_NAME));
+        reportEntities.add(getSummaryReportEntity(isbnCountMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
+        reportEntities.add(getSummaryReportEntity(issnCountMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
+        reportEntities.add(getSummaryReportEntity(lccnCountMap, RecapConstants.MATCH_POINT_FIELD_LCCN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
+        saveReportEntities(reportEntities);
+    }
+
+    public ReportEntity getSummaryReportEntity(Map<String, Integer> countMap, String fieldName, String fileName) {
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setFileName(fileName);
+        reportEntity.setType(RecapConstants.SUMMARY_TYPE);
+        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+
+        ReportDataEntity bibsInTableDataEntity = new ReportDataEntity();
+        bibsInTableDataEntity.setHeaderName(RecapConstants.SUMMARY_NUM_BIBS_IN_TABLE);
+        bibsInTableDataEntity.setHeaderValue(String.valueOf(bibliographicDetailsRepository.count()));
+        reportDataEntities.add(bibsInTableDataEntity);
+
+        ReportDataEntity itemsInTableDataEntity = new ReportDataEntity();
+        itemsInTableDataEntity.setHeaderName(RecapConstants.SUMMARY_NUM_ITEMS_IN_TABLE);
+        itemsInTableDataEntity.setHeaderValue(String.valueOf(itemDetailsRepository.count()));
+        reportDataEntities.add(itemsInTableDataEntity);
+
+        ReportDataEntity matchingKeyFieldDataEntity = new ReportDataEntity();
+        matchingKeyFieldDataEntity.setHeaderName(RecapConstants.SUMMARY_MATCHING_KEY_FIELD);
+        matchingKeyFieldDataEntity.setHeaderValue(getMatchPointTagEntity(fieldName));
+        reportDataEntities.add(matchingKeyFieldDataEntity);
+
+        ReportDataEntity matchedBibCountDataEntity = new ReportDataEntity();
+        matchedBibCountDataEntity.setHeaderName(RecapConstants.SUMMARY_MATCHING_BIB_COUNT);
+        matchedBibCountDataEntity.setHeaderValue(String.valueOf(countMap.get(RecapConstants.BIB_COUNT)));
+        reportDataEntities.add(matchedBibCountDataEntity);
+
+        ReportDataEntity matchedItemCountDataEntity = new ReportDataEntity();
+        matchedItemCountDataEntity.setHeaderName(RecapConstants.SUMMARY_NUM_ITEMS_AFFECTED);
+        matchedItemCountDataEntity.setHeaderValue(String.valueOf(countMap.get(RecapConstants.ITEM_COUNT)));
+        reportDataEntities.add(matchedItemCountDataEntity);
+
+        reportEntity.addAll(reportDataEntities);
+        return reportEntity;
+    }
+
+    private String getMatchPointTagEntity(String fieldName) {
         if(fieldName.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-            reportDataEntity.setHeaderValue(RecapConstants.OCLC_TAG);
+            return RecapConstants.OCLC_TAG;
         } else if(fieldName.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-            reportDataEntity.setHeaderValue(RecapConstants.ISBN_TAG);
+            return RecapConstants.ISBN_TAG;
         } else if(fieldName.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-            reportDataEntity.setHeaderValue(RecapConstants.ISSN_TAG);
+            return RecapConstants.ISSN_TAG;
         } else {
-            reportDataEntity.setHeaderValue(RecapConstants.LCCNN_TAG);
-        }
-        return reportDataEntity;
-    }
-
-    public void getMultipleMatchPointMatchRecords(String fileName, String type, Date from, Date to, List<MatchingReportReCAPCSVRecord> matchingReportReCAPCSVRecords) {
-        ReCAPCSVMatchingRecordGenerator reCAPCSVMatchingRecordGenerator = new ReCAPCSVMatchingRecordGenerator();
-        List<String> barcodesHavingMoreThanOneCount = reportDetailRepository.groupByHeaderValueHavingCountMoreThanOne(RecapConstants.MATCHING_BARCODE);
-        if(!CollectionUtils.isEmpty(barcodesHavingMoreThanOneCount)) {
-            for(String barcode : barcodesHavingMoreThanOneCount) {
-                Map<String,List<ReportDataEntity>> reportDataEntityMap = new HashMap<>();
-                List<ReportEntity> reportEntities = reportDetailRepository.fetchReportEntityBasedOnHeaderValue(fileName, type, from, to, RecapConstants.MATCHING_BARCODE, barcode);
-                if(!CollectionUtils.isEmpty(reportEntities)) {
-                    for(ReportEntity reportEntityFromDB : reportEntities) {
-                        List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
-                        for (ReportDataEntity reportDataEntity : reportEntityFromDB.getReportDataEntities()) {
-                            if(RecapConstants.MATCHING_LOCAL_BIB_ID.equalsIgnoreCase(reportDataEntity.getHeaderName())) {
-                                String headerValue = reportDataEntity.getHeaderValue();
-                                if(reportDataEntityMap.containsKey(headerValue)) {
-                                    reportDataEntityList.addAll(reportDataEntityMap.get(headerValue));
-                                }
-                                reportDataEntityList.addAll(reportEntityFromDB.getReportDataEntities());
-                                reportDataEntityMap.put(headerValue, reportDataEntityList);
-                                break;
-                            }
-                        }
-                    }
-                    for(String localBibId : reportDataEntityMap.keySet()) {
-                        ReportEntity reportEntity = new ReportEntity();
-                        if(!CollectionUtils.isEmpty(reportDataEntityMap.get(localBibId))) {
-                            reportEntity.addAll(reportDataEntityMap.get(localBibId));
-                            MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity);
-                            matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void getSingleMatchPointMatchRecords(String fileName, String type, Date from, Date to, List<MatchingReportReCAPCSVRecord> matchingReportReCAPCSVRecords) {
-        ReCAPCSVMatchingRecordGenerator reCAPCSVMatchingRecordGenerator = new ReCAPCSVMatchingRecordGenerator();
-        List<String> barcodesHavingOnlyOneCount = reportDetailRepository.groupByHeaderValueHavingCountEqualsOne(RecapConstants.MATCHING_BARCODE);
-        if(!CollectionUtils.isEmpty(barcodesHavingOnlyOneCount)) {
-            for(String barcode : barcodesHavingOnlyOneCount) {
-                List<ReportEntity> reportEntities = reportDetailRepository.fetchReportEntityBasedOnHeaderValue(fileName, type, from, to, RecapConstants.MATCHING_BARCODE, barcode);
-                if(!CollectionUtils.isEmpty(reportEntities)) {
-                    for(ReportEntity reportEntity : reportEntities) {
-                        MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity);
-                        matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
-                    }
-                }
-            }
+            return RecapConstants.LCCN_TAG;
         }
     }
 }
