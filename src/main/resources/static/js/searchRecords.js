@@ -3,7 +3,9 @@
  */
 
 jQuery(document).ready(function ($) {
-    $("#searchResults").tablesorter();
+    $("#searchResults").tablesorter({
+        sortList: [[1,0]]
+    });
 });
 
 function showItems(resultRowIndex) {
