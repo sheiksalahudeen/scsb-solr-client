@@ -81,7 +81,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
         Criteria criteria = null;
         String fieldName = searchRecordsRequest.getFieldName();
-        String fieldValue = searchRecordsRequest.getFieldValue();
+        String fieldValue = searchRecordsRequest.getFieldValue().trim();
 
         if (StringUtils.isBlank(fieldName) && StringUtils.isBlank(fieldValue)) {
             criteria = new Criteria().expression(RecapConstants.ALL);
