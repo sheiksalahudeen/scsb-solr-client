@@ -186,7 +186,6 @@ public class BibJSONUtilUT extends BaseTestCase{
         List items = bibItemMap.get("Item");
         assertNotNull(bibs);
         Bib bib = (Bib)bibs.get(0);
-        assertEquals("al-Baḥrayn",bib.getTitleStartsWith());
         assertEquals(bibs.size(), 1);
         assertNotNull(items);
         assertEquals(items.size(), 1);
