@@ -212,7 +212,6 @@ public class BibAT extends BaseTestCase {
         bib.setTitle("Test Bib 1");
         bib.setBarcode("1");
         String[] titleTokened = bib.getTitle().split(" ");
-        bib.setTitleStartsWith("^"+titleTokened[0]);
         bib.setAuthorDisplay("Nancy L");
         bib.setPublisher("McClelland & Stewart, limited");
         bib.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
@@ -235,7 +234,6 @@ public class BibAT extends BaseTestCase {
         bib1.setTitle("Bib Test 1");
         bib1.setBarcode("1");
         String[] titleTokened1 = bib1.getTitle().split(" ");
-        bib1.setTitleStartsWith("^"+titleTokened1[0]);
         bib1.setAuthorDisplay("Hoepli");
         bib1.setPublisher("Tata, limited");
         bib1.setImprint("Tata, limited [c1926]");
@@ -303,7 +301,6 @@ public class BibAT extends BaseTestCase {
         bib1.setDocType("Bib");
         bib1.setTitle("Test Bib Doc 1");
         String[] titleTokened1 = bib1.getTitle().split(" ");
-        bib1.setTitleStartsWith("^"+titleTokened1[0]);
         bib1.setAuthorDisplay("Nancy L");
         bib1.setPublisher("McClelland & Stewart, limited");
         bib1.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
@@ -327,7 +324,6 @@ public class BibAT extends BaseTestCase {
         bib2.setDocType("Bib");
         bib2.setTitle("Test Bib Doc 2");
         String[] titleTokened2 = bib2.getTitle().split(" ");
-        bib2.setTitleStartsWith("^"+titleTokened2[0]);
         bib2.setAuthorDisplay("Nancy L");
         bib2.setPublisher("McClelland & Stewart, limited");
         bib2.setImprint("Toronto, McClelland & Stewart, limited [c1926]");

@@ -92,7 +92,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
                 String[] splitedTitle = fieldValue.split(" ");
-                criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith(splitedTitle[0]);
+                criteria = new Criteria(RecapConstants.TITLE).startsWith(splitedTitle[0]);
             } else {
                 criteria = new Criteria(fieldName).is(fieldValue);
             }

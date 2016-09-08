@@ -87,9 +87,6 @@ public class Bib {
     @Field("LeaderMaterialType")
     private String leaderMaterialType;
 
-    @Field("TitleStartsWith")
-    private String titleStartsWith;
-
     public String getId() {
         return id;
     }
@@ -288,14 +285,6 @@ public class Bib {
 
     public void setLeaderMaterialType(String leaderMaterialType) {
         this.leaderMaterialType = leaderMaterialType;
-    }
-
-    public String getTitleStartsWith() {
-        return titleStartsWith;
-    }
-
-    public void setTitleStartsWith(String titleStartsWith) {
-        this.titleStartsWith = titleStartsWith;
     }
 
     @Override
