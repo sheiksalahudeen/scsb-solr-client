@@ -138,27 +138,28 @@ public class MatchingAlgorithmHelperService {
         return matchingFieldValues;
     }
 
-    public Map<String, Set<Bib>> getMatchingReports(String fieldName, String fieldValue, List<Bib> bibs, Set<Bib> unMatchingBibSet ) {
+    public Map<String, Set<Bib>> getMatchingBibsBasedOnTitle(List<Bib> bibs, Set<Bib> unMatchingBibSet ) {
         Map<String, Set<Bib>> owningInstitutionMap = new HashMap<>();
         Set<Bib> owningInstitutionBibSet = new HashSet<>();
         if (!CollectionUtils.isEmpty(bibs)) {
-            for (Bib bib : bibs) {
-                String titleToMatch = getTitleToMatch(bib.getTitleDisplay());
-                List<Bib> bibList = new ArrayList<>();
-                if(fieldName.equals(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-                    bibList = bibCrudRepository.findByTitleDisplayAndOclcNumber(titleToMatch, fieldValue);
-                } else if (fieldName.equals(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-                    bibList = bibCrudRepository.findByTitleDisplayAndIsbn(titleToMatch, fieldValue);
-                } else if (fieldName.equals(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-                    bibList = bibCrudRepository.findByTitleDisplayAndIssn(titleToMatch, fieldValue);
-                } else if(fieldName.equals(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
-                    bibList = bibCrudRepository.findByTitleDisplayAndLccn(titleToMatch, fieldValue);
-                }
-
-                if(bibList.size() > 1) {
-                    owningInstitutionBibSet.addAll(bibList);
-                } else {
-                    unMatchingBibSet.addAll(bibs);
+            for (int i = 0; i < bibs.size(); i++) {
+                for (int j = 0; j < bibs.size(); j++) {
+                    if (i != j) {
+                        Bib tempBib1 = bibs.get(i);
+                        Bib tempBib2 = bibs.get(j);
+                        String tempTitle1 = tempBib1.getTitleDisplay().replaceAll("[^\\w\\s]", "").trim();
+                        String tempTitle2 = tempBib2.getTitleDisplay().replaceAll("[^\\w\\s]", "").trim();
+                        if (StringUtils.isNotBlank(tempTitle1) && StringUtils.isNotBlank(tempTitle2)) {
+                            String title1 = getTitleToMatch(tempTitle1);
+                            String title2 = getTitleToMatch(tempTitle2);
+                            if (title1.equalsIgnoreCase(title2)) {
+                                owningInstitutionBibSet.add(tempBib1);
+                            } else {
+                                unMatchingBibSet.add(tempBib1);
+                                unMatchingBibSet.add(tempBib2);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -218,6 +219,12 @@ public class MatchingAlgorithmHelperService {
                         barcodeReportDataEntity.setHeaderName(RecapConstants.MATCHING_BARCODE);
                         barcodeReportDataEntity.setHeaderValue(item.getBarcode());
                         reportDataEntities.add(barcodeReportDataEntity);
+                    }
+                    if(StringUtils.isNotBlank(item.getVolumePartYear())) {
+                        ReportDataEntity volumePartYearReportDataEntity = new ReportDataEntity();
+                        volumePartYearReportDataEntity.setHeaderName(RecapConstants.MATCHING_VOLUME_PART_YEAR);
+                        volumePartYearReportDataEntity.setHeaderValue(item.getVolumePartYear());
+                        reportDataEntities.add(volumePartYearReportDataEntity);
                     }
                     if(StringUtils.isNotBlank(bib.getOwningInstitution())) {
                         ReportDataEntity institutionReportDataEntity = new ReportDataEntity();

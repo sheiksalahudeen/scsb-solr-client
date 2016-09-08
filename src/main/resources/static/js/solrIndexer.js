@@ -9,6 +9,11 @@ jQuery(document).ready(function ($) {
         fullIndex();
     });
 
+    $("#matchingReports-form").submit(function (event) {
+        event.preventDefault();
+        generateReport();
+    });
+
     $('#dateFrom').datetimepicker({
         format: "dd-mm-yyyy hh:ii"
     });
@@ -60,6 +65,7 @@ function updateStatus() {
 }
 
 function saveReport() {
+    $("#saveReport").attr('disabled', 'disabled');
     document.getElementById("matchingAlgorithmStatus").value = '';
     var criteria = $('#matchingCriteria').val();
     var url = '';
@@ -81,6 +87,40 @@ function saveReport() {
         });
         request.done(function (msg) {
             document.getElementById("matchingAlgorithmStatus").value = msg;
+            $("#saveReport").removeAttr('disabled');
+        })
+    }
+}
+
+function generateReport() {
+    var $form = $('#matchingReports-form');
+    $("#report").attr('disabled', 'disabled');
+    document.getElementById("matchingAlgoReportStatus").value = '';
+    var criteria = $('#matchingCriteriaForReports').val();
+    var url = '';
+    if(criteria === 'ALL') {
+        url = "/matchingAlgorithm/generateReports/full";
+    } else if(criteria === 'OCLC') {
+        url = "/matchingAlgorithm/generateReports/oclc";
+    } else if(criteria === 'ISBN') {
+        url = "/matchingAlgorithm/generateReports/isbn";
+    } else if(criteria === 'ISSN') {
+        url = "/matchingAlgorithm/generateReports/issn";
+    } else if(criteria === 'LCCN') {
+        url = "/matchingAlgorithm/generateReports/lccn";
+    }
+    if(url !== '') {
+        var request = $.ajax({
+            url: url,
+            type: 'post',
+            data: $form.serialize(),
+            success: function (response) {
+                console.log("completed");
+                $("#report").removeAttr('disabled');
+            }
+        });
+        request.done(function (msg) {
+            document.getElementById("matchingAlgoReportStatus").value = msg;
         })
     }
 }
