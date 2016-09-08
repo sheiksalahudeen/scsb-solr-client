@@ -1,8 +1,9 @@
 package org.recap.executors;
 
-import com.google.common.collect.Lists;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.seda.SedaEndpoint;
+import org.apache.camel.component.solr.SolrConstants;
 import org.recap.admin.SolrAdmin;
-import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public abstract class IndexExecutorService {
     @Autowired
     SolrAdmin solrAdmin;
 
+    @Autowired
+    ProducerTemplate producerTemplate;
+
     @Value("${solr.url}")
     String solrUrl;
 
@@ -39,12 +43,14 @@ public abstract class IndexExecutorService {
     @Value("${item.rest.url}")
     public String itemResourceURL;
 
-    @Value("${merge.indexes.interval}")
-    public Integer mergeIndexesInterval;
+    @Value("${solr.url}")
+    String solrUri;
+
+    @Value("${solr.router.uri.type}")
+    String solrRouterURI;
 
     private ExecutorService executorService;
     private Integer loopCount;
-    private Integer callableCountByMergeInterval;
     private long startTime;
     private StopWatch stopWatch;
 
@@ -68,14 +74,6 @@ public abstract class IndexExecutorService {
                 loopCount = remainder == 0 ? quotient : quotient + 1;
                 logger.info("Loop Count Value : " + loopCount);
 
-                logger.info("Merge Indexes Interval : " + mergeIndexesInterval);
-
-                callableCountByMergeInterval = mergeIndexesInterval / (docsPerThread);
-                if (callableCountByMergeInterval == 0) {
-                    callableCountByMergeInterval = 1;
-                }
-                logger.info("Number of callables to execute to merge indexes : " + callableCountByMergeInterval);
-
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
 
@@ -87,43 +85,40 @@ public abstract class IndexExecutorService {
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
+                List<Future<Integer>> futures = executorService.invokeAll(callables);
+                futures
+                        .stream()
+                        .map(future -> {
+                            try {
+                                return future.get();
+                            } catch (Exception e) {
+                                throw new IllegalStateException(e);
+                            }
+                        });
+                logger.info("No of Futures Added : " + futures.size());
+
                 int futureCount = 0;
                 int totalBibsProcessed = 0;
-                List<List<Callable<Integer>>> partitions = Lists.partition(new ArrayList<Callable<Integer>>(callables), callableCountByMergeInterval);
-                for (List<Callable<Integer>> partitionCallables : partitions) {
-                    List<Future<Integer>> futures = executorService.invokeAll(partitionCallables);
-                    futures
-                            .stream()
-                            .map(future -> {
-                                try {
-                                    return future.get();
-                                } catch (Exception e) {
-                                    throw new IllegalStateException(e);
-                                }
-                            });
-                    logger.info("No of Futures Added : " + futures.size());
-
-                    int numOfBibsProcessed = 0;
-                    for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
-                        Future future = iterator.next();
-                        try {
-                            Integer entitiesCount = (Integer) future.get();
-                            numOfBibsProcessed += entitiesCount;
-                            totalBibsProcessed += entitiesCount;
-                            logger.info("Num of bibs fetched by thread : " + entitiesCount);
-                            futureCount++;
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
+                for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                    Future future = iterator.next();
+                    try {
+                        Integer entitiesCount = (Integer) future.get();
+                        totalBibsProcessed += entitiesCount;
+                        logger.info("Num of bibs fetched by thread : " + entitiesCount);
+                        futureCount++;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
-                    logger.info("Num of Bibs Processed and indexed to core on merge interval : " + numOfBibsProcessed);
-                    logger.info("Total Num of Bibs Processed and indexed to core : " + totalBibsProcessed);
                 }
-
                 logger.info("Total futures executed: " + futureCount);
-                logger.info("Total Bibs Processed : " + totalBibsProcessed);
+                SedaEndpoint solrQSedaEndPoint = (SedaEndpoint) producerTemplate.getCamelContext().getEndpoint("seda:solrQ");
+                Integer solrQSize = solrQSedaEndPoint.getExchanges().size();
+                while (solrQSize != 0) {
+                    solrQSize = solrQSedaEndPoint.getExchanges().size();
+                }
+                producerTemplate.sendBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
                 stopWatch.stop();
                 logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
                 executorService.shutdown();
