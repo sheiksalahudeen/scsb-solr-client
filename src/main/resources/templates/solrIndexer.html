@@ -202,7 +202,6 @@
                                     <div class="col-xs-6">
                                         <div th:fragment="matchingReports-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
                                             <form id="matchingReports-form" name="matchingReports-form" class="form-horizontal" action="#"
-                                                  th:action="@{/matchingAlgorithm/generateReports}"
                                                   th:object="${solrIndexRequest}" method="post" enctype="multipart/form-data">
 
                                                 <fieldset>
@@ -270,6 +269,12 @@
                                                                     class="btn btn-info active">Generate Report
                                                             </button>
                                                         </div>
+                                                    </div>
+
+                                                    <br/><br/><br/>
+                                                    <div class="form-group col-sm-12">
+                                                        <textarea class="form-control" id="matchingAlgoReportStatus" rows="5"
+                                                                  placeholder="Matching Algorithm Status" readonly="true"></textarea>
                                                     </div>
 
                                                 </fieldset>

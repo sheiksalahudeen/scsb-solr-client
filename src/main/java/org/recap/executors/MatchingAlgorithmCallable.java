@@ -44,7 +44,7 @@ public class MatchingAlgorithmCallable implements Callable {
         Integer itemCount = 0;
         try {
             List<Bib> bibs = matchingAlgorithmHelperService.getBibs(fieldName, fieldValue);
-            Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports(fieldName, fieldValue, bibs, matchingExceptionSet);
+            Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingBibsBasedOnTitle(bibs, matchingExceptionSet);
             if (owningInstitutionMap.size() > 1) {
                 for (String owningInstitution : owningInstitutionMap.keySet()) {
                     Set<Bib> bibSet = owningInstitutionMap.get(owningInstitution);
@@ -63,7 +63,7 @@ public class MatchingAlgorithmCallable implements Callable {
                     }
                 }
             }
-            generateExceptionReport(fieldName, fieldValue, matchingExceptionSet, exceptionReportFileName, exceptionReportEntityMap, itemCount, reportEntityExceptionMap);
+            generateExceptionReport(fieldName, fieldValue, matchingExceptionSet, exceptionReportFileName, exceptionReportEntityMap, reportEntityExceptionMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +74,7 @@ public class MatchingAlgorithmCallable implements Callable {
         return responseMap;
     }
 
-    public void generateExceptionReport(String fieldName, String fieldValue, Set<Bib> matchingExceptionSet, String exceptionReportFileName, Map<Integer, Map<String, ReportEntity>> exceptionReportEntityMap, Integer itemCount, Map<Integer, Map<String, ReportEntity>> reportEntityExceptionMap) {
+    public void generateExceptionReport(String fieldName, String fieldValue, Set<Bib> matchingExceptionSet, String exceptionReportFileName, Map<Integer, Map<String, ReportEntity>> exceptionReportEntityMap, Map<Integer, Map<String, ReportEntity>> reportEntityExceptionMap) {
         if(!CollectionUtils.isEmpty(matchingExceptionSet)) {
             Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getBibsForOwningInstitution(matchingExceptionSet);
             if(owningInstitutionMap.size() > 1) {

@@ -1,5 +1,6 @@
 package org.recap.matchingAlgorithm.report;
 
+import com.google.common.collect.Ordering;
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
@@ -20,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by angelind on 23/8/16.
@@ -69,6 +68,8 @@ public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         ReCAPCSVMatchingRecordGenerator reCAPCSVMatchingRecordGenerator = new ReCAPCSVMatchingRecordGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
             MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new MatchingReportReCAPCSVRecord());
+            matchingReportReCAPCSVRecord.setTitleWithoutSymbols(matchingReportReCAPCSVRecord.getTitle().replaceAll("[^\\w\\s]", "").trim());
+            matchingReportReCAPCSVRecord.setTitle(matchingReportReCAPCSVRecord.getTitle().replaceAll("\"", "\"\""));
             matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
         }
 
@@ -77,7 +78,14 @@ public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         logger.info("Total Num of CSVRecords Prepared : " + matchingReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(matchingReportReCAPCSVRecords)) {
-            matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getTitle));
+            if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
+                matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getTitleWithoutSymbols, String.CASE_INSENSITIVE_ORDER));
+            } else {
+                matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getOclc, Ordering.natural().nullsLast())
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getIsbn, Ordering.natural().nullsLast()))
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getIssn, Ordering.natural().nullsLast()))
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getLccn, Ordering.natural().nullsLast())));
+            }
 
             producer.sendBodyAndHeader(RecapConstants.CSV_MATCHING_ALGO_REPORT_Q, matchingReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
 

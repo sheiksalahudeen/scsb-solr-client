@@ -1,5 +1,6 @@
 package org.recap.matchingAlgorithm.report;
 
+import com.google.common.collect.Ordering;
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
@@ -67,6 +68,9 @@ public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         ReCAPCSVMatchingRecordGenerator reCAPCSVMatchingRecordGenerator = new ReCAPCSVMatchingRecordGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
             MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new MatchingReportReCAPCSVRecord());
+            String title = matchingReportReCAPCSVRecord.getTitle();
+            matchingReportReCAPCSVRecord.setTitleWithoutSymbols(title.replaceAll("[^\\w\\s]", "").trim());
+            matchingReportReCAPCSVRecord.setTitle(title.replaceAll("\"", "\"\""));
             matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
         }
 
@@ -75,7 +79,14 @@ public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         logger.info("Total Num of CSVRecords Prepared : " + matchingReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(matchingReportReCAPCSVRecords)) {
-            matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getTitle));
+            if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
+                matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getTitleWithoutSymbols, String.CASE_INSENSITIVE_ORDER));
+            } else {
+                matchingReportReCAPCSVRecords.sort(Comparator.comparing(MatchingReportReCAPCSVRecord::getOclc, Ordering.natural().nullsLast())
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getIsbn, Ordering.natural().nullsLast()))
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getIssn, Ordering.natural().nullsLast()))
+                .thenComparing(Comparator.comparing(MatchingReportReCAPCSVRecord::getLccn, Ordering.natural().nullsLast())));
+            }
 
             producer.sendBodyAndHeader(RecapConstants.FTP_MATCHING_ALGO_REPORT_Q, matchingReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
 

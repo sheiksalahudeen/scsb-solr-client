@@ -4,14 +4,12 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
-import java.io.Serializable;
-
 /**
  * Created by angelind on 22/8/16.
  */
 
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
-public class MatchingReportReCAPCSVRecord implements Serializable{
+public class MatchingReportReCAPCSVRecord {
 
     @DataField(pos = 1)
     private String bibId;
@@ -20,19 +18,24 @@ public class MatchingReportReCAPCSVRecord implements Serializable{
     @DataField(pos = 3)
     private String barcode;
     @DataField(pos = 4)
-    private String institutionId;
+    private String volumePartYear;
     @DataField(pos = 5)
-    private String oclc;
+    private String institutionId;
     @DataField(pos = 6)
-    private String isbn;
+    private String oclc;
     @DataField(pos = 7)
-    private String issn;
+    private String isbn;
     @DataField(pos = 8)
-    private String lccn;
+    private String issn;
     @DataField(pos = 9)
-    private String useRestrictions;
+    private String lccn;
     @DataField(pos = 10)
+    private String useRestrictions;
+    @DataField(pos = 11)
     private String summaryHoldings;
+
+    @Ignore
+    private String titleWithoutSymbols;
 
     @Ignore
     private String localBibId;
@@ -59,6 +62,14 @@ public class MatchingReportReCAPCSVRecord implements Serializable{
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public String getVolumePartYear() {
+        return volumePartYear;
+    }
+
+    public void setVolumePartYear(String volumePartYear) {
+        this.volumePartYear = volumePartYear;
     }
 
     public String getInstitutionId() {
@@ -125,7 +136,11 @@ public class MatchingReportReCAPCSVRecord implements Serializable{
         this.localBibId = localBibId;
     }
 
-    /*public int compareTo(MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
-        return title.compareToIgnoreCase(matchingReportReCAPCSVRecord.getTitle());
-    }*/
+    public String getTitleWithoutSymbols() {
+        return titleWithoutSymbols;
+    }
+
+    public void setTitleWithoutSymbols(String titleWithoutSymbols) {
+        this.titleWithoutSymbols = titleWithoutSymbols;
+    }
 }

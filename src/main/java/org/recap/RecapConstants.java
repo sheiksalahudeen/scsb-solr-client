@@ -63,6 +63,7 @@ public class RecapConstants {
     public static final String MATCHING_BIB_ID = "BibId";
     public static final String MATCHING_TITLE = "Title";
     public static final String MATCHING_BARCODE = "Barcode";
+    public static final String MATCHING_VOLUME_PART_YEAR = "VolumePartYear";
     public static final String MATCHING_INSTITUTION_ID = "InstitutionId";
     public static final String MATCHING_OCLC = "Oclc";
     public static final String MATCHING_ISBN = "Isbn";

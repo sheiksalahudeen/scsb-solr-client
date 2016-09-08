@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.recap.RecapConstants;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
@@ -34,6 +35,7 @@ public class MatchingAlgorithmHelperServiceUT {
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
         when(bibCrudRepository.findByOclcNumber("00 1 614-793-8682")).thenReturn(getBibs());
+        when(itemCrudRepository.findByCollectionGroupDesignationAndItemIdIn(RecapConstants.SHARED_CGD, Arrays.asList(1))).thenReturn(Arrays.asList(getItem()));
         when(itemCrudRepository.findByItemId(1)).thenReturn(getItem());
     }
 
@@ -41,7 +43,7 @@ public class MatchingAlgorithmHelperServiceUT {
     public void testGetBibs(){
         List<Bib> bibs =  matchingAlgorithmHelperService.getBibs("OCLCNumber","00 1 614-793-8682");
         assertNotNull(bibs);
-        assertEquals(1,bibs.size());
+        assertEquals(2,bibs.size());
         assertEquals("1",bibs.get(0).getId());
         assertEquals("SampleTitle",bibs.get(0).getTitle());
         assertEquals("PUL",bibs.get(0).getOwningInstitution());
@@ -51,7 +53,7 @@ public class MatchingAlgorithmHelperServiceUT {
 
     @Test
     public void testGetMatchingReports(){
-        Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingReports("OCLCNumber","00 1 614-793-8682", getBibs(), new HashSet<>());
+        Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingBibsBasedOnTitle(getBibs(), new HashSet<>());
         assertNotNull(owningInstitutionMap);
         Set<Bib> bibSet = owningInstitutionMap.get("PUL");
         Bib bib = bibSet.iterator().next();
@@ -64,21 +66,38 @@ public class MatchingAlgorithmHelperServiceUT {
 
     private List<Bib> getBibs(){
         List<Bib> bibs = new ArrayList<>();
-        Bib bib = new Bib();
-        bib.setId("1");
-        bib.setBibId(1);
-        bib.setOwningInstitutionBibId("1");
-        bib.setTitle("SampleTitle");
-        bib.setOwningInstitution("PUL");
-        bib.setBarcode("BA342");
-        bib.setImprint("Imprint");
         List<Integer> owningInstHoldingsIdList = new ArrayList<>();
         owningInstHoldingsIdList.add(1);
-        bib.setOwningInstHoldingsIdList(owningInstHoldingsIdList);
         List<Integer> bibItemIdList = new ArrayList<>();
         bibItemIdList.add(1);
-        bib.setBibItemIdList(bibItemIdList);
-        bibs.add(bib);
+
+        Bib bib1 = new Bib();
+        bib1.setId("1");
+        bib1.setBibId(1);
+        bib1.setOwningInstitutionBibId("1");
+        bib1.setTitle("SampleTitle");
+        bib1.setTitleDisplay("SampleTitle");
+        bib1.setOclcNumber(Arrays.asList("00 1 614-793-8682"));
+        bib1.setOwningInstitution("PUL");
+        bib1.setBarcode("BA342");
+        bib1.setImprint("Imprint");
+        bib1.setOwningInstHoldingsIdList(owningInstHoldingsIdList);
+        bib1.setBibItemIdList(bibItemIdList);
+        bibs.add(bib1);
+
+        Bib bib2 = new Bib();
+        bib2.setId("2");
+        bib2.setBibId(2);
+        bib2.setOwningInstitutionBibId("2");
+        bib2.setTitle("SampleTitle");
+        bib2.setTitleDisplay("SampleTitle");
+        bib2.setOwningInstitution("PUL");
+        bib2.setOclcNumber(Arrays.asList("00 1 614-793-8682"));
+        bib2.setBarcode("BA342");
+        bib2.setImprint("Imprint");
+        bib2.setOwningInstHoldingsIdList(owningInstHoldingsIdList);
+        bib2.setBibItemIdList(bibItemIdList);
+        bibs.add(bib2);
         return bibs;
     }
 
