@@ -84,6 +84,24 @@ public class BibJSONUtil extends MarcUtil {
         return oclcNumbers;
     }
 
+    public List<String> getISBNNumber(Record record){
+        List<String> isbnNumbers = new ArrayList<>();
+        List<String> isbnNumberList = getMultiDataFieldValues(record,"020", null, null, "a");
+        for(String isbnNumber : isbnNumberList){
+            isbnNumbers.add(isbnNumber.replaceAll("[^0-9]", ""));
+        }
+        return isbnNumbers;
+    }
+
+    public List<String> getISSNNumber(Record record){
+        List<String> issnNumbers = new ArrayList<>();
+        List<String> issnNumberList = getMultiDataFieldValues(record,"022", null, null, "a");
+        for(String issnNumber : issnNumberList){
+            issnNumbers.add(issnNumber.replaceAll("[^0-9]", ""));
+        }
+        return issnNumbers;
+    }
+
     public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
         Map map = new HashMap();
         List<Item> items = new ArrayList<>();
@@ -154,8 +172,8 @@ public class BibJSONUtil extends MarcUtil {
         bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
         bib.setPublicationDate(getPublicationDateValue(marcRecord));
         bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
-        bib.setIsbn(getMultiDataFieldValues(marcRecord, "020", null, null, "a"));
-        bib.setIssn(getMultiDataFieldValues(marcRecord, "022", null, null, "a"));
+        bib.setIsbn(getISBNNumber(marcRecord));
+        bib.setIssn(getISSNNumber(marcRecord));
         bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode.toString()));
         bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
         bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
@@ -183,22 +201,26 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getTitle(Record marcRecord) {
         StringBuilder title=new StringBuilder();
-        title.append(getDataFieldValueStartsWith(marcRecord, "24", Arrays.asList('a', 'b')));
-        title.append(getDataFieldValueStartsWith(marcRecord, "13", Arrays.asList('1')));
-        title.append(getDataFieldValueStartsWith(marcRecord, "73", Arrays.asList('a')));
-        title.append(getDataFieldValueStartsWith(marcRecord, "74", Arrays.asList('a')));
-        title.append(getDataFieldValueStartsWith(marcRecord, "83", Arrays.asList('a')));
+        title.append(getDataFieldValueStartsWith(marcRecord, "245", Arrays.asList('a', 'b','n','p')) + " ");
+        title.append(getDataFieldValueStartsWith(marcRecord, "246", Arrays.asList('a', 'b')) + " ");
+        title.append(getDataFieldValueStartsWith(marcRecord, "130", Arrays.asList('a')) + " ");
+        title.append(getDataFieldValueStartsWith(marcRecord, "730", Arrays.asList('a')) + " ");
+        title.append(getDataFieldValueStartsWith(marcRecord, "740", Arrays.asList('a')) + " ");
+        title.append(getDataFieldValueStartsWith(marcRecord, "830", Arrays.asList('a'))+ " ");
         return title.toString();
     }
 
     public String getTitleDisplay(Record marcRecord) {
-        return getDataFieldValue(marcRecord, "245", null, null, "a");
+        StringBuilder titleDisplay = new StringBuilder();
+        titleDisplay.append(getDataFieldValueStartsWith(marcRecord, "245", Arrays.asList('a', 'b','n','p')));
+        return titleDisplay.toString();
     }
 
     public String getAuthorDisplayValue(Record marcRecord) {
         StringBuilder author = new StringBuilder();
-        author.append(getDataFieldValueStartsWith(marcRecord, "10", Arrays.asList('a')));
-        author.append(getDataFieldValueStartsWith(marcRecord, "11", Arrays.asList('a')));
+        author.append(getDataFieldValueStartsWith(marcRecord, "100", Arrays.asList('a','q')) + " ");
+        author.append(getDataFieldValueStartsWith(marcRecord, "110", Arrays.asList('a','b')) + " ");
+        author.append(getDataFieldValueStartsWith(marcRecord, "111", Arrays.asList('a')) + " ");
         return author.toString();
     }
 
@@ -207,10 +229,13 @@ public class BibJSONUtil extends MarcUtil {
         List<String> fieldValues = null;
 
         Map<String, List<Character>> authorMap = new HashMap<>();
-        authorMap.put("10", Arrays.asList('a'));
-        authorMap.put("11", Arrays.asList('a'));
-        authorMap.put("70", Arrays.asList('a'));
-        authorMap.put("71", Arrays.asList('a'));
+        authorMap.put("100", Arrays.asList('a','q'));
+        authorMap.put("110", Arrays.asList('a','b'));
+        authorMap.put("111", Arrays.asList('a'));
+        authorMap.put("700", Arrays.asList('a'));
+        authorMap.put("710", Arrays.asList('a','b'));
+        authorMap.put("711", Arrays.asList('a'));
+
 
         for (Map.Entry<String, List<Character>> entry : authorMap.entrySet()) {
             fieldValues = getListOfDataFieldValuesStartsWith(marcRecord, entry.getKey(), entry.getValue());
