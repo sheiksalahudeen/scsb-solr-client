@@ -111,6 +111,7 @@ public class RecapConstants {
 
     public static final String BIB_COUNT = "bibCount";
     public static final String ITEM_COUNT = "itemCount";
+    public static final String BIB_ITEM_COUNT = "bibItemCount";
 
     public static final String MATCHING_EXCEPTION_OCCURED = "MatchingExceptionOccurred";
     public static final String EXCEPTION_MSG = "ExceptionMessage";

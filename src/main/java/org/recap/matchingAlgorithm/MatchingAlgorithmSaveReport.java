@@ -5,6 +5,8 @@ import org.recap.RecapConstants;
 import org.recap.executors.MatchingAlgorithmCallable;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,12 @@ public class MatchingAlgorithmSaveReport {
 
     @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;
+
+    @Autowired
+    public BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    public ItemDetailsRepository itemDetailsRepository;
 
     private ExecutorService executorService;
 
@@ -89,7 +97,9 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
-            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME);
+            long bibCount = bibliographicDetailsRepository.count();
+            long itemCount = itemDetailsRepository.count();
+            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, bibCount, itemCount);
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
             matchingAlgorithmHelperService.saveReportEntities(Arrays.asList(summaryReportEntity));
@@ -116,9 +126,11 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
+            long bibCount = bibliographicDetailsRepository.count();
+            long itemCount = itemDetailsRepository.count();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
-            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(isbnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME);
+            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(isbnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, bibCount, itemCount);
             matchingAlgorithmHelperService.saveReportEntities(Arrays.asList(summaryReportEntity));
             stopWatch.stop();
             logger.info("Total Time Taken to save Reports : " + stopWatch.getTotalTimeSeconds());
@@ -143,9 +155,11 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
+            long bibCount = bibliographicDetailsRepository.count();
+            long itemCount = itemDetailsRepository.count();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
-            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(issnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME);
+            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(issnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, bibCount, itemCount);
             matchingAlgorithmHelperService.saveReportEntities(Arrays.asList(summaryReportEntity));
             stopWatch.stop();
             logger.info("Total Time Taken to save Reports : " + stopWatch.getTotalTimeSeconds());
@@ -170,9 +184,11 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
+            long bibCount = bibliographicDetailsRepository.count();
+            long itemCount = itemDetailsRepository.count();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
-            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(lccnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME);
+            ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(lccnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, bibCount, itemCount);
             matchingAlgorithmHelperService.saveReportEntities(Arrays.asList(summaryReportEntity));
             stopWatch.stop();
             logger.info("Total Time Taken to save Reports : " + stopWatch.getTotalTimeSeconds());
@@ -183,9 +199,10 @@ public class MatchingAlgorithmSaveReport {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("Total Num of Duplicate " + fieldName + " Found : " + matchingFieldList.size());
+
         Integer itemCount = 0;
-        Integer bibCount = 0;
         Map<String, Integer> countMap = new HashMap<>();
+        Map<Integer, Integer> bibItemCountMap = new HashMap<>();
 
         ExecutorService executorService = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
@@ -216,15 +233,17 @@ public class MatchingAlgorithmSaveReport {
                 Map<String, Object> responseMap = (Map<String, Object>) future.get();
                 matchingReportEntityMap.putAll((Map<? extends Integer, ? extends Map<String, ReportEntity>>) responseMap.get(RecapConstants.MATCHING_REPORT_ENTITY_MAP));
                 exceptionReportEntityMap.putAll((Map<? extends Integer, ? extends Map<String, ReportEntity>>) responseMap.get(RecapConstants.EXCEPTION_REPORT_ENTITY_MAP));
-                itemCount = itemCount + (Integer) responseMap.get(RecapConstants.ITEM_COUNT);
-                bibCount = bibCount + (Integer) responseMap.get(RecapConstants.BIB_COUNT);
+                bibItemCountMap.putAll((Map<? extends Integer, ? extends Integer>) responseMap.get(RecapConstants.BIB_ITEM_COUNT));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
         }
-        countMap.put(RecapConstants.BIB_COUNT, bibCount);
+        countMap.put(RecapConstants.BIB_COUNT, bibItemCountMap.size());
+        for(Integer bibId : bibItemCountMap.keySet()) {
+            itemCount = itemCount + bibItemCountMap.get(bibId);
+        }
         countMap.put(RecapConstants.ITEM_COUNT, itemCount);
         stopWatch.stop();
         logger.info("Total Time Taken to Match and Populate " + fieldName + " Report : " + stopWatch.getTotalTimeSeconds());

@@ -40,8 +40,7 @@ public class MatchingAlgorithmCallable implements Callable {
         Set<Bib> matchingExceptionSet = new HashSet<>();
         Map<Integer, Map<String,ReportEntity>> reportEntityMatchingMap = new HashMap();
         Map<Integer, Map<String,ReportEntity>> reportEntityExceptionMap = new HashMap<>();
-        Integer bibCount = 0;
-        Integer itemCount = 0;
+        Map<Integer, Integer> bibItemCountMap = new HashMap<>();
         try {
             List<Bib> bibs = matchingAlgorithmHelperService.getBibs(fieldName, fieldValue);
             Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingBibsBasedOnTitle(bibs, matchingExceptionSet);
@@ -49,15 +48,14 @@ public class MatchingAlgorithmCallable implements Callable {
                 for (String owningInstitution : owningInstitutionMap.keySet()) {
                     Set<Bib> bibSet = owningInstitutionMap.get(owningInstitution);
                     for(Bib bib : bibSet) {
-                        bibCount = bibCount + 1;
                         Integer bibId = bib.getBibId();
                         if(matchingReportEntityMap.containsKey(bibId)) {
                             Integer barcodeCount = addReportDataEntityToMap(fieldName, matchingReportEntityMap, fieldValue, bib, bibId, reportEntityMatchingMap);
-                            itemCount = itemCount + barcodeCount;
+                            bibItemCountMap.put(bibId, barcodeCount);
                         } else {
                             Map<String, ReportEntity> barcodeReportEntityMap = matchingAlgorithmHelperService.populateReportEntity(fieldName, fieldValue, bib, matchingFileName,
                                     RecapConstants.MATCHING_TYPE);
-                            itemCount = itemCount + barcodeReportEntityMap.size();
+                            bibItemCountMap.put(bibId, barcodeReportEntityMap.size());
                             reportEntityMatchingMap.put(bibId, barcodeReportEntityMap);
                         }
                     }
@@ -69,8 +67,7 @@ public class MatchingAlgorithmCallable implements Callable {
         }
         responseMap.put(RecapConstants.MATCHING_REPORT_ENTITY_MAP, reportEntityMatchingMap);
         responseMap.put(RecapConstants.EXCEPTION_REPORT_ENTITY_MAP, reportEntityExceptionMap);
-        responseMap.put(RecapConstants.ITEM_COUNT, itemCount);
-        responseMap.put(RecapConstants.BIB_COUNT, bibCount);
+        responseMap.put(RecapConstants.BIB_ITEM_COUNT, bibItemCountMap);
         return responseMap;
     }
 
