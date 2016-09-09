@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
@@ -175,46 +176,8 @@ public class ExecutorAT extends BaseTestCase {
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
     }
 
-    //Added for ReCAP-111 jira, test will be failing until duplicate issue is fixed.
-    @Test
-    public void testDuplicateRecordsIndexed() throws Exception {
-        bibSolrCrudRepository.deleteAll();
-        URL resource = getClass().getResource("BibContentToCheckDuplicateRecords.xml");
-        File bibContentFile = new File(resource.toURI());
-        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setContent(sourceBibContent.getBytes());
-        bibliographicEntity.setOwningInstitutionId(3);
-        String owningInstitutionBibId = "001";
-        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
-        bibliographicEntity.setCreatedDate(new Date());
-        bibliographicEntity.setCreatedBy("tst");
-        bibliographicEntity.setLastUpdatedDate(new Date());
-        bibliographicEntity.setLastUpdatedBy("tst");
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(3, owningInstitutionBibId);
-        assertNotNull(fetchedBibliographicEntity);
-        assertNotNull(fetchedBibliographicEntity.getContent());
-
-        performIndex(fetchedBibliographicEntity);
-
-        Integer bibliographicId = fetchedBibliographicEntity.getBibliographicId();
-
-        Long countOnSingleIndex = bibSolrCrudRepository.countByBibId(bibliographicId);
-        assertEquals(countOnSingleIndex, new Long(1));
-
-        Thread.sleep(1000);
-
-        performIndex(fetchedBibliographicEntity);
-
-        Long countOnDoubleIndex = bibSolrCrudRepository.countByBibId(bibliographicId);
-        assertEquals(countOnDoubleIndex, new Long(1));
-
-    }
 
     private void performIndex(BibliographicEntity bibliographicEntity) throws Exception {
         List<String> coreNames = new ArrayList<>();

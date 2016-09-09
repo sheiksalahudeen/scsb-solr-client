@@ -180,6 +180,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setCreatedDate(today);
         holdingsEntity.setLastUpdatedDate(today);
         holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setLastUpdatedBy("tst");
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
@@ -214,6 +215,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity1.setContent("mock holdings".getBytes());
         holdingsEntity1.setCreatedDate(new Date());
         holdingsEntity1.setLastUpdatedDate(new Date());
+        holdingsEntity1.setOwningInstitutionId(1);
         holdingsEntity1.setCreatedBy("tst");
         holdingsEntity1.setLastUpdatedBy("tst");
         holdingsEntity1.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
@@ -224,6 +226,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity2.setCreatedDate(new Date());
         holdingsEntity2.setLastUpdatedDate(new Date());
         holdingsEntity2.setCreatedBy("tst");
+        holdingsEntity2.setOwningInstitutionId(1);
         holdingsEntity2.setLastUpdatedBy("tst");
         holdingsEntity2.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
@@ -290,6 +293,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         holdingsEntity.setLastUpdatedDate(new Date());
         holdingsEntity.setCreatedBy("tst");
         holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
