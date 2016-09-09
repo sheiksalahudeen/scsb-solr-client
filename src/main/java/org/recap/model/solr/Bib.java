@@ -87,6 +87,9 @@ public class Bib {
     @Field("LeaderMaterialType")
     private String leaderMaterialType;
 
+    @Field("Title_sort")
+    private String titleSort;
+
     public String getId() {
         return id;
     }
@@ -285,6 +288,14 @@ public class Bib {
 
     public void setLeaderMaterialType(String leaderMaterialType) {
         this.leaderMaterialType = leaderMaterialType;
+    }
+
+    public String getTitleSort() {
+        return titleSort;
+    }
+
+    public void setTitleSort(String titleSort) {
+        this.titleSort = titleSort;
     }
 
     @Override

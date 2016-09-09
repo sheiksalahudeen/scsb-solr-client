@@ -18,6 +18,7 @@ public class RecapConstants {
     public static final String AVAILABILITY = "Availability";
     public static final String TITLE = "Title_search";
     public static final String TITLE_STARTS_WITH= "TitleStartsWith";
+    public static final String TITLE_SORT= "Title_sort";
     public static final String BARCODE = "Barcode";
     public static final String CALL_NUMBER = "CallNumber";
     public static final String NOTES = "Notes";
