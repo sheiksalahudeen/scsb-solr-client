@@ -327,14 +327,16 @@ public class MatchingAlgorithmHelperService {
 
     public void saveSummaryReportEntity(Map<String, Integer> oclcCountMap, Map<String, Integer> isbnCountMap, Map<String, Integer> issnCountMap, Map<String, Integer> lccnCountMap) {
         List<ReportEntity> reportEntities = new ArrayList<>();
-        reportEntities.add(getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_FILE_NAME));
-        reportEntities.add(getSummaryReportEntity(isbnCountMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
-        reportEntities.add(getSummaryReportEntity(issnCountMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
-        reportEntities.add(getSummaryReportEntity(lccnCountMap, RecapConstants.MATCH_POINT_FIELD_LCCN, RecapConstants.SUMMARY_REPORT_FILE_NAME));
+        long bibCount = bibliographicDetailsRepository.count();
+        long itemCount = itemDetailsRepository.count();
+        reportEntities.add(getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
+        reportEntities.add(getSummaryReportEntity(isbnCountMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
+        reportEntities.add(getSummaryReportEntity(issnCountMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
+        reportEntities.add(getSummaryReportEntity(lccnCountMap, RecapConstants.MATCH_POINT_FIELD_LCCN, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
         saveReportEntities(reportEntities);
     }
 
-    public ReportEntity getSummaryReportEntity(Map<String, Integer> countMap, String fieldName, String fileName) {
+    public ReportEntity getSummaryReportEntity(Map<String, Integer> countMap, String fieldName, String fileName, long bibCount, long itemCount) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setCreatedDate(new Date());
@@ -344,12 +346,12 @@ public class MatchingAlgorithmHelperService {
 
         ReportDataEntity bibsInTableDataEntity = new ReportDataEntity();
         bibsInTableDataEntity.setHeaderName(RecapConstants.SUMMARY_NUM_BIBS_IN_TABLE);
-        bibsInTableDataEntity.setHeaderValue(String.valueOf(bibliographicDetailsRepository.count()));
+        bibsInTableDataEntity.setHeaderValue(String.valueOf(bibCount));
         reportDataEntities.add(bibsInTableDataEntity);
 
         ReportDataEntity itemsInTableDataEntity = new ReportDataEntity();
         itemsInTableDataEntity.setHeaderName(RecapConstants.SUMMARY_NUM_ITEMS_IN_TABLE);
-        itemsInTableDataEntity.setHeaderValue(String.valueOf(itemDetailsRepository.count()));
+        itemsInTableDataEntity.setHeaderValue(String.valueOf(itemCount));
         reportDataEntities.add(itemsInTableDataEntity);
 
         ReportDataEntity matchingKeyFieldDataEntity = new ReportDataEntity();
