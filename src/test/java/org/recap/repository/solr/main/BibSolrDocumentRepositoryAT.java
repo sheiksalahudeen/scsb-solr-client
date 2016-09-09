@@ -301,4 +301,11 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         }
     }
 
+    @Test
+    public void testGetModifiedText() throws Exception {
+        String searchText = "Test-Title.";
+        String modifiedText = bibSolrDocumentRepositoryImpl.getModifiedText(searchText);
+        assertEquals(modifiedText, "Test\\-Title\\.");
+    }
+
 }

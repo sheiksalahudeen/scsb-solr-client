@@ -26,6 +26,7 @@ public class RecapConstants {
     public static final String MONOGRAPH = "Monograph";
     public static final String SERIAL = "Serial";
     public static final String OTHER = "Other";
+    public static final String AND = "AND";
 
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
