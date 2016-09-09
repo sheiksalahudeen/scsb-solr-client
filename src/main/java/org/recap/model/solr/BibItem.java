@@ -82,8 +82,8 @@ public class BibItem {
     @Field("BibItemId")
     private List<Integer> bibItemIdList;
 
-    @Field("TitleStartsWith")
-    private String titleStartsWith;
+    @Field("Title_sort")
+    private String titleSort;
 
     @Ignore
     private List<Item> items = new ArrayList<>();
@@ -280,12 +280,12 @@ public class BibItem {
         this.items = items;
     }
 
-    public String getTitleStartsWith() {
-        return titleStartsWith;
+    public String getTitleSort() {
+        return titleSort;
     }
 
-    public void setTitleStartsWith(String titleStartsWith) {
-        this.titleStartsWith = titleStartsWith;
+    public void setTitleSort(String titleSort) {
+        this.titleSort = titleSort;
     }
 }
 

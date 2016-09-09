@@ -148,6 +148,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setOwningInstitution(institutionCode);
         bib.setTitle(getTitle(marcRecord));
         bib.setTitleDisplay(getTitleDisplay(marcRecord));
+        bib.setTitleSort(getTitleSort(marcRecord, bib.getTitleDisplay()));
         bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
         bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
         bib.setPublisher(getPublisherValue(marcRecord));
@@ -223,6 +224,14 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getLeader(Record marcRecord) {
         return marcRecord.getLeader() != null ? marcRecord.getLeader().toString() : null;
+    }
+
+    public String getTitleSort(Record marcRecord, String titleDisplay) {
+        Integer secondIndicatorForDataField = getSecondIndicatorForDataField(marcRecord, "245");
+        if (StringUtils.isNotBlank(titleDisplay) && titleDisplay.length() >= secondIndicatorForDataField) {
+            return titleDisplay.substring(secondIndicatorForDataField);
+        }
+        return "";
     }
 
 }

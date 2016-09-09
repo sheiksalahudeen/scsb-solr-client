@@ -175,4 +175,13 @@ public class MarcUtilUT {
 
     }
 
+    @Test
+    public void getSecondIndicatorForDataField() throws Exception {
+        MarcUtil marcUtil = new MarcUtil();
+        List<Record> records = marcUtil.convertMarcXmlToRecord(marcXML);
+        assertNotNull(records.get(0));
+        Integer secondIndicatorForDataField = marcUtil.getSecondIndicatorForDataField(records.get(0), "245");
+        assertEquals(secondIndicatorForDataField, new Integer(3));
+    }
+
 }

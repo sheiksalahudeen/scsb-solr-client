@@ -38,7 +38,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SimpleQuery query = new SimpleQuery();
         query.setPageRequest(page);
-        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE));
+        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
         query.addCriteria(getCriteriaForFieldName(searchRecordsRequest));
         query.addFilterQuery(getFilterQueryForInputFields(searchRecordsRequest, query));
         query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
@@ -88,6 +88,9 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         } else if (StringUtils.isBlank(fieldName)) {
             criteria = new Criteria().is(fieldValue);
         } else if (StringUtils.isBlank(fieldValue)) {
+            if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
+                fieldName = RecapConstants.TITLE;
+            }
             criteria = new Criteria(fieldName).expression(RecapConstants.ALL);
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
