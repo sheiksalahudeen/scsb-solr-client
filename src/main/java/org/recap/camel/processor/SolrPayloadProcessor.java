@@ -27,7 +27,7 @@ public class SolrPayloadProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Exchange exchangeWithBody = createExchangeWithBody(camelContext, exchange.getIn().getBody());
         exchangeWithBody.getIn().setHeader(SolrConstants.OPERATION, SolrConstants.OPERATION_ADD_BEANS);
-        producerTemplate.send(solrRouterURI + solrUri + "/" + solrCore, exchangeWithBody);
+        producerTemplate.send("solr:" + solrUri + "/" + solrCore, exchangeWithBody);
     }
 
     protected Exchange createExchangeWithBody(CamelContext camelContext, Object body) {
