@@ -206,7 +206,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String titleDisplay = bibJSONUtil.getTitleDisplay(marcRecord);
-        assertEquals(titleDisplay, "al-Baḥrayn :");
+        assertEquals(titleDisplay, "al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /");
     }
 
     @Test
@@ -215,7 +215,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String authorDisplayValue = bibJSONUtil.getAuthorDisplayValue(marcRecord);
-        assertEquals(authorDisplayValue, "Rumayḥī, Muḥammad Ghānim.Rumayḥī, Muḥammad Rumayḥī");
+        assertEquals(authorDisplayValue, "Rumayḥī, Muḥammad Ghānim. Rumayḥī, Muḥammad Rumayḥī ");
     }
 
     @Test
@@ -241,6 +241,16 @@ public class BibJSONUtilUT extends BaseTestCase{
         Record marcRecord = records.get(0);
         String titles = bibJSONUtil.getTitle(marcRecord);
         assertNotNull(titles);
-        assertEquals(titles,"al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /al-Baḥrayn :Muḥammad al-Rumayḥī.");
+        assertEquals(titles,"al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /   Muḥammad al-Rumayḥī.   ");
+    }
+
+    @Test
+    public void testTitleSort() throws Exception {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+        Record marcRecord = records.get(0);
+        String titleSort = bibJSONUtil.getTitleSort(marcRecord, bibJSONUtil.getTitleDisplay(marcRecord));
+        assertNotNull(titleSort);
+        assertEquals(titleSort,"Baḥrayn :");
     }
 }

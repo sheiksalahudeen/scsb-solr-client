@@ -120,8 +120,8 @@ public class BibliographicMarcRecordUT {
         Record marcRecord = records.get(0);
         BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
         assertNotNull(bibliographicMarcRecord);
-        assertEquals("Rih Husayn Muhammad",bibliographicMarcRecord.getTitle());
-        assertEquals("Ibn Jubayr",bibliographicMarcRecord.getAuthor());
+        assertEquals("Rih Husayn Muhammad    Travels of Ibn Jubayr. \"E.J.W. Gibb memorial\" series ; ",bibliographicMarcRecord.getTitle());
+        assertEquals("Ibn Jubayr   ",bibliographicMarcRecord.getAuthor());
         assertEquals("AMS Press,",bibliographicMarcRecord.getPublisher());
         assertEquals("1973] 1907.",bibliographicMarcRecord.getPublishedDate());
         assertEquals("01814cam a2200409 450000",bibliographicMarcRecord.getTag000());

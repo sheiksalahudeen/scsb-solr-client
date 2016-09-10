@@ -157,4 +157,16 @@ public class MarcUtil {
         return null;
     }
 
+    public Integer getSecondIndicatorForDataField(Record marcRecord, String field) {
+        List<VariableField> dataFields = marcRecord.getVariableFields(field);
+        if (!CollectionUtils.isEmpty(dataFields)) {
+            DataField dataField = (DataField) dataFields.get(0);
+            char dataFieldIndicator2 = dataField.getIndicator2();
+            if (Character.isDigit(dataFieldIndicator2)) {
+                return Character.getNumericValue(dataFieldIndicator2);
+            }
+        }
+        return 0;
+    }
+
 }

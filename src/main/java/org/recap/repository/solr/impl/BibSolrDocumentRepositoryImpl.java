@@ -21,7 +21,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.text.CharacterIterator;
 import java.text.NumberFormat;
+import java.text.StringCharacterIterator;
 import java.util.*;
 
 /**
@@ -38,7 +40,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SimpleQuery query = new SimpleQuery();
         query.setPageRequest(page);
-        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE));
+        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
         query.addCriteria(getCriteriaForFieldName(searchRecordsRequest));
         query.addFilterQuery(getFilterQueryForInputFields(searchRecordsRequest, query));
         query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
@@ -81,20 +83,25 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public Criteria getCriteriaForFieldName(SearchRecordsRequest searchRecordsRequest) {
         Criteria criteria = null;
         String fieldName = searchRecordsRequest.getFieldName();
-        String fieldValue = searchRecordsRequest.getFieldValue().trim();
+        String fieldValue = getModifiedText(searchRecordsRequest.getFieldValue().trim());
 
         if (StringUtils.isBlank(fieldName) && StringUtils.isBlank(fieldValue)) {
             criteria = new Criteria().expression(RecapConstants.ALL);
         } else if (StringUtils.isBlank(fieldName)) {
-            criteria = new Criteria().is(fieldValue);
+            fieldValue = StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ");
+            criteria = new Criteria().expression(fieldValue);
         } else if (StringUtils.isBlank(fieldValue)) {
+            if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
+                fieldName = RecapConstants.TITLE;
+            }
             criteria = new Criteria(fieldName).expression(RecapConstants.ALL);
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
                 String[] splitedTitle = fieldValue.split(" ");
                 criteria = new Criteria(RecapConstants.TITLE).startsWith(splitedTitle[0]);
             } else {
-                criteria = new Criteria(fieldName).is(fieldValue);
+                fieldValue = StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ");
+                criteria = new Criteria(fieldName).expression(fieldValue);
             }
         }
         return criteria;
@@ -148,5 +155,65 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             emptySearch = true;
         }
         return emptySearch;
+    }
+
+    public String getModifiedText(String searchText) {
+        StringBuffer modifiedText = new StringBuffer();
+        StringCharacterIterator stringCharacterIterator = new StringCharacterIterator(searchText);
+        char character = stringCharacterIterator.current();
+        while (character != CharacterIterator.DONE) {
+            if (character == '\\') {
+                modifiedText.append("\\\\");
+            } else if (character == '?') {
+                modifiedText.append("\\?");
+            } else if (character == '*') {
+                modifiedText.append("\\*");
+            } else if (character == '+') {
+                modifiedText.append("\\+");
+            } else if (character == ':') {
+                modifiedText.append("\\:");
+            } else if (character == '{') {
+                modifiedText.append("\\{");
+            } else if (character == '}') {
+                modifiedText.append("\\}");
+            } else if (character == '[') {
+                modifiedText.append("\\[");
+            } else if (character == ']') {
+                modifiedText.append("\\]");
+            } else if (character == '(') {
+                modifiedText.append("\\(");
+            } else if (character == ')') {
+                modifiedText.append("\\)");
+            } else if (character == '^') {
+                modifiedText.append("\\^");
+            } else if (character == '~') {
+                modifiedText.append("\\~");
+            } else if (character == '-') {
+                modifiedText.append("\\-");
+            } else if (character == '!') {
+                modifiedText.append("\\!");
+            } else if (character == '\'') {
+                modifiedText.append("\\'");
+            } else if (character == '@') {
+                modifiedText.append("\\@");
+            } else if (character == '#') {
+                modifiedText.append("\\#");
+            } else if (character == '$') {
+                modifiedText.append("\\$");
+            } else if (character == '%') {
+                modifiedText.append("\\%");
+            } else if (character == '/') {
+                modifiedText.append("\\/");
+            } else if (character == '"') {
+                modifiedText.append("\\\"");
+            } else if (character == '.') {
+                modifiedText.append("\\.");
+            }
+            else {
+                modifiedText.append(character);
+            }
+            character = stringCharacterIterator.next();
+        }
+        return modifiedText.toString();
     }
 }

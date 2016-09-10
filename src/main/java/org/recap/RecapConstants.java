@@ -18,6 +18,7 @@ public class RecapConstants {
     public static final String AVAILABILITY = "Availability";
     public static final String TITLE = "Title_search";
     public static final String TITLE_STARTS_WITH= "TitleStartsWith";
+    public static final String TITLE_SORT= "Title_sort";
     public static final String BARCODE = "Barcode";
     public static final String CALL_NUMBER = "CallNumber";
     public static final String NOTES = "Notes";
@@ -25,6 +26,7 @@ public class RecapConstants {
     public static final String MONOGRAPH = "Monograph";
     public static final String SERIAL = "Serial";
     public static final String OTHER = "Other";
+    public static final String AND = "AND";
 
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
@@ -111,6 +113,7 @@ public class RecapConstants {
 
     public static final String BIB_COUNT = "bibCount";
     public static final String ITEM_COUNT = "itemCount";
+    public static final String BIB_ITEM_COUNT = "bibItemCount";
 
     public static final String MATCHING_EXCEPTION_OCCURED = "MatchingExceptionOccurred";
     public static final String EXCEPTION_MSG = "ExceptionMessage";
