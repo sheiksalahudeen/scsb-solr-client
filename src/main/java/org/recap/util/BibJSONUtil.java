@@ -111,12 +111,12 @@ public class BibJSONUtil extends MarcUtil {
         List<Integer> holdingsIds = new ArrayList<>();
         List<Integer> itemIds = new ArrayList<>();
 
-//        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
-//        for (ItemEntity itemEntity : itemEntities) {
-//            itemIds.add(itemEntity.getItemId());
-//            Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
-//            items.add(item);
-//        }
+        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+        for (ItemEntity itemEntity : itemEntities) {
+            itemIds.add(itemEntity.getItemId());
+            Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
+            items.add(item);
+        }
         List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             holdingsIds.add(holdingsEntity.getHoldingsId());

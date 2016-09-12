@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -28,16 +29,16 @@ public class BibIndexCallable implements Callable {
     private String solrURL;
     private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private ProducerTemplate producerTemplate;
 
-    private BibCrudRepositoryMultiCoreSupport bibCrudRepositoryMultiCoreSupport;
-
-    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId) {
+    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
@@ -68,10 +69,9 @@ public class BibIndexCallable implements Callable {
 
         executorService.shutdown();
 
-        bibCrudRepositoryMultiCoreSupport = new BibCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
-            bibCrudRepositoryMultiCoreSupport.save(bibsToIndex);
+            producerTemplate.sendBody("seda:solrQ", bibsToIndex);
         }
-        return bibliographicEntities.getSize();
+        return bibliographicEntities.getNumberOfElements();
     }
 }

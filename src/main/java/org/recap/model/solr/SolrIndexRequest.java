@@ -6,8 +6,10 @@ import java.util.Date;
  * Created by SheikS on 6/18/2016.
  */
 public class SolrIndexRequest {
+    private String docType;
     private Integer numberOfThreads;
     private Integer numberOfDocs;
+    private Integer commitInterval;
     private Integer owningInstitutionId;
     private boolean doClean;
     private String dateFrom;
@@ -16,6 +18,14 @@ public class SolrIndexRequest {
     private String reportType;
     private String transmissionType;
     private Date createdDate;
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
+    }
 
     public Integer getNumberOfThreads() {
         return numberOfThreads;
@@ -31,6 +41,14 @@ public class SolrIndexRequest {
 
     public void setNumberOfDocs(Integer numberOfDocs) {
         this.numberOfDocs = numberOfDocs;
+    }
+
+    public Integer getCommitInterval() {
+        return commitInterval;
+    }
+
+    public void setCommitInterval(Integer commitInterval) {
+        this.commitInterval = commitInterval;
     }
 
     public Integer getOwningInstitutionId() {

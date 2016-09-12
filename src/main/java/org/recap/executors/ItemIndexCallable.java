@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -27,16 +28,16 @@ public class ItemIndexCallable implements Callable {
     private String solrURL;
     private Integer owningInstitutionId;
     private ItemDetailsRepository itemDetailsRepository;
+    private ProducerTemplate producerTemplate;
 
-    private ItemCrudRepositoryMultiCoreSupport itemCrudRepositoryMultiCoreSupport;
-
-    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository, Integer owningInstitutionId) {
+    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.itemDetailsRepository = itemDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
@@ -66,10 +67,9 @@ public class ItemIndexCallable implements Callable {
 
         executorService.shutdown();
 
-        itemCrudRepositoryMultiCoreSupport = new ItemCrudRepositoryMultiCoreSupport(coreName, solrURL);
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
-            itemCrudRepositoryMultiCoreSupport.save(itemsToIndex);
+            producerTemplate.sendBody("seda:solrQ", itemsToIndex);
         }
-        return itemEntities.getSize();
+        return itemEntities.getNumberOfElements();
     }
 }
