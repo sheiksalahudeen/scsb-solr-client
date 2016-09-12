@@ -74,11 +74,11 @@ public class RecapConstants {
     public static final String MATCHING_USE_RESTRICTIONS = "UseRestrictions";
     public static final String MATCHING_SUMMARY_HOLDINGS = "SummaryHoldings";
 
-    public static final String SUMMARY_NUM_BIBS_IN_TABLE = "NumberOfBibsInTable";
-    public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "NumberOfItemsInTable";
+    public static final String SUMMARY_NUM_BIBS_IN_TABLE = "CountOfBibsInTable";
+    public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "CountOfItemsInTable";
     public static final String SUMMARY_MATCHING_KEY_FIELD = "MatchingKeyField";
     public static final String SUMMARY_MATCHING_BIB_COUNT = "CountOfBibMatches";
-    public static final String SUMMARY_NUM_ITEMS_AFFECTED = "NumberOfItemsAffected";
+    public static final String SUMMARY_NUM_ITEMS_AFFECTED = "CountOfItemAffected";
 
     public static final String MATCHING_LOCAL_BIB_ID = "LocalBibId";
 
