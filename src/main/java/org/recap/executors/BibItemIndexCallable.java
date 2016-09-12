@@ -91,9 +91,9 @@ public class BibItemIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBody("seda:solrQ", bibsToIndex);
         }
-//        if (!CollectionUtils.isEmpty(itemsToIndex)) {
-//            producerTemplate.sendBody("seda:solrQ", itemsToIndex);
-//        }
+        if (!CollectionUtils.isEmpty(itemsToIndex)) {
+            producerTemplate.sendBody("seda:solrQ", itemsToIndex);
+        }
         return bibliographicEntities.getNumberOfElements();
     }
 }

@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,12 @@ public class ItemIndexExecutorService extends IndexExecutorService {
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
 
+    @Autowired
+    ProducerTemplate producerTemplate;
+
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
-        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository, owningInstitutionId);
+        return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository, owningInstitutionId, producerTemplate);
     }
 
     @Override

@@ -50,9 +50,6 @@ public abstract class IndexExecutorService {
     @Value("${solr.router.uri.type}")
     String solrRouterURI;
 
-    @Value("${commit.indexes.interval}")
-    public Integer commitIndexesInterval;
-
     private ExecutorService executorService;
     private Integer loopCount;
     private Integer callableCountByCommitInterval;
@@ -64,6 +61,7 @@ public abstract class IndexExecutorService {
 
         Integer numThreads = solrIndexRequest.getNumberOfThreads();
         Integer docsPerThread = solrIndexRequest.getNumberOfDocs();
+        Integer commitIndexesInterval = solrIndexRequest.getCommitInterval();
         Integer owningInstitutionId = solrIndexRequest.getOwningInstitutionId();
 
         try {
@@ -134,8 +132,11 @@ public abstract class IndexExecutorService {
                     while (solrQSize != 0) {
                         solrQSize = solrQSedaEndPoint.getExchanges().size();
                     }
-                    producerTemplate.sendBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
+                    Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
+                    logger.info("Commit future done : " + future.isDone());
+                    while (!future.isDone()) {
 
+                    }
                     logger.info("Num of Bibs Processed and indexed to core on commit interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and indexed to core : " + totalBibsProcessed);
                 }
