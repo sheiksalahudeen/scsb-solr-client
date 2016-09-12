@@ -11,30 +11,30 @@ import org.apache.camel.dataformat.bindy.annotation.DataField;
 public class SummaryReportReCAPCSVRecord {
 
     @DataField(pos = 1)
-    private String numberOfBibsInTable;
+    private String countOfBibsInTable;
     @DataField(pos = 2)
-    private String numberOfItemsInTable;
+    private String countOfItemsInTable;
     @DataField(pos = 3)
     private String matchingKeyField;
     @DataField(pos = 4)
     private String countOfBibMatches;
     @DataField(pos = 5)
-    private String numberOfItemsAffected;
+    private String countOfItemAffected;
 
-    public String getNumberOfBibsInTable() {
-        return numberOfBibsInTable;
+    public String getCountOfBibsInTable() {
+        return countOfBibsInTable;
     }
 
-    public void setNumberOfBibsInTable(String numberOfBibsInTable) {
-        this.numberOfBibsInTable = numberOfBibsInTable;
+    public void setCountOfBibsInTable(String countOfBibsInTable) {
+        this.countOfBibsInTable = countOfBibsInTable;
     }
 
-    public String getNumberOfItemsInTable() {
-        return numberOfItemsInTable;
+    public String getCountOfItemsInTable() {
+        return countOfItemsInTable;
     }
 
-    public void setNumberOfItemsInTable(String numberOfItemsInTable) {
-        this.numberOfItemsInTable = numberOfItemsInTable;
+    public void setCountOfItemsInTable(String countOfItemsInTable) {
+        this.countOfItemsInTable = countOfItemsInTable;
     }
 
     public String getMatchingKeyField() {
@@ -53,11 +53,11 @@ public class SummaryReportReCAPCSVRecord {
         this.countOfBibMatches = countOfBibMatches;
     }
 
-    public String getNumberOfItemsAffected() {
-        return numberOfItemsAffected;
+    public String getCountOfItemAffected() {
+        return countOfItemAffected;
     }
 
-    public void setNumberOfItemsAffected(String numberOfItemsAffected) {
-        this.numberOfItemsAffected = numberOfItemsAffected;
+    public void setCountOfItemAffected(String countOfItemAffected) {
+        this.countOfItemAffected = countOfItemAffected;
     }
 }
