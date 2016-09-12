@@ -135,7 +135,7 @@ public abstract class IndexExecutorService {
                     Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
                     logger.info("Commit future done : " + future.isDone());
                     while (!future.isDone()) {
-
+                        logger.info("Thread is busy committing to Solr.");
                     }
                     logger.info("Num of Bibs Processed and indexed to core on commit interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and indexed to core : " + totalBibsProcessed);
