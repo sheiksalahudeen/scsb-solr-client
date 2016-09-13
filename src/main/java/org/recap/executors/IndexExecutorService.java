@@ -144,6 +144,9 @@ public abstract class IndexExecutorService {
                 stopWatch.stop();
                 logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
                 executorService.shutdown();
+
+                //Final commit
+                producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
             } else {
                 logger.info("No records found to index for the criteria");
             }
