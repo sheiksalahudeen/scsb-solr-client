@@ -224,9 +224,9 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getAuthorDisplayValue(Record marcRecord) {
         StringBuilder author = new StringBuilder();
-        author.append(getDataFieldValueStartsWith(marcRecord, "100", Arrays.asList('a','q')) + " ");
-        author.append(getDataFieldValueStartsWith(marcRecord, "110", Arrays.asList('a','b')) + " ");
-        author.append(getDataFieldValueStartsWith(marcRecord, "111", Arrays.asList('a')) + " ");
+        author.append(getDataFieldValueStartsWith(marcRecord, "100", Arrays.asList('a','b','c','d','e','f','g','j','k','l','n','p','q','t','u','0','4','6','8')) + " ");
+        author.append(getDataFieldValueStartsWith(marcRecord, "110", Arrays.asList('a','b','c','d','e','f','g','k','l','n','p','t','u','0','4','6','8')) + " ");
+        author.append(getDataFieldValueStartsWith(marcRecord, "111", Arrays.asList('a','c','d','e','f','g','j','k','l','n','p','q','t','u','0','4','6','8')) + " ");
         return author.toString();
     }
 
