@@ -251,6 +251,6 @@ public class BibJSONUtilUT extends BaseTestCase{
         Record marcRecord = records.get(0);
         String titleSort = bibJSONUtil.getTitleSort(marcRecord, bibJSONUtil.getTitleDisplay(marcRecord));
         assertNotNull(titleSort);
-        assertEquals(titleSort,"Baḥrayn :");
+        assertEquals(titleSort,"Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /");
     }
 }
