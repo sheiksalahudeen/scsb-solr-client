@@ -28,7 +28,8 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
-apply plugin: "net.saliman.cobertura"
+apply plugin: 'net.saliman.cobertura'
+apply plugin: 'jacoco'
 
 sonarqube {
 	properties {
@@ -99,4 +100,14 @@ eclipse {
 
 cobertura {
 	coverageFormats = [ 'xml', 'html' ]
+}
+
+jacocoTestReport {
+	group = "Reporting"
+	reports {
+		xml.enabled true
+		csv.enabled false
+		html.enabled = true
+		html.destination "${buildDir}/jacocoHtml"
+	}
 }
