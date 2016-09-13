@@ -44,6 +44,9 @@ public class Item {
     @Field("SummaryHoldings")
     private String summaryHoldings;
 
+    @Field("OwningInstitution")
+    private String owningInstitution;
+
     @Field("ItemBibId")
     private List<Integer> itemBibIdList;
 
@@ -136,6 +139,14 @@ public class Item {
 
     public void setSummaryHoldings(String summaryHoldings) {
         this.summaryHoldings = summaryHoldings;
+    }
+
+    public String getOwningInstitution() {
+        return owningInstitution;
+    }
+
+    public void setOwningInstitution(String owningInstitution) {
+        this.owningInstitution = owningInstitution;
     }
 
     public List<Integer> getHoldingsIdList() {

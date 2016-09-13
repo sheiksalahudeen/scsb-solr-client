@@ -1,8 +1,9 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.HoldingsEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Created by hemalathas on 21/6/16.
@@ -10,5 +11,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface HoldingsDetailsRepository extends JpaRepository<HoldingsEntity, String> {
 
     HoldingsEntity findByHoldingsId(Integer holdingsId);
-
+    Long countByOwningInstitutionId(Integer institutionId);
+    Page<HoldingsEntity> findByOwningInstitutionId(Pageable pageable, Integer institutionId);
 }

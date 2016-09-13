@@ -5,6 +5,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
@@ -165,19 +166,24 @@ public class BibItemRecordSetupCallableUT {
         holdingsEntity.setHoldingsId(1);
         holdingsEntity.setContent(holdingContent.getBytes());
         holdingsEntities.add(holdingsEntity);
-
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
+
+        holdingsEntity.setBibliographicEntities(bibliographicEntities);
 
         BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity);
         Map<String, List> bibItem = ( Map<String, List>)bibItemRecordSetupCallable.call();
         assertNotNull(bibItem);
         List<Bib> bib = (List<Bib>)bibItem.get("Bib");
+        List<Holdings> holdings = (List<Holdings>)bibItem.get("Holdings");
         List<Item> item = (List<Item>)bibItem.get("Item");
         assertNotNull(bib);
+        assertNotNull(holdings);
         assertNotNull(item);
         assertNotNull(bib.get(0));
+        assertNotNull(holdings.get(0));
         assertNotNull(item.get(0));
         assertEquals(new Integer(1),new Integer(bib.get(0).getBibId()));
+        assertEquals(new Integer(1),new Integer(holdings.get(0).getHoldingsId()));
         assertEquals(new Integer(1),new Integer(item.get(0).getItemId()));
     }
 }

@@ -9,6 +9,7 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +105,7 @@ public class BibJSONUtil extends MarcUtil {
 
     public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
         Map map = new HashMap();
+        List<Holdings> holdingsList = new ArrayList<>();
         List<Item> items = new ArrayList<>();
 
         Bib bib = generateBib(bibliographicEntity);
@@ -120,12 +122,15 @@ public class BibJSONUtil extends MarcUtil {
         List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             holdingsIds.add(holdingsEntity.getHoldingsId());
+            Holdings holdings = new HoldingsJSONUtil().generateHoldingsForIndex(holdingsEntity);
+            holdingsList.add(holdings);
         }
 
         bib.setHoldingsIdList(holdingsIds);
         bib.setBibItemIdList(itemIds);
 
         map.put("Bib", Arrays.asList(bib));
+        map.put("Holdings", holdingsList);
         map.put("Item", items);
         return map;
     }

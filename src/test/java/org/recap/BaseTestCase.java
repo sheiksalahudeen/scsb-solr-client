@@ -7,6 +7,7 @@ import org.recap.admin.SolrAdmin;
 import org.recap.repository.jpa.*;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
+import org.recap.repository.solr.main.HoldingsSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,9 @@ public class BaseTestCase {
 
     @Autowired
     public BibSolrCrudRepository bibSolrCrudRepository;
+
+    @Autowired
+    public HoldingsSolrCrudRepository holdingsSolrCrudRepository;
 
     @Autowired
     public BibliographicDetailsRepository bibliographicDetailsRepository;
