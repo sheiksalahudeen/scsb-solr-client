@@ -4,7 +4,8 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +24,9 @@ import java.util.concurrent.Future;
 
 
 public class BibIndexCallable implements Callable {
+
+    Logger logger = LoggerFactory.getLogger(BibIndexCallable.class);
+
     private final int pageNum;
     private final int docsPerPage;
     private String coreName;
@@ -48,6 +52,7 @@ public class BibIndexCallable implements Callable {
                 bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
                 bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
+        logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         List<Bib> bibsToIndex = new ArrayList<>();
 
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
@@ -68,6 +73,8 @@ public class BibIndexCallable implements Callable {
         }
 
         executorService.shutdown();
+
+        logger.info("No of Bibs to index : " + bibsToIndex.size());
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBody("seda:solrQ", bibsToIndex);

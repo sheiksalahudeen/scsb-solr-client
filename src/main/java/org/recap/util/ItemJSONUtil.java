@@ -42,6 +42,10 @@ public class ItemJSONUtil extends MarcUtil{
             }
             item.setItemBibIdList(bibIdList);
 
+            InstitutionEntity institutionEntity = itemEntity.getInstitutionEntity();
+            String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
+            item.setOwningInstitution(institutionCode);
+
             ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
             if (itemStatusEntity != null) {
                 item.setAvailability(itemStatusEntity.getStatusCode());
@@ -56,10 +60,6 @@ public class ItemJSONUtil extends MarcUtil{
             if(null != holdingsEntity) {
                 holdingsIds.add(holdingsEntity.getHoldingsId());
                 item.setHoldingsIdList(holdingsIds);
-                String holdingsContent = new String(holdingsEntity.getContent());
-                List<Record> records = convertMarcXmlToRecord(holdingsContent);
-                Record marcRecord = records.get(0);
-                item.setSummaryHoldings(getDataFieldValue(marcRecord, "866", null, null, "a"));
             }
         } catch (Exception e) {
             e.printStackTrace();

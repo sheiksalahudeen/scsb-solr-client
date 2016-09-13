@@ -4,7 +4,8 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +22,8 @@ import java.util.concurrent.Future;
  * Created by angelind on 15/6/16.
  */
 public class ItemIndexCallable implements Callable {
+
+    Logger logger = LoggerFactory.getLogger(ItemIndexCallable.class);
 
     private int pageNum;
     private int docsPerPage;
@@ -46,6 +49,7 @@ public class ItemIndexCallable implements Callable {
                 itemDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
                 itemDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
+        logger.info("Num Items Fetched : " + itemEntities.getNumberOfElements());
         List<Item> itemsToIndex = new ArrayList<>();
 
         Iterator<ItemEntity> iterator = itemEntities.iterator();
@@ -66,6 +70,8 @@ public class ItemIndexCallable implements Callable {
         }
 
         executorService.shutdown();
+
+        logger.info("No of Items to index : " + itemsToIndex.size());
 
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBody("seda:solrQ", itemsToIndex);

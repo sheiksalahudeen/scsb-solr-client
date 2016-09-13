@@ -54,6 +54,7 @@ public class BibItemIndexCallable implements Callable {
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         List<Bib> bibsToIndex = new ArrayList<>();
+        List<Bib> holdingsToIndex = new ArrayList<>();
         List<Item> itemsToIndex = new ArrayList<>();
 
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
@@ -76,6 +77,8 @@ public class BibItemIndexCallable implements Callable {
                 Map<String, List> stringListMap = (Map<String, List>) future.get();
                 List bibs = stringListMap.get("Bib");
                 bibsToIndex.addAll(bibs);
+                List holdings = stringListMap.get("Holdings");
+                holdingsToIndex.addAll(holdings);
                 List items = stringListMap.get("Item");
                 itemsToIndex.addAll(items);
             }
@@ -84,12 +87,16 @@ public class BibItemIndexCallable implements Callable {
         }
 
         logger.info("No of Bibs to index : " + bibsToIndex.size());
+        logger.info("No of Holdings to index : " + holdingsToIndex.size());
         logger.info("No of Items to index : " + itemsToIndex.size());
 
         executorService.shutdown();
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBody("seda:solrQ", bibsToIndex);
+        }
+        if (!CollectionUtils.isEmpty(holdingsToIndex)) {
+            producerTemplate.sendBody("seda:solrQ", holdingsToIndex);
         }
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBody("seda:solrQ", itemsToIndex);

@@ -6,6 +6,7 @@ import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
 import org.recap.executors.BibIndexExecutorService;
 import org.recap.executors.BibItemIndexExecutorService;
+import org.recap.executors.HoldingsIndexExecutorService;
 import org.recap.executors.ItemIndexExecutorService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
@@ -26,7 +27,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Created by Sheik on 6/18/2016.
@@ -38,6 +38,9 @@ public class SolrIndexController {
 
     @Autowired
     BibIndexExecutorService bibIndexExecutorService;
+
+    @Autowired
+    HoldingsIndexExecutorService holdingsIndexExecutorService;
 
     @Autowired
     ItemIndexExecutorService itemIndexExecutorService;
@@ -104,6 +107,9 @@ public class SolrIndexController {
         if (solrIndexRequest.getDocType().equalsIgnoreCase("Bibs")) {
             bibIndexExecutorService.index(solrIndexRequest);
             totalTimeTaken = bibIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
+        } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Holdings")) {
+            holdingsIndexExecutorService.index(solrIndexRequest);
+            totalTimeTaken = holdingsIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
         } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Items")) {
             itemIndexExecutorService.index(solrIndexRequest);
             totalTimeTaken = itemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
