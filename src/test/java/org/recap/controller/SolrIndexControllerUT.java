@@ -83,6 +83,7 @@ public class SolrIndexControllerUT extends BaseControllerUT{
 
     private SolrIndexRequest getSolrIndexRequest(){
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setDocType("");
         return solrIndexRequest;
     }
 
