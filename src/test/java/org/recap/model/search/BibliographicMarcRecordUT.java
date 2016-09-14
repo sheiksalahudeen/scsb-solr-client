@@ -121,7 +121,7 @@ public class BibliographicMarcRecordUT {
         BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
         assertNotNull(bibliographicMarcRecord);
         assertEquals("Rih Husayn Muhammad    Travels of Ibn Jubayr. \"E.J.W. Gibb memorial\" series ; ",bibliographicMarcRecord.getTitle());
-        assertEquals("Ibn Jubayr   ",bibliographicMarcRecord.getAuthor());
+        assertEquals("Ibn Jubayr 1145-1217.   ",bibliographicMarcRecord.getAuthor());
         assertEquals("AMS Press,",bibliographicMarcRecord.getPublisher());
         assertEquals("1973] 1907.",bibliographicMarcRecord.getPublishedDate());
         assertEquals("01814cam a2200409 450000",bibliographicMarcRecord.getTag000());
