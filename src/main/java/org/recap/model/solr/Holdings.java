@@ -12,7 +12,7 @@ public class Holdings {
     @Field
     private String id;
 
-    @Field("HoldingsId")
+    @Field("HoldingId")
     private Integer holdingsId;
 
     @Field("DocType")
@@ -20,6 +20,9 @@ public class Holdings {
 
     @Field("SummaryHoldings")
     private String summaryHoldings;
+
+    @Field("OwningInstitution")
+    private String owningInstitution;
 
     public String getId() {
         return id;
@@ -51,5 +54,13 @@ public class Holdings {
 
     public void setSummaryHoldings(String summaryHoldings) {
         this.summaryHoldings = summaryHoldings;
+    }
+
+    public String getOwningInstitution() {
+        return owningInstitution;
+    }
+
+    public void setOwningInstitution(String owningInstitution) {
+        this.owningInstitution = owningInstitution;
     }
 }

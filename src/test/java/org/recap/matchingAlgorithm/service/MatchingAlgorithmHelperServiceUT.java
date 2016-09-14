@@ -108,7 +108,6 @@ public class MatchingAlgorithmHelperServiceUT {
         item.setBarcode("BA352");
         item.setAvailability("Available");
         item.setUseRestriction("Allowed");
-        item.setSummaryHoldings("Summary Holding");
         item.setCollectionGroupDesignation("Shared");
         return item;
     }

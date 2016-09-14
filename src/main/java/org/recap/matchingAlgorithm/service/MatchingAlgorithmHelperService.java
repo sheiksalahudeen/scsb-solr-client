@@ -10,11 +10,13 @@ import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.solr.Bib;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.repository.solr.main.HoldingsSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class MatchingAlgorithmHelperService {
 
     @Autowired
     public BibSolrCrudRepository bibCrudRepository;
+
+    @Autowired
+    public HoldingsSolrCrudRepository holdingsSolrCrudRepository;
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;
@@ -238,13 +243,19 @@ public class MatchingAlgorithmHelperService {
                         useRestrictionsReportDataEntity.setHeaderValue(item.getUseRestriction());
                         reportDataEntities.add(useRestrictionsReportDataEntity);
                     }
-                    String summaryHoldings = item.getSummaryHoldings();
-                    if(StringUtils.isNotBlank(summaryHoldings)) {
-                        ReportDataEntity summaryHoldingsReportDataEntity = new ReportDataEntity();
-                        summaryHoldingsReportDataEntity.setHeaderName(RecapConstants.MATCHING_SUMMARY_HOLDINGS);
-                        String headerValue = checkAndTruncateHeaderValue(summaryHoldings);
-                        summaryHoldingsReportDataEntity.setHeaderValue(headerValue);
-                        reportDataEntities.add(summaryHoldingsReportDataEntity);
+                    if (!CollectionUtils.isEmpty(bib.getHoldingsIdList())) {
+                        Integer holdingsId = bib.getHoldingsIdList().get(0);
+                        if (null != holdingsId) {
+                            Holdings holdings = holdingsSolrCrudRepository.findByHoldingsId(holdingsId);
+                            String summaryHoldings = holdings.getSummaryHoldings();
+                            if (StringUtils.isNotBlank(summaryHoldings)) {
+                                ReportDataEntity summaryHoldingsReportDataEntity = new ReportDataEntity();
+                                summaryHoldingsReportDataEntity.setHeaderName(RecapConstants.MATCHING_SUMMARY_HOLDINGS);
+                                String headerValue = checkAndTruncateHeaderValue(summaryHoldings);
+                                summaryHoldingsReportDataEntity.setHeaderValue(headerValue);
+                                reportDataEntities.add(summaryHoldingsReportDataEntity);
+                            }
+                        }
                     }
                     ReportDataEntity matchingFieldReportDataEntity = getMatchingFieldEntity(fieldName, fieldValue);
                     reportDataEntities.add(matchingFieldReportDataEntity);

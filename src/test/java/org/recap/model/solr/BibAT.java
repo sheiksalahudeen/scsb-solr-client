@@ -349,7 +349,6 @@ public class BibAT extends BaseTestCase {
         item1.setCollectionGroupDesignation("Shared");
         item1.setCallNumber("H3");
         item1.setCustomerCode("Test Cust Code");
-        item1.setSummaryHoldings("test SH");
         item1.setUseRestriction("In Library Use");
         item1.setVolumePartYear("V.1 1982");
         item1.setItemBibIdList(Arrays.asList(bibId1, bibId2));
@@ -363,7 +362,6 @@ public class BibAT extends BaseTestCase {
         item2.setCollectionGroupDesignation("Shared");
         item2.setCallNumber("H3");
         item2.setCustomerCode("Test Cust Code");
-        item2.setSummaryHoldings("test SH");
         item2.setUseRestriction("In Library Use");
         item2.setVolumePartYear("V.1 1982");
         item2.setItemBibIdList(Arrays.asList(bibId1, bibId2));

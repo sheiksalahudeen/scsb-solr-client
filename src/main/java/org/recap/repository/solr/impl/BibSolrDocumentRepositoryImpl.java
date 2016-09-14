@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.solr.BibItem;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.springframework.data.domain.Page;
@@ -141,6 +142,18 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
                     for (Integer itemId : bibItem.getBibItemIdList()) {
                         bibItem.getItems().add(itemMap.get(itemId));
+                    }
+                }
+                if (!CollectionUtils.isEmpty(bibItem.getHoldingsIdList())) {
+                    Integer holdingsId = bibItem.getHoldingsIdList().get(0);
+                    if (null != holdingsId) {
+                        SimpleQuery holdingsQuery = new SimpleQuery(new Criteria(RecapConstants.HOLDING_ID).is(holdingsId));
+                        holdingsQuery.setRows(1);
+                        ScoredPage<Holdings> holdingsResult = solrTemplate.queryForPage(holdingsQuery, Holdings.class);
+                        List<Holdings> holdingsList = holdingsResult.getContent();
+                        if (!CollectionUtils.isEmpty(holdingsList)) {
+                            bibItem.setSummaryHoldings(holdingsList.get(0).getSummaryHoldings());
+                        }
                     }
                 }
             }
