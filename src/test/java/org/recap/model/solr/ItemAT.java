@@ -38,7 +38,6 @@ public class ItemAT extends  BaseTestCase {
         item.setCollectionGroupDesignation("Shared");
         item.setUseRestriction("Use Restriction");
         item.setVolumePartYear("1970");
-        item.setSummaryHoldings("This item has 2 Holdings");
         item.setHoldingsIdList(holdingsIdList);
         item.setItemBibIdList(itemBibIdList);
         Item indexedItem = itemCrudRepository.save(item);
@@ -54,7 +53,6 @@ public class ItemAT extends  BaseTestCase {
         assertEquals(indexedItem.getCollectionGroupDesignation(),"Shared");
         assertEquals(indexedItem.getUseRestriction(),"Use Restriction");
         assertEquals(indexedItem.getVolumePartYear(),"1970");
-        assertEquals(indexedItem.getSummaryHoldings(),"This item has 2 Holdings");
         assertTrue(indexedItem.getHoldingsIdList().equals(holdingsIdList));
         assertTrue(indexedItem.getItemBibIdList().equals(itemBibIdList));
     }

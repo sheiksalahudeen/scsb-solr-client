@@ -230,7 +230,7 @@ public class SearchRecordsController {
                         searchResultRow.setUseRestriction(item.getUseRestriction());
                         searchResultRow.setBarcode(item.getBarcode());
                         searchResultRow.setAvailability(item.getAvailability());
-                        searchResultRow.setSummaryHoldings(item.getSummaryHoldings());
+                        searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                     }
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
@@ -248,10 +248,7 @@ public class SearchRecordsController {
                                 searchItemResultRows.add(searchItemResultRow);
                             }
                         }
-                        Item firstItem = bibItem.getItems().get(0);
-                        if (null != firstItem) {
-                            searchResultRow.setSummaryHoldings(firstItem.getSummaryHoldings());
-                        }
+                        searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                         searchResultRow.setShowItems(true);
                         Collections.sort(searchItemResultRows);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);

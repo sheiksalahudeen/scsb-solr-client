@@ -24,11 +24,16 @@ public class HoldingsAT extends BaseTestCase {
         holdings.setHoldingsId(1001);
         holdings.setDocType("Holdings");
         holdings.setSummaryHoldings("Test Summary Holdings Info");
+        holdings.setOwningInstitution("NYPL");
 
         Holdings indexedHoldings = holdingsSolrCrudRepository.save(holdings);
-        assertNotNull(indexedHoldings);
-        assertEquals(indexedHoldings.getHoldingsId(),new Integer(1001));
-        assertEquals(indexedHoldings.getDocType(),"Holdings");
-        assertEquals(indexedHoldings.getSummaryHoldings(),"Test Summary Holdings Info");
+        solrTemplate.softCommit();
+
+        Holdings fetchedHoldings = holdingsSolrCrudRepository.findByHoldingsId(indexedHoldings.getHoldingsId());
+        assertNotNull(fetchedHoldings);
+        assertEquals(fetchedHoldings.getHoldingsId(), new Integer(1001));
+        assertEquals(fetchedHoldings.getDocType(), "Holdings");
+        assertEquals(fetchedHoldings.getSummaryHoldings(), "Test Summary Holdings Info");
+        assertEquals(fetchedHoldings.getOwningInstitution(), "NYPL");
     }
 }

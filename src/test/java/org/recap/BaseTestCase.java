@@ -12,6 +12,7 @@ import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -65,6 +66,9 @@ public class BaseTestCase {
 
     @Autowired
     BibSolrDocumentRepository bibSolrDocumentRepository;
+
+    @Autowired
+    public SolrTemplate solrTemplate;
 
     @Value("${bib.rest.url}")
     public String bibResourceURL;

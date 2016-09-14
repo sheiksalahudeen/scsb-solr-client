@@ -1,5 +1,6 @@
 package org.recap.model.solr;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 
@@ -40,9 +41,6 @@ public class Item {
 
     @Field("CallNumber")
     private String callNumber;
-
-    @Field("SummaryHoldings")
-    private String summaryHoldings;
 
     @Field("OwningInstitution")
     private String owningInstitution;
@@ -131,14 +129,6 @@ public class Item {
 
     public void setCallNumber(String callNumber) {
         this.callNumber = callNumber;
-    }
-
-    public String getSummaryHoldings() {
-        return summaryHoldings;
-    }
-
-    public void setSummaryHoldings(String summaryHoldings) {
-        this.summaryHoldings = summaryHoldings;
     }
 
     public String getOwningInstitution() {
