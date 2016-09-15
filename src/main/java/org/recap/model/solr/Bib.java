@@ -30,6 +30,9 @@ public class Bib {
     @Field("Title_display")
     private String titleDisplay;
 
+    @Field("TitleStartsWith")
+    private String titleStartsWith;
+
     @Field("Author_display")
     private String authorDisplay;
 
@@ -136,6 +139,14 @@ public class Bib {
 
     public void setTitleDisplay(String titleDisplay) {
         this.titleDisplay = titleDisplay;
+    }
+
+    public String getTitleStartsWith() {
+        return titleStartsWith;
+    }
+
+    public void setTitleStartsWith(String titleStartsWith) {
+        this.titleStartsWith = titleStartsWith;
     }
 
     public String getAuthorDisplay() {

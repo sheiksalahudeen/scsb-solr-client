@@ -6,7 +6,24 @@ jQuery(document).ready(function ($) {
     $("#searchResults").tablesorter({
         sortList: [[1,0]]
     });
+
+    if ($("#fieldValue").val().length == 0) {
+        $("#clearSearchText").hide();
+    }
+
+    $("#fieldValue").keyup(function(e) {
+        if ($("#fieldValue").val().length > 0) {
+            $("#clearSearchText").show();
+        } else {
+            $("#clearSearchText").hide();
+        }
+    });
 });
+
+function clearSearchText() {
+    $("#fieldValue").val('');
+    $("#clearSearchText").hide();
+}
 
 function showItems(resultRowIndex) {
     toggleIcon(resultRowIndex);
@@ -70,4 +87,47 @@ jQuery(document).keypress(function (e) {
         $("#search").click();
     }
 });
+
+function selectOrDeselectFacets() {
+    var selectAllFacets = $('#selectAllFacets').is(":checked");
+    if(selectAllFacets) {
+        $('#owningInstitutionNYPL').prop('checked', true);
+        $('#owningInstitutionCUL').prop('checked', true);
+        $('#owningInstitutionPUL').prop('checked', true);
+
+        $('#shared').prop('checked', true);
+        $('#private').prop('checked', true);
+        $('#open').prop('checked', true);
+
+        $('#available').prop('checked', true);
+        $('#notAvailable').prop('checked', true);
+
+        $('#monograph').prop('checked', true);
+        $('#serials').prop('checked', true);
+        $('#others').prop('checked', true);
+
+        $('#noRestriction').prop('checked', true);
+        $('#inLibraryUse').prop('checked', true);
+        $('#supervisedUse').prop('checked', true);
+    } else {
+        $('#owningInstitutionNYPL').prop('checked', false);
+        $('#owningInstitutionCUL').prop('checked', false);
+        $('#owningInstitutionPUL').prop('checked', false);
+
+        $('#shared').prop('checked', false);
+        $('#private').prop('checked', false);
+        $('#open').prop('checked', false);
+
+        $('#available').prop('checked', false);
+        $('#notAvailable').prop('checked', false);
+
+        $('#monograph').prop('checked', false);
+        $('#serials').prop('checked', false);
+        $('#others').prop('checked', false);
+
+        $('#noRestriction').prop('checked', false);
+        $('#inLibraryUse').prop('checked', false);
+        $('#supervisedUse').prop('checked', false);
+    }
+}
 
