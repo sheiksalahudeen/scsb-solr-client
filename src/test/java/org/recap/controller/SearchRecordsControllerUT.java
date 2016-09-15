@@ -167,7 +167,8 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
         materialTypes.add("Monograph");
         searchRecordsRequest.setMaterialTypes(materialTypes);
         searchRecordsRequest.setTotalPageCount(1);
-        searchRecordsRequest.setTotalRecordsCount("1");
+        searchRecordsRequest.setTotalBibRecordsCount("1");
+        searchRecordsRequest.setTotalItemRecordsCount("1");
         searchRecordsRequest.setSelectAll(false);
         searchRecordsRequest.setIndex(1);
         searchRecordsRequest.setPageNumber(1);

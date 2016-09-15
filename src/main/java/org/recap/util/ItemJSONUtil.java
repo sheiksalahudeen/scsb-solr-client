@@ -1,8 +1,7 @@
 package org.recap.util;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.marc4j.marc.Record;
+import org.apache.commons.lang3.StringUtils;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ public class ItemJSONUtil extends MarcUtil{
 
     Logger logger = LoggerFactory.getLogger(ItemJSONUtil.class);
 
-    private static ItemJSONUtil itemJSONUtil;
-
     public ItemJSONUtil() {
     }
 
@@ -31,7 +28,8 @@ public class ItemJSONUtil extends MarcUtil{
             item.setBarcode(itemEntity.getBarcode());
             item.setDocType("Item");
             item.setCustomerCode(itemEntity.getCustomerCode());
-            item.setUseRestriction(itemEntity.getUseRestrictions());
+            String useRestrictions = itemEntity.getUseRestrictions();
+            item.setUseRestriction(StringUtils.isNotBlank(useRestrictions) ? useRestrictions : RecapConstants.NO_RESTRICTIONS);
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumber(itemEntity.getCallNumber());
 

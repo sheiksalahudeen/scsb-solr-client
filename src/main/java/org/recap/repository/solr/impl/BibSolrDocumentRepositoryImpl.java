@@ -9,6 +9,7 @@ import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.RequestMethod;
@@ -39,26 +40,40 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     @Override
     public List<BibItem> search(SearchRecordsRequest searchRecordsRequest, Pageable page) {
 
-        SimpleQuery query = new SimpleQuery();
-        query.setPageRequest(page);
-        query.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
-        query.addCriteria(getCriteriaForFieldName(searchRecordsRequest));
-        query.addFilterQuery(getFilterQueryForInputFields(searchRecordsRequest, query));
-        query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
+        Criteria criteriaForFieldName = getCriteriaForFieldName(searchRecordsRequest);
 
-        Page results = solrTemplate.queryForPage(query, BibItem.class);
+        SimpleQuery bibQuery = new SimpleQuery();
+        bibQuery.setPageRequest(page);
+        bibQuery.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
+        bibQuery.addCriteria(criteriaForFieldName);
+        bibQuery.addFilterQuery(getBibFilterQueryForInputFields(searchRecordsRequest, bibQuery));
+        bibQuery.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
 
-        searchRecordsRequest.setPageNumber(results.getNumber());
-        searchRecordsRequest.setTotalPageCount(results.getTotalPages());
-        String totalCount = NumberFormat.getNumberInstance().format(results.getTotalElements());
-        searchRecordsRequest.setTotalRecordsCount(totalCount);
-        List<BibItem> bibItems = buildBibItems(results);
+        Page bibItemResults = solrTemplate.queryForPage(bibQuery, BibItem.class);
+
+        SimpleQuery itemQuery = new SimpleQuery();
+        itemQuery.setPageRequest(new PageRequest(0,1));
+        itemQuery.addCriteria(criteriaForFieldName);
+        itemQuery.addFilterQuery(getItemFilterQueryForInputFields(searchRecordsRequest, itemQuery));
+        itemQuery.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.ITEM)));
+
+        Page itemResults = solrTemplate.queryForPage(itemQuery, Item.class);
+        String totalItemCount = NumberFormat.getNumberInstance().format(itemResults.getTotalElements());
+        searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
+
+        searchRecordsRequest.setPageNumber(bibItemResults.getNumber());
+        searchRecordsRequest.setTotalPageCount(bibItemResults.getTotalPages());
+        String totalBibCount = NumberFormat.getNumberInstance().format(bibItemResults.getTotalElements());
+        searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+        List<BibItem> bibItems = buildBibItems(bibItemResults);
         return bibItems;
     }
 
-    private SimpleFilterQuery getFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
+    private SimpleFilterQuery getBibFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
         SimpleFilterQuery filterQuery = new SimpleFilterQuery();
         String fieldName = searchRecordsRequest.getFieldName();
+        List<String> useRestrictions = new ArrayList<>();
+        useRestrictions.addAll(searchRecordsRequest.getUseRestrictions());
 
         if (!isEmptySearch(searchRecordsRequest) || StringUtils.isBlank(fieldName)) {
             query.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
@@ -69,7 +84,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
             query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes())));
         }
-        if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) || !CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations()) || !CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())
+                || !CollectionUtils.isEmpty(useRestrictions)) {
             filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
         }
         if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations())) {
@@ -77,6 +93,39 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         }
         if (!CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
             filterQuery.addCriteria(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability()));
+        }
+        if (!CollectionUtils.isEmpty(useRestrictions)) {
+            filterQuery.addCriteria(new Criteria(RecapConstants.USE_RESTRICTION).in(useRestrictions));
+        }
+        return filterQuery;
+    }
+
+    private SimpleFilterQuery getItemFilterQueryForInputFields(SearchRecordsRequest searchRecordsRequest, SimpleQuery query) {
+        SimpleFilterQuery filterQuery = new SimpleFilterQuery();
+        String fieldName = searchRecordsRequest.getFieldName();
+        List<String> useRestrictions = new ArrayList<>();
+        useRestrictions.addAll(searchRecordsRequest.getUseRestrictions());
+
+        if (!isEmptySearch(searchRecordsRequest) || StringUtils.isBlank(fieldName)) {
+            query.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions()) || !CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
+            filterQuery.setJoin(Join.from(RecapConstants.HOLDINGS_ID).to(RecapConstants.HOLDINGS_ID));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getOwningInstitutions())) {
+            filterQuery.addCriteria(new Criteria(RecapConstants.OWNING_INSTITUTION).in(searchRecordsRequest.getOwningInstitutions()));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getMaterialTypes())) {
+            filterQuery.addCriteria(new Criteria(RecapConstants.LEADER_MATERIAL_TYPE).in(searchRecordsRequest.getMaterialTypes()));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getCollectionGroupDesignations())) {
+            query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.COLLECTION_GROUP_DESIGNATION).in(searchRecordsRequest.getCollectionGroupDesignations())));
+        }
+        if (!CollectionUtils.isEmpty(searchRecordsRequest.getAvailability())) {
+            query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.AVAILABILITY).in(searchRecordsRequest.getAvailability())));
+        }
+        if (!CollectionUtils.isEmpty(useRestrictions)) {
+            query.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.USE_RESTRICTION).in(useRestrictions)));
         }
         return filterQuery;
     }
@@ -99,7 +148,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         } else {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
                 String[] splitedTitle = fieldValue.split(" ");
-                criteria = new Criteria(RecapConstants.TITLE).startsWith(splitedTitle[0]);
+                criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith(splitedTitle[0]);
             } else {
                 fieldValue = StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ");
                 criteria = new Criteria(fieldName).expression(fieldValue);

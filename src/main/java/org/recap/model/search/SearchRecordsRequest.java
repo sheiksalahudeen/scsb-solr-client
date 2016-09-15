@@ -14,15 +14,18 @@ public class SearchRecordsRequest {
     private List<String> collectionGroupDesignations = null;
     private List<String> availability = null;
     private List<String> materialTypes = null;
+    private List<String> useRestrictions = null;
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
     private Integer totalPageCount = 0;
-    private String totalRecordsCount = "0";
+    private String totalBibRecordsCount = "0";
+    private String totalItemRecordsCount = "0";
     private Integer pageNumber = 0;
     private Integer pageSize = 25;
 
     private boolean showResults = false;
     private boolean selectAll = false;
+    private boolean selectAllFacets = false;
 
     private Integer index;
     private String errorMessage;
@@ -87,6 +90,17 @@ public class SearchRecordsRequest {
         this.materialTypes = materialTypes;
     }
 
+    public List<String> getUseRestrictions() {
+        if(null == useRestrictions) {
+            useRestrictions = new ArrayList<>();
+        }
+        return useRestrictions;
+    }
+
+    public void setUseRestrictions(List<String> useRestrictions) {
+        this.useRestrictions = useRestrictions;
+    }
+
     public List<SearchResultRow> getSearchResultRows() {
         if (null == searchResultRows) {
             searchResultRows = new ArrayList<>();
@@ -122,12 +136,20 @@ public class SearchRecordsRequest {
         this.pageSize = pageSize;
     }
 
-    public String getTotalRecordsCount() {
-        return totalRecordsCount;
+    public String getTotalBibRecordsCount() {
+        return totalBibRecordsCount;
     }
 
-    public void setTotalRecordsCount(String totalRecordsCount) {
-        this.totalRecordsCount = totalRecordsCount;
+    public void setTotalBibRecordsCount(String totalBibRecordsCount) {
+        this.totalBibRecordsCount = totalBibRecordsCount;
+    }
+
+    public String getTotalItemRecordsCount() {
+        return totalItemRecordsCount;
+    }
+
+    public void setTotalItemRecordsCount(String totalItemRecordsCount) {
+        this.totalItemRecordsCount = totalItemRecordsCount;
     }
 
     public boolean isShowResults() {
@@ -140,6 +162,14 @@ public class SearchRecordsRequest {
 
     public boolean isSelectAll() {
         return selectAll;
+    }
+
+    public boolean isSelectAllFacets() {
+        return selectAllFacets;
+    }
+
+    public void setSelectAllFacets(boolean selectAllFacets) {
+        this.selectAllFacets = selectAllFacets;
     }
 
     public void setSelectAll(boolean selectAll) {

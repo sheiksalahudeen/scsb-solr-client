@@ -19,16 +19,24 @@
                                th:field="*{pageNumber}" hidden="hidden"/>
                         <input id="totalPageCount" name="totalPageCount" type="text"
                                th:field="*{totalPageCount}" hidden="hidden"/>
-                        <input id="totalRecordsCount" name="totalRecordsCount" type="text"
-                               th:field="*{totalRecordsCount}" hidden="hidden"/>
+                        <input id="totalBibRecordsCount" name="totalBibRecordsCount" type="text"
+                               th:field="*{totalBibRecordsCount}" hidden="hidden"/>
+                        <input id="totalItemRecordsCount" name="totalItemRecordsCount" type="text"
+                               th:field="*{totalItemRecordsCount}" hidden="hidden"/>
                         <button id="pageSizeChangeButtonId" type="submit"
                                 name="action" value="pageSizeChange"
                                 hidden="hidden"></button>
-                        <div class="form-group">
+                        <div class="form-group has-feedback">
                             <div id="fieldValueId" name="fieldValueName" class="col-sm-9">
                                 <input type="text" th:field="*{fieldValue}"
                                        class="form-control"
                                        id="fieldValue"/>
+                                <i id="clearSearchText" class="fa fa-times form-control-feedback"
+                                   aria-hidden="true"
+                                   onclick="clearSearchText()"
+                                   style="cursor: pointer; pointer-events: all; font-size: 17px; margin-top: 7px;"
+                                   th:title="clear">
+                                </i>
                             </div>
                             <div id="fieldNameId" name="fieldName" class="col-sm-2">
                                 <select id="fieldName"
@@ -53,13 +61,23 @@
                             </div>
                             <div id="searchButtonDivId" name="searchButtonDivName" class="col-sm-1">
                                 <button id="search" type="submit" name="action" value="search"
-                                        class="btn btn-info active">
+                                        class="btn btn-info active" style="width: 100px;">
                                     <i class="fa fa-search" aria-hidden="true"> Search</i>
                                 </button>
                             </div>
                         </div>
-                        <div id="checkBoxesId" name="checkBoxesName" class="form-group col-sm-9">
-                            <div id="ownInstId" name="ownInstName" class="col-sm-3">
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <div id="checkBoxesId" name="checkBoxesName" class="form-group">
+                            <div id="selectAllFacetsDiv" name="selectAllFacetsDiv" class="col-sm-1">
+                                <label style="margin-top: 40px; margin-left: 20px;">Select/ Unselect All Facets</label>
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="checkbox" id="selectAllFacets"
+                                       name="selectAllFacets" th:field="*{selectAllFacets}" th:onclick="'javascript:selectOrDeselectFacets()'"
+                                       style="margin-top: 60px; margin-left: -10px;"/>
+                            </div>
+                            <div id="ownInstId" name="ownInstName" class="col-sm-1" style="margin-left: -50px; margin-right: 20px;">
                                 <label>Owning Institution</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="owningInstitutionNYPL"
@@ -76,7 +94,7 @@
                                             for="owningInstitutionPUL">Princeton</label></li>
                                 </ul>
                             </div>
-                            <div id="cgdId" name="cgdName" class="col-sm-3">
+                            <div id="cgdId" name="cgdName" class="col-sm-1" style="margin-left: 20px; margin-right: 20px;">
                                 <label>Collection Group</label>
                                 <ul class="checkbox" style="padding-left: 20px;">
                                     <li><input type="checkbox" id="shared" name="shared" value="Shared"
@@ -91,9 +109,9 @@
                                             for="open">Open</label></li>
                                 </ul>
                             </div>
-                            <div id="availabilityId" name="availabilityName" class="col-sm-3">
+                            <div id="availabilityId" name="availabilityName" class="col-sm-2" style="margin-right: -80px; margin-left: 20px;">
                                 <label>Availability</label>
-                                <ul class="checkbox" style="padding-left: 20px;">
+                                <ul class="checkbox" style="padding-left: 20px; margin-top: 20px;">
                                     <li><input type="checkbox" id="available" name="available"
                                                value="Available" th:field="*{availability}"/><label
                                             for="available">In ReCAP</label></li>
@@ -102,9 +120,22 @@
                                             for="notAvailable">Out</label></li>
                                 </ul>
                             </div>
-                            <div id="materialTypeId" name="materialTypeName" class="col-sm-3">
+                            <div id="useRestrictionId" name="useRestrictionName" class="col-sm-2" style="margin-right: 20px;">
+                                <label>Use Restriction</label>
+                                <ul class="checkbox" style="padding-left: 20px; margin-top: 20px;">
+                                    <li><input type="checkbox" id="noRestriction" name="noRestriction"
+                                               value="No Restrictions" th:field="*{useRestrictions}"/><label>No Restriction</label></li>
+                                    <li><input type="checkbox" id="inLibraryUse" name="inLibraryUse"
+                                               value="In Library Use" th:field="*{useRestrictions}"/><label
+                                            for="inLibraryUse">In Library Use</label></li>
+                                    <li><input type="checkbox" id="supervisedUse" name="supervisedUse"
+                                               value="Supervised Use" th:field="*{useRestrictions}"/><label
+                                            for="supervisedUse">Supervised Use</label></li>
+                                </ul>
+                            </div>
+                            <div id="materialTypeId" name="materialTypeName" class="col-sm-1" style="margin-left: -60px; margin-right: 20px;">
                                 <label>Material Type</label>
-                                <ul class="checkbox" style="padding-left: 20px;">
+                                <ul class="checkbox" style="padding-left: 20px; margin-top: 20px;">
                                     <li><input type="checkbox" id="monograph" name="monograph"
                                                value="Monograph" th:field="*{materialTypes}"/><label
                                             for="monograph">Monograph</label></li>
@@ -116,53 +147,51 @@
                                             for="others">Others</label></li>
                                 </ul>
                             </div>
-                        </div>
-                        <div id="buttonsDivId" name="buttonsDivName" class="form-group col-sm-12" style="margin-top: 25px;">
-                            <div class="col-sm-3">
-                                <button id="clear" type="submit" name="action" value="clear"
-                                        class="btn btn-info active  pull-right">Clear Boxes
-                                </button>
+                            <div class="col-sm-1">
                             </div>
-                            <div class="col-sm-3">
-                                <button id="newSearch" type="submit" name="action" value="newSearch"
-                                        class="btn btn-info active  pull-right">Reset Search
+                            <div id="buttonsDivId" name="buttonsDivName" class="col-sm-2" style="margin-top: 20px;">
+                                <button id="newSearch" type="submit" name="action" value="newSearch" style="margin-left: 70px;"
+                                        class="btn btn-info active">New Search
                                 </button>
                             </div>
                         </div>
                         <div  class="form-group col-sm-6" style="margin-top: 10px;" data-th-if="*{errorMessage ne null}">
-                            <div class="alert alert-info">
+                            <div class="alert alert-info" style="margin-left: 200px; margin-right: -80px; margin-bottom: 0px;">
                                 <span style="font-weight: bold"><span th:text="*{errorMessage}"></span></span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-sm-12" style="margin-top: 40px;">
+                    <div class="form-group col-sm-12" style="margin-top: 0px;">
                         <hr style="border-top-width: 3px;"/>
                     </div>
                     <div data-th-if="*{showResults}">
-                        <div id="searchResultsHeadId" name="searchResultsHeadName" class="form-group col-sm-2" style="margin-top: -40px;"
-                             data-th-if="*{showResults}">
-                            <h3 align="left" style="color: dodgerblue">Search Results</h3>
-                        </div>
-                        <div class="form-group col-sm-4" data-th-if="*{searchResultRows.size() &gt; 0 &amp;&amp; showResults}">
-                            <label class="col-sm-2" for="numOfRecordsId" style="margin-top: -15px;">Show</label>
-                            <select id="numOfRecordsId" name="numOfRecordsName"
-                                    class="form-control col-sm-2"
-                                    style="width: 100px; margin-top: -25px;"
-                                    th:field="*{pageSize}" onchange="document.getElementById('pageSizeChangeButtonId').click()">
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
+                        <div id="paginationDivTopId" name="paginationDivName" class="col-sm-12 form-group" style="margin-top: 0px; margin-bottom: 0px;">
+                            <div class="pull-left" style="margin-top: -50px;"
+                                 th:if="*{totalPageCount &gt; 1}">
+                                <div th:replace="pagination :: #paginationId"></div>
+                            </div>
+                            <div class="form-group col-sm-4" data-th-if="*{searchResultRows.size() &gt; 0 &amp;&amp; showResults}" style="padding-left: 150px; margin-right: -15px;">
+                                <label class="col-sm-2" for="numOfRecordsId" style="margin-top: -10px; padding-left: 15px;">Show</label>
+                                <select id="numOfRecordsId" name="numOfRecordsName"
+                                        class="form-control col-sm-2"
+                                        style="width: 100px; margin-top: -20px; margin-left: 20px;"
+                                        th:field="*{pageSize}" onchange="document.getElementById('pageSizeChangeButtonId').click()">
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group col-sm-12">
-                            <span align="right" class="pull-right" style="margin-top: -45px; font-weight: bold">Search Results Found: <span th:text="*{totalRecordsCount}"></span></span>
+                            <span align="right" class="pull-right" style="margin-top: -60px; font-weight: bold">Bibliographic Results Found: <span th:text="*{totalBibRecordsCount}"></span></span>
+                            <span align="right" class="pull-right" style="margin-top: -40px; font-weight: bold">Item Results Found: <span th:text="*{totalItemRecordsCount}"></span></span>
                         </div>
                         <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
-                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}" style="margin-top: -20px;">
+                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}" style="margin-top: -40px;">
                             <span>No search results found. Please refine search conditions.</span>
                         </div>
                         <div id="searchResultsDiv" class="form-group col-sm-12 table-responsive"
-                             data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -20px;">
+                             data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -30px;">
                             <table id="searchResults" name="searchResults" class="table table-hover tablesorter">
                                 <thead id="mainHead" style="background-color: grey; color: white;">
                                 <tr id="mainRow" class="parentRow">
@@ -170,16 +199,16 @@
                                         <label for="selectAll" style="width: 80px;">Select All</label>
                                         <input type="checkbox" id="selectAll" name="selectAll" class="outerSelectAllCBClass" th:field="*{selectAll}" style="margin-left: 26px;" th:onclick="'javascript:selectAllParentRows();enableExportSelectedRecordButton()'"/>
                                     </th>
-                                    <th class="sortHead" id="TitleHeadId" th:onclick="'javascript:sortHeader()'">Title</th>
-                                    <th class="sortHead" id="AuthorHeadId" th:onclick="'javascript:sortHeader()'">Author</th>
-                                    <th data-sorter="false">Publisher</th>
-                                    <th data-sorter="false">Publisher Date</th>
-                                    <th data-sorter="false">OI</th>
-                                    <th data-sorter="false">CC</th>
-                                    <th data-sorter="false">CGD</th>
-                                    <th data-sorter="false">Use Restriction</th>
-                                    <th data-sorter="false">Barcode</th>
-                                    <th data-sorter="false">SH</th>
+                                    <th class="sortHead" style="text-align: center; padding-right: 80px;" id="TitleHeadId" th:title="'Title'" th:onclick="'javascript:sortHeader()'">Title</th>
+                                    <th class="sortHead" style="text-align: center; padding-right: 80px;" id="AuthorHeadId" th:title="'Author'" th:onclick="'javascript:sortHeader()'">Author</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Publisher'">Publisher</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Publisher Date'">Publisher Date</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Owning Institution'">OI</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Customer Code'">CC</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Collection Group Designation'">CGD</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Use Restriction'">Use Restriction</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Barcode'">Barcode</th>
+                                    <th data-sorter="false" style="text-align: left;" th:title="'Summary Holdings'">SH</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -188,9 +217,8 @@
                                     <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].availability}"/>
                                     <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].leaderMaterialType}"/>
                                     <td data-th-id="'searchResultsDataPlus-'+ ${searchResultStat.index}">
-                                        <i class="fa fa-circle"
-                                           th:if="${searchResult.availability == 'Available' || searchResult.availability == 'Not Available'}"
-                                           th:style="${searchResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
+                                        <img src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Available'}"/>
+                                        <img src="images/out.png" alt="Out" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Not Available'}"/>
                                         <input type="checkbox" id="selected" name="selected" class="selectOuterCBClass"
                                                th:unless="${searchResult.showItems}"
                                                th:field="*{searchResultRows[__${searchResultStat.index}__].selected}"
@@ -227,7 +255,7 @@
                                     </td>
                                     <td data-th-id="'searchResultsDataUR-'+ ${searchResultStat.index}">
                                         <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].useRestriction}"/>
-                                        <span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction}"></span>
+                                        <span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction == 'No Restrictions'} ? '' : ${searchResult.useRestriction}"></span>
                                     </td>
                                     <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
                                         <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" name="showItemsInput" type="hidden" th:value="false"/>
@@ -302,46 +330,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div id="paginationDivId" name="paginationDivName" class="col-md-12 form-group">
+                            <div id="paginationBottomDivId" name="paginationDivName" class="col-md-12 form-group">
                                 <div class="pull-left" style="margin-top: -40px;"
                                      th:if="*{totalPageCount &gt; 1}">
-                                    <div id="paginationId" name="paginationName" class="pagination pagination-centered">
-                                        <ul class="pagination">
-                                            <li th:class="*{pageNumber == 0} ? 'disabled' : ''">
-                                                <span th:if="*{pageNumber == 0}">First</span>
-                                                <a th:if="*{pageNumber != 0}" href="#"
-                                                   title="Go to first page"
-                                                   onclick="document.getElementById('firstBottom').click();">First</a>
-                                                <button id="firstBottom" type="submit" name="action"
-                                                        value="first" hidden="hidden"></button>
-                                            </li>
-                                            <li th:class="*{(pageNumber != 0) &amp;&amp; (totalPageCount &gt; 1)}? '' : 'disabled'">
-                                                <span th:if="*{pageNumber == 0}">Previous</span>
-                                                <a th:if="*{pageNumber != 0}" href="#"
-                                                   title="Go to previous page"
-                                                   onclick="document.getElementById('pageNumber').value = parseInt(document.getElementById('pageNumber').value) - 1; document.getElementById('previousBottom').click();">Previous</a>
-                                                <button id="previousBottom" type="submit"
-                                                        name="action" value="previous"
-                                                        hidden="hidden"></button>
-                                            </li>
-                                            <li th:class="*{(pageNumber+1 != totalPageCount) &amp;&amp; (totalPageCount &gt; 1)}? '' : 'disabled'">
-                                                <span th:if="*{pageNumber+1 == totalPageCount}">Next</span>
-                                                <a th:if="*{pageNumber+1 != totalPageCount}"
-                                                   href="#" title="Go to next page"
-                                                   onclick="document.getElementById('pageNumber').value = parseInt(document.getElementById('pageNumber').value) + 1; document.getElementById('nextBottom').click();">Next</a>
-                                                <button id="nextBottom" type="submit" name="action"
-                                                        value="next" hidden="hidden"></button>
-                                            </li>
-                                            <li th:class="*{pageNumber+1 == totalPageCount}? 'disabled' : ''">
-                                                <span th:if="*{pageNumber+1 == totalPageCount}">Last</span>
-                                                <a th:if="*{pageNumber+1 != totalPageCount}"
-                                                   href="#"
-                                                   onclick="document.getElementById('lastBottom').click();">Last</a>
-                                                <button id="lastBottom" type="submit" name="action"
-                                                        value="last" hidden="hidden"></button>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <div th:replace="pagination :: #paginationId"></div>
                                 </div>
                                 <div id="selectButtonsId" name="selectButtonsName" class="pull-right">
                                     <button id="export" type="submit" name="action" value="export"
@@ -358,8 +350,10 @@
                                 <span>OI - Owning Institution, CC - Customer Code, CGD - Collection Group Designation, SH - Summary Holdings</span>
                             </div>
                             <div class="col-md-12 form-group">
-                                <i class="fa fa-circle" style="font-size: 20px; color: green;"></i><span> In ReCAP </span>
-                                <i class="fa fa-circle" style="font-size: 20px; color: red; margin-left: 15px;"></i><span> Out </span>
+                                <img src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;"/>
+                                <span> In ReCAP </span>
+                                <img src="images/out.png" alt="Out" style="width:20px;height:25px;"/>
+                                <span> Out </span>
                             </div>
                         </div>
                     </div>

@@ -29,6 +29,11 @@ public class RecapConstants {
     public static final String OTHER = "Other";
     public static final String AND = "AND";
 
+    public static final String USE_RESTRICTION = "UseRestriction";
+    public static final String NO_RESTRICTIONS = "No Restrictions";
+    public static final String IN_LIBRARY_USE = "In Library Use";
+    public static final String SUPERVISED_USE = "Supervised Use";
+
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
     //Matching Algorithm Constants

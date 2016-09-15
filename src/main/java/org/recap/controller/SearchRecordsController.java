@@ -127,6 +127,7 @@ public class SearchRecordsController {
         searchRecordsRequest.setCollectionGroupDesignations(new ArrayList<>());
         searchRecordsRequest.setAvailability(new ArrayList<>());
         searchRecordsRequest.setMaterialTypes(new ArrayList<>());
+        searchRecordsRequest.setUseRestrictions(new ArrayList<>());
         searchRecordsRequest.setShowResults(false);
         return new ModelAndView("searchRecords");
     }
@@ -167,7 +168,7 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        int totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalRecordsCount()).intValue();
+        int totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalBibRecordsCount()).intValue();
         int totalPagesCount = (int) Math.ceil((double) totalRecordsCount / (double) searchRecordsRequest.getPageSize());
         Integer pageNumber = searchRecordsRequest.getPageNumber();
         if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
@@ -181,6 +182,7 @@ public class SearchRecordsController {
     private void setDefaultsToSearchRecordsRequest(SearchRecordsRequest searchRecordsRequest) {
         searchRecordsRequest.setFieldName("");
         searchRecordsRequest.setFieldValue("");
+        searchRecordsRequest.setSelectAllFacets(true);
 
         searchRecordsRequest.getOwningInstitutions().add("NYPL");
         searchRecordsRequest.getOwningInstitutions().add("CUL");
@@ -196,6 +198,10 @@ public class SearchRecordsController {
         searchRecordsRequest.getMaterialTypes().add("Monograph");
         searchRecordsRequest.getMaterialTypes().add("Serial");
         searchRecordsRequest.getMaterialTypes().add("Other");
+
+        searchRecordsRequest.getUseRestrictions().add("No Restrictions");
+        searchRecordsRequest.getUseRestrictions().add("In Library Use");
+        searchRecordsRequest.getUseRestrictions().add("Supervised Use");
 
         searchRecordsRequest.setPageNumber(0);
         searchRecordsRequest.setPageSize(25);
@@ -263,7 +269,7 @@ public class SearchRecordsController {
     private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {
         boolean emptySearch = false;
         if (searchRecordsRequest.getMaterialTypes().size() == 0 && searchRecordsRequest.getAvailability().size() == 0 &&
-                searchRecordsRequest.getCollectionGroupDesignations().size() == 0 && searchRecordsRequest.getOwningInstitutions().size() == 0) {
+                searchRecordsRequest.getCollectionGroupDesignations().size() == 0 && searchRecordsRequest.getOwningInstitutions().size() == 0 && searchRecordsRequest.getUseRestrictions().size() == 0) {
             emptySearch = true;
         }
         return emptySearch;

@@ -26,7 +26,8 @@ public class SearchRecordsRequestUT {
         assertEquals("Shared",searchRecordsRequest.getCollectionGroupDesignations().get(0));
         assertEquals("Monograph",searchRecordsRequest.getMaterialTypes().get(0));
         assertEquals(new Integer(1),searchRecordsRequest.getTotalPageCount());
-        assertEquals("1",searchRecordsRequest.getTotalRecordsCount());
+        assertEquals("1",searchRecordsRequest.getTotalBibRecordsCount());
+        assertEquals("1",searchRecordsRequest.getTotalItemRecordsCount());
         assertEquals(new Integer(1),searchRecordsRequest.getIndex());
 
     }
@@ -54,7 +55,8 @@ public class SearchRecordsRequestUT {
         materialTypes.add("Monograph");
         searchRecordsRequest.setMaterialTypes(materialTypes);
         searchRecordsRequest.setTotalPageCount(1);
-        searchRecordsRequest.setTotalRecordsCount("1");
+        searchRecordsRequest.setTotalBibRecordsCount("1");
+        searchRecordsRequest.setTotalItemRecordsCount("1");
         searchRecordsRequest.setSelectAll(false);
         searchRecordsRequest.setIndex(1);
     }

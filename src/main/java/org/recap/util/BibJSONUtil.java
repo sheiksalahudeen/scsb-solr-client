@@ -171,6 +171,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setOwningInstitution(institutionCode);
         bib.setTitle(getTitle(marcRecord));
         bib.setTitleDisplay(getTitleDisplay(marcRecord));
+        bib.setTitleStartsWith(getTitleStartsWith(marcRecord));
         bib.setTitleSort(getTitleSort(marcRecord, bib.getTitleDisplay()));
         bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
         bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
@@ -214,6 +215,16 @@ public class BibJSONUtil extends MarcUtil {
         title.append(getDataFieldValueStartsWith(marcRecord, "740", Arrays.asList('a')) + " ");
         title.append(getDataFieldValueStartsWith(marcRecord, "830", Arrays.asList('a'))+ " ");
         return title.toString();
+    }
+
+    private String getTitleStartsWith(Record marcRecord){
+        String title = getTitleDisplay(marcRecord);
+        String titleStartsWith = null;
+        if(title!=null){
+            String[] splitedTitle = title.split(" ");
+            titleStartsWith = splitedTitle[0];
+        }
+        return titleStartsWith;
     }
 
     public String getTitleDisplay(Record marcRecord) {
