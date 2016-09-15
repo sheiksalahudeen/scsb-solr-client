@@ -11,27 +11,27 @@ import org.apache.camel.dataformat.bindy.annotation.DataField;
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX", skipFirstLine = true)
 public class MatchingReportReCAPCSVRecord {
 
-    @DataField(pos = 1)
+    @DataField(pos = 1, columnName = "Bib Id")
     private String bibId;
-    @DataField(pos = 2)
+    @DataField(pos = 2, columnName = "Title")
     private String title;
-    @DataField(pos = 3)
+    @DataField(pos = 3, columnName = "Barcode")
     private String barcode;
-    @DataField(pos = 4)
+    @DataField(pos = 4, columnName = "Volume Part Year")
     private String volumePartYear;
-    @DataField(pos = 5)
+    @DataField(pos = 5, columnName = "Institution Id")
     private String institutionId;
-    @DataField(pos = 6)
+    @DataField(pos = 6, columnName = "OCLC")
     private String oclc;
-    @DataField(pos = 7)
+    @DataField(pos = 7, columnName = "ISBN")
     private String isbn;
-    @DataField(pos = 8)
+    @DataField(pos = 8, columnName = "ISSN")
     private String issn;
-    @DataField(pos = 9)
+    @DataField(pos = 9, columnName = "LCCN")
     private String lccn;
-    @DataField(pos = 10)
+    @DataField(pos = 10, columnName = "Use Restrictions")
     private String useRestrictions;
-    @DataField(pos = 11)
+    @DataField(pos = 11, columnName = "Summary Holdings")
     private String summaryHoldings;
 
     @Ignore

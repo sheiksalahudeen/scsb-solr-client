@@ -36,8 +36,8 @@ public class ReportGeneratorUT extends BaseTestCase{
     @Test
     public void testMatchingReportForFileSystem() throws Exception {
         ReportEntity reportEntity1 = saveMatchingReportEntity();
-        ReportEntity reportEntity2 = saveMatchingReportEntity();
-        ReportEntity reportEntity3 = saveMatchingReportEntity();
+        saveMatchingReportEntity();
+        saveMatchingReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
         StopWatch stopWatch = new StopWatch();
