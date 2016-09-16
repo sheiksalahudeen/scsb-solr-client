@@ -21,7 +21,7 @@ public class SearchRecordsRequest {
     private String totalBibRecordsCount = "0";
     private String totalItemRecordsCount = "0";
     private Integer pageNumber = 0;
-    private Integer pageSize = 25;
+    private Integer pageSize = 10;
 
     private boolean showResults = false;
     private boolean selectAll = false;

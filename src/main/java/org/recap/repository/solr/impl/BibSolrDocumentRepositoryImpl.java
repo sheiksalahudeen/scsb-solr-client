@@ -160,10 +160,14 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     private List<BibItem> buildBibItems(Page results) {
         List<BibItem> bibItems = results.getContent();
         Set<Integer> itemIds = new HashSet<>();
+        Set<Integer> holdingsIds = new HashSet<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
                     itemIds.addAll(bibItem.getBibItemIdList());
+                }
+                if(!CollectionUtils.isEmpty(bibItem.getHoldingsIdList())) {
+                    holdingsIds.add(bibItem.getHoldingsIdList().get(0));
                 }
             }
         }
@@ -186,6 +190,25 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 }
             }
         }
+        Map<Integer, Holdings> holdingsMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(holdingsIds)) {
+            List<List<Integer>> partitions = Lists.partition(new ArrayList<>(holdingsIds), 1000);
+            for(List<Integer> partitionHoldingsIds : partitions) {
+                SimpleQuery query = new SimpleQuery(new Criteria(RecapConstants.HOLDING_ID).in(partitionHoldingsIds));
+                query.setRows(partitionHoldingsIds.size());
+                ScoredPage<Holdings> holdingsPage = solrTemplate.queryForPage(query, Holdings.class, RequestMethod.POST);
+                if(holdingsPage.getTotalElements() > partitionHoldingsIds.size()) {
+                    query.setRows(Math.toIntExact(holdingsPage.getTotalElements()));
+                    holdingsPage = solrTemplate.queryForPage(query, Holdings.class, RequestMethod.POST);
+                }
+                List<Holdings> holdingsList = holdingsPage.getContent();
+                if(!CollectionUtils.isEmpty(holdingsList)) {
+                    for(Holdings holdings : holdingsList) {
+                        holdingsMap.put(holdings.getHoldingsId(), holdings);
+                    }
+                }
+            }
+        }
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
                 if (!CollectionUtils.isEmpty(bibItem.getBibItemIdList())) {
@@ -193,17 +216,10 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                         bibItem.getItems().add(itemMap.get(itemId));
                     }
                 }
-                if (!CollectionUtils.isEmpty(bibItem.getHoldingsIdList())) {
-                    Integer holdingsId = bibItem.getHoldingsIdList().get(0);
-                    if (null != holdingsId) {
-                        SimpleQuery holdingsQuery = new SimpleQuery(new Criteria(RecapConstants.HOLDING_ID).is(holdingsId));
-                        holdingsQuery.setRows(1);
-                        ScoredPage<Holdings> holdingsResult = solrTemplate.queryForPage(holdingsQuery, Holdings.class);
-                        List<Holdings> holdingsList = holdingsResult.getContent();
-                        if (!CollectionUtils.isEmpty(holdingsList)) {
-                            bibItem.setSummaryHoldings(holdingsList.get(0).getSummaryHoldings());
-                        }
-                    }
+                List<Integer> holdingsIdList = bibItem.getHoldingsIdList();
+                if (!CollectionUtils.isEmpty(holdingsIdList)) {
+                    Holdings holdings = holdingsMap.get(holdingsIdList.get(0));
+                    bibItem.setSummaryHoldings(holdings!= null ? holdings.getSummaryHoldings() : "");
                 }
             }
         }
