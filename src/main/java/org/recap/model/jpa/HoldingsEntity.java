@@ -11,7 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "holdings_t", schema = "recap", catalog = "")
-public class HoldingsEntity implements Serializable {
+@IdClass(HoldingsPK.class)
+public class HoldingsEntity implements Serializable{
 
     @Column(name = "HOLDINGS_ID", insertable = false, updatable = false)
     private Integer holdingsId;
@@ -34,6 +35,7 @@ public class HoldingsEntity implements Serializable {
     @Column(name = "LAST_UPDATED_BY")
     private String lastUpdatedBy;
 
+    @Id
     @Column(name = "OWNING_INST_ID")
     private Integer owningInstitutionId;
 
@@ -48,7 +50,13 @@ public class HoldingsEntity implements Serializable {
     @ManyToMany(mappedBy = "holdingsEntities")
     private List<BibliographicEntity> bibliographicEntities;
 
-    @OneToMany(mappedBy = "holdingsEntity", cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "item_holdings_t", joinColumns = {
+            @JoinColumn(name="OWNING_INST_HOLDINGS_ID", referencedColumnName = "OWNING_INST_HOLDINGS_ID"),
+            @JoinColumn(name="HOLDINGS_INST_ID", referencedColumnName = "OWNING_INST_ID")},
+            inverseJoinColumns = {
+                    @JoinColumn(name="OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
+                    @JoinColumn(name="ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID") })
     private List<ItemEntity> itemEntities;
 
     public HoldingsEntity() {

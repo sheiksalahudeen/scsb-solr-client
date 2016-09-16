@@ -309,7 +309,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -356,7 +356,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
-        itemEntity1.setHoldingsEntity(holdingsEntity);
+        itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
 
         ItemEntity itemEntity2 = new ItemEntity();
@@ -372,7 +372,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
         itemEntity2.setCustomerCode("123");
-        itemEntity2.setHoldingsEntity(holdingsEntity);
+        itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));

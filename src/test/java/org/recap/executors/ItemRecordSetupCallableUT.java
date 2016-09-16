@@ -9,6 +9,7 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -151,7 +152,7 @@ public class ItemRecordSetupCallableUT extends BaseTestCase{
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setHoldingsId(1);
         holdingsEntity.setContent(holdingContent.getBytes());
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
