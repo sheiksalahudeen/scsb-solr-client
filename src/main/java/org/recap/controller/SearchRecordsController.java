@@ -204,7 +204,7 @@ public class SearchRecordsController {
         searchRecordsRequest.getUseRestrictions().add("Supervised Use");
 
         searchRecordsRequest.setPageNumber(0);
-        searchRecordsRequest.setPageSize(25);
+        searchRecordsRequest.setPageSize(10);
         searchRecordsRequest.setShowResults(false);
     }
 
