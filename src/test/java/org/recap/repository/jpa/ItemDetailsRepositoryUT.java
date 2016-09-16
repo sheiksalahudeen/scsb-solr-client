@@ -81,7 +81,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -119,7 +119,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertEquals(savedItemEntity.getBarcode(), "1231");
         assertEquals(savedItemEntity.getOwningInstitutionItemId(), owningInstitutionItemId);
         assertEquals(savedItemEntity.getCustomerCode(), "PA");
-        assertNotNull(savedItemEntity.getHoldingsEntity());
+        assertNotNull(savedItemEntity.getHoldingsEntities());
         assertTrue(savedItemEntity.getOwningInstitutionId() == owningInstitutionId);
         assertTrue(savedItemEntity.getCollectionGroupId() == 1);
     }

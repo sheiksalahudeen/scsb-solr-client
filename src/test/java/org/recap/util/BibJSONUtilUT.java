@@ -171,7 +171,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));

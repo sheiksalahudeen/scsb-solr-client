@@ -151,7 +151,8 @@ public class BibAT extends BaseTestCase {
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -186,7 +187,7 @@ public class BibAT extends BaseTestCase {
         Item item = itemCrudRepository.findByItemId(itemId);
         assertNotNull(item);
         assertEquals(barcode, item.getBarcode());
-        assertNull(item.getUseRestriction());
+        assertNotNull(item.getUseRestriction());
         solrTemplate.rollback();
     }
 
@@ -236,7 +237,7 @@ public class BibAT extends BaseTestCase {
         bib1.setTitle("Bib Test 1");
         bib1.setBarcode("1");
         String[] titleTokened1 = bib1.getTitle().split(" ");
-        bib.setTitleStartsWith("^"+titleTokened1[0]);
+        bib1.setTitleStartsWith("^"+titleTokened1[0]);
         bib1.setAuthorDisplay("Hoepli");
         bib1.setPublisher("Tata, limited");
         bib1.setImprint("Tata, limited [c1926]");

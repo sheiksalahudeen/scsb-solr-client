@@ -134,6 +134,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = getBibliographicEntity(sourceBibContent, owningInstitutionBibId);
         HoldingsEntity holdingsEntity = getHoldingsEntity(owningInstitutionHoldingsId);
         ItemEntity itemEntity = getItemEntity(owningInstitutionItemId, barcode, holdingsEntity);
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
@@ -270,7 +271,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("1");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setHoldingsEntity(holdingsEntity);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         return itemEntity;
     }
 
@@ -306,6 +307,119 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         String searchText = "Test-Title.";
         String modifiedText = bibSolrDocumentRepositoryImpl.getModifiedText(searchText);
         assertEquals(modifiedText, "Test\\-Title\\.");
+    }
+
+    @Test
+    public void searchBoundWithDocuments() throws Exception {
+        Map<String, List<Object>> stringListMap = saveBoundWithSolrDocs();
+        assertNotNull(stringListMap);
+
+        List<Object> bibs =  stringListMap.get("Bibs");
+        assertNotNull(bibs);
+
+        List<Object> items =  stringListMap.get("Items");
+        assertNotNull(items);
+        Item item1 = (Item) items.get(0);
+
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("Barcode");
+        searchRecordsRequest.setFieldValue(item1.getBarcode());
+        searchRecordsRequest.getOwningInstitutions().add("CUL");
+
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 2));
+        assertNotNull(bibItems);
+        assertEquals(bibItems.size(), 2);
+    }
+
+    private Map<String, List<Object>> saveBoundWithSolrDocs() throws InterruptedException {
+        Map<String, List<Object>> map = new HashMap<>();
+        Random random = new Random();
+        List<Bib> bibs = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        List<String> issnList = new ArrayList<>();
+        List<String>isbnList = new ArrayList<>();
+        List<String> oclcNumberList = new ArrayList<>();
+        issnList.add("0394469756");
+        isbnList.add("0394469755");
+        oclcNumberList.add("00133182");
+        oclcNumberList.add("00440790");
+
+        Integer bibId1 = random.nextInt();
+        Integer holdingsId1 = random.nextInt();
+        Integer holdingsId2 = random.nextInt();
+        Integer itemId1 = random.nextInt();
+        Integer barcode = random.nextInt();
+
+        Bib bib1 = new Bib();
+        bib1.setBibId(bibId1);
+        bib1.setDocType("Bib");
+        bib1.setTitle("Test Bib Doc 1");
+        String[] titleTokened1 = bib1.getTitle().split(" ");
+        bib1.setAuthorDisplay("Nancy L");
+        bib1.setPublisher("McClelland & Stewart, limited");
+        bib1.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib1.setIssn(issnList);
+        bib1.setIsbn(isbnList);
+        bib1.setOclcNumber(oclcNumberList);
+        bib1.setPublicationDate("1960");
+        bib1.setMaterialType("Material Type 1");
+        bib1.setNotes("Bibliographical footnotes 1");
+        bib1.setOwningInstitution("CUL");
+        bib1.setSubject("Arab countries Politics and government.");
+        bib1.setPublicationPlace("Paris");
+        bib1.setLccn("71448228");
+        bib1.setHoldingsIdList(Arrays.asList(holdingsId1));
+        bib1.setBibItemIdList(Arrays.asList(itemId1));
+
+        Integer bibId2 = random.nextInt();
+
+        Bib bib2 = new Bib();
+        bib2.setBibId(bibId2);
+        bib2.setDocType("Bib");
+        bib2.setTitle("Test Bib Doc 2");
+        String[] titleTokened2 = bib2.getTitle().split(" ");
+        bib2.setAuthorDisplay("Nancy L");
+        bib2.setPublisher("McClelland & Stewart, limited");
+        bib2.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib2.setIssn(issnList);
+        bib2.setIsbn(isbnList);
+        bib2.setOclcNumber(oclcNumberList);
+        bib2.setPublicationDate("1960");
+        bib2.setMaterialType("Material Type 2");
+        bib2.setNotes("Bibliographical footnotes 2");
+        bib2.setOwningInstitution("CUL");
+        bib2.setSubject("Arab countries Politics and government.");
+        bib2.setPublicationPlace("Paris");
+        bib2.setLccn("71448229");
+        bib2.setHoldingsIdList(Arrays.asList(holdingsId2));
+        bib2.setBibItemIdList(Arrays.asList(itemId1));
+
+        Item item1 = new Item();
+        item1.setItemId(itemId1);
+        item1.setDocType("Item");
+        item1.setBarcode(String.valueOf(barcode));
+        item1.setAvailability("Available");
+        item1.setCollectionGroupDesignation("Shared");
+        item1.setCallNumber("H3");
+        item1.setCustomerCode("Test Cust Code");
+        item1.setUseRestriction("In Library Use");
+        item1.setVolumePartYear("V.1 1982");
+        item1.setItemBibIdList(Arrays.asList(bibId1, bibId2));
+        item1.setHoldingsIdList(Arrays.asList(holdingsId1, holdingsId2));
+
+        bibs.add(bib1);
+        bibs.add(bib2);
+        items.add(item1);
+
+        bibSolrCrudRepository.save(bib1);
+        itemCrudRepository.save(item1);
+        bibSolrCrudRepository.save(bib2);
+        solrTemplate.commit();
+        Thread.sleep(2000);
+
+        map.put("Bibs", Arrays.asList(bib1, bib2));
+        map.put("Items", Arrays.asList(item1));
+        return map;
     }
 
 }

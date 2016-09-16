@@ -99,7 +99,7 @@ public class SolrUnicodeAT extends BaseTestCase {
         String sourceTitle = marcUtil.getDataFieldValueStartsWith(records.get(0), "24", Arrays.asList('a', 'b'));
         assertNotNull(sourceTitle);
 
-        assertEquals(sourceTitle, solrTitle);
+        assertEquals(sourceTitle.trim(), solrTitle.trim());
     }
 
     public File getUnicodeContentFile() throws URISyntaxException {

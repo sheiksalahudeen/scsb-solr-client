@@ -6,6 +6,7 @@ import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +55,12 @@ public class ItemJSONUtil extends MarcUtil{
             }
 
             List<Integer> holdingsIds = new ArrayList<>();
-            HoldingsEntity holdingsEntity = itemEntity.getHoldingsEntity();
-            if(null != holdingsEntity) {
-                holdingsIds.add(holdingsEntity.getHoldingsId());
-                item.setHoldingsIdList(holdingsIds);
+            List<HoldingsEntity> holdingsEntities = itemEntity.getHoldingsEntities();
+            if (!CollectionUtils.isEmpty(holdingsEntities)) {
+                for (HoldingsEntity holdingsEntity : holdingsEntities) {
+                    holdingsIds.add(holdingsEntity.getHoldingsId());
+                    item.setHoldingsIdList(holdingsIds);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
