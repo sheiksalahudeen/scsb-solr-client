@@ -318,7 +318,7 @@
                                             </td>
                                             <td data-th-id="'searchItemResultsDataUR-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
                                                 <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].useRestriction}"/>
-                                                <span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction}"></span>
+                                                <span data-th-id="'searchItemResultsDataURS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.useRestriction == 'No Restrictions'} ? '' : ${searchItemResult.useRestriction}"></span>
                                             </td>
                                             <td data-th-id="'searchItemResultsDataBar-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
                                                 <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].barcode}"/>
