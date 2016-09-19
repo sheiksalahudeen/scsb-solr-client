@@ -422,4 +422,13 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         return map;
     }
 
+    @Test
+    public void buildCriteriaForTitleTwoWords() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("Title_search");
+        searchRecordsRequest.setFieldValue("Population Census");
+        Criteria criteria = bibSolrDocumentRepositoryImpl.getCriteriaForFieldName(searchRecordsRequest);
+        assertNotNull(criteria);
+    }
+
 }
