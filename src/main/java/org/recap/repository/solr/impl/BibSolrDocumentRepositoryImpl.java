@@ -150,8 +150,14 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 String[] splitedTitle = fieldValue.split(" ");
                 criteria = new Criteria(RecapConstants.TITLE_STARTS_WITH).startsWith(splitedTitle[0]);
             } else {
-                fieldValue = StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ");
-                criteria = new Criteria(fieldName).expression(fieldValue);
+                String[] splitValues = fieldValue.split("\\s+");
+                for (String splitValue : splitValues) {
+                    if (null == criteria) {
+                        criteria = new Criteria().and(fieldName).expression(splitValue);
+                    } else {
+                        criteria.and(fieldName).expression(splitValue);
+                    }
+                }
             }
         }
         return criteria;
