@@ -281,20 +281,19 @@
                                                        th:onclick="'javascript:selectAllChildRows('+${searchResultStat.index}+');enableExportSelectedRecordButton()'"
                                                        />
                                             </th>
-                                            <th data-th-id="'searchItemResultsCNHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Call Number</th>
-                                            <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Chronology &amp; Enumeration</th>
-                                            <th data-th-id="'searchItemResultsCCHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">CC</th>
-                                            <th data-th-id="'searchItemResultsCGDHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">CGD</th>
-                                            <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Use Restriction</th>
-                                            <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}" style="background-color: grey; color: white;">Barcode</th>
+                                            <th data-th-id="'searchItemResultsCNHead-' + ${searchResultStat.index}" th:title="'Call Number'" style="background-color: grey; color: white;">Call Number</th>
+                                            <th data-th-id="'searchItemResultsCHnEnumHead-' + ${searchResultStat.index}" th:title="'Chronology &amp; Enumeration'" style="background-color: grey; color: white;">Chronology &amp; Enumeration</th>
+                                            <th data-th-id="'searchItemResultsCCHead-' + ${searchResultStat.index}" th:title="'Customer Code'" style="background-color: grey; color: white;">CC</th>
+                                            <th data-th-id="'searchItemResultsCGDHead-' + ${searchResultStat.index}" th:title="'Collection Group Designation'" style="background-color: grey; color: white;">CGD</th>
+                                            <th data-th-id="'searchItemResultsURHead-' + ${searchResultStat.index}" th:title="'Use Restriction'" style="background-color: grey; color: white;">Use Restriction</th>
+                                            <th data-th-id="'searchItemResultsBarHead-' + ${searchResultStat.index}" th:title="'Barcode'" style="background-color: grey; color: white;">Barcode</th>
                                         </tr>
                                         <tr data-th-if="${searchResult.showItems}" data-th-id="'searchItemResultsRow-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:each="searchItemResult,searchItemResultStat : ${searchResult.searchItemResultRows}" class="collapse childRow" th:classappend="'row' + ${searchResultStat.index}">
                                             <td></td>
                                             <td></td>
                                             <td data-th-id="'searchItemResultsDataPlus-'+ ${searchItemResultStat.index}">
-                                                <i class="fa fa-circle"
-                                                   th:if="${searchItemResult.availability == 'Available' || searchItemResult.availability == 'Not Available'}"
-                                                   th:style="${searchItemResult.availability == 'Available'} ? 'font-size: 20px; color: green;' : (${searchItemResult.availability == 'Not Available'} ? 'font-size: 20px; color: red;' : '')"></i>
+                                                <img src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;" th:if="${searchItemResult.availability == 'Available'}"/>
+                                                <img src="images/out.png" alt="Out" style="width:20px;height:25px;" th:if="${searchItemResult.availability == 'Not Available'}"/>
                                                 <input type="checkbox" id="selectedItem" name="selectedItem" class="selectInnerCBClass"
                                                        th:value="${searchItemResult.selectedItem}"
                                                        th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].selectedItem}"
