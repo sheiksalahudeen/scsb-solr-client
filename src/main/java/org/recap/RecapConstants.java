@@ -129,4 +129,7 @@ public class RecapConstants {
 
     //Error Message
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";
+
+    public static final String SOLR_CORE = "solrCore";
+    public static final String SOLR_QUEUE = "seda:solrQ";
 }

@@ -4,8 +4,12 @@ import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.component.solr.SolrConstants;
+import org.apache.commons.lang3.StringUtils;
+import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
+import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
@@ -31,6 +36,9 @@ public abstract class IndexExecutorService {
 
     @Autowired
     ProducerTemplate producerTemplate;
+
+    @Autowired
+    InstitutionDetailsRepository institutionDetailsRepository;
 
     @Value("${solr.url}")
     String solrUrl;
@@ -50,35 +58,44 @@ public abstract class IndexExecutorService {
     @Value("${solr.router.uri.type}")
     String solrRouterURI;
 
-    private ExecutorService executorService;
-    private Integer loopCount;
-    private Integer callableCountByCommitInterval;
-    private long startTime;
-    private StopWatch stopWatch;
-
     public void indexByOwningInstitutionId(SolrIndexRequest solrIndexRequest) {
-        startProcess();
+        StopWatch stopWatch1 = new StopWatch();
+        stopWatch1.start();
 
         Integer numThreads = solrIndexRequest.getNumberOfThreads();
         Integer docsPerThread = solrIndexRequest.getNumberOfDocs();
         Integer commitIndexesInterval = solrIndexRequest.getCommitInterval();
-        Integer owningInstitutionId = solrIndexRequest.getOwningInstitutionId();
+        String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
+        Integer owningInstitutionId = 0;
+        String coreName = null;
 
         try {
-            ExecutorService executorService = getExecutorService(numThreads);
+            ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+            Integer totalDocCount = 0;
+            if (StringUtils.isBlank(owningInstitutionCode)) {
+                totalDocCount = getTotalDocCount(null);
+                coreName = solrCore;
+            } else {
+                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(owningInstitutionCode);
+                if (null != institutionEntity) {
+                    owningInstitutionId = institutionEntity.getInstitutionId();
+                    totalDocCount = getTotalDocCount(owningInstitutionId);
+                }
+                coreName = owningInstitutionCode;
+            }
 
-            Integer totalDocCount = (null == owningInstitutionId ? getTotalDocCount(null) : getTotalDocCount(owningInstitutionId));
+            solrAdmin.createSolrCores(Arrays.asList(coreName));
 
             logger.info("Total Document Count From DB : " + totalDocCount);
 
             if (totalDocCount > 0) {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
-                loopCount = remainder == 0 ? quotient : quotient + 1;
+                Integer loopCount = remainder == 0 ? quotient : quotient + 1;
                 logger.info("Loop Count Value : " + loopCount);
                 logger.info("Commit Indexes Interval : " + commitIndexesInterval);
 
-                callableCountByCommitInterval = commitIndexesInterval / (docsPerThread);
+                Integer callableCountByCommitInterval = commitIndexesInterval / (docsPerThread);
                 if (callableCountByCommitInterval == 0) {
                     callableCountByCommitInterval = 1;
                 }
@@ -90,7 +107,7 @@ public abstract class IndexExecutorService {
                 int coreNum = 0;
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                    Callable callable = getCallable(solrCore, pageNum, docsPerThread, owningInstitutionId);
+                    Callable callable = getCallable(coreName, pageNum, docsPerThread, owningInstitutionId);
                     callables.add(callable);
                     coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
@@ -127,63 +144,40 @@ public abstract class IndexExecutorService {
                         }
                     }
 
-                    SedaEndpoint solrQSedaEndPoint = (SedaEndpoint) producerTemplate.getCamelContext().getEndpoint("seda:solrQ");
+                    SedaEndpoint solrQSedaEndPoint = (SedaEndpoint) producerTemplate.getCamelContext().getEndpoint(RecapConstants.SOLR_QUEUE);
                     Integer solrQSize = solrQSedaEndPoint.getExchanges().size();
+                    logger.info("Solr Queue size : " + solrQSize);
                     while (solrQSize != 0) {
                         solrQSize = solrQSedaEndPoint.getExchanges().size();
                     }
-                    Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
+                    Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + coreName, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
                     logger.info("Commit future done : " + future.isDone());
                     while (!future.isDone()) {
                         //NoOp.
                     }
-                    logger.info("Num of Bibs Processed and indexed to core on commit interval : " + numOfBibsProcessed);
-                    logger.info("Total Num of Bibs Processed and indexed to core : " + totalBibsProcessed);
+                    logger.info("Commit future done : " + future.isDone());
+                    logger.info("Num of Bibs Processed and indexed to core " + coreName + " on commit interval : " + numOfBibsProcessed);
+                    logger.info("Total Num of Bibs Processed and indexed to core " + coreName + " : " + totalBibsProcessed);
                 }
                 logger.info("Total futures executed: " + futureCount);
                 stopWatch.stop();
-                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index : " + stopWatch.getTotalTimeSeconds() + " seconds");
+                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index to core " + coreName + " : " + stopWatch.getTotalTimeSeconds() + " seconds");
                 executorService.shutdown();
 
                 //Final commit
-                producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + solrCore, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
+                producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + coreName, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
             } else {
                 logger.info("No records found to index for the criteria");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        endProcess();
+        stopWatch1.stop();
+        logger.info("Total time taken:" + stopWatch1.getTotalTimeSeconds() + " secs");
     }
 
     public void index(SolrIndexRequest solrIndexRequest) {
         indexByOwningInstitutionId(solrIndexRequest);
-    }
-
-    private ExecutorService getExecutorService(Integer numThreads) {
-        if (null == executorService || executorService.isShutdown()) {
-            executorService = Executors.newFixedThreadPool(numThreads);
-        }
-        return executorService;
-    }
-
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public StopWatch getStopWatch() {
-        if (null == stopWatch) {
-            stopWatch = new StopWatch();
-        }
-        return stopWatch;
-    }
-
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
     }
 
     private void deleteTempIndexes(List<String> coreNames, String solrUrl) {
@@ -202,15 +196,6 @@ public abstract class IndexExecutorService {
         for (int i = 0; i < numThreads; i++) {
             coreNames.add("temp" + i);
         }
-    }
-
-    private void startProcess() {
-        startTime = System.currentTimeMillis();
-        getStopWatch().start();
-    }
-
-    private void endProcess() {
-        getStopWatch().stop();
     }
 
     public void setSolrAdmin(SolrAdmin solrAdmin) {

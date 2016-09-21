@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -74,7 +75,7 @@ public class ItemIndexCallable implements Callable {
         logger.info("No of Items to index : " + itemsToIndex.size());
 
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", itemsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         return itemEntities.getNumberOfElements();
     }

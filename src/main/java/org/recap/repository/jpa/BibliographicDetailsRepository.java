@@ -5,6 +5,7 @@ import org.recap.model.jpa.BibliographicPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     BibliographicEntity findByBibliographicId(Integer bibId);
     List<BibliographicEntity> findByOwningInstitutionBibId(String owningInstitutionBibId);
 
+    @Query(value = "select count(*) from bibliographic_t bib, institution_t inst where bib.OWNING_INST_ID = inst.INSTITUTION_ID AND inst.INSTITUTION_CODE=?1 limit 1",  nativeQuery = true)
+    Long countByOwningInstitutionCode(String institutionCode);
 }

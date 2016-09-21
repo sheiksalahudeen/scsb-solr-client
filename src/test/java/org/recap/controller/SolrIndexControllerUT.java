@@ -53,7 +53,6 @@ public class SolrIndexControllerUT extends BaseControllerUT{
         doNothing().when(itemCrudRepository).deleteAll();
         doNothing().when(solrAdmin).unloadTempCores();
         doNothing().when(bibItemIndexExecutorService).index(getSolrIndexRequest());
-        when(bibItemIndexExecutorService.getStopWatch()).thenReturn(new StopWatch());
     }
 
     @Test

@@ -103,22 +103,15 @@ public class SolrIndexController {
             }
         }
 
-        String totalTimeTaken = null;
         if (solrIndexRequest.getDocType().equalsIgnoreCase("Bibs")) {
             bibIndexExecutorService.index(solrIndexRequest);
-            totalTimeTaken = bibIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
         } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Holdings")) {
             holdingsIndexExecutorService.index(solrIndexRequest);
-            totalTimeTaken = holdingsIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
         } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Items")) {
             itemIndexExecutorService.index(solrIndexRequest);
-            totalTimeTaken = itemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
         } else {
             bibItemIndexExecutorService.index(solrIndexRequest);
-            totalTimeTaken = bibItemIndexExecutorService.getStopWatch().getTotalTimeSeconds() + " secs";
         }
-
-        logger.info("Total time taken:" + totalTimeTaken);
 
         return solrIndexer(model);
     }

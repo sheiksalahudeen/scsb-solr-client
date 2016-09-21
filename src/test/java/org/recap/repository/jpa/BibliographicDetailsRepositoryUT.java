@@ -129,4 +129,10 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(byItemId);
     }
 
+    @Test
+    public void countByOwningInstitutionCode() throws Exception {
+        Long bibCount = bibliographicDetailsRepository.countByOwningInstitutionCode("PUL");
+        assertNotNull(bibCount);
+    }
+
 }

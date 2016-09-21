@@ -64,6 +64,7 @@ public class ExecutorAT extends BaseTestCase {
 
     private int numThreads = 5;
     private int docsPerThread = 10000;
+    private int commitInterval = 10000;
 
 
     public void unloadCores() throws Exception {
@@ -95,7 +96,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(null);
+        solrIndexRequest.setOwningInstitutionCode(null);
+        solrIndexRequest.setCommitInterval(commitInterval);
         unloadCores();
         bibSolrCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
@@ -111,7 +113,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(null);
+        solrIndexRequest.setOwningInstitutionCode(null);
+        solrIndexRequest.setCommitInterval(commitInterval);
         unloadCores();
         bibSolrCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
@@ -127,7 +130,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(3);
+        solrIndexRequest.setOwningInstitutionCode("NYPL");
+        solrIndexRequest.setCommitInterval(commitInterval);
         unloadCores();
         bibSolrCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
@@ -142,7 +146,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(2);
+        solrIndexRequest.setOwningInstitutionCode("CUL");
+        solrIndexRequest.setCommitInterval(commitInterval);
         bibSolrCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         indexDocuments(solrIndexRequest);
@@ -153,7 +158,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(null);
+        solrIndexRequest.setOwningInstitutionCode(null);
+        solrIndexRequest.setCommitInterval(commitInterval);
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -167,7 +173,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(3);
+        solrIndexRequest.setOwningInstitutionCode("NYPL");
+        solrIndexRequest.setCommitInterval(commitInterval);
         itemCrudRepository.deleteAll();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -217,7 +224,8 @@ public class ExecutorAT extends BaseTestCase {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(numThreads);
         solrIndexRequest.setNumberOfDocs(docsPerThread);
-        solrIndexRequest.setOwningInstitutionId(3);
+        solrIndexRequest.setOwningInstitutionCode("NYPL");
+        solrIndexRequest.setCommitInterval(commitInterval);
         bibSolrCrudRepository.deleteAll();
         itemCrudRepository.deleteAll();
         indexDocuments(solrIndexRequest);

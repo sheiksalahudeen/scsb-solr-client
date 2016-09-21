@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
@@ -93,13 +94,13 @@ public class BibItemIndexCallable implements Callable {
         executorService.shutdown();
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", bibsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         if (!CollectionUtils.isEmpty(holdingsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", holdingsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", itemsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         return bibliographicEntities.getNumberOfElements();
     }

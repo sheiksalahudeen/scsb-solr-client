@@ -61,11 +61,15 @@ public class SolrAdmin {
             coreAdminRequest.setDataDir(dataDir);
 
             try {
-                coreAdminResponse = coreAdminRequest.process(solrAdminClient);
-                if (coreAdminResponse.getStatus() == 0) {
-                    logger.info("Created Solr core with name: " + coreName);
+                if (!isCoreExist(coreName)) {
+                    coreAdminResponse = coreAdminRequest.process(solrAdminClient);
+                    if (coreAdminResponse.getStatus() == 0) {
+                        logger.info("Created Solr core with name: " + coreName);
+                    } else {
+                        logger.error("Error in creating Solr core with name: " + coreName);
+                    }
                 } else {
-                    logger.error("Error in creating Solr core with name: " + coreName);
+                    logger.info("Solr core with name " + coreName + " already exists.");
                 }
             } catch (SolrServerException e) {
                 e.printStackTrace();
@@ -146,5 +150,18 @@ public class SolrAdmin {
             coreAdminRequest = new CoreAdminRequest();
         }
         return coreAdminRequest;
+    }
+
+    public boolean isCoreExist(String coreName) throws IOException, SolrServerException {
+        CoreAdminRequest coreAdminRequest = getCoreAdminRequest();
+        coreAdminRequest.setAction(CoreAdminParams.CoreAdminAction.STATUS);
+        CoreAdminResponse cores = coreAdminRequest.process(solrAdminClient);
+        for (int i = 0; i < cores.getCoreStatus().size(); i++) {
+            String name = cores.getCoreStatus().getName(i);
+            if (name.equals(coreName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

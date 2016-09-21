@@ -6,6 +6,7 @@ import org.apache.solr.common.params.CoreAdminParams;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -18,6 +19,10 @@ import static org.junit.Assert.assertTrue;
  */
 
 public class SolrAdminAT extends BaseTestCase {
+
+    @Value("${solr.parent.core}")
+    String solrCore;
+
     String tempCoreName1 = "temp0";
     String tempCoreName2 = "temp1";
     String tempCoreName3 = "temp2";
@@ -44,5 +49,11 @@ public class SolrAdminAT extends BaseTestCase {
 
         System.out.println(cores.getStatus());
 
+    }
+
+    @Test
+    public void testIfCoreExist() throws Exception {
+        boolean isCoreExists = solrAdmin.isCoreExist(solrCore);
+        assertTrue(isCoreExists);
     }
 }

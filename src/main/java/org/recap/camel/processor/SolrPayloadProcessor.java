@@ -3,6 +3,7 @@ package org.recap.camel.processor;
 import org.apache.camel.*;
 import org.apache.camel.component.solr.SolrConstants;
 import org.apache.camel.impl.DefaultExchange;
+import org.recap.RecapConstants;
 
 /**
  * Created by rajeshbabuk on 30/8/16.
@@ -25,6 +26,7 @@ public class SolrPayloadProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        solrCore = (String) exchange.getIn().getHeader(RecapConstants.SOLR_CORE);
         Exchange exchangeWithBody = createExchangeWithBody(camelContext, exchange.getIn().getBody());
         exchangeWithBody.getIn().setHeader(SolrConstants.OPERATION, SolrConstants.OPERATION_ADD_BEANS);
         producerTemplate.send("solr:" + solrUri + "/" + solrCore, exchangeWithBody);
