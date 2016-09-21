@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.solr.Holdings;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
@@ -27,13 +28,15 @@ public class HoldingsIndexCallable implements Callable {
 
     private final int pageNum;
     private final int docsPerPage;
+    private String coreName;
     private Integer owningInstitutionId;
     private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
 
-    public HoldingsIndexCallable(int pageNum, int docsPerPage, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
+    public HoldingsIndexCallable(int pageNum, String coreName, int docsPerPage, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
+        this.coreName = coreName;
         this.holdingsDetailsRepository = holdingsDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
         this.producerTemplate = producerTemplate;
@@ -71,7 +74,7 @@ public class HoldingsIndexCallable implements Callable {
         logger.info("No of Holdings to index : " + holdingsToIndex.size());
 
         if (!CollectionUtils.isEmpty(holdingsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", holdingsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         return holdingsEntities.getNumberOfElements();
     }

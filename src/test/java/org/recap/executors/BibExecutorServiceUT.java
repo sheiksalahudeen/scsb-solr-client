@@ -48,7 +48,7 @@ public class BibExecutorServiceUT {
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(5);
         solrIndexRequest.setNumberOfDocs(1000);
-        solrIndexRequest.setOwningInstitutionId(null);
+        solrIndexRequest.setOwningInstitutionCode(null);
         bibIndexExecutorService.index(solrIndexRequest);
         assertEquals(1000,mockBibIndexCallable.call());
     }

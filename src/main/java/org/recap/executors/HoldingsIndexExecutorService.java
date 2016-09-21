@@ -22,7 +22,7 @@ public class HoldingsIndexExecutorService extends IndexExecutorService {
 
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
-        return new HoldingsIndexCallable(pageNum, docsPerPage, holdingsDetailsRepository, owningInstitutionId, producerTemplate);
+        return new HoldingsIndexCallable(pageNum, coreName, docsPerPage, holdingsDetailsRepository, owningInstitutionId, producerTemplate);
     }
 
     @Override

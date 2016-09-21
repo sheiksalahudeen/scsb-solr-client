@@ -10,7 +10,7 @@ public class SolrIndexRequest {
     private Integer numberOfThreads;
     private Integer numberOfDocs;
     private Integer commitInterval;
-    private Integer owningInstitutionId;
+    private String owningInstitutionCode;
     private boolean doClean;
     private String dateFrom;
 
@@ -51,12 +51,12 @@ public class SolrIndexRequest {
         this.commitInterval = commitInterval;
     }
 
-    public Integer getOwningInstitutionId() {
-        return owningInstitutionId;
+    public String getOwningInstitutionCode() {
+        return owningInstitutionCode;
     }
 
-    public void setOwningInstitutionId(Integer owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
+    public void setOwningInstitutionCode(String owningInstitutionCode) {
+        this.owningInstitutionCode = owningInstitutionCode;
     }
 
     public boolean isDoClean() {

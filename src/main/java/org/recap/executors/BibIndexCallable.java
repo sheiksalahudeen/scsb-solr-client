@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -77,7 +78,7 @@ public class BibIndexCallable implements Callable {
         logger.info("No of Bibs to index : " + bibsToIndex.size());
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
-            producerTemplate.sendBody("seda:solrQ", bibsToIndex);
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         return bibliographicEntities.getNumberOfElements();
     }

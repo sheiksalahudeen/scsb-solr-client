@@ -52,7 +52,8 @@ public class BibItemIndexExecutorServiceUT extends BaseTestCase{
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
         solrIndexRequest.setNumberOfThreads(5);
         solrIndexRequest.setNumberOfDocs(1000);
-        solrIndexRequest.setOwningInstitutionId(null);
+        solrIndexRequest.setOwningInstitutionCode(null);
+        solrIndexRequest.setCommitInterval(10000);
         bibItemIndexExecutorService.index(solrIndexRequest);
     }
 
