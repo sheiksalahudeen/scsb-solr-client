@@ -3,9 +3,7 @@
  */
 
 jQuery(document).ready(function ($) {
-    $("#searchResults").tablesorter({
-        sortList: [[1,0]]
-    });
+    $("#searchResults").tablesorter();
 
     if ($("#fieldValue").val().length == 0) {
         $("#clearSearchText").hide();
