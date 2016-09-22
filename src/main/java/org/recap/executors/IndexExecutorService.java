@@ -66,7 +66,7 @@ public abstract class IndexExecutorService {
         Integer docsPerThread = solrIndexRequest.getNumberOfDocs();
         Integer commitIndexesInterval = solrIndexRequest.getCommitInterval();
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
-        Integer owningInstitutionId = 0;
+        Integer owningInstitutionId = null;
         String coreName = null;
 
         try {
