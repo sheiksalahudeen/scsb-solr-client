@@ -67,25 +67,20 @@ public abstract class IndexExecutorService {
         Integer commitIndexesInterval = solrIndexRequest.getCommitInterval();
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         Integer owningInstitutionId = null;
-        String coreName = null;
+        String coreName = solrCore;
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
             Integer totalDocCount = 0;
             if (StringUtils.isBlank(owningInstitutionCode)) {
                 totalDocCount = getTotalDocCount(null);
-                coreName = solrCore;
             } else {
                 InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(owningInstitutionCode);
                 if (null != institutionEntity) {
                     owningInstitutionId = institutionEntity.getInstitutionId();
                     totalDocCount = getTotalDocCount(owningInstitutionId);
                 }
-                coreName = owningInstitutionCode;
             }
-
-            solrAdmin.createSolrCores(Arrays.asList(coreName));
-
             logger.info("Total Document Count From DB : " + totalDocCount);
 
             if (totalDocCount > 0) {
