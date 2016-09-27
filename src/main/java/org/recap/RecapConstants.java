@@ -17,7 +17,9 @@ public class RecapConstants {
     public static final String OWNING_INSTITUTION = "OwningInstitution";
     public static final String COLLECTION_GROUP_DESIGNATION = "CollectionGroupDesignation";
     public static final String AVAILABILITY = "Availability";
-    public static final String TITLE = "Title_search";
+    public static final String TITLE_SEARCH = "Title_search";
+    public static final String AUTHOR_SEARCH = "Author_search";
+    public static final String PUBLISHER = "Publisher";
     public static final String TITLE_STARTS_WITH= "TitleStartsWith";
     public static final String TITLE_SORT= "Title_sort";
     public static final String BARCODE = "Barcode";
@@ -28,6 +30,7 @@ public class RecapConstants {
     public static final String SERIAL = "Serial";
     public static final String OTHER = "Other";
     public static final String AND = "AND";
+    public static final String ALL_DIACRITICS = "all_diacritics";
 
     public static final String USE_RESTRICTION = "UseRestriction";
     public static final String NO_RESTRICTIONS = "No Restrictions";

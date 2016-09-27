@@ -431,4 +431,58 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertNotNull(criteria);
     }
 
+    @Test
+    public void testAllFieldsSearchAndDiacriticsFields() throws Exception {
+        Bib bib = saveBib();
+        assertNotNull(bib);
+
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("Title_search");
+        searchRecordsRequest.setFieldValue("lincoln inn");
+        searchRecordsRequest.getOwningInstitutions().add("CUL");
+
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        assertNotNull(bibItems);
+        assertEquals(bibItems.size(), 1);
+
+        searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName(null);
+        searchRecordsRequest.setFieldValue("lincoln inn");
+        searchRecordsRequest.getOwningInstitutions().add("CUL");
+
+        bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        assertNotNull(bibItems);
+        assertEquals(bibItems.size(), 1);
+
+    }
+
+    private Bib saveBib() throws Exception {
+        Random random = new Random();
+        Integer bibId = random.nextInt();
+        Integer holdingsId = random.nextInt();
+        Integer itemId = random.nextInt();
+
+        Bib bib = new Bib();
+        bib.setBibId(bibId);
+        bib.setDocType("Bib");
+        bib.setTitle("Lincoln's Inn Title");
+        bib.setAuthorDisplay("Nancy L");
+        bib.setPublisher("McClelland & Stewart, limited");
+        bib.setImprint("Toronto, McClelland & Stewart, limited [c1926]");
+        bib.setPublicationDate("1960");
+        bib.setMaterialType("Material Type 1");
+        bib.setNotes("Bibliographical footnotes 1");
+        bib.setOwningInstitution("CUL");
+        bib.setSubject("Arab countries Politics and government.");
+        bib.setPublicationPlace("Paris");
+        bib.setLccn("71448228");
+        bib.setHoldingsIdList(Arrays.asList(holdingsId));
+        bib.setBibItemIdList(Arrays.asList(itemId));
+
+        bibSolrCrudRepository.save(bib);
+        solrTemplate.commit();
+        Thread.sleep(2000);
+        return bib;
+    }
+
 }
