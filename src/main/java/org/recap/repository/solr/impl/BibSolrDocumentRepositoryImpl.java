@@ -44,7 +44,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SimpleQuery bibQuery = new SimpleQuery();
         bibQuery.setPageRequest(page);
-        //bibQuery.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
+        bibQuery.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
         bibQuery.addCriteria(criteriaForFieldName);
         bibQuery.addFilterQuery(getBibFilterQueryForInputFields(searchRecordsRequest, bibQuery));
         bibQuery.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
@@ -138,11 +138,14 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (StringUtils.isBlank(fieldName) && StringUtils.isBlank(fieldValue)) {
             criteria = new Criteria().expression(RecapConstants.ALL);
         } else if (StringUtils.isBlank(fieldName)) {
-            fieldValue = StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ");
-            criteria = new Criteria().expression(fieldValue);
+            fieldValue = "(" + StringUtils.join(fieldValue.split("\\s+"), " " + RecapConstants.AND + " ") + ")";
+            criteria = new Criteria().expression(fieldValue)
+                    .or(RecapConstants.TITLE_SEARCH).expression(fieldValue)
+                    .or(RecapConstants.AUTHOR_SEARCH).expression(fieldValue)
+                    .or(RecapConstants.PUBLISHER).expression(fieldValue);
         } else if (StringUtils.isBlank(fieldValue)) {
             if (RecapConstants.TITLE_STARTS_WITH.equals(fieldName)) {
-                fieldName = RecapConstants.TITLE;
+                fieldName = RecapConstants.TITLE_SEARCH;
             }
             criteria = new Criteria(fieldName).expression(RecapConstants.ALL);
         } else {
