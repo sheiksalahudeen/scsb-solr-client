@@ -44,7 +44,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SimpleQuery bibQuery = new SimpleQuery();
         bibQuery.setPageRequest(page);
-        bibQuery.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
+        //bibQuery.addSort(new Sort(Sort.Direction.ASC, RecapConstants.TITLE_SORT));
         bibQuery.addCriteria(criteriaForFieldName);
         bibQuery.addFilterQuery(getBibFilterQueryForInputFields(searchRecordsRequest, bibQuery));
         bibQuery.addFilterQuery(new SimpleFilterQuery(new Criteria(RecapConstants.DOCTYPE).is(RecapConstants.BIB)));
