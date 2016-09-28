@@ -45,6 +45,7 @@ function fullIndex() {
         success: function (response) {
             console.log("completed");
             $("#submit").removeAttr('disabled');
+            document.getElementById("fullIndexingStatus").value = response;
         }
     });
     setTimeout(function(){

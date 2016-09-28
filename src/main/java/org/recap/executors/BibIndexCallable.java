@@ -67,10 +67,13 @@ public class BibIndexCallable implements Callable {
         }
 
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
-            Future future = futureIterator.next();
-
-            Bib bib = (Bib) future.get();
-            bibsToIndex.add(bib);
+            try {
+                Future future = futureIterator.next();
+                Bib bib = (Bib) future.get();
+                bibsToIndex.add(bib);
+            } catch (Exception e) {
+                logger.error("Exception : " + e.getMessage());
+            }
         }
 
         executorService.shutdown();
@@ -80,6 +83,6 @@ public class BibIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
-        return bibliographicEntities.getNumberOfElements();
+        return bibsToIndex.size();
     }
 }

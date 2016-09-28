@@ -102,23 +102,25 @@ public class SolrIndexController {
                 e.printStackTrace();
             }
         }
-
+        Integer totalProcessedRecords = 0;
         if (solrIndexRequest.getDocType().equalsIgnoreCase("Bibs")) {
-            bibIndexExecutorService.index(solrIndexRequest);
+            totalProcessedRecords = bibIndexExecutorService.index(solrIndexRequest);
         } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Holdings")) {
-            holdingsIndexExecutorService.index(solrIndexRequest);
+            totalProcessedRecords = holdingsIndexExecutorService.index(solrIndexRequest);
         } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Items")) {
-            itemIndexExecutorService.index(solrIndexRequest);
+            totalProcessedRecords = itemIndexExecutorService.index(solrIndexRequest);
         } else {
-            bibItemIndexExecutorService.index(solrIndexRequest);
+            totalProcessedRecords = bibItemIndexExecutorService.index(solrIndexRequest);
         }
 
-        return solrIndexer(model);
+        String status = "Total number of records processed : " + totalProcessedRecords;
+
+        return report(status);
     }
 
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
-    public String report() {
-        return "Index process initiated!";
+    public String report(String status) {
+        return StringUtils.isBlank(status) ? "Index process initiated!" : status;
     }
 }

@@ -64,10 +64,13 @@ public class ItemIndexCallable implements Callable {
         }
 
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
-            Future future = futureIterator.next();
-
-            Item item = (Item) future.get();
-            itemsToIndex.add(item);
+            try {
+                Future future = futureIterator.next();
+                Item item = (Item) future.get();
+                itemsToIndex.add(item);
+            } catch (Exception e) {
+                logger.error("Exception : " + e.getMessage());
+            }
         }
 
         executorService.shutdown();
@@ -77,6 +80,6 @@ public class ItemIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
-        return itemEntities.getNumberOfElements();
+        return itemsToIndex.size();
     }
 }
