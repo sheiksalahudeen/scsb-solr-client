@@ -71,10 +71,9 @@ public class BibItemIndexCallable implements Callable {
 
         logger.info("Num futures to prepare Bib and Associated data : " + futures.size());
 
-        try {
-            for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
+        for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
+            try {
                 Future future = futureIterator.next();
-
                 Map<String, List> stringListMap = (Map<String, List>) future.get();
                 List bibs = stringListMap.get("Bib");
                 bibsToIndex.addAll(bibs);
@@ -82,9 +81,9 @@ public class BibItemIndexCallable implements Callable {
                 holdingsToIndex.addAll(holdings);
                 List items = stringListMap.get("Item");
                 itemsToIndex.addAll(items);
+            } catch (Exception e) {
+                logger.error("Exception : " + e.getMessage());
             }
-        } catch (Exception e) {
-            logger.error("Exception  : " +e.getMessage());
         }
 
         logger.info("No of Bibs to index : " + bibsToIndex.size());
@@ -102,6 +101,6 @@ public class BibItemIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
-        return bibliographicEntities.getNumberOfElements();
+        return bibsToIndex.size();
     }
 }

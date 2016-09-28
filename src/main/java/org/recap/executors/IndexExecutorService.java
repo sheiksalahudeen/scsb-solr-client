@@ -58,7 +58,7 @@ public abstract class IndexExecutorService {
     @Value("${solr.router.uri.type}")
     String solrRouterURI;
 
-    public void indexByOwningInstitutionId(SolrIndexRequest solrIndexRequest) {
+    public Integer indexByOwningInstitutionId(SolrIndexRequest solrIndexRequest) {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
 
@@ -68,6 +68,8 @@ public abstract class IndexExecutorService {
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         Integer owningInstitutionId = null;
         String coreName = solrCore;
+
+        Integer totalBibsProcessed = 0;
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
@@ -108,7 +110,6 @@ public abstract class IndexExecutorService {
                 }
 
                 int futureCount = 0;
-                int totalBibsProcessed = 0;
                 List<List<Callable<Integer>>> partitions = Lists.partition(new ArrayList<Callable<Integer>>(callables), callableCountByCommitInterval);
                 for (List<Callable<Integer>> partitionCallables : partitions) {
                     List<Future<Integer>> futures = executorService.invokeAll(partitionCallables);
@@ -169,10 +170,11 @@ public abstract class IndexExecutorService {
         }
         stopWatch1.stop();
         logger.info("Total time taken:" + stopWatch1.getTotalTimeSeconds() + " secs");
+        return totalBibsProcessed;
     }
 
-    public void index(SolrIndexRequest solrIndexRequest) {
-        indexByOwningInstitutionId(solrIndexRequest);
+    public Integer index(SolrIndexRequest solrIndexRequest) {
+        return indexByOwningInstitutionId(solrIndexRequest);
     }
 
     private void deleteTempIndexes(List<String> coreNames, String solrUrl) {

@@ -63,10 +63,13 @@ public class HoldingsIndexCallable implements Callable {
         }
 
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
-            Future future = futureIterator.next();
-
-            Holdings holdings = (Holdings) future.get();
-            holdingsToIndex.add(holdings);
+            try {
+                Future future = futureIterator.next();
+                Holdings holdings = (Holdings) future.get();
+                holdingsToIndex.add(holdings);
+            } catch (Exception e) {
+                logger.error("Exception : " + e.getMessage());
+            }
         }
 
         executorService.shutdown();
@@ -76,6 +79,6 @@ public class HoldingsIndexCallable implements Callable {
         if (!CollectionUtils.isEmpty(holdingsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
-        return holdingsEntities.getNumberOfElements();
+        return holdingsToIndex.size();
     }
 }
