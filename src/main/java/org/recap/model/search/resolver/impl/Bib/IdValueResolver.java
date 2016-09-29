@@ -1,12 +1,12 @@
-package org.recap.model.search.resolver.impl;
+package org.recap.model.search.resolver.impl.Bib;
 
-import org.recap.model.search.resolver.ValueResolver;
+import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;
 
 /**
  * Created by peris on 9/29/16.
  */
-public class IdValueResolver implements ValueResolver {
+public class IdValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
         return field.equalsIgnoreCase("id");
@@ -14,8 +14,6 @@ public class IdValueResolver implements ValueResolver {
 
     @Override
     public void setValue(BibItem bibItem, Object value) {
-        if (value instanceof String) {
             bibItem.setId((String)value);
-        }
     }
 }

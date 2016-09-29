@@ -1,12 +1,13 @@
-package org.recap.model.search.resolver.impl;
+package org.recap.model.search.resolver.impl.Bib;
 
-import org.recap.model.search.resolver.ValueResolver;
+import org.recap.model.search.resolver.BibValueResolver;
+import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;
 
 /**
  * Created by peris on 9/29/16.
  */
-public class BarcodeValueResolver implements ValueResolver {
+public class BarcodeValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
         return field.equalsIgnoreCase("Barcode");

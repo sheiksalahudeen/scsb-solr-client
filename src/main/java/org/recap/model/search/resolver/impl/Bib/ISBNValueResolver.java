@@ -1,6 +1,6 @@
-package org.recap.model.search.resolver.impl;
+package org.recap.model.search.resolver.impl.Bib;
 
-import org.recap.model.search.resolver.ValueResolver;
+import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by peris on 9/29/16.
  */
-public class ISBNValueResolver implements ValueResolver {
+public class ISBNValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
         return field.equalsIgnoreCase("ISBN");
