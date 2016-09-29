@@ -13,7 +13,9 @@ public class IdValueResolver implements ValueResolver {
     }
 
     @Override
-    public void setValue(BibItem bibItem, String value) {
-        bibItem.setId(value);
+    public void setValue(BibItem bibItem, Object value) {
+        if (value instanceof String) {
+            bibItem.setId((String)value);
+        }
     }
 }

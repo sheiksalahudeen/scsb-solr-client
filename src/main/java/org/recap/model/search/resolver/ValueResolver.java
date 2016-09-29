@@ -8,5 +8,5 @@ import org.recap.model.solr.BibItem;
 public interface ValueResolver {
     public Boolean isInterested(String field);
 
-    public void setValue(BibItem bibItem, String Value);
+    public void setValue(BibItem bibItem, Object Value);
 }
