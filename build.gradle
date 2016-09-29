@@ -82,11 +82,14 @@ dependencies {
 	compile('org.springframework.data:spring-data-commons:1.12.1.RELEASE')
 	compile('org.springframework.data:spring-data-jpa:1.10.2.RELEASE')
 	compile('com.google.guava:guava:19.0') {exclude module: "solr-solrj"}
-	compile('org.apache.solr:solr-solrj:6.0.1')
+	compile('org.apache.solr:solr-solrj:6.2.1')
 	compile('info.freelibrary:freelib-marc4j:2.6.11')
-	compile group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0'
+	compile(group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0')
+
+
 	runtime('mysql:mysql-connector-java')
-	testCompile('org.springframework.boot:spring-boot-starter-test') 
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
 }
 

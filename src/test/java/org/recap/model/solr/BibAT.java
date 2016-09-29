@@ -1,6 +1,13 @@
 package org.recap.model.solr;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.DefaultSolrParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.recap.BaseTestCase;
@@ -10,10 +17,13 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
+import org.recap.repository.solr.main.SolrInputDocumentRepository;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.result.ScoredPage;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -37,6 +47,9 @@ public class BibAT extends BaseTestCase {
 
     @Autowired
     BibSolrDocumentRepository bibSolrDocumentRepository;
+
+    @Autowired
+    SolrInputDocumentRepository solrInputDocumentRepository;
 
 
     @Before
@@ -388,6 +401,40 @@ public class BibAT extends BaseTestCase {
         Long countByItemId = itemCrudRepository.countByItemId(itemId1);
         assertNotNull(countByItemId);
         assertEquals("1", String.valueOf(countByItemId));
+    }
+
+    @Test
+    public void saveNestedDocuments() throws Exception {
+
+        solrTemplate.getSolrClient().deleteByQuery("*:*");
+        solrTemplate.commit();
+
+        SolrInputDocument solrInputDocument = new SolrInputDocument();
+        solrInputDocument.addField("BibId", "123");
+        solrInputDocument.addField("DocType", "Bib");
+        solrInputDocument.addField("Title_search", "History of Science");
+
+
+        SolrInputDocument childSolrInputDocument = new SolrInputDocument();
+        childSolrInputDocument.addField("id", "12");
+        childSolrInputDocument.addField("HoldingsId", "12");
+        childSolrInputDocument.addField("DocType", "Holdings");
+        solrInputDocument.addChildDocument(childSolrInputDocument);
+
+        SolrInputDocument solrInputDocument1 = new SolrInputDocument();
+        solrInputDocument1.addField("BibId", "12312");
+        solrInputDocument1.addField("DocType", "Bib");
+        solrInputDocument1.addField("Title_search", "War of the worlds");
+
+        solrTemplate.saveDocuments(Arrays.asList(solrInputDocument, solrInputDocument1));
+        solrTemplate.commit();
+
+        SolrQuery solrQuery = new SolrQuery("BibId:123");
+        solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib]");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
     }
 
 }
