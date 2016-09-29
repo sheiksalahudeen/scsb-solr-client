@@ -410,21 +410,23 @@ public class BibAT extends BaseTestCase {
         solrTemplate.commit();
 
         SolrInputDocument solrInputDocument = new SolrInputDocument();
-        solrInputDocument.addField("BibId", "123");
-        solrInputDocument.addField("DocType", "Bib");
-        solrInputDocument.addField("Title_search", "History of Science");
+        solrInputDocument.setField("id", "123");
+        solrInputDocument.setField("BibId", "123");
+        solrInputDocument.setField("DocType", "Bib");
+        solrInputDocument.setField("Title_search", "History of Science");
 
 
         SolrInputDocument childSolrInputDocument = new SolrInputDocument();
-        childSolrInputDocument.addField("id", "12");
+        childSolrInputDocument.setField("id", "12");
         childSolrInputDocument.addField("HoldingsId", "12");
-        childSolrInputDocument.addField("DocType", "Holdings");
+        childSolrInputDocument.setField("DocType", "Holdings");
         solrInputDocument.addChildDocument(childSolrInputDocument);
 
         SolrInputDocument solrInputDocument1 = new SolrInputDocument();
-        solrInputDocument1.addField("BibId", "12312");
-        solrInputDocument1.addField("DocType", "Bib");
-        solrInputDocument1.addField("Title_search", "War of the worlds");
+        solrInputDocument1.setField("id", "12312");
+        solrInputDocument1.setField("BibId", "12312");
+        solrInputDocument1.setField("DocType", "Bib");
+        solrInputDocument1.setField("Title_search", "War of the worlds");
 
         solrTemplate.saveDocuments(Arrays.asList(solrInputDocument, solrInputDocument1));
         solrTemplate.commit();
