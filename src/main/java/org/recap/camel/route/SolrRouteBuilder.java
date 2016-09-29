@@ -3,6 +3,7 @@ package org.recap.camel.route;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.solr.SolrConstants;
 import org.recap.RecapConstants;
 import org.recap.camel.processor.SolrPayloadProcessor;
 import org.slf4j.Logger;
@@ -30,7 +31,10 @@ public class SolrRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     SolrPayloadProcessor solrPayloadProcessor = new SolrPayloadProcessor(solrUri, solrCore, solrRouterURI, producerTemplate, camelContext);
-                    from(RecapConstants.SOLR_QUEUE).process(solrPayloadProcessor);
+                    from(RecapConstants.SOLR_QUEUE).setHeader(SolrConstants.OPERATION, constant(SolrConstants.OPERATION_INSERT))
+                            .setHeader(SolrConstants.FIELD + "id", body())
+                            .setHeader(SolrConstants.OPERATION, constant(SolrConstants.OPERATION_COMMIT))
+                            .to("solr:" + solrUri + "/" + solrCore);
                 }
             });
         } catch (Exception e) {
