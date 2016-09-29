@@ -21,19 +21,16 @@ public class SolrRouteBuilder {
     Logger logger = LoggerFactory.getLogger(SolrRouteBuilder.class);
 
     @Autowired
-    public SolrRouteBuilder(CamelContext camelContext, ProducerTemplate producerTemplate,
+    public SolrRouteBuilder(CamelContext camelContext,
                             @Value("${solr.url}") String solrUri,
-                            @Value("${solr.router.uri.type}") String solrRouterURI,
                             @Value("${solr.parent.core}") String solrCore) {
 
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    SolrPayloadProcessor solrPayloadProcessor = new SolrPayloadProcessor(solrUri, solrCore, solrRouterURI, producerTemplate, camelContext);
                     from(RecapConstants.SOLR_QUEUE).setHeader(SolrConstants.OPERATION, constant(SolrConstants.OPERATION_INSERT))
                             .setHeader(SolrConstants.FIELD + "id", body())
-                            .setHeader(SolrConstants.OPERATION, constant(SolrConstants.OPERATION_COMMIT))
                             .to("solr:" + solrUri + "/" + solrCore);
                 }
             });

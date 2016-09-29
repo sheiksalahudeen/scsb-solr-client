@@ -145,7 +145,6 @@ public abstract class IndexExecutorService {
                         solrQSize = solrQSedaEndPoint.getExchanges().size();
                     }
                     Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + coreName, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
-                    logger.info("Commit future done : " + future.isDone());
                     while (!future.isDone()) {
                         //NoOp.
                     }
