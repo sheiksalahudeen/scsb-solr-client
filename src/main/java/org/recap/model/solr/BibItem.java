@@ -73,14 +73,8 @@ public class BibItem {
     @Field("Imprint")
     private String imprint;
 
-    @Field("HoldingsId")
-    private List<Integer> holdingsIdList;
-
     @Field("OwningInstHoldingsId")
     private List<Integer> owningInstHoldingsIdList;
-
-    @Field("BibItemId")
-    private List<Integer> bibItemIdList;
 
     @Field("OwningInstitutionBibId")
     private String owningInstitutionBibId;
@@ -257,28 +251,12 @@ public class BibItem {
         this.imprint = imprint;
     }
 
-    public List<Integer> getHoldingsIdList() {
-        return holdingsIdList;
-    }
-
-    public void setHoldingsIdList(List<Integer> holdingsIdList) {
-        this.holdingsIdList = holdingsIdList;
-    }
-
     public List<Integer> getOwningInstHoldingsIdList() {
         return owningInstHoldingsIdList;
     }
 
     public void setOwningInstHoldingsIdList(List<Integer> owningInstHoldingsIdList) {
         this.owningInstHoldingsIdList = owningInstHoldingsIdList;
-    }
-
-    public List<Integer> getBibItemIdList() {
-        return bibItemIdList;
-    }
-
-    public void setBibItemIdList(List<Integer> bibItemIdList) {
-        this.bibItemIdList = bibItemIdList;
     }
 
     public String getOwningInstitutionBibId() {
