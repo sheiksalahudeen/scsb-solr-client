@@ -395,7 +395,6 @@ public class BibAT extends BaseTestCase {
 
     @Test
     public void saveNestedDocuments() throws Exception {
-
         solrTemplate.getSolrClient().deleteByQuery("*:*");
         solrTemplate.commit();
 
@@ -406,23 +405,39 @@ public class BibAT extends BaseTestCase {
         solrInputDocument.setField("Title_search", "History of Science");
 
 
-        SolrInputDocument childSolrInputDocument = new SolrInputDocument();
-        childSolrInputDocument.setField("id", "12");
-        childSolrInputDocument.addField("HoldingsId", "12");
-        childSolrInputDocument.setField("DocType", "Holdings");
-        solrInputDocument.addChildDocument(childSolrInputDocument);
+        SolrInputDocument itemSolrInputDocument = new SolrInputDocument();
+        itemSolrInputDocument.setField("id", "12312");
+        itemSolrInputDocument.setField("DocType", "Item");
+        itemSolrInputDocument.setField("Barcode", "i.12313");
 
-        SolrInputDocument solrInputDocument1 = new SolrInputDocument();
-        solrInputDocument1.setField("id", "12312");
-        solrInputDocument1.setField("BibId", "12312");
-        solrInputDocument1.setField("DocType", "Bib");
-        solrInputDocument1.setField("Title_search", "War of the worlds");
+        SolrInputDocument holdingsSolrInputDocument = new SolrInputDocument();
+        holdingsSolrInputDocument.setField("id", "12");
+        holdingsSolrInputDocument.addField("HoldingsId", "12");
+        holdingsSolrInputDocument.setField("DocType", "Holdings");
+        holdingsSolrInputDocument.addChildDocument(itemSolrInputDocument);
 
-        solrTemplate.saveDocuments(Arrays.asList(solrInputDocument, solrInputDocument1));
+        solrInputDocument.addChildDocument(holdingsSolrInputDocument);
+
+
+        solrTemplate.saveDocuments(Arrays.asList(solrInputDocument));
         solrTemplate.commit();
 
         SolrQuery solrQuery = new SolrQuery("BibId:123");
         solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib]");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+        SolrDocument solrDocument = results.get(0);
+        List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
+        SolrDocument childDoc = childDocuments.get(0);
+        assertNotNull(childDoc);
+    }
+
+    @Test
+    public void searchNested() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("Title_search: Kuṟaḷ neṟiyum Citta");
+        solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib childFilter=DocType:Holdings]");
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         assertNotNull(queryResponse);
         SolrDocumentList results = queryResponse.getResults();

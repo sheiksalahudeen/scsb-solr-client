@@ -10,9 +10,9 @@ import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
-import org.recap.model.search.resolver.ValueResolver;
 import org.recap.model.search.resolver.impl.Bib.*;
-import org.recap.model.search.resolver.impl.item.ItemOwningInstitutionValueResolver;
+import org.recap.model.search.resolver.impl.Bib.DocTypeValueResolver;
+import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -55,14 +56,15 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 populateBibItem(solrDocument, bibItem);
                 List<SolrDocument> holdingsSolrDocuments = solrDocument.getChildDocuments();
                 List<Item> items = new ArrayList<>();
-                for (Iterator<SolrDocument> solrDocumentIterator = holdingsSolrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
-                    SolrDocument holdingsSolrDocument = solrDocumentIterator.next();
-                    populateBibItem(holdingsSolrDocument, bibItem);
-                    List<SolrDocument> itemSolrDocuments = holdingsSolrDocument.getChildDocuments();
-                    for (Iterator<SolrDocument> documentIterator = itemSolrDocuments.iterator(); documentIterator.hasNext(); ) {
-                        SolrDocument itemSolrDocument = documentIterator.next();
-                        Item item = getItem(itemSolrDocument);
-                        items.add(item);
+                if (!CollectionUtils.isEmpty(holdingsSolrDocuments)) {
+                    for (Iterator<SolrDocument> solrDocumentIterator = holdingsSolrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
+                        SolrDocument childSolrDocument = solrDocumentIterator.next();
+                        if (childSolrDocument.getFieldValue("DocType").equals("Holdings")) {
+                            populateBibItem(childSolrDocument, bibItem);
+                        } else if (childSolrDocument.getFieldValue("DocType").equals("Item")){
+                            Item item = getItem(childSolrDocument);
+                            items.add(item);
+                        }
                     }
                 }
                 bibItem.setItems(items);
@@ -79,7 +81,21 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private Item getItem(SolrDocument itemSolrDocument) {
         Item item = new Item();
-        return null;
+
+        Collection<String> fieldNames = itemSolrDocument.getFieldNames();
+        List<ItemValueResolver> itemValueResolvers = getItemValueResolvers();
+        for (Iterator<String> iterator = fieldNames.iterator(); iterator.hasNext(); ) {
+            String fieldName = iterator.next();
+            Object fieldValue = itemSolrDocument.getFieldValue(fieldName);
+            for (Iterator<ItemValueResolver> itemValueResolverIterator = itemValueResolvers.iterator(); itemValueResolverIterator.hasNext(); ) {
+                ItemValueResolver itemValueResolver = itemValueResolverIterator.next();
+                if(itemValueResolver.isInterested(fieldName)){
+                    itemValueResolver.setValue(item, fieldValue);
+                }
+            }
+        }
+
+        return item;
 
     }
 
@@ -198,7 +214,6 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             bibValueResolvers = new ArrayList<>();
             bibValueResolvers.add(new AuthorDisplayValueResolver());
             bibValueResolvers.add(new AuthorSearchValueResolver());
-            bibValueResolvers.add(new BarcodeValueResolver());
             bibValueResolvers.add(new BibIdValueResolver());
             bibValueResolvers.add(new DocTypeValueResolver());
             bibValueResolvers.add(new IdValueResolver());
@@ -226,7 +241,15 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public List<ItemValueResolver> getItemValueResolvers() {
         if (null == itemValueResolvers) {
             itemValueResolvers = new ArrayList<>();
+            itemValueResolvers.add(new AvailabilityValueResolver());
+            itemValueResolvers.add(new BarcodeValueResolver());
+            itemValueResolvers.add(new CallNumberValueResolver());
+            itemValueResolvers.add(new CollectionGroupDesignationValueResolver());
+            itemValueResolvers.add(new CustomerCodeValueResolver());
+            itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.DocTypeValueResolver());
             itemValueResolvers.add(new ItemOwningInstitutionValueResolver());
+            itemValueResolvers.add(new UseRestrictionValueResolver());
+            itemValueResolvers.add(new VolumePartYearValueResolver());
         }
         return itemValueResolvers;
     }
