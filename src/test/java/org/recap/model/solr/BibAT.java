@@ -437,6 +437,10 @@ public class BibAT extends BaseTestCase {
         assertNotNull(queryResponse);
         SolrDocumentList results = queryResponse.getResults();
         assertNotNull(results);
+        SolrDocument solrDocument = results.get(0);
+        List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
+        SolrDocument childDoc = childDocuments.get(0);
+        assertNotNull(childDoc);
     }
 
 }
