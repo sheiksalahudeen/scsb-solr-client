@@ -75,7 +75,7 @@ public class SolrIndexControllerUT extends BaseControllerUT{
 
     @Test
     public void report()throws Exception{
-        String response =solrIndexController.report();
+        String response =solrIndexController.report("");
         assertNotNull(response);
         assertTrue(response.contains("Index process initiated!"));
     }

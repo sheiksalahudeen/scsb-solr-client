@@ -3,6 +3,7 @@ package org.recap.executors;
 import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Callable;
@@ -19,9 +20,12 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
     @Autowired
     ProducerTemplate producerTemplate;
 
+    @Autowired
+    SolrTemplate solrTemplate;
+
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
-        return new BibItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, owningInstitutionId, producerTemplate);
+        return new BibItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, owningInstitutionId, producerTemplate, solrTemplate);
     }
 
     @Override

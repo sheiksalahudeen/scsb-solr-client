@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(classes = Main.class)
 @WebAppConfiguration
 @Transactional
-@Rollback()
+@Rollback(false)
 public class BaseTestCase {
 
     @Autowired

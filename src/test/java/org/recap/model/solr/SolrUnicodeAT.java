@@ -1,6 +1,7 @@
 package org.recap.model.solr;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -77,14 +78,11 @@ public class SolrUnicodeAT extends BaseTestCase {
         String fetchedBibContent = new String(fetchedBibliographicEntity.getContent());
         assertEquals(sourceBibContent, fetchedBibContent);
 
-        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity);
-        List<Bib> bibs = stringListMap.get("Bib");
-        assertNotNull(bibs);
-        assertTrue(bibs.size() > 0);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        assertNotNull(solrInputDocument);
 
         //bibSolrCrudRepository = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);
-        bibSolrCrudRepository.save(bibs);
-        solrTemplate.softCommit();
+        solrTemplate.saveDocument(solrInputDocument);
         Bib solrBib = bibSolrCrudRepository.findByBibId(fetchedBibliographicEntity.getBibliographicId());
         assertNotNull(solrBib);
 

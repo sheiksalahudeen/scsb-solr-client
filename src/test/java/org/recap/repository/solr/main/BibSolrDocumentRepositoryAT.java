@@ -2,7 +2,7 @@ package org.recap.repository.solr.main;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -79,12 +79,10 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 
-        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity);
-        List<Bib> bibs = stringListMap.get("Bib");
-        assertNotNull(bibs);
-        assertTrue(bibs.size() > 0);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        assertNotNull(solrInputDocument);
 
-        bibSolrCrudRepository.save(bibs);
+        solrTemplate.saveDocument(solrInputDocument);
         solrTemplate.softCommit();
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
@@ -147,18 +145,10 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertNotNull(fetchedBibliographicEntity);
         assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
 
-        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity);
-        List<Bib> bibs = stringListMap.get("Bib");
-        assertNotNull(bibs);
-        assertTrue(bibs.size() == 1);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        assertNotNull(solrInputDocument);
 
-        List<Item> items = stringListMap.get("Item");
-        assertNotNull(items);
-        assertTrue(items.size() == 1);
-
-        bibSolrCrudRepository.save(bibs);
-        itemCrudRepository.save(items);
-        solrTemplate.softCommit();
+        solrTemplate.saveDocument(solrInputDocument);
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setFieldName(null); // All fields.
@@ -200,18 +190,10 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        Map<String, List> stringListMap = bibJSONUtil.generateBibAndItemsForIndex(fetchedBibliographicEntity);
-        List<Bib> bibs = stringListMap.get("Bib");
-        assertNotNull(bibs);
-        assertTrue(bibs.size() == 1);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        assertNotNull(solrInputDocument);
 
-        List<Item> items = stringListMap.get("Item");
-        assertNotNull(items);
-        assertTrue(items.size() == 1);
-
-        bibSolrCrudRepository.save(bibs);
-        itemCrudRepository.save(items);
-        solrTemplate.softCommit();
+        solrTemplate.saveDocument(solrInputDocument);
 
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setFieldName(null); // All fields.

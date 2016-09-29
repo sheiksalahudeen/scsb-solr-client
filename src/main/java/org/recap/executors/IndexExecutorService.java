@@ -101,12 +101,10 @@ public abstract class IndexExecutorService {
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
 
-                int coreNum = 0;
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
                     Callable callable = getCallable(coreName, pageNum, docsPerThread, owningInstitutionId);
                     callables.add(callable);
-                    coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
                 int futureCount = 0;

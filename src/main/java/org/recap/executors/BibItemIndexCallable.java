@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.solr.common.SolrInputDocument;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -27,16 +29,17 @@ import java.util.concurrent.Future;
 public class BibItemIndexCallable implements Callable {
 
     Logger logger = LoggerFactory.getLogger(BibItemIndexCallable.class);
-
     private final int pageNum;
+
     private final int docsPerPage;
     private String coreName;
     private String solrURL;
     private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ProducerTemplate producerTemplate;
+    private SolrTemplate solrTemplate;
 
-    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
+    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
@@ -44,6 +47,7 @@ public class BibItemIndexCallable implements Callable {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
         this.producerTemplate = producerTemplate;
+        this.solrTemplate = solrTemplate;
     }
 
     @Override
@@ -54,53 +58,35 @@ public class BibItemIndexCallable implements Callable {
                 bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
-        List<Bib> bibsToIndex = new ArrayList<>();
-        List<Bib> holdingsToIndex = new ArrayList<>();
-        List<Item> itemsToIndex = new ArrayList<>();
-
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
 
 
         ExecutorService executorService = Executors.newFixedThreadPool(50);
         List<Future> futures = new ArrayList<>();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             BibliographicEntity bibliographicEntity = iterator.next();
-            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity));
+            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, solrTemplate));
             futures.add(submit);
         }
 
         logger.info("Num futures to prepare Bib and Associated data : " + futures.size());
 
+        List<SolrInputDocument> solrInputDocumentsToIndex = new ArrayList<>();
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
             try {
                 Future future = futureIterator.next();
-                Map<String, List> stringListMap = (Map<String, List>) future.get();
-                List bibs = stringListMap.get("Bib");
-                bibsToIndex.addAll(bibs);
-                List holdings = stringListMap.get("Holdings");
-                holdingsToIndex.addAll(holdings);
-                List items = stringListMap.get("Item");
-                itemsToIndex.addAll(items);
+                SolrInputDocument solrInputDocument = (SolrInputDocument) future.get();
+                solrInputDocumentsToIndex.add(solrInputDocument);
             } catch (Exception e) {
                 logger.error("Exception : " + e.getMessage());
             }
         }
 
-        logger.info("No of Bibs to index : " + bibsToIndex.size());
-        logger.info("No of Holdings to index : " + holdingsToIndex.size());
-        logger.info("No of Items to index : " + itemsToIndex.size());
-
         executorService.shutdown();
 
-        if (!CollectionUtils.isEmpty(bibsToIndex)) {
-            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);
+        if (!CollectionUtils.isEmpty(solrInputDocumentsToIndex)) {
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, solrInputDocumentsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
-        if (!CollectionUtils.isEmpty(holdingsToIndex)) {
-            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);
-        }
-        if (!CollectionUtils.isEmpty(itemsToIndex)) {
-            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);
-        }
-        return bibsToIndex.size();
+        return solrInputDocumentsToIndex.size();
     }
 }

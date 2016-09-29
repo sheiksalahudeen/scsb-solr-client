@@ -1,6 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
@@ -13,6 +14,7 @@ import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -103,36 +105,44 @@ public class BibJSONUtil extends MarcUtil {
         return issnNumbers;
     }
 
-    public Map<String, List> generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity) {
-        Map map = new HashMap();
-        List<Holdings> holdingsList = new ArrayList<>();
-        List<Item> items = new ArrayList<>();
+    public SolrInputDocument generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, SolrTemplate solrTemplate) {
 
         Bib bib = generateBib(bibliographicEntity);
+        SolrInputDocument bibSolrInputDocument = generateBibSolrInputDocument(bib, solrTemplate);
 
-        List<Integer> holdingsIds = new ArrayList<>();
-        List<Integer> itemIds = new ArrayList<>();
-
-        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
-        for (ItemEntity itemEntity : itemEntities) {
-            itemIds.add(itemEntity.getItemId());
-            Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
-            items.add(item);
-        }
         List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        List<SolrInputDocument> holdingsSolrInputDocuments = new ArrayList<>();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
-            holdingsIds.add(holdingsEntity.getHoldingsId());
             Holdings holdings = new HoldingsJSONUtil().generateHoldingsForIndex(holdingsEntity);
-            holdingsList.add(holdings);
+            List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
+            List<SolrInputDocument> itemSolrInputDocuments = new ArrayList<>();
+            ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
+            for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
+                ItemEntity itemEntity = iterator.next();
+                Item item = itemJSONUtil.generateItemForIndex(itemEntity);
+                SolrInputDocument itemSolrInputDocument = generateItemSolrInputDocument(item, solrTemplate);
+                itemSolrInputDocuments.add(itemSolrInputDocument);
+            }
+            SolrInputDocument holdingsSolrInputDocument = generateHoldingsSolrInputDocument(holdings, solrTemplate);
+            holdingsSolrInputDocument.addChildDocuments(itemSolrInputDocuments);
+            holdingsSolrInputDocuments.add(holdingsSolrInputDocument);
         }
 
-        bib.setHoldingsIdList(holdingsIds);
-        bib.setBibItemIdList(itemIds);
+        bibSolrInputDocument.addChildDocuments(holdingsSolrInputDocuments);
 
-        map.put("Bib", Arrays.asList(bib));
-        map.put("Holdings", holdingsList);
-        map.put("Item", items);
-        return map;
+        return bibSolrInputDocument;
+    }
+
+    private SolrInputDocument generateItemSolrInputDocument(Item item, SolrTemplate solrTemplate) {
+        return solrTemplate.convertBeanToSolrInputDocument(item);
+    }
+
+    private SolrInputDocument generateHoldingsSolrInputDocument(Holdings holdings, SolrTemplate solrTemplate) {
+        return solrTemplate.convertBeanToSolrInputDocument(holdings);
+    }
+
+    private SolrInputDocument generateBibSolrInputDocument(Bib bib, SolrTemplate solrTemplate) {
+        return solrTemplate.convertBeanToSolrInputDocument(bib);
     }
 
     public Bib generateBibForIndex(BibliographicEntity bibliographicEntity) {
@@ -161,6 +171,7 @@ public class BibJSONUtil extends MarcUtil {
         bib.setBibId(bibliographicId);
 
         bib.setDocType("Bib");
+        bib.setId(bibliographicEntity.getOwningInstitutionId()+bibliographicEntity.getOwningInstitutionBibId());
         String bibContent = new String(bibliographicEntity.getContent());
         List<Record> records = convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);

@@ -1,6 +1,7 @@
 package org.recap.util;
 
 
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -173,23 +174,14 @@ public class BibJSONUtilUT extends BaseTestCase{
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
-
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntities.add(bibliographicEntity);
         itemEntity.setBibliographicEntities(bibliographicEntities);
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        Map<String, List> bibItemMap = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity);
-        assertNotNull(bibItemMap);
-        List bibs = bibItemMap.get("Bib");
-        List items = bibItemMap.get("Item");
-        assertNotNull(bibs);
-        Bib bib = (Bib)bibs.get(0);
-        assertEquals(bibs.size(), 1);
-        assertEquals("al-Baḥrayn",bib.getTitleStartsWith());
-        assertNotNull(items);
-        assertEquals(items.size(), 1);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate);
+        assertNotNull(solrInputDocument);
     }
 
     @Test

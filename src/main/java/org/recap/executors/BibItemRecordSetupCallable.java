@@ -1,12 +1,10 @@
 package org.recap.executors;
 
+import org.apache.solr.common.SolrInputDocument;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.util.BibJSONUtil;
+import org.springframework.data.solr.core.SolrTemplate;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -15,14 +13,16 @@ import java.util.concurrent.Callable;
 public class BibItemRecordSetupCallable implements Callable {
 
     BibliographicEntity bibliographicEntity;
+    private final SolrTemplate solrTemplate;
 
-    public BibItemRecordSetupCallable(BibliographicEntity bibliographicEntity) {
+    public BibItemRecordSetupCallable(BibliographicEntity bibliographicEntity, SolrTemplate solrTemplate) {
         this.bibliographicEntity = bibliographicEntity;
+        this.solrTemplate = solrTemplate;
     }
 
     @Override
     public Object call() throws Exception {
-        Map<String, List> stringListMap = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity);
-        return stringListMap ;
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, solrTemplate);
+        return solrInputDocument ;
     }
 }

@@ -1,12 +1,16 @@
 package org.recap.executors;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +24,9 @@ import static junit.framework.TestCase.assertNotNull;
  * Created by premkb on 1/8/16.
  */
 public class BibItemRecordSetupCallableUT {
+
+    @Mock
+    SolrTemplate mockSolrTemplate;
 
 
     private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
@@ -134,6 +141,12 @@ public class BibItemRecordSetupCallableUT {
             "            </record>\n" +
             "          </collection>";
 
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
+
+
     @Test
     public void call()throws Exception{
         List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
@@ -170,7 +183,7 @@ public class BibItemRecordSetupCallableUT {
 
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
 
-        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity);
+        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate);
         Map<String, List> bibItem = ( Map<String, List>)bibItemRecordSetupCallable.call();
         assertNotNull(bibItem);
         List<Bib> bib = (List<Bib>)bibItem.get("Bib");
