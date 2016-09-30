@@ -37,7 +37,7 @@ public class BibItem {
     @Field("Author_search")
     private List<String> authorSearch;
 
-    @Field("OwningInstitution")
+    @Field("BibOwningInstitution")
     private String owningInstitution;
 
     @Field("Publisher")

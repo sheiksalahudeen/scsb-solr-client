@@ -42,7 +42,7 @@ public class Item {
     @Field("CallNumber")
     private String callNumber;
 
-    @Field("OwningInstitution")
+    @Field("ItemOwningInstitution")
     private String owningInstitution;
 
     @Field("ItemBibId")

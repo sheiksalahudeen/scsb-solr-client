@@ -39,7 +39,7 @@ public class Bib {
     @Field("Author_search")
     private List<String> authorSearch;
 
-    @Field("OwningInstitution")
+    @Field("BibOwningInstitution")
     private String owningInstitution;
 
     @Field("Publisher")
@@ -75,7 +75,7 @@ public class Bib {
     @Field("Imprint")
     private String imprint;
 
-    @Field("HoldingsId")
+    @Field("BibHoldingsId")
     private List<Integer> holdingsIdList;
 
     @Field("OwningInstHoldingsId")

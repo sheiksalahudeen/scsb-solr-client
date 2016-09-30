@@ -11,7 +11,7 @@ import org.recap.model.solr.Item;
 public class ItemOwningInstitutionValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("OwningInstitution");
+        return field.equals("ItemOwningInstitution");
     }
 
     @Override
