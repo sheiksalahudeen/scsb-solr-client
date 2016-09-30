@@ -45,9 +45,10 @@ public class SolrQureyBuilder {
                 .append(coreFilterQuery)
                 .append(searchRecordsRequest.getFieldName())
                 .append(":")
-                .append(searchRecordsRequest.getFieldValue())
-                .append(and)
-                .append(queryStringForItemCriteria);
+                .append(searchRecordsRequest.getFieldValue());
+                if(StringUtils.isNotBlank(queryStringForItemCriteria)){
+                    strBuilder.append(and).append(queryStringForItemCriteria);
+                }
 
         SolrQuery solrQurey = new SolrQuery(strBuilder.toString());
         solrQurey.addFilterQuery(queryStringForBibCriteria);
@@ -86,9 +87,21 @@ public class SolrQureyBuilder {
         List<String> collectionGroupDesignations = searchRecordsRequest.getCollectionGroupDesignations();
         List<String> useRestrictions = searchRecordsRequest.getUseRestrictions();
 
-        stringBuilder.append(buildQueryForCriteriaField(RecapConstants.AVAILABILITY, availability))
-        .append(and).append(buildQueryForCriteriaField(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations))
-        .append(and).append(buildQueryForCriteriaField(RecapConstants.USE_RESTRICTION, useRestrictions));
+        if (CollectionUtils.isNotEmpty(availability)) {
+            stringBuilder.append(buildQueryForCriteriaField(RecapConstants.AVAILABILITY, availability));
+        }
+        if (StringUtils.isNotBlank(stringBuilder.toString())) {
+            stringBuilder.append(and);
+        }
+        if (CollectionUtils.isNotEmpty(collectionGroupDesignations)) {
+            stringBuilder.append(buildQueryForCriteriaField(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations));
+        }
+        if (StringUtils.isNotBlank(stringBuilder.toString())) {
+            stringBuilder.append(and);
+        }
+        if (CollectionUtils.isNotEmpty(useRestrictions)) {
+            stringBuilder.append(buildQueryForCriteriaField(RecapConstants.USE_RESTRICTION, useRestrictions));
+        }
 
         return stringBuilder.toString();
     }
@@ -96,16 +109,23 @@ public class SolrQureyBuilder {
     private String getQueryStringForBibCriteria(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strinBuilder = new StringBuilder();
         List<String> owningInstitutions = searchRecordsRequest.getOwningInstitutions();
-        strinBuilder.append(buildQueryForCriteriaField(RecapConstants.BIB_OWNING_INSTITUTION, owningInstitutions));
+        if (CollectionUtils.isNotEmpty(owningInstitutions)) {
+            strinBuilder.append(buildQueryForCriteriaField(RecapConstants.BIB_OWNING_INSTITUTION, owningInstitutions));
+        }
+        if (!StringUtils.isNotBlank(strinBuilder.toString())) {
+            strinBuilder.append(and);
+        }
         List<String> materialTypes = searchRecordsRequest.getMaterialTypes();
-        strinBuilder.append(and).append(buildQueryForCriteriaField(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes));
+        if (CollectionUtils.isNotEmpty(materialTypes)) {
+            strinBuilder.append(buildQueryForCriteriaField(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes));
+        }
         return strinBuilder.toString();
     }
 
 
     private String buildQueryForCriteriaField(String fieldName, List<String> values) {
         List<String> modifiedValues = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(values)) {
+        if (CollectionUtils.isNotEmpty(values)) {
             for (String value : values) {
                 modifiedValues.add("\"" + value + "\"");
             }
