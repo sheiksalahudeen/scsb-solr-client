@@ -21,7 +21,7 @@ public class Holdings {
     @Field("SummaryHoldings")
     private String summaryHoldings;
 
-    @Field("OwningInstitution")
+    @Field("HoldingsOwningInstitution")
     private String owningInstitution;
 
     public String getId() {
