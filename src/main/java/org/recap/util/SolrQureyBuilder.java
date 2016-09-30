@@ -28,10 +28,6 @@ public class SolrQureyBuilder {
 
     String coreFilterQuery = "{!parent which=\"DocType:Bib\"}";
 
-    String itemFitlerQuery = "";
-
-    String bibFilterQuery  = "";
-
     public SolrQuery getQuryForSpecificFieldSpecificValue(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strBuilder = new StringBuilder();
         String queryStringForBibCriteria = getQueryStringForBibCriteria(searchRecordsRequest);
@@ -65,12 +61,6 @@ public class SolrQureyBuilder {
 
         solrQuery.setParam("fl", flQ);
         return solrQuery;
-    }
-
-    private String getQueryString(SearchRecordsRequest searchRecordsRequest) {
-        StringBuilder strinBuilder = new StringBuilder();
-        strinBuilder.append(getQueryStringForBibCriteria(searchRecordsRequest)).append(getQueryStringForItemCriteria(searchRecordsRequest));
-        return strinBuilder.toString();
     }
 
     private String getQueryStringForItemCriteria(SearchRecordsRequest searchRecordsRequest) {
