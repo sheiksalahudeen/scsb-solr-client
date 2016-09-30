@@ -42,12 +42,6 @@ public class BibAT extends BaseTestCase {
     @Autowired
     BibSolrDocumentRepository bibSolrDocumentRepository;
 
-    @Before
-    public void setUp() throws Exception {
-        assertNotNull(this.bibSolrCrudRepository);
-        this.bibSolrCrudRepository.deleteAll();
-    }
-
     @Test
     public void indexBib() throws Exception {
 
@@ -438,6 +432,21 @@ public class BibAT extends BaseTestCase {
     public void searchNested() throws Exception {
         SolrQuery solrQuery = new SolrQuery("Title_search: Kuṟaḷ neṟiyum Citta");
         solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib childFilter=DocType:Holdings]");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+        SolrDocument solrDocument = results.get(0);
+        List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
+        SolrDocument childDoc = childDocuments.get(0);
+        assertNotNull(childDoc);
+    }
+
+
+    @Test
+    public void allFieldsNoValue() throws Exception {
+        String itemQueryCriteria = "CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\")+AND+Availability:(\"Available\"+\"Not+Available\")+AND+UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
+        SolrQuery solrQuery = new SolrQuery("{!parent which=\"DocType:Bib\"}*:*+AND+"+itemQueryCriteria);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         assertNotNull(queryResponse);
         SolrDocumentList results = queryResponse.getResults();

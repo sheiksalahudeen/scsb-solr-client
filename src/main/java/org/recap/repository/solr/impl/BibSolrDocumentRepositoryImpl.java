@@ -17,6 +17,7 @@ import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
+import org.recap.util.SolrQureyBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
@@ -45,36 +46,30 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public List<BibItem> search(SearchRecordsRequest searchRecordsRequest, Pageable page) {
         List<BibItem> bibItems = new ArrayList<>();
         try {
-            SolrQuery solrQuery;
-            if (StringUtils.isNotEmpty(searchRecordsRequest.getFieldName())) {
-                solrQuery = new SolrQuery(searchRecordsRequest.getFieldName()+":"+searchRecordsRequest.getFieldValue());
-            } else {
-                solrQuery = new SolrQuery(searchRecordsRequest.getFieldValue());
-            }
-            solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib]");
-
-            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-
-            SolrDocumentList bibSolrDocuments = queryResponse.getResults();
-            for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
-                SolrDocument solrDocument =  iterator.next();
-                BibItem bibItem = new BibItem();
-                populateBibItem(solrDocument, bibItem);
-                List<SolrDocument> holdingsSolrDocuments = solrDocument.getChildDocuments();
-                List<Item> items = new ArrayList<>();
-                if (!CollectionUtils.isEmpty(holdingsSolrDocuments)) {
-                    for (Iterator<SolrDocument> solrDocumentIterator = holdingsSolrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
-                        SolrDocument childSolrDocument = solrDocumentIterator.next();
-                        if (childSolrDocument.getFieldValue("DocType").equals("Holdings")) {
-                            populateBibItem(childSolrDocument, bibItem);
-                        } else if (childSolrDocument.getFieldValue("DocType").equals("Item")){
-                            Item item = getItem(childSolrDocument);
-                            items.add(item);
+            SolrQuery solrQuery = new SolrQureyBuilder().getSolrQueryForCriteria(searchRecordsRequest);
+            if (null!= solrQuery) {
+                QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+                SolrDocumentList bibSolrDocuments = queryResponse.getResults();
+                for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
+                    SolrDocument solrDocument =  iterator.next();
+                    BibItem bibItem = new BibItem();
+                    populateBibItem(solrDocument, bibItem);
+                    List<SolrDocument> holdingsSolrDocuments = solrDocument.getChildDocuments();
+                    List<Item> items = new ArrayList<>();
+                    if (!CollectionUtils.isEmpty(holdingsSolrDocuments)) {
+                        for (Iterator<SolrDocument> solrDocumentIterator = holdingsSolrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
+                            SolrDocument childSolrDocument = solrDocumentIterator.next();
+                            if (childSolrDocument.getFieldValue("DocType").equals("Holdings")) {
+                                populateBibItem(childSolrDocument, bibItem);
+                            } else if (childSolrDocument.getFieldValue("DocType").equals("Item")){
+                                Item item = getItem(childSolrDocument);
+                                items.add(item);
+                            }
                         }
                     }
+                    bibItem.setItems(items);
+                    bibItems.add(bibItem);
                 }
-                bibItem.setItems(items);
-                bibItems.add(bibItem);
             }
         } catch (SolrServerException e) {
             e.printStackTrace();
