@@ -1,5 +1,6 @@
 package org.recap.repository.solr.impl;
 
+import org.apache.camel.component.solr.SolrConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -44,7 +45,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public List<BibItem> search(SearchRecordsRequest searchRecordsRequest, Pageable page) {
         List<BibItem> bibItems = new ArrayList<>();
         try {
-            SolrQuery solrQuery = new SolrQuery(searchRecordsRequest.getFieldName()+":"+searchRecordsRequest.getFieldValue());
+            SolrQuery solrQuery;
+            if (StringUtils.isNotEmpty(searchRecordsRequest.getFieldName())) {
+                solrQuery = new SolrQuery(searchRecordsRequest.getFieldName()+":"+searchRecordsRequest.getFieldValue());
+            } else {
+                solrQuery = new SolrQuery(searchRecordsRequest.getFieldValue());
+            }
             solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib]");
 
             QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
