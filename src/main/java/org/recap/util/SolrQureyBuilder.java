@@ -14,12 +14,6 @@ import java.util.List;
  */
 public class SolrQureyBuilder {
 
-    String fq = "&fq=";
-
-    String fl = "fl";
-
-    String flQ = "*,[child parentFilter=DocType:Bib]";
-
     String all = "*:*";
 
     String and = " AND ";
@@ -52,7 +46,6 @@ public class SolrQureyBuilder {
 
         SolrQuery solrQurey = new SolrQuery(strBuilder.toString());
         solrQurey.addFilterQuery(queryStringForBibCriteria);
-        solrQurey.setParam(fl, flQ);
         return solrQurey;
     }
 
@@ -76,7 +69,6 @@ public class SolrQureyBuilder {
         SolrQuery solrQuery = new SolrQuery(queryString);
         solrQuery.addFilterQuery(coreFilterQuery + getQueryStringForItemCriteria(searchRecordsRequest));
 
-        solrQuery.setParam(fl, flQ);
         return solrQuery;
     }
 
