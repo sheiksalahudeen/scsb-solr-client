@@ -2,6 +2,7 @@ package org.recap.repository.solr.impl;
 
 import org.apache.camel.component.solr.SolrConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -36,6 +37,8 @@ import java.util.*;
 @Repository
 public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
+    Logger log = Logger.getLogger(BibSolrDocumentRepositoryImpl.class);
+
     @Resource
     private SolrTemplate solrTemplate;
 
@@ -67,14 +70,13 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     BibItem bibItem = new BibItem();
                     populateBibItem(solrDocument, bibItem);
                     populateItemInfo(bibItem, searchRecordsRequest);
-//                    bibItem.setItems(items);
                     bibItems.add(bibItem);
                 }
             }
         } catch (SolrServerException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         return bibItems;
@@ -96,9 +98,9 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
             }
         } catch (SolrServerException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+           log.error(e.getMessage());
         }
     }
 

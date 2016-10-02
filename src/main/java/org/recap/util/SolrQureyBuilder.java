@@ -109,11 +109,11 @@ public class SolrQureyBuilder {
         if (CollectionUtils.isNotEmpty(owningInstitutions)) {
             strinBuilder.append(buildQueryForCriteriaField(RecapConstants.BIB_OWNING_INSTITUTION, owningInstitutions));
         }
-        if (StringUtils.isNotBlank(strinBuilder.toString())) {
-            strinBuilder.append(and);
-        }
+
         List<String> materialTypes = searchRecordsRequest.getMaterialTypes();
-        if (CollectionUtils.isNotEmpty(materialTypes)) {
+        if (StringUtils.isNotBlank(strinBuilder.toString()) && CollectionUtils.isNotEmpty(materialTypes)) {
+            strinBuilder.append(and).append(buildQueryForCriteriaField(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes));
+        }else if (CollectionUtils.isNotEmpty(materialTypes)) {
             strinBuilder.append(buildQueryForCriteriaField(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes));
         }
         return strinBuilder.toString();
@@ -131,7 +131,7 @@ public class SolrQureyBuilder {
     }
 
     /**
-     * IF the getSolrQueryForCriteria() is called with Item field/value combinatin, the query would still return
+     * IF the getSolrQueryForCriteria() is called with Item field/value combination, the query would still return
      * only Bib Criteria. You will need to call getItemSolrQueryForCriteria()
      * @throws Exception
      */
@@ -158,7 +158,12 @@ public class SolrQureyBuilder {
     public SolrQuery getItemSolrQueryForCriteria(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isBlank(searchRecordsRequest.getFieldValue())) {
             String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
-            SolrQuery solrQuery = new SolrQuery(parentQueryString+and+queryStringForItemCriteria);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(parentQueryString);
+            if(StringUtils.isNotBlank(queryStringForItemCriteria)){
+                stringBuilder.append(and).append(queryStringForItemCriteria);
+            }
+            SolrQuery solrQuery = new SolrQuery(stringBuilder.toString());
             return solrQuery;
         } else if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
             String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
