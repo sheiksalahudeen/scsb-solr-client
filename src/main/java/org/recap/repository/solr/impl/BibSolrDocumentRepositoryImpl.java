@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.CharacterIterator;
+import java.text.NumberFormat;
 import java.text.StringCharacterIterator;
 import java.util.*;
 
@@ -65,6 +66,9 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             if (null!= solrQuery) {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
                 SolrDocumentList bibSolrDocuments = queryResponse.getResults();
+                String totalBibCount = NumberFormat.getNumberInstance().format(bibSolrDocuments.getNumFound());
+                searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+                setItemCount(searchRecordsRequest);
                 for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
                     SolrDocument solrDocument =  iterator.next();
                     BibItem bibItem = new BibItem();
@@ -172,6 +176,22 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             }
         }
         return criteria;
+    }
+
+    private void setItemCount(SearchRecordsRequest searchRecordsRequest) {
+        SolrQuery itemSolrQueryForCriteria = new SolrQuery(getSolrQureyBuilder().getQueryStringForItemCriteria(searchRecordsRequest));
+        itemSolrQueryForCriteria.setRows(1);
+        QueryResponse queryResponse = null;
+        try {
+            queryResponse = solrTemplate.getSolrClient().query(itemSolrQueryForCriteria);
+            SolrDocumentList solrDocuments = queryResponse.getResults();
+            String totalItemCount = NumberFormat.getNumberInstance().format(solrDocuments.getNumFound());
+            searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getModifiedText(String searchText) {

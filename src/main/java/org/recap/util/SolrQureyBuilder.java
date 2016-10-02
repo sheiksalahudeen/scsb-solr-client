@@ -77,7 +77,7 @@ public class SolrQureyBuilder {
     }
 
 
-    private String getQueryStringForItemCriteria(SearchRecordsRequest searchRecordsRequest) {
+    public String getQueryStringForItemCriteria(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
 
         List<String> availability = searchRecordsRequest.getAvailability();
@@ -87,16 +87,14 @@ public class SolrQureyBuilder {
         if (CollectionUtils.isNotEmpty(availability)) {
             stringBuilder.append(buildQueryForCriteriaField(RecapConstants.AVAILABILITY, availability));
         }
-        if (StringUtils.isNotBlank(stringBuilder.toString())) {
-            stringBuilder.append(and);
-        }
-        if (CollectionUtils.isNotEmpty(collectionGroupDesignations)) {
+        if (StringUtils.isNotBlank(stringBuilder.toString()) && CollectionUtils.isNotEmpty(collectionGroupDesignations)) {
+            stringBuilder.append(and).append(buildQueryForCriteriaField(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations));
+        } else if (CollectionUtils.isNotEmpty(collectionGroupDesignations)){
             stringBuilder.append(buildQueryForCriteriaField(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations));
         }
-        if (StringUtils.isNotBlank(stringBuilder.toString())) {
-            stringBuilder.append(and);
-        }
-        if (CollectionUtils.isNotEmpty(useRestrictions)) {
+        if (StringUtils.isNotBlank(stringBuilder.toString()) && CollectionUtils.isNotEmpty(useRestrictions)) {
+            stringBuilder.append(and).append(buildQueryForCriteriaField(RecapConstants.USE_RESTRICTION, useRestrictions));
+        } else if (CollectionUtils.isNotEmpty(useRestrictions)) {
             stringBuilder.append(buildQueryForCriteriaField(RecapConstants.USE_RESTRICTION, useRestrictions));
         }
 
