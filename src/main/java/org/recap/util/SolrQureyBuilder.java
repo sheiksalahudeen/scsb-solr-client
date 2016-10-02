@@ -1,12 +1,10 @@
 package org.recap.util;
 
-import org.apache.camel.language.Bean;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -155,23 +153,33 @@ public class SolrQureyBuilder {
 
     public SolrQuery getItemSolrQueryForCriteria(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isBlank(searchRecordsRequest.getFieldValue())) {
-            String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(parentQueryString);
-            if(StringUtils.isNotBlank(queryStringForItemCriteria)){
-                stringBuilder.append(and).append(queryStringForItemCriteria);
-            }
-            SolrQuery solrQuery = new SolrQuery(stringBuilder.toString());
+            SolrQuery solrQuery = getSolrQueryForItem(parentQueryString, searchRecordsRequest);
             return solrQuery;
         } else if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
-            SolrQuery solrQuery = new SolrQuery(parentQueryString+and+queryStringForItemCriteria);
+            SolrQuery solrQuery = getSolrQueryForItem(parentQueryString, searchRecordsRequest);
             return solrQuery;
         } else if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
                 && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())
                 && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
-            return getQuryForItemSpecificFieldSpecificValue(parentQueryString, searchRecordsRequest);
+            SolrQuery quryForItemSpecificFieldSpecificValue = getQuryForItemSpecificFieldSpecificValue(parentQueryString, searchRecordsRequest);
+
+            return quryForItemSpecificFieldSpecificValue;
+        }else if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
+                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())
+                && (!searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || !searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
+            SolrQuery solrQueryForItem = getSolrQueryForItem(parentQueryString, searchRecordsRequest);
+            return solrQueryForItem;
         }
         return null;
+    }
+
+    private SolrQuery getSolrQueryForItem(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
+        String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(parentQueryString);
+        if(StringUtils.isNotBlank(queryStringForItemCriteria)){
+            stringBuilder.append(and).append(queryStringForItemCriteria);
+        }
+        return new SolrQuery(stringBuilder.toString());
     }
 }

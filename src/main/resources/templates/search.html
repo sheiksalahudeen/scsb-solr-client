@@ -93,6 +93,20 @@
                                     </ul>
                                 </td>
                                 <td colspan="2">
+                                    <label>Material Type</label>
+                                    <ul id="materialTypeId" class="checkbox" style="padding-left: 20px;">
+                                        <li><input type="checkbox" id="monograph" name="monograph"
+                                                   value="Monograph" th:field="*{materialTypes}"/><label
+                                                for="monograph">Monograph</label></li>
+                                        <li><input type="checkbox" id="serials" name="serials"
+                                                   value="Serial" th:field="*{materialTypes}"/><label
+                                                for="serials">Serials</label></li>
+                                        <li><input type="checkbox" id="others" name="others" value="Other"
+                                                   th:field="*{materialTypes}"/><label
+                                                for="others">Others</label></li>
+                                    </ul>
+                                </td>
+                                <td colspan="2">
                                     <label>Collection Group</label>
                                     <ul id="cgdId" class="checkbox" style="padding-left: 20px;">
                                         <li><input type="checkbox" id="shared" name="shared" value="Shared"
@@ -105,17 +119,6 @@
                                         <li><input type="checkbox" id="open" name="open" value="Open"
                                                    th:field="*{collectionGroupDesignations}"/><label
                                                 for="open">Open</label></li>
-                                    </ul>
-                                </td>
-                                <td colspan="2">
-                                    <label>Availability</label>
-                                    <ul id="availabilityId" class="checkbox" style="padding-left: 20px;">
-                                        <li><input type="checkbox" id="available" name="available"
-                                                   value="Available" th:field="*{availability}"/><label
-                                                for="available">In ReCAP</label></li>
-                                        <li><input type="checkbox" id="notAvailable" name="notAvailable"
-                                                   value="Not Available" th:field="*{availability}"/><label
-                                                for="notAvailable">Out</label></li>
                                     </ul>
                                 </td>
                                 <td colspan="2">
@@ -132,17 +135,14 @@
                                     </ul>
                                 </td>
                                 <td colspan="2">
-                                    <label>Material Type</label>
-                                    <ul id="materialTypeId" class="checkbox" style="padding-left: 20px;">
-                                        <li><input type="checkbox" id="monograph" name="monograph"
-                                                   value="Monograph" th:field="*{materialTypes}"/><label
-                                                for="monograph">Monograph</label></li>
-                                        <li><input type="checkbox" id="serials" name="serials"
-                                                   value="Serial" th:field="*{materialTypes}"/><label
-                                                for="serials">Serials</label></li>
-                                        <li><input type="checkbox" id="others" name="others" value="Other"
-                                                   th:field="*{materialTypes}"/><label
-                                                for="others">Others</label></li>
+                                    <label>Availability</label>
+                                    <ul id="availabilityId" class="checkbox" style="padding-left: 20px;">
+                                        <li><input type="checkbox" id="available" name="available"
+                                                   value="Available" th:field="*{availability}"/><label
+                                                for="available">In ReCAP</label></li>
+                                        <li><input type="checkbox" id="notAvailable" name="notAvailable"
+                                                   value="Not Available" th:field="*{availability}"/><label
+                                                for="notAvailable">Out</label></li>
                                     </ul>
                                 </td>
                                 <td colspan="1">
