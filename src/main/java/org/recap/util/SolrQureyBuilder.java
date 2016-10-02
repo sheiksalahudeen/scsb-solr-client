@@ -32,7 +32,7 @@ public class SolrQureyBuilder {
                 .append(and).append(queryStringForBibCriteria);
         SolrQuery solrQuery = new SolrQuery(strBuilder.toString());
         solrQuery.setRows(searchRecordsRequest.getPageSize());
-        solrQuery.setStart(searchRecordsRequest.getPageNumber());
+        solrQuery.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
 
         return solrQuery;
     }
@@ -59,7 +59,7 @@ public class SolrQureyBuilder {
         strBuilder.append(searchRecordsRequest.getFieldValue()).append(and).append(queryStringForBibCriteria);
         SolrQuery solrQuery = new SolrQuery(strBuilder.toString());
         solrQuery.setRows(searchRecordsRequest.getPageSize());
-        solrQuery.setStart(searchRecordsRequest.getPageNumber());
+        solrQuery.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         return solrQuery;
     }
 
@@ -72,7 +72,7 @@ public class SolrQureyBuilder {
         }
         SolrQuery solrQuery = new SolrQuery(strBuilder.toString());
         solrQuery.setRows(searchRecordsRequest.getPageSize());
-        solrQuery.setStart(searchRecordsRequest.getPageNumber());
+        solrQuery.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         return solrQuery;
     }
 
@@ -148,7 +148,7 @@ public class SolrQureyBuilder {
             strBuilder.append(queryStringForBibCriteria);
             SolrQuery solrQuery = new SolrQuery(strBuilder.toString());
             solrQuery.setRows(searchRecordsRequest.getPageSize());
-            solrQuery.setStart(searchRecordsRequest.getPageNumber());
+            solrQuery.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
             return solrQuery;
         }
     }
