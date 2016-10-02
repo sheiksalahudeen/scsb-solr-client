@@ -89,7 +89,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName("BibId");
         searchRecordsRequest.setFieldValue(String.valueOf(fetchedBibliographicEntity.getBibliographicId()));
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertEquals(bibliographicEntity.getOwningInstitutionBibId(), bibItems.get(0).getOwningInstitutionBibId());
@@ -115,7 +115,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setFieldName(RecapConstants.TITLE_STARTS_WITH);
         searchRecordsRequest.setFieldValue("Semiznachnye tabli︠t︡sy");
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 10));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
     }
 
@@ -154,7 +154,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName(null); // All fields.
         searchRecordsRequest.setFieldValue(barcode);
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertEquals(bibliographicEntity.getOwningInstitutionBibId(), bibItems.get(0).getOwningInstitutionBibId());
@@ -199,7 +199,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName(null); // All fields.
         searchRecordsRequest.setFieldValue("al-Ḥuṭayʼah :");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertTrue(bibliographicEntity.getItemEntities().size() > 0);
@@ -308,7 +308,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue(item1.getBarcode());
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 2));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 2);
     }
@@ -423,7 +423,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue("lincoln inn");
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 1);
 
@@ -432,7 +432,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue("lincoln inn");
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 1);
 

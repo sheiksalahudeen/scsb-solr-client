@@ -15,6 +15,9 @@ public class Bib {
     @Field("id")
     private String id;
 
+    @Field("ContentType")
+    private String contentType;
+
     @Field("BibId")
     private Integer bibId;
 
@@ -293,6 +296,14 @@ public class Bib {
         this.owningInstitutionBibId = owningInstitutionBibId;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
     public String getLeaderMaterialType() {
         return leaderMaterialType;
     }
@@ -312,23 +323,87 @@ public class Bib {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Bib)) return false;
 
         Bib bib = (Bib) o;
 
-        if (!id.equals(bib.id)) return false;
-        if (!bibId.equals(bib.bibId)) return false;
-        if (!owningInstitution.equals(bib.owningInstitution)) return false;
-        return owningInstitutionBibId.equals(bib.owningInstitutionBibId);
+        if (getId() != null ? !getId().equals(bib.getId()) : bib.getId() != null) return false;
+        if (getContentType() != null ? !getContentType().equals(bib.getContentType()) : bib.getContentType() != null)
+            return false;
+        if (getBibId() != null ? !getBibId().equals(bib.getBibId()) : bib.getBibId() != null) return false;
+        if (getDocType() != null ? !getDocType().equals(bib.getDocType()) : bib.getDocType() != null) return false;
+        if (getBarcode() != null ? !getBarcode().equals(bib.getBarcode()) : bib.getBarcode() != null) return false;
+        if (getTitle() != null ? !getTitle().equals(bib.getTitle()) : bib.getTitle() != null) return false;
+        if (getTitleDisplay() != null ? !getTitleDisplay().equals(bib.getTitleDisplay()) : bib.getTitleDisplay() != null)
+            return false;
+        if (getTitleStartsWith() != null ? !getTitleStartsWith().equals(bib.getTitleStartsWith()) : bib.getTitleStartsWith() != null)
+            return false;
+        if (getAuthorDisplay() != null ? !getAuthorDisplay().equals(bib.getAuthorDisplay()) : bib.getAuthorDisplay() != null)
+            return false;
+        if (getAuthorSearch() != null ? !getAuthorSearch().equals(bib.getAuthorSearch()) : bib.getAuthorSearch() != null)
+            return false;
+        if (getOwningInstitution() != null ? !getOwningInstitution().equals(bib.getOwningInstitution()) : bib.getOwningInstitution() != null)
+            return false;
+        if (getPublisher() != null ? !getPublisher().equals(bib.getPublisher()) : bib.getPublisher() != null)
+            return false;
+        if (getPublicationPlace() != null ? !getPublicationPlace().equals(bib.getPublicationPlace()) : bib.getPublicationPlace() != null)
+            return false;
+        if (getPublicationDate() != null ? !getPublicationDate().equals(bib.getPublicationDate()) : bib.getPublicationDate() != null)
+            return false;
+        if (getSubject() != null ? !getSubject().equals(bib.getSubject()) : bib.getSubject() != null) return false;
+        if (getIsbn() != null ? !getIsbn().equals(bib.getIsbn()) : bib.getIsbn() != null) return false;
+        if (getIssn() != null ? !getIssn().equals(bib.getIssn()) : bib.getIssn() != null) return false;
+        if (getOclcNumber() != null ? !getOclcNumber().equals(bib.getOclcNumber()) : bib.getOclcNumber() != null)
+            return false;
+        if (getMaterialType() != null ? !getMaterialType().equals(bib.getMaterialType()) : bib.getMaterialType() != null)
+            return false;
+        if (getNotes() != null ? !getNotes().equals(bib.getNotes()) : bib.getNotes() != null) return false;
+        if (getLccn() != null ? !getLccn().equals(bib.getLccn()) : bib.getLccn() != null) return false;
+        if (getImprint() != null ? !getImprint().equals(bib.getImprint()) : bib.getImprint() != null) return false;
+        if (getHoldingsIdList() != null ? !getHoldingsIdList().equals(bib.getHoldingsIdList()) : bib.getHoldingsIdList() != null)
+            return false;
+        if (getOwningInstHoldingsIdList() != null ? !getOwningInstHoldingsIdList().equals(bib.getOwningInstHoldingsIdList()) : bib.getOwningInstHoldingsIdList() != null)
+            return false;
+        if (getBibItemIdList() != null ? !getBibItemIdList().equals(bib.getBibItemIdList()) : bib.getBibItemIdList() != null)
+            return false;
+        if (getOwningInstitutionBibId() != null ? !getOwningInstitutionBibId().equals(bib.getOwningInstitutionBibId()) : bib.getOwningInstitutionBibId() != null)
+            return false;
+        if (getLeaderMaterialType() != null ? !getLeaderMaterialType().equals(bib.getLeaderMaterialType()) : bib.getLeaderMaterialType() != null)
+            return false;
+        return getTitleSort() != null ? getTitleSort().equals(bib.getTitleSort()) : bib.getTitleSort() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + bibId.hashCode();
-        result = 31 * result + owningInstitution.hashCode();
-        result = 31 * result + owningInstitutionBibId.hashCode();
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getContentType() != null ? getContentType().hashCode() : 0);
+        result = 31 * result + (getBibId() != null ? getBibId().hashCode() : 0);
+        result = 31 * result + (getDocType() != null ? getDocType().hashCode() : 0);
+        result = 31 * result + (getBarcode() != null ? getBarcode().hashCode() : 0);
+        result = 31 * result + (getTitle() != null ? getTitle().hashCode() : 0);
+        result = 31 * result + (getTitleDisplay() != null ? getTitleDisplay().hashCode() : 0);
+        result = 31 * result + (getTitleStartsWith() != null ? getTitleStartsWith().hashCode() : 0);
+        result = 31 * result + (getAuthorDisplay() != null ? getAuthorDisplay().hashCode() : 0);
+        result = 31 * result + (getAuthorSearch() != null ? getAuthorSearch().hashCode() : 0);
+        result = 31 * result + (getOwningInstitution() != null ? getOwningInstitution().hashCode() : 0);
+        result = 31 * result + (getPublisher() != null ? getPublisher().hashCode() : 0);
+        result = 31 * result + (getPublicationPlace() != null ? getPublicationPlace().hashCode() : 0);
+        result = 31 * result + (getPublicationDate() != null ? getPublicationDate().hashCode() : 0);
+        result = 31 * result + (getSubject() != null ? getSubject().hashCode() : 0);
+        result = 31 * result + (getIsbn() != null ? getIsbn().hashCode() : 0);
+        result = 31 * result + (getIssn() != null ? getIssn().hashCode() : 0);
+        result = 31 * result + (getOclcNumber() != null ? getOclcNumber().hashCode() : 0);
+        result = 31 * result + (getMaterialType() != null ? getMaterialType().hashCode() : 0);
+        result = 31 * result + (getNotes() != null ? getNotes().hashCode() : 0);
+        result = 31 * result + (getLccn() != null ? getLccn().hashCode() : 0);
+        result = 31 * result + (getImprint() != null ? getImprint().hashCode() : 0);
+        result = 31 * result + (getHoldingsIdList() != null ? getHoldingsIdList().hashCode() : 0);
+        result = 31 * result + (getOwningInstHoldingsIdList() != null ? getOwningInstHoldingsIdList().hashCode() : 0);
+        result = 31 * result + (getBibItemIdList() != null ? getBibItemIdList().hashCode() : 0);
+        result = 31 * result + (getOwningInstitutionBibId() != null ? getOwningInstitutionBibId().hashCode() : 0);
+        result = 31 * result + (getLeaderMaterialType() != null ? getLeaderMaterialType().hashCode() : 0);
+        result = 31 * result + (getTitleSort() != null ? getTitleSort().hashCode() : 0);
         return result;
     }
 }

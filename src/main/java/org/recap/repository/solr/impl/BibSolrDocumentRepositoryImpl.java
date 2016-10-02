@@ -41,12 +41,24 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     List<BibValueResolver> bibValueResolvers;
     List<ItemValueResolver> itemValueResolvers;
+    private SolrQureyBuilder solrQureyBuilder;
+
+    public SolrQureyBuilder getSolrQureyBuilder() {
+        if (null == solrQureyBuilder) {
+            solrQureyBuilder = new SolrQureyBuilder();
+        }
+        return solrQureyBuilder;
+    }
+
+    public void setSolrQureyBuilder(SolrQureyBuilder solrQureyBuilder) {
+        this.solrQureyBuilder = solrQureyBuilder;
+    }
 
     @Override
-    public List<BibItem> search(SearchRecordsRequest searchRecordsRequest, Pageable page) {
+    public List<BibItem> search(SearchRecordsRequest searchRecordsRequest) {
         List<BibItem> bibItems = new ArrayList<>();
         try {
-            SolrQuery solrQuery = new SolrQureyBuilder().getSolrQueryForCriteria(searchRecordsRequest);
+            SolrQuery solrQuery = getSolrQureyBuilder().getSolrQueryForCriteria(searchRecordsRequest);
             if (null!= solrQuery) {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
                 SolrDocumentList bibSolrDocuments = queryResponse.getResults();
@@ -54,20 +66,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     SolrDocument solrDocument =  iterator.next();
                     BibItem bibItem = new BibItem();
                     populateBibItem(solrDocument, bibItem);
-                    List<SolrDocument> holdingsSolrDocuments = solrDocument.getChildDocuments();
-                    List<Item> items = new ArrayList<>();
-                    if (!CollectionUtils.isEmpty(holdingsSolrDocuments)) {
-                        for (Iterator<SolrDocument> solrDocumentIterator = holdingsSolrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
-                            SolrDocument childSolrDocument = solrDocumentIterator.next();
-                            if (childSolrDocument.getFieldValue("DocType").equals("Holdings")) {
-                                populateBibItem(childSolrDocument, bibItem);
-                            } else if (childSolrDocument.getFieldValue("DocType").equals("Item")){
-                                Item item = getItem(childSolrDocument);
-                                items.add(item);
-                            }
-                        }
-                    }
-                    bibItem.setItems(items);
+                    populateItemInfo(bibItem, searchRecordsRequest);
+//                    bibItem.setItems(items);
                     bibItems.add(bibItem);
                 }
             }
@@ -78,6 +78,28 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         }
 
         return bibItems;
+    }
+
+    private void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
+        SolrQuery itemSolrQueryForCriteria = getSolrQureyBuilder().getItemSolrQueryForCriteria("_root_:" + bibItem.getRoot(), searchRecordsRequest);
+        QueryResponse queryResponse = null;
+        try {
+            queryResponse = solrTemplate.getSolrClient().query(itemSolrQueryForCriteria);
+            SolrDocumentList solrDocuments = queryResponse.getResults();
+            for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
+                SolrDocument solrDocument = iterator.next();
+                String docType = (String) solrDocument.getFieldValue("DocType");
+                if(docType.equalsIgnoreCase("Item")){
+                    Item item = getItem(solrDocument);
+                    bibItem.addItem(item);
+                }
+
+            }
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Item getItem(SolrDocument itemSolrDocument) {
@@ -213,6 +235,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public List<BibValueResolver> getBibValueResolvers() {
         if (null == bibValueResolvers) {
             bibValueResolvers = new ArrayList<>();
+            bibValueResolvers.add(new RootValueResolver());
             bibValueResolvers.add(new AuthorDisplayValueResolver());
             bibValueResolvers.add(new AuthorSearchValueResolver());
             bibValueResolvers.add(new BibIdValueResolver());

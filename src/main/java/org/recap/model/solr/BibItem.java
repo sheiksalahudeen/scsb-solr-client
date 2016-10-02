@@ -86,6 +86,9 @@ public class BibItem {
     private String titleSort;
 
     @Ignore
+    private String root;
+
+    @Ignore
     private String summaryHoldings;
 
     @Ignore
@@ -297,5 +300,17 @@ public class BibItem {
 
     public void setSummaryHoldings(String summaryHoldings) {
         this.summaryHoldings = summaryHoldings;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public void setRoot(String root) {
+        this.root = root;
+    }
+
+    public void addItem(Item item) {
+        getItems().add(item);
     }
 }

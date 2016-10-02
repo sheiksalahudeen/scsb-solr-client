@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface CustomDocumentRepository {
 
-    List<BibItem> search(SearchRecordsRequest searchRecordsRequest, Pageable page);
+    List<BibItem> search(SearchRecordsRequest searchRecordsRequest);
 }

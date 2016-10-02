@@ -13,6 +13,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.SearchRecordsRequest;
+import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,10 @@ public class BibAT extends BaseTestCase {
 
     @Autowired
     BibSolrDocumentRepository bibSolrDocumentRepository;
+
+    @Autowired
+    BibSolrDocumentRepositoryImpl bibSolrDocumentRepositoryImpl;
+
 
     @Test
     public void indexBib() throws Exception {
@@ -272,7 +277,7 @@ public class BibAT extends BaseTestCase {
         String searchFieldValue = "Test";
         searchRecordsRequest.setFieldValue(searchFieldValue.split(" ")[0]);
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, 1));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         assertNotNull(bibItems.get(0));
     }
 
@@ -388,44 +393,16 @@ public class BibAT extends BaseTestCase {
     }
 
     @Test
-    public void saveNestedDocuments() throws Exception {
-        solrTemplate.getSolrClient().deleteByQuery("*:*");
-        solrTemplate.commit();
+    public void blindSearch() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.getOwningInstitutions().addAll(Arrays.asList("NYPL", "CUL", "PUL"));
+        searchRecordsRequest.getCollectionGroupDesignations().addAll(Arrays.asList("Shared", "Private", "Open"));
+        searchRecordsRequest.getAvailability().addAll(Arrays.asList("Available", "Not Available"));
+        searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
+        searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrInputDocument solrInputDocument = new SolrInputDocument();
-        solrInputDocument.setField("id", "123");
-        solrInputDocument.setField("BibId", "123");
-        solrInputDocument.setField("DocType", "Bib");
-        solrInputDocument.setField("Title_search", "History of Science");
+        bibSolrDocumentRepositoryImpl.search(searchRecordsRequest);
 
-
-        SolrInputDocument itemSolrInputDocument = new SolrInputDocument();
-        itemSolrInputDocument.setField("id", "12312");
-        itemSolrInputDocument.setField("DocType", "Item");
-        itemSolrInputDocument.setField("Barcode", "i.12313");
-
-        SolrInputDocument holdingsSolrInputDocument = new SolrInputDocument();
-        holdingsSolrInputDocument.setField("id", "12");
-        holdingsSolrInputDocument.addField("HoldingsId", "12");
-        holdingsSolrInputDocument.setField("DocType", "Holdings");
-        holdingsSolrInputDocument.addChildDocument(itemSolrInputDocument);
-
-        solrInputDocument.addChildDocument(holdingsSolrInputDocument);
-
-
-        solrTemplate.saveDocuments(Arrays.asList(solrInputDocument));
-        solrTemplate.commit();
-
-        SolrQuery solrQuery = new SolrQuery("BibId:123");
-        solrQuery.setParam("fl", "*,[child parentFilter=DocType:Bib]");
-        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-        assertNotNull(queryResponse);
-        SolrDocumentList results = queryResponse.getResults();
-        assertNotNull(results);
-        SolrDocument solrDocument = results.get(0);
-        List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
-        SolrDocument childDoc = childDocuments.get(0);
-        assertNotNull(childDoc);
     }
 
     @Test
@@ -455,5 +432,16 @@ public class BibAT extends BaseTestCase {
         List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
         SolrDocument childDoc = childDocuments.get(0);
         assertNotNull(childDoc);
+    }
+
+
+    @Test
+    public void childrenForParents() throws Exception {
+        String query = "_root_:(\"3.b10719868x\" \"3.b127185884\") Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
+        SolrQuery solrQuery = new SolrQuery(query);
+        solrQuery.setStart(0);
+        solrQuery.setRows(2);
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
     }
 }

@@ -60,8 +60,8 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(searchRecordsController).build();
         List<BibItem> bibItems = new ArrayList<>();
-        when(bibSolrDocumentRepository.search(getSearchRecordsRequest(),new PageRequest(0, 10))).thenReturn(bibItems);
-        when(bibSolrDocumentRepository.search(getSearchRecordsRequest(), new PageRequest(getSearchRecordsRequest().getPageNumber(), getSearchRecordsRequest().getPageSize()))).thenReturn(bibItems);
+        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(bibItems);
+        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(bibItems);
     }
 
 

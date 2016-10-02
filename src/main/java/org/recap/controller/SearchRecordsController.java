@@ -66,7 +66,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
-            List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, searchRecordsRequest.getPageSize()));
+            List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
         }
@@ -100,7 +100,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(0, searchRecordsRequest.getPageSize()));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
@@ -111,7 +111,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(searchRecordsRequest.getTotalPageCount() - 1, searchRecordsRequest.getPageSize()));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
@@ -174,7 +174,7 @@ public class SearchRecordsController {
         if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
             pageNumber = totalPagesCount - 1;
         }
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(pageNumber, searchRecordsRequest.getPageSize()));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
@@ -209,7 +209,7 @@ public class SearchRecordsController {
     }
 
     private void searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest, new PageRequest(searchRecordsRequest.getPageNumber(), searchRecordsRequest.getPageSize()));
+        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
     }
 
