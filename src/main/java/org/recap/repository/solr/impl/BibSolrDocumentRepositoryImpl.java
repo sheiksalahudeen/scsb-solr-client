@@ -66,8 +66,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             if (null!= solrQuery) {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
                 SolrDocumentList bibSolrDocuments = queryResponse.getResults();
-                String totalBibCount = NumberFormat.getNumberInstance().format(bibSolrDocuments.getNumFound());
-                searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+                setCounts(searchRecordsRequest, bibSolrDocuments);
+
                 setItemCount(searchRecordsRequest);
                 for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
                     SolrDocument solrDocument =  iterator.next();
@@ -84,6 +84,14 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         }
 
         return bibItems;
+    }
+
+    private void setCounts(SearchRecordsRequest searchRecordsRequest, SolrDocumentList bibSolrDocuments) {
+        long numFound = bibSolrDocuments.getNumFound();
+        String totalBibCount = NumberFormat.getNumberInstance().format(numFound);
+        searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+        int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
+        searchRecordsRequest.setTotalPageCount(totalPagesCount);
     }
 
     private void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
