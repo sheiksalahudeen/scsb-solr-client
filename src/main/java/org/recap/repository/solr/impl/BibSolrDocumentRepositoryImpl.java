@@ -63,11 +63,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         List<BibItem> bibItems = new ArrayList<>();
         try {
             SolrQuery solrQuery = getSolrQureyBuilder().getSolrQueryForCriteria(searchRecordsRequest);
+            solrQuery.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
             if (null!= solrQuery) {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
                 SolrDocumentList bibSolrDocuments = queryResponse.getResults();
                 setCounts(searchRecordsRequest, bibSolrDocuments);
-
                 setItemCount(searchRecordsRequest);
                 for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
                     SolrDocument solrDocument =  iterator.next();
