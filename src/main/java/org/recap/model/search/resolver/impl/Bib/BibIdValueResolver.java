@@ -15,8 +15,6 @@ public class BibIdValueResolver implements BibValueResolver {
 
     @Override
     public void setValue(BibItem bibItem, Object value) {
-        if (value instanceof String) {
-            bibItem.setBibId((Integer) value);
-        }
+        bibItem.setBibId((Integer) value);
     }
 }
