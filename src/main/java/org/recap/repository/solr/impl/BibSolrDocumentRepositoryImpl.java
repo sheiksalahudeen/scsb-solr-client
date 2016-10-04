@@ -19,6 +19,7 @@ import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.recap.util.SolrQueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.stereotype.Repository;
@@ -42,28 +43,18 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     @Resource
     private SolrTemplate solrTemplate;
 
+    @Autowired
+    private SolrQueryBuilder solrQueryBuilder;
+
     List<BibValueResolver> bibValueResolvers;
     List<ItemValueResolver> itemValueResolvers;
-    private SolrQueryBuilder solrQueryBuilder;
-    private Integer pageNum;
-
-    public SolrQueryBuilder getSolrQueryBuilder() {
-        if (null == solrQueryBuilder) {
-            solrQueryBuilder = new SolrQueryBuilder();
-        }
-        return solrQueryBuilder;
-    }
-
-    public void setSolrQueryBuilder(SolrQueryBuilder solrQueryBuilder) {
-        this.solrQueryBuilder = solrQueryBuilder;
-    }
 
     @Override
     public List<BibItem> search(SearchRecordsRequest searchRecordsRequest) {
         List<BibItem> bibItems = new ArrayList<>();
         try {
             if (isItemField(searchRecordsRequest)) {
-                bibItems = searchByItem(searchRecordsRequest);
+                //bibItems = searchByItem(searchRecordsRequest);
             } else {
                 bibItems = searchByBib(searchRecordsRequest);
             }
@@ -76,115 +67,71 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibItems;
     }
 
-    private List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
-        List<BibItem> bibItems = new ArrayList<>();
-        SolrQuery solrQuery = getSolrQueryBuilder().getItemSolrQueryForCriteria(null, searchRecordsRequest);
-        if (null != solrQuery) {
-            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-            SolrDocumentList itemSolrDocuments = queryResponse.getResults();
-            String totalItemCount = NumberFormat.getNumberInstance().format(itemSolrDocuments.getNumFound());
-            searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
-            for (Iterator<SolrDocument> iterator = itemSolrDocuments.iterator(); iterator.hasNext(); ) {
-                SolrDocument solrDocument = iterator.next();
-                Item item = getItem(solrDocument);
-                bibItems.addAll(getBibItems(item, searchRecordsRequest));
-            }
-        }
-
-        return bibItems;
-    }
-
-    private List<BibItem> getBibItems(Item item, SearchRecordsRequest searchRecordsRequest) {
-        List<BibItem> bibItems = new ArrayList<>();
-        String queryStringForBibCriteria = solrQueryBuilder.getQueryStringForBibCriteria(searchRecordsRequest);
-        if (StringUtils.isNotBlank(queryStringForBibCriteria)) {
-            SolrQuery itemSolrQuery = new SolrQuery("_root_:" + item.getRoot() + " AND " + queryStringForBibCriteria);
-            QueryResponse queryResponse = null;
-            try {
-                queryResponse = solrTemplate.getSolrClient().query(itemSolrQuery);
-                SolrDocumentList solrDocuments = queryResponse.getResults();
-                for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
-                    SolrDocument solrDocument = iterator.next();
-                    BibItem bibItem = new BibItem();
-                    String docType = (String) solrDocument.getFieldValue("DocType");
-                    if (docType.equalsIgnoreCase("Bib")) {
-                        populateBibItem(solrDocument, bibItem);
-                        bibItem.setItems(Arrays.asList(item));
-                        bibItems.add(bibItem);
-                    }
-                }
-            } catch (SolrServerException e) {
-                log.error(e.getMessage());
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
-        } else {
-            //TODO: If Item criteria is selected and no bib facets selected
-        }
-        return bibItems;
-    }
+//    private List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
+//        List<BibItem> bibItems = new ArrayList<>();
+//        SolrQuery solrQuery = solrQueryBuilder.getItemSolrQueryForCriteria(null, searchRecordsRequest);
+//        if (null != solrQuery) {
+//            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+//            SolrDocumentList itemSolrDocuments = queryResponse.getResults();
+//            String totalItemCount = NumberFormat.getNumberInstance().format(itemSolrDocuments.getNumFound());
+//            searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
+//            for (Iterator<SolrDocument> iterator = itemSolrDocuments.iterator(); iterator.hasNext(); ) {
+//                SolrDocument solrDocument = iterator.next();
+//                Item item = getItem(solrDocument);
+//                bibItems.addAll(getBibItems(item, searchRecordsRequest));
+//            }
+//        }
+//
+//        return bibItems;
+//    }
+//
+//    private List<BibItem> getBibItems(Item item, SearchRecordsRequest searchRecordsRequest) {
+//        List<BibItem> bibItems = new ArrayList<>();
+//        String queryStringForBibCriteria = solrQueryBuilder.getQueryStringForBibCriteria(searchRecordsRequest);
+//        if (StringUtils.isNotBlank(queryStringForBibCriteria)) {
+//            SolrQuery itemSolrQuery = new SolrQuery("_root_:" + item.getRoot() + " AND " + queryStringForBibCriteria);
+//            QueryResponse queryResponse = null;
+//            try {
+//                queryResponse = solrTemplate.getSolrClient().query(itemSolrQuery);
+//                SolrDocumentList solrDocuments = queryResponse.getResults();
+//                for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
+//                    SolrDocument solrDocument = iterator.next();
+//                    BibItem bibItem = new BibItem();
+//                    String docType = (String) solrDocument.getFieldValue("DocType");
+//                    if (docType.equalsIgnoreCase("Bib")) {
+//                        populateBibItem(solrDocument, bibItem);
+//                        bibItem.setItems(Arrays.asList(item));
+//                        bibItems.add(bibItem);
+//                    }
+//                }
+//            } catch (SolrServerException e) {
+//                log.error(e.getMessage());
+//            } catch (IOException e) {
+//                log.error(e.getMessage());
+//            }
+//        } else {
+//            //TODO: If Item criteria is selected and no bib facets selected
+//        }
+//        return bibItems;
+//    }
 
     private List<BibItem> searchByBib(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
-        if (null != getItemCountForItemCriteria(searchRecordsRequest) && 0 != getItemCountForItemCriteria(searchRecordsRequest)) {
-            SolrQuery solrQuery = getSolrQueryBuilder().getSolrQueryForCriteria(searchRecordsRequest);
-            solrQuery.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
-            if (null != solrQuery) {
-                bibItems = getBibItemsForBib(searchRecordsRequest, solrQuery);
-            }
-        }
-        return bibItems;
-    }
 
-    private List<BibItem> getBibItemsForBib(SearchRecordsRequest searchRecordsRequest, SolrQuery solrQuery) throws SolrServerException, IOException {
-        List<BibItem> bibItems = new ArrayList<>();
-        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-        SolrDocumentList bibSolrDocuments = queryResponse.getResults();
-        setCounts(searchRecordsRequest, bibSolrDocuments);
-        resolveBibItems(searchRecordsRequest, bibItems, bibSolrDocuments);
-
-        if (bibItems.size() > 0 && bibItems.size() <= searchRecordsRequest.getPageSize()) {
-            return bibItems;
-        } else {
-            Integer pageNum = getPageNum(searchRecordsRequest);
-            searchRecordsRequest.setPageNumber(pageNum);
-            solrQuery.setStart(pageNum * searchRecordsRequest.getPageSize());
-            return getBibItemsForBib(bibItems, searchRecordsRequest, solrQuery);
-        }
-    }
-
-
-    private List<BibItem> getBibItemsForBib(List<BibItem> bibItems, SearchRecordsRequest searchRecordsRequest, SolrQuery solrQuery) throws SolrServerException, IOException {
-        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-        SolrDocumentList bibSolrDocuments = queryResponse.getResults();
-        resolveBibItems(searchRecordsRequest, bibItems, bibSolrDocuments);
-
-        if (bibItems.size() > 0 && bibItems.size() <= searchRecordsRequest.getPageSize()) {
-            return bibItems;
-        } else {
-            int pageNum = getPageNum(searchRecordsRequest);
-            searchRecordsRequest.setPageNumber(pageNum);
-            solrQuery.setStart(pageNum * searchRecordsRequest.getPageSize());
-            getBibItemsForBib(bibItems, searchRecordsRequest, solrQuery);
-        }
-
-        return bibItems;
-    }
-
-
-    private void resolveBibItems(SearchRecordsRequest searchRecordsRequest, List<BibItem> bibItems, SolrDocumentList bibSolrDocuments) {
-        for (Iterator<SolrDocument> iterator = bibSolrDocuments.iterator(); iterator.hasNext(); ) {
-            if (bibItems.size() == searchRecordsRequest.getPageSize()) {
-                break;
-            }
-            SolrDocument solrDocument = iterator.next();
+        SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
+        queryForParentAndChildCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+        queryForParentAndChildCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForParentAndChildCriteria);
+        SolrDocumentList bibSolrDocumentList = queryResponse.getResults();
+        setCounts(searchRecordsRequest, bibSolrDocumentList);
+        for (Iterator<SolrDocument> iterator = bibSolrDocumentList.iterator(); iterator.hasNext(); ) {
+            SolrDocument bibSolrDocument = iterator.next();
             BibItem bibItem = new BibItem();
-            populateBibItem(solrDocument, bibItem);
-            populateItemInfo(bibItem, searchRecordsRequest);
-            if (!CollectionUtils.isEmpty(bibItem.getItems())) {
-                bibItems.add(bibItem);
-            }
+            populateBibItem(bibSolrDocument, bibItem);
+            populateItemInfo(bibItem);
+            bibItems.add(bibItem);
         }
+        return bibItems;
     }
 
     private boolean isItemField(SearchRecordsRequest searchRecordsRequest) {
@@ -204,19 +151,16 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         searchRecordsRequest.setTotalPageCount(totalPagesCount);
     }
 
-    private void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
-        SolrQuery itemSolrQueryForCriteria = getSolrQueryBuilder().getItemSolrQueryForCriteria("_root_:" + bibItem.getRoot(), searchRecordsRequest);
+    private void populateItemInfo(BibItem bibItem) {
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForItem("_root_:" + bibItem.getRoot(), RecapConstants.ITEM);
         QueryResponse queryResponse = null;
         try {
-            queryResponse = solrTemplate.getSolrClient().query(itemSolrQueryForCriteria);
+            queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
             SolrDocumentList solrDocuments = queryResponse.getResults();
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
-                String docType = (String) solrDocument.getFieldValue("DocType");
-                if (docType.equalsIgnoreCase("Item")) {
-                    Item item = getItem(solrDocument);
-                    bibItem.addItem(item);
-                }
+                Item item = getItem(solrDocument);
+                bibItem.addItem(item);
             }
         } catch (SolrServerException e) {
             log.error(e.getMessage());
@@ -240,9 +184,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 }
             }
         }
-
         return item;
-
     }
 
     private void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
@@ -293,23 +235,6 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             }
         }
         return criteria;
-    }
-
-    private Long getItemCountForItemCriteria(SearchRecordsRequest searchRecordsRequest) {
-        SolrQuery itemSolrQueryForCriteria = new SolrQuery(getSolrQueryBuilder().getQueryStringForItemCriteria(searchRecordsRequest));
-        itemSolrQueryForCriteria.setRows(1);
-        QueryResponse queryResponse = null;
-        try {
-            queryResponse = solrTemplate.getSolrClient().query(itemSolrQueryForCriteria);
-            SolrDocumentList solrDocuments = queryResponse.getResults();
-            long totalItemCount = solrDocuments.getNumFound();
-            return Long.valueOf(totalItemCount);
-        } catch (SolrServerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public String getModifiedText(String searchText) {
@@ -420,17 +345,5 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
         }
         return itemValueResolvers;
-    }
-
-    public Integer getPageNum(SearchRecordsRequest searchRecordsRequest) {
-        if (searchRecordsRequest.getPageNumber() >= 1) {
-            return (searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS) && !searchRecordsRequest.loopedPreviously()) ? searchRecordsRequest.getPageNumber() - 1 : searchRecordsRequest.getPageNumber() + 1;
-        } else if (searchRecordsRequest.getPageNumber() == 0 && searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS)){
-            searchRecordsRequest.setLoopedPreviously(true);
-           return searchRecordsRequest.getPageNumber() + 1;
-        }else if (searchRecordsRequest.getPageNumber() == 0 && !searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS)){
-           return searchRecordsRequest.getPageNumber() + 1;
-        }
-        return searchRecordsRequest.getPageNumber();
     }
 }
