@@ -13,7 +13,6 @@ import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -66,6 +65,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.resetPageNumber();
             List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -100,7 +100,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.setPageNumber(0);
+        searchRecordsRequest.resetPageNumber();
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);

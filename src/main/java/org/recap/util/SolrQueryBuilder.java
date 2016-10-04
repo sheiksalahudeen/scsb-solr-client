@@ -15,13 +15,13 @@ import java.util.List;
  */
 
 @Component
-public class SolrQureyBuilder {
+public class SolrQueryBuilder {
 
     String all = "*:*";
 
     String and = " AND ";
 
-    public SolrQuery getQuryForBibSpecificFieldSpecificValue(SearchRecordsRequest searchRecordsRequest) {
+    public SolrQuery getQueryForBibSpecificFieldSpecificValue(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strBuilder = new StringBuilder();
         String queryStringForBibCriteria = getQueryStringForBibCriteria(searchRecordsRequest);
         strBuilder.append(searchRecordsRequest.getFieldName())
@@ -35,12 +35,15 @@ public class SolrQureyBuilder {
         return solrQuery;
     }
 
-    public SolrQuery getQuryForItemSpecificFieldSpecificValue(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
+    public SolrQuery getQueryForItemSpecificFieldSpecificValue(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strBuilder = new StringBuilder();
         String queryStringForItemCriteria = getQueryStringForItemCriteria(searchRecordsRequest);
+        if (StringUtils.isNotBlank(parentQueryString)) {
+            strBuilder
+                    .append(parentQueryString)
+                    .append(and);
+        }
         strBuilder
-                .append(parentQueryString)
-                .append(and)
                 .append(searchRecordsRequest.getFieldName())
                 .append(":")
                 .append(searchRecordsRequest.getFieldValue())
@@ -51,7 +54,7 @@ public class SolrQureyBuilder {
         return solrQuery;
     }
 
-    public SolrQuery getQuryForAllFieldsSpecificValue(SearchRecordsRequest searchRecordsRequest) {
+    public SolrQuery getQueryForAllFieldsSpecificValue(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strBuilder = new StringBuilder();
         String queryStringForBibCriteria = getQueryStringForBibCriteria(searchRecordsRequest);
         strBuilder.append(searchRecordsRequest.getFieldValue()).append(and).append(queryStringForBibCriteria);
@@ -61,7 +64,7 @@ public class SolrQureyBuilder {
         return solrQuery;
     }
 
-    public SolrQuery getQuryForAllFieldsNoValue(SearchRecordsRequest searchRecordsRequest) {
+    public SolrQuery getQueryForAllFieldsNoValue(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strBuilder = new StringBuilder();
         String queryStringForBibCriteria = getQueryStringForBibCriteria(searchRecordsRequest);
         strBuilder.append(all);
@@ -99,7 +102,7 @@ public class SolrQureyBuilder {
         return stringBuilder.toString();
     }
 
-    private String getQueryStringForBibCriteria(SearchRecordsRequest searchRecordsRequest) {
+    public String getQueryStringForBibCriteria(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder strinBuilder = new StringBuilder();
         List<String> owningInstitutions = searchRecordsRequest.getOwningInstitutions();
         if (CollectionUtils.isNotEmpty(owningInstitutions)) {
@@ -133,22 +136,15 @@ public class SolrQureyBuilder {
      */
     public SolrQuery getSolrQueryForCriteria(SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isBlank(searchRecordsRequest.getFieldValue())) {
-            return getQuryForAllFieldsNoValue(searchRecordsRequest);
+            return getQueryForAllFieldsNoValue(searchRecordsRequest);
         } else if (StringUtils.isBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            return getQuryForAllFieldsSpecificValue(searchRecordsRequest);
+            return getQueryForAllFieldsSpecificValue(searchRecordsRequest);
         } else if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())
-                && (!searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) && !searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
-            return getQuryForBibSpecificFieldSpecificValue(searchRecordsRequest);
-        } else {
-            StringBuilder strBuilder = new StringBuilder();
-            String queryStringForBibCriteria = getQueryStringForBibCriteria(searchRecordsRequest);
-            strBuilder.append(queryStringForBibCriteria);
-            SolrQuery solrQuery = new SolrQuery(strBuilder.toString());
-            solrQuery.setRows(searchRecordsRequest.getPageSize());
-            solrQuery.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
-            return solrQuery;
+                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
+            return getQueryForBibSpecificFieldSpecificValue(searchRecordsRequest);
         }
+
+        return null;
     }
 
     public SolrQuery getItemSolrQueryForCriteria(String parentQueryString, SearchRecordsRequest searchRecordsRequest) {
@@ -159,16 +155,10 @@ public class SolrQureyBuilder {
             SolrQuery solrQuery = getSolrQueryForItem(parentQueryString, searchRecordsRequest);
             return solrQuery;
         } else if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())
-                && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
-            SolrQuery quryForItemSpecificFieldSpecificValue = getQuryForItemSpecificFieldSpecificValue(parentQueryString, searchRecordsRequest);
+                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
+            SolrQuery quryForItemSpecificFieldSpecificValue = getQueryForItemSpecificFieldSpecificValue(parentQueryString, searchRecordsRequest);
 
             return quryForItemSpecificFieldSpecificValue;
-        }else if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())
-                && (!searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || !searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
-            SolrQuery solrQueryForItem = getSolrQueryForItem(parentQueryString, searchRecordsRequest);
-            return solrQueryForItem;
         }
         return null;
     }

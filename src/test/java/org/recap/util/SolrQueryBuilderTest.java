@@ -6,12 +6,10 @@ import org.recap.model.search.SearchRecordsRequest;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by peris on 9/30/16.
  */
-public class SolrQureyBuilderTest {
+public class SolrQueryBuilderTest {
     @Test
     public void allFieldsNoValueQuery() throws Exception {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
@@ -23,8 +21,8 @@ public class SolrQureyBuilderTest {
         searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrQureyBuilder solrQureyBuilder = new SolrQureyBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQureyBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -39,8 +37,8 @@ public class SolrQureyBuilderTest {
         searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrQureyBuilder solrQureyBuilder = new SolrQureyBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQureyBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -55,8 +53,8 @@ public class SolrQureyBuilderTest {
         searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrQureyBuilder solrQureyBuilder = new SolrQureyBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQureyBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -76,8 +74,8 @@ public class SolrQureyBuilderTest {
         searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrQureyBuilder solrQureyBuilder = new SolrQureyBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQureyBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -92,8 +90,8 @@ public class SolrQureyBuilderTest {
         searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
-        SolrQureyBuilder solrQureyBuilder = new SolrQureyBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQureyBuilder.getItemSolrQueryForCriteria("_root_:12",searchRecordsRequest);
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getItemSolrQueryForCriteria("_root_:12",searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 

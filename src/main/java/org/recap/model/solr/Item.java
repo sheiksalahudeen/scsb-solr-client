@@ -51,6 +51,9 @@ public class Item {
     @Field("HoldingsId")
     private List<Integer> holdingsIdList;
 
+    @Ignore
+    private String root;
+
     public String getId() {
         return id;
     }
@@ -153,5 +156,13 @@ public class Item {
 
     public void setItemBibIdList(List<Integer> itemBibIdList) {
         this.itemBibIdList = itemBibIdList;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public void setRoot(String root) {
+        this.root = root;
     }
 }
