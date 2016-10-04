@@ -29,6 +29,7 @@ public class SearchRecordsRequest {
 
     private Integer index;
     private String errorMessage;
+    private String operationType;
 
     public SearchRecordsRequest() {
         this.setFieldName("");
@@ -223,5 +224,13 @@ public class SearchRecordsRequest {
 
     public void resetPageNumber() {
         this.pageNumber = 0;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
     }
 }

@@ -54,7 +54,6 @@ public class SearchRecordsController {
     @RequestMapping("/search")
     public String searchRecords(Model model) {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        setDefaultsToSearchRecordsRequest(searchRecordsRequest);
         model.addAttribute("searchRecordsRequest", searchRecordsRequest);
         return "searchRecords";
     }
@@ -79,6 +78,7 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
+        searchRecordsRequest.setOperationType("previous");
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -89,6 +89,7 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
+        searchRecordsRequest.setOperationType("next");
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -139,7 +140,8 @@ public class SearchRecordsController {
     public ModelAndView newSearch(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        setDefaultsToSearchRecordsRequest(searchRecordsRequest);
+        searchRecordsRequest = new SearchRecordsRequest();
+        model.addAttribute("searchRecordsRequest", searchRecordsRequest);
         return new ModelAndView("searchRecords");
     }
 
@@ -179,35 +181,6 @@ public class SearchRecordsController {
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-    }
-
-    private void setDefaultsToSearchRecordsRequest(SearchRecordsRequest searchRecordsRequest) {
-        searchRecordsRequest.setFieldName("");
-        searchRecordsRequest.setFieldValue("");
-        searchRecordsRequest.setSelectAllFacets(true);
-
-        searchRecordsRequest.getOwningInstitutions().add("NYPL");
-        searchRecordsRequest.getOwningInstitutions().add("CUL");
-        searchRecordsRequest.getOwningInstitutions().add("PUL");
-
-        searchRecordsRequest.getCollectionGroupDesignations().add("Shared");
-        searchRecordsRequest.getCollectionGroupDesignations().add("Private");
-        searchRecordsRequest.getCollectionGroupDesignations().add("Open");
-
-        searchRecordsRequest.getAvailability().add("Available");
-        searchRecordsRequest.getAvailability().add("Not Available");
-
-        searchRecordsRequest.getMaterialTypes().add("Monograph");
-        searchRecordsRequest.getMaterialTypes().add("Serial");
-        searchRecordsRequest.getMaterialTypes().add("Other");
-
-        searchRecordsRequest.getUseRestrictions().add("No Restrictions");
-        searchRecordsRequest.getUseRestrictions().add("In Library Use");
-        searchRecordsRequest.getUseRestrictions().add("Supervised Use");
-
-        searchRecordsRequest.setPageNumber(0);
-        searchRecordsRequest.setPageSize(10);
-        searchRecordsRequest.setShowResults(false);
     }
 
     private void searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
