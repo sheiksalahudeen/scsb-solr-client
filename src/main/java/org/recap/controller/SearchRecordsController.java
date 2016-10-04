@@ -172,12 +172,6 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        int totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalBibRecordsCount()).intValue();
-        int totalPagesCount = (int) Math.ceil((double) totalRecordsCount / (double) searchRecordsRequest.getPageSize());
-        Integer pageNumber = searchRecordsRequest.getPageNumber();
-        if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
-            pageNumber = totalPagesCount - 1;
-        }
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);

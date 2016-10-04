@@ -45,6 +45,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     List<BibValueResolver> bibValueResolvers;
     List<ItemValueResolver> itemValueResolvers;
     private SolrQueryBuilder solrQueryBuilder;
+    private Integer pageNum;
 
     public SolrQueryBuilder getSolrQueryBuilder() {
         if (null == solrQueryBuilder) {
@@ -142,10 +143,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         setCounts(searchRecordsRequest, bibSolrDocuments);
         resolveBibItems(searchRecordsRequest, bibItems, bibSolrDocuments);
 
-        if (bibItems.size() == searchRecordsRequest.getPageSize()) {
+        if (bibItems.size() > 0 && bibItems.size() <= searchRecordsRequest.getPageSize()) {
             return bibItems;
         } else {
-            solrQuery.setStart(searchRecordsRequest.getPageNumber() + 1 * searchRecordsRequest.getPageSize());
+            Integer pageNum = getPageNum(searchRecordsRequest);
+            searchRecordsRequest.setPageNumber(pageNum);
+            solrQuery.setStart(pageNum * searchRecordsRequest.getPageSize());
             return getBibItemsForBib(bibItems, searchRecordsRequest, solrQuery);
         }
     }
@@ -159,7 +162,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (bibItems.size() > 0 && bibItems.size() <= searchRecordsRequest.getPageSize()) {
             return bibItems;
         } else {
-            int pageNum = searchRecordsRequest.getPageNumber() + 1;
+            int pageNum = getPageNum(searchRecordsRequest);
             searchRecordsRequest.setPageNumber(pageNum);
             solrQuery.setStart(pageNum * searchRecordsRequest.getPageSize());
             getBibItemsForBib(bibItems, searchRecordsRequest, solrQuery);
@@ -415,5 +418,17 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
         }
         return itemValueResolvers;
+    }
+
+    public Integer getPageNum(SearchRecordsRequest searchRecordsRequest) {
+        if (searchRecordsRequest.getPageNumber() >= 1) {
+            return (searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous") && !searchRecordsRequest.loopedPreviously()) ? searchRecordsRequest.getPageNumber() - 1 : searchRecordsRequest.getPageNumber() + 1;
+        } else if (searchRecordsRequest.getPageNumber() == 0 && searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous")){
+            searchRecordsRequest.setLoopedPreviously(true);
+           return searchRecordsRequest.getPageNumber() + 1;
+        }else if (searchRecordsRequest.getPageNumber() == 0 && !searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous")){
+           return searchRecordsRequest.getPageNumber() + 1;
+        }
+        return searchRecordsRequest.getPageNumber();
     }
 }

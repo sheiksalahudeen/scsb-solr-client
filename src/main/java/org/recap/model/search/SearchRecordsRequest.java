@@ -23,6 +23,8 @@ public class SearchRecordsRequest {
     private Integer pageNumber = 0;
     private Integer pageSize = 10;
 
+    private Boolean loopedPreviously = false;
+
     private boolean showResults = false;
     private boolean selectAll = false;
     private boolean selectAllFacets = false;
@@ -35,6 +37,8 @@ public class SearchRecordsRequest {
         this.setFieldName("");
         this.setFieldValue("");
         this.setSelectAllFacets(true);
+        this.setOperationType("");
+        this.setLoopedPreviously(false);
 
         this.getOwningInstitutions().add("NYPL");
         this.getOwningInstitutions().add("CUL");
@@ -232,5 +236,13 @@ public class SearchRecordsRequest {
 
     public void setOperationType(String operationType) {
         this.operationType = operationType;
+    }
+
+    public Boolean loopedPreviously() {
+        return loopedPreviously;
+    }
+
+    public void setLoopedPreviously(Boolean loopedPreviously) {
+        this.loopedPreviously = loopedPreviously;
     }
 }
