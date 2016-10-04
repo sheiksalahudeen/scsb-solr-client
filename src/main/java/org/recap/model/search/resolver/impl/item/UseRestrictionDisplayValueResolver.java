@@ -4,16 +4,17 @@ import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.solr.Item;
 
 /**
- * Created by peris on 9/29/16.
+ * Created by angelind on 4/10/16.
  */
-public class AvailabilityValueResolver implements ItemValueResolver {
+public class UseRestrictionDisplayValueResolver implements ItemValueResolver {
+
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("Availability");
+        return field.equals("UseRestriction_display");
     }
 
     @Override
     public void setValue(Item item, Object value) {
-        item.setAvailability((String)value);
+        item.setUseRestrictionDisplay((String) value);
     }
 }

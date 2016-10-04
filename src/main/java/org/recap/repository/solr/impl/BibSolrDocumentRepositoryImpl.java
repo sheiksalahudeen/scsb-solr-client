@@ -404,14 +404,16 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     public List<ItemValueResolver> getItemValueResolvers() {
         if (null == itemValueResolvers) {
             itemValueResolvers = new ArrayList<>();
-            itemValueResolvers.add(new AvailabilityValueResolver());
+            itemValueResolvers.add(new AvailabilitySearchValueResolver());
+            itemValueResolvers.add(new AvailabilityDisplayValueResolver());
             itemValueResolvers.add(new BarcodeValueResolver());
             itemValueResolvers.add(new CallNumberValueResolver());
             itemValueResolvers.add(new CollectionGroupDesignationValueResolver());
             itemValueResolvers.add(new CustomerCodeValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.DocTypeValueResolver());
             itemValueResolvers.add(new ItemOwningInstitutionValueResolver());
-            itemValueResolvers.add(new UseRestrictionValueResolver());
+            itemValueResolvers.add(new UseRestrictionSearchValueResolver());
+            itemValueResolvers.add(new UseRestrictionDisplayValueResolver());
             itemValueResolvers.add(new VolumePartYearValueResolver());
             itemValueResolvers.add(new ItemRootValueResolver());
             itemValueResolvers.add(new ItemIdValueResolver());
