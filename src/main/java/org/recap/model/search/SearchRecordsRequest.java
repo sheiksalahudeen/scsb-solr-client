@@ -23,22 +23,17 @@ public class SearchRecordsRequest {
     private Integer pageNumber = 0;
     private Integer pageSize = 10;
 
-    private Boolean loopedPreviously = false;
-
     private boolean showResults = false;
     private boolean selectAll = false;
     private boolean selectAllFacets = false;
 
     private Integer index;
     private String errorMessage;
-    private String operationType;
 
     public SearchRecordsRequest() {
         this.setFieldName("");
         this.setFieldValue("");
         this.setSelectAllFacets(true);
-        this.setOperationType("");
-        this.setLoopedPreviously(false);
 
         this.getOwningInstitutions().add("NYPL");
         this.getOwningInstitutions().add("CUL");
@@ -49,15 +44,15 @@ public class SearchRecordsRequest {
         this.getCollectionGroupDesignations().add("Open");
 
         this.getAvailability().add("Available");
-        this.getAvailability().add("Not Available");
+        this.getAvailability().add("NotAvailable");
 
         this.getMaterialTypes().add("Monograph");
         this.getMaterialTypes().add("Serial");
         this.getMaterialTypes().add("Other");
 
-        this.getUseRestrictions().add("No Restrictions");
-        this.getUseRestrictions().add("In Library Use");
-        this.getUseRestrictions().add("Supervised Use");
+        this.getUseRestrictions().add("NoRestrictions");
+        this.getUseRestrictions().add("InLibraryUse");
+        this.getUseRestrictions().add("SupervisedUse");
 
         this.setPageNumber(0);
         this.setPageSize(10);
@@ -226,24 +221,7 @@ public class SearchRecordsRequest {
         this.errorMessage = errorMessage;
     }
 
-    public void resetPageNumberAndOperationType() {
+    public void resetPageNumber() {
         this.pageNumber = 0;
-        this.operationType = "";
-    }
-
-    public String getOperationType() {
-        return operationType;
-    }
-
-    public void setOperationType(String operationType) {
-        this.operationType = operationType;
-    }
-
-    public Boolean loopedPreviously() {
-        return loopedPreviously;
-    }
-
-    public void setLoopedPreviously(Boolean loopedPreviously) {
-        this.loopedPreviously = loopedPreviously;
     }
 }

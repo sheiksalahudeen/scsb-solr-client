@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +63,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.resetPageNumberAndOperationType();
+            searchRecordsRequest.resetPageNumber();
             List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -78,7 +77,6 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
-        searchRecordsRequest.setOperationType(RecapConstants.OPERATION_PREVIOUS);
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -89,7 +87,6 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
-        searchRecordsRequest.setOperationType(RecapConstants.OPERATION_NEXT);
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -101,7 +98,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.resetPageNumberAndOperationType();
+        searchRecordsRequest.resetPageNumber();
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -114,7 +111,6 @@ public class SearchRecordsController {
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
-        searchRecordsRequest.setOperationType("");
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -203,9 +199,9 @@ public class SearchRecordsController {
                     if (null != item) {
                         searchResultRow.setCustomerCode(item.getCustomerCode());
                         searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                        searchResultRow.setUseRestriction(item.getUseRestriction());
+                        searchResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                         searchResultRow.setBarcode(item.getBarcode());
-                        searchResultRow.setAvailability(item.getAvailability());
+                        searchResultRow.setAvailability(item.getAvailabilityDisplay());
                         searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                     }
                 } else {
@@ -218,9 +214,9 @@ public class SearchRecordsController {
                                 searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                                 searchItemResultRow.setCustomerCode(item.getCustomerCode());
                                 searchItemResultRow.setBarcode(item.getBarcode());
-                                searchItemResultRow.setUseRestriction(item.getUseRestriction());
+                                searchItemResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                                 searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                                searchItemResultRow.setAvailability(item.getAvailability());
+                                searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
                                 searchItemResultRows.add(searchItemResultRow);
                             }
                         }
