@@ -422,11 +422,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     public Integer getPageNum(SearchRecordsRequest searchRecordsRequest) {
         if (searchRecordsRequest.getPageNumber() >= 1) {
-            return (searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous") && !searchRecordsRequest.loopedPreviously()) ? searchRecordsRequest.getPageNumber() - 1 : searchRecordsRequest.getPageNumber() + 1;
-        } else if (searchRecordsRequest.getPageNumber() == 0 && searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous")){
+            return (searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS) && !searchRecordsRequest.loopedPreviously()) ? searchRecordsRequest.getPageNumber() - 1 : searchRecordsRequest.getPageNumber() + 1;
+        } else if (searchRecordsRequest.getPageNumber() == 0 && searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS)){
             searchRecordsRequest.setLoopedPreviously(true);
            return searchRecordsRequest.getPageNumber() + 1;
-        }else if (searchRecordsRequest.getPageNumber() == 0 && !searchRecordsRequest.getOperationType().equalsIgnoreCase("Previous")){
+        }else if (searchRecordsRequest.getPageNumber() == 0 && !searchRecordsRequest.getOperationType().equalsIgnoreCase(RecapConstants.OPERATION_PREVIOUS)){
            return searchRecordsRequest.getPageNumber() + 1;
         }
         return searchRecordsRequest.getPageNumber();

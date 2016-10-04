@@ -226,8 +226,9 @@ public class SearchRecordsRequest {
         this.errorMessage = errorMessage;
     }
 
-    public void resetPageNumber() {
+    public void resetPageNumberAndOperationType() {
         this.pageNumber = 0;
+        this.operationType = "";
     }
 
     public String getOperationType() {

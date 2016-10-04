@@ -64,7 +64,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.resetPageNumber();
+            searchRecordsRequest.resetPageNumberAndOperationType();
             List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -78,7 +78,7 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
-        searchRecordsRequest.setOperationType("previous");
+        searchRecordsRequest.setOperationType(RecapConstants.OPERATION_PREVIOUS);
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -89,7 +89,7 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
-        searchRecordsRequest.setOperationType("next");
+        searchRecordsRequest.setOperationType(RecapConstants.OPERATION_NEXT);
         searchRecordsRequest.setSearchResultRows(null);
         searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -101,7 +101,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.resetPageNumber();
+        searchRecordsRequest.resetPageNumberAndOperationType();
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -114,6 +114,7 @@ public class SearchRecordsController {
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
+        searchRecordsRequest.setOperationType("");
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
