@@ -138,4 +138,7 @@ public class RecapConstants {
 
     public static final String SOLR_CORE = "solrCore";
     public static final String SOLR_QUEUE = "seda:solrQ";
+
+    public static final String OPERATION_NEXT = "Next";
+    public static final String OPERATION_PREVIOUS = "Previous";
 }
