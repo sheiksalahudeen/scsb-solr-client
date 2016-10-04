@@ -21,7 +21,7 @@ public class Item {
     @Field("Barcode")
     private String barcode;
 
-    @Field("Availability")
+    @Field("Availability_search")
     private String availability;
 
     @Field("CollectionGroupDesignation")
@@ -33,7 +33,7 @@ public class Item {
     @Field("CustomerCode")
     private String customerCode;
 
-    @Field("UseRestriction")
+    @Field("UseRestriction_search")
     private String useRestriction;
 
     @Field("VolumePartYear")
@@ -50,6 +50,12 @@ public class Item {
 
     @Field("HoldingsId")
     private List<Integer> holdingsIdList;
+
+    @Field("Availability_display")
+    private String availabilityDisplay;
+
+    @Field("UseRestriction_display")
+    private String useRestrictionDisplay;
 
     @Ignore
     private String root;
@@ -156,6 +162,22 @@ public class Item {
 
     public void setItemBibIdList(List<Integer> itemBibIdList) {
         this.itemBibIdList = itemBibIdList;
+    }
+
+    public String getAvailabilityDisplay() {
+        return availabilityDisplay;
+    }
+
+    public void setAvailabilityDisplay(String availabilityDisplay) {
+        this.availabilityDisplay = availabilityDisplay;
+    }
+
+    public String getUseRestrictionDisplay() {
+        return useRestrictionDisplay;
+    }
+
+    public void setUseRestrictionDisplay(String useRestrictionDisplay) {
+        this.useRestrictionDisplay = useRestrictionDisplay;
     }
 
     public String getRoot() {

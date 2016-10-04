@@ -419,7 +419,6 @@ public class BibAT extends BaseTestCase {
         assertNotNull(childDoc);
     }
 
-
     @Test
     public void allFieldsNoValue() throws Exception {
         String itemQueryCriteria = "CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\")+AND+Availability:(\"Available\"+\"Not+Available\")+AND+UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
@@ -432,6 +431,33 @@ public class BibAT extends BaseTestCase {
         List<SolrDocument> childDocuments = solrDocument.getChildDocuments();
         SolrDocument childDoc = childDocuments.get(0);
         assertNotNull(childDoc);
+    }
+
+    @Test
+    public void titleSearchWithValue() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("BibOwningInstitution(\"NYPL\" \"PUL\" \"CUL\") AND LeaderMaterialType:Monograph AND Title_search:Un signo AND ({!parent which=\"ContentType:parent\"}UseRestriction_search:NoRestrictions OR {!parent which=\"ContentType:parent\"}UseRestriction_search:SupervisedUse)");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+    }
+
+    @Test
+    public void allFieldsWithValue() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("BibOwningInstitution(\"NYPL\" \"PUL\" \"CUL\") AND LeaderMaterialType:Monograph AND Un signo AND ({!parent which=\"ContentType:parent\"}UseRestriction_search:NoRestrictions OR {!parent which=\"ContentType:parent\"}UseRestriction_search:SupervisedUse)");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+    }
+
+    @Test
+    public void fetchChildBasedOnParentCriteria() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("UseRestriction_search:SupervisedUse AND ({!child of=\"ContentType:parent\"}BibOwningInstitution:NYPL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:PUL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:CUL) AND {!child of=\"ContentType:parent\"}LeaderMaterialType:Monograph");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
     }
 
 
