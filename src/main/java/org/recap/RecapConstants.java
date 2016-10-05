@@ -18,7 +18,7 @@ public class RecapConstants {
     public static final String HOLDINGS_OWNING_INSTITUTION = "HoldingsOwningInstitution";
     public static final String ITEM_OWNING_INSTITUTION = "ItemOwningInstitution";
     public static final String COLLECTION_GROUP_DESIGNATION = "CollectionGroupDesignation";
-    public static final String AVAILABILITY = "Availability";
+    public static final String AVAILABILITY = "Availability_search";
     public static final String TITLE_SEARCH = "Title_search";
     public static final String AUTHOR_SEARCH = "Author_search";
     public static final String PUBLISHER = "Publisher";
@@ -35,7 +35,7 @@ public class RecapConstants {
     public static final String OR = "OR";
     public static final String ALL_DIACRITICS = "all_diacritics";
 
-    public static final String USE_RESTRICTION = "UseRestriction";
+    public static final String USE_RESTRICTION = "UseRestriction_search";
     public static final String NO_RESTRICTIONS = "No Restrictions";
     public static final String IN_LIBRARY_USE = "In Library Use";
     public static final String SUPERVISED_USE = "Supervised Use";
@@ -138,4 +138,7 @@ public class RecapConstants {
 
     public static final String SOLR_CORE = "solrCore";
     public static final String SOLR_QUEUE = "seda:solrQ";
+
+    public static final String OPERATION_NEXT = "Next";
+    public static final String OPERATION_PREVIOUS = "Previous";
 }

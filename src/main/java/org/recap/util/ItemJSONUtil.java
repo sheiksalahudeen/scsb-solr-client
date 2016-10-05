@@ -30,8 +30,9 @@ public class ItemJSONUtil extends MarcUtil{
             item.setBarcode(itemEntity.getBarcode());
             item.setDocType("Item");
             item.setCustomerCode(itemEntity.getCustomerCode());
-            String useRestrictions = itemEntity.getUseRestrictions();
-            item.setUseRestriction(StringUtils.isNotBlank(useRestrictions) ? useRestrictions : RecapConstants.NO_RESTRICTIONS);
+            String useRestriction = StringUtils.isNotBlank(itemEntity.getUseRestrictions()) ? itemEntity.getUseRestrictions() : RecapConstants.NO_RESTRICTIONS;
+            item.setUseRestriction(useRestriction.replaceAll(" ", ""));
+            item.setUseRestrictionDisplay(useRestriction);
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumber(itemEntity.getCallNumber());
 
@@ -48,7 +49,9 @@ public class ItemJSONUtil extends MarcUtil{
 
             ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
             if (itemStatusEntity != null) {
-                item.setAvailability(itemStatusEntity.getStatusCode());
+                String statusCode = itemStatusEntity.getStatusCode();
+                item.setAvailability(statusCode.replaceAll(" ", ""));
+                item.setAvailabilityDisplay(statusCode);
             }
             CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
             if (collectionGroupEntity != null) {

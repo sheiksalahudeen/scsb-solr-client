@@ -13,7 +13,6 @@ import org.recap.util.CsvUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -27,7 +26,6 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +53,6 @@ public class SearchRecordsController {
     @RequestMapping("/search")
     public String searchRecords(Model model) {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        setDefaultsToSearchRecordsRequest(searchRecordsRequest);
         model.addAttribute("searchRecordsRequest", searchRecordsRequest);
         return "searchRecords";
     }
@@ -66,6 +63,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.resetPageNumber();
             List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -100,7 +98,7 @@ public class SearchRecordsController {
                                        BindingResult result,
                                        Model model) {
         searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.setPageNumber(0);
+        searchRecordsRequest.resetPageNumber();
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
@@ -139,7 +137,8 @@ public class SearchRecordsController {
     public ModelAndView newSearch(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        setDefaultsToSearchRecordsRequest(searchRecordsRequest);
+        searchRecordsRequest = new SearchRecordsRequest();
+        model.addAttribute("searchRecordsRequest", searchRecordsRequest);
         return new ModelAndView("searchRecords");
     }
 
@@ -170,44 +169,9 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        int totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalBibRecordsCount()).intValue();
-        int totalPagesCount = (int) Math.ceil((double) totalRecordsCount / (double) searchRecordsRequest.getPageSize());
-        Integer pageNumber = searchRecordsRequest.getPageNumber();
-        if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
-            pageNumber = totalPagesCount - 1;
-        }
         List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
         buildResults(searchRecordsRequest, bibItems);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-    }
-
-    private void setDefaultsToSearchRecordsRequest(SearchRecordsRequest searchRecordsRequest) {
-        searchRecordsRequest.setFieldName("");
-        searchRecordsRequest.setFieldValue("");
-        searchRecordsRequest.setSelectAllFacets(true);
-
-        searchRecordsRequest.getOwningInstitutions().add("NYPL");
-        searchRecordsRequest.getOwningInstitutions().add("CUL");
-        searchRecordsRequest.getOwningInstitutions().add("PUL");
-
-        searchRecordsRequest.getCollectionGroupDesignations().add("Shared");
-        searchRecordsRequest.getCollectionGroupDesignations().add("Private");
-        searchRecordsRequest.getCollectionGroupDesignations().add("Open");
-
-        searchRecordsRequest.getAvailability().add("Available");
-        searchRecordsRequest.getAvailability().add("Not Available");
-
-        searchRecordsRequest.getMaterialTypes().add("Monograph");
-        searchRecordsRequest.getMaterialTypes().add("Serial");
-        searchRecordsRequest.getMaterialTypes().add("Other");
-
-        searchRecordsRequest.getUseRestrictions().add("No Restrictions");
-        searchRecordsRequest.getUseRestrictions().add("In Library Use");
-        searchRecordsRequest.getUseRestrictions().add("Supervised Use");
-
-        searchRecordsRequest.setPageNumber(0);
-        searchRecordsRequest.setPageSize(10);
-        searchRecordsRequest.setShowResults(false);
     }
 
     private void searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
@@ -235,9 +199,9 @@ public class SearchRecordsController {
                     if (null != item) {
                         searchResultRow.setCustomerCode(item.getCustomerCode());
                         searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                        searchResultRow.setUseRestriction(item.getUseRestriction());
+                        searchResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                         searchResultRow.setBarcode(item.getBarcode());
-                        searchResultRow.setAvailability(item.getAvailability());
+                        searchResultRow.setAvailability(item.getAvailabilityDisplay());
                         searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                     }
                 } else {
@@ -250,9 +214,9 @@ public class SearchRecordsController {
                                 searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                                 searchItemResultRow.setCustomerCode(item.getCustomerCode());
                                 searchItemResultRow.setBarcode(item.getBarcode());
-                                searchItemResultRow.setUseRestriction(item.getUseRestriction());
+                                searchItemResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                                 searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                                searchItemResultRow.setAvailability(item.getAvailability());
+                                searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
                                 searchItemResultRows.add(searchItemResultRow);
                             }
                         }

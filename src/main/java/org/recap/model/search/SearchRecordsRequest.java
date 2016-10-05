@@ -30,6 +30,35 @@ public class SearchRecordsRequest {
     private Integer index;
     private String errorMessage;
 
+    public SearchRecordsRequest() {
+        this.setFieldName("");
+        this.setFieldValue("");
+        this.setSelectAllFacets(true);
+
+        this.getOwningInstitutions().add("NYPL");
+        this.getOwningInstitutions().add("CUL");
+        this.getOwningInstitutions().add("PUL");
+
+        this.getCollectionGroupDesignations().add("Shared");
+        this.getCollectionGroupDesignations().add("Private");
+        this.getCollectionGroupDesignations().add("Open");
+
+        this.getAvailability().add("Available");
+        this.getAvailability().add("NotAvailable");
+
+        this.getMaterialTypes().add("Monograph");
+        this.getMaterialTypes().add("Serial");
+        this.getMaterialTypes().add("Other");
+
+        this.getUseRestrictions().add("NoRestrictions");
+        this.getUseRestrictions().add("InLibraryUse");
+        this.getUseRestrictions().add("SupervisedUse");
+
+        this.setPageNumber(0);
+        this.setPageSize(10);
+        this.setShowResults(false);
+    }
+
     public String getFieldValue() {
         return fieldValue;
     }
@@ -190,5 +219,9 @@ public class SearchRecordsRequest {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public void resetPageNumber() {
+        this.pageNumber = 0;
     }
 }
