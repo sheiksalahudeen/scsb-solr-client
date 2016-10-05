@@ -2,7 +2,6 @@ package org.recap.model.jpa;
 
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -38,7 +37,7 @@ public class BibliographicEntityUT extends BaseTestCase {
 
     @Test
     public void findByInstitutionId() throws Exception {
-        Long beforeSaveCount = bibliographicDetailsRepository.countByOwningInstitutionId(3);
+        Long beforeSaveCount = bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(3);
         assertNotNull(beforeSaveCount);
         Random random = new Random();
         Date today = new Date();
@@ -73,7 +72,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         assertEquals(entity.getInstitutionEntity().getInstitutionCode(),"NYPL");
 
         System.out.println("owning institution bibId-->" + entity.getOwningInstitutionBibId());
-        Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionId(3);
+        Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(3);
         assertTrue((beforeSaveCount + 1) == afterSave);
         bibliographicDetailsRepository.delete(entity);
 
@@ -81,7 +80,7 @@ public class BibliographicEntityUT extends BaseTestCase {
 
     @Test
     public void findByInstitutionIdPagable() throws Exception {
-        Long beforeSaveCount = bibliographicDetailsRepository.countByOwningInstitutionId(3);
+        Long beforeSaveCount = bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(3);
         assertNotNull(beforeSaveCount);
         if (beforeSaveCount == 0 || beforeSaveCount <= 3) {
             Random random = new Random();
@@ -120,14 +119,14 @@ public class BibliographicEntityUT extends BaseTestCase {
             BibliographicEntity entity3 = bibliographicDetailsRepository.save(bibliographicEntity2);
             assertNotNull(entity3);
 
-            Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
+            Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(0, 3), 3);
             assertNotNull(byInstitutionId);
             assertTrue(byInstitutionId.getContent().size() == 3);
             bibliographicDetailsRepository.delete(bibliographicEntity);
             bibliographicDetailsRepository.delete(bibliographicEntity1);
             bibliographicDetailsRepository.delete(bibliographicEntity2);
         } else {
-            Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 3), 3);
+            Page<BibliographicEntity> byInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(0, 3), 3);
             assertNotNull(byInstitutionId);
             assertTrue(byInstitutionId.getContent().size() == 3);
         }
@@ -150,7 +149,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getBibliographicId());
         assertNotNull(fetchedBibliographicEntity.getOwningInstitutionId());
@@ -404,7 +403,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.save(bibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 

@@ -47,8 +47,8 @@ public class ItemIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
         Page<ItemEntity> itemEntities = owningInstitutionId == null ?
-                itemDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
-                itemDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+                itemDetailsRepository.findAllByIsDeletedFalse(new PageRequest(pageNum, docsPerPage)) :
+                itemDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Items Fetched : " + itemEntities.getNumberOfElements());
         List<Item> itemsToIndex = new ArrayList<>();

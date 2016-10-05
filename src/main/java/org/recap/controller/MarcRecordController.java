@@ -6,6 +6,7 @@ import org.marc4j.marc.Subfield;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.BibDataField;
 import org.recap.model.search.BibliographicMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -68,8 +69,9 @@ public class MarcRecordController {
             if (null != institutionEntity) {
                 bibliographicMarcRecord.setOwningInstitution(institutionEntity.getInstitutionCode());
             }
-            if (!CollectionUtils.isEmpty(bibliographicEntity.getItemEntities())) {
-                bibliographicMarcRecord.setCallNumber(bibliographicEntity.getItemEntities().get(0).getCallNumber());
+            List<ItemEntity> nonDeletedItemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+            if (!CollectionUtils.isEmpty(nonDeletedItemEntities)) {
+                bibliographicMarcRecord.setCallNumber(nonDeletedItemEntities.get(0).getCallNumber());
             }
             model.addAttribute("bibliographicMarcRecord", bibliographicMarcRecord);
             return "marcRecordView";

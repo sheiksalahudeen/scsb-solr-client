@@ -43,7 +43,7 @@ public class BibItemIndexExecutorServiceUT extends BaseTestCase{
     @Test
     public void mergeIndexFrequency() throws Exception {
 
-        Mockito.when(mockBibliographicDetailsRepository.count()).thenReturn(500000L);
+        Mockito.when(mockBibliographicDetailsRepository.countByIsDeletedFalse()).thenReturn(500000L);
         Mockito.when(mockBibItemIndexCallable.call()).thenReturn(1000);
 
         BibItemIndexExecutorService bibItemIndexExecutorService = new MockBibItemIndexExecutorService();

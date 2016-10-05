@@ -9,6 +9,9 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -20,6 +23,12 @@ import static junit.framework.TestCase.assertNotNull;
  * Created by premkb on 1/8/16.
  */
 public class BibJSONUtilUT extends BaseTestCase{
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
 
     private String holdingContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n" +
             "            <record>\n" +
@@ -180,7 +189,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         itemEntity.setBibliographicEntities(bibliographicEntities);
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
     }
 

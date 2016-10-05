@@ -12,6 +12,20 @@ import java.util.List;
 @Entity
 @Table(name = "bibliographic_t", schema = "recap", catalog = "")
 @IdClass(BibliographicPK.class)
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "BibliographicEntity.getNonDeletedHoldingsEntities",
+                query = "SELECT HOLDINGS_T.* FROM HOLDINGS_T, BIBLIOGRAPHIC_HOLDINGS_T WHERE BIBLIOGRAPHIC_HOLDINGS_T.HOLDINGS_INST_ID = HOLDINGS_T.OWNING_INST_ID " +
+                        "AND BIBLIOGRAPHIC_HOLDINGS_T.OWNING_INST_HOLDINGS_ID = HOLDINGS_T.OWNING_INST_HOLDINGS_ID AND HOLDINGS_T.IS_DELETED = 0 AND " +
+                        "BIBLIOGRAPHIC_HOLDINGS_T.OWNING_INST_BIB_ID = :owningInstitutionBibId AND BIBLIOGRAPHIC_HOLDINGS_T.BIB_INST_ID = :owningInstitutionId",
+                resultClass = HoldingsEntity.class),
+        @NamedNativeQuery(
+                name = "BibliographicEntity.getNonDeletedItemEntities",
+                query = "SELECT ITEM_T.* FROM ITEM_T, BIBLIOGRAPHIC_ITEM_T WHERE BIBLIOGRAPHIC_ITEM_T.ITEM_INST_ID = ITEM_T.OWNING_INST_ID " +
+                        "AND BIBLIOGRAPHIC_ITEM_T.OWNING_INST_ITEM_ID = ITEM_T.OWNING_INST_ITEM_ID AND ITEM_T.IS_DELETED = 0 AND " +
+                        "BIBLIOGRAPHIC_ITEM_T.OWNING_INST_BIB_ID = :owningInstitutionBibId AND BIBLIOGRAPHIC_ITEM_T.BIB_INST_ID = :owningInstitutionId",
+                resultClass = ItemEntity.class),
+})
 public class BibliographicEntity implements Serializable {
     @Column(name = "BIBLIOGRAPHIC_ID", insertable = false, updatable = false)
     private Integer bibliographicId;
@@ -41,6 +55,9 @@ public class BibliographicEntity implements Serializable {
     @Id
     @Column(name = "OWNING_INST_BIB_ID")
     private String owningInstitutionBibId;
+
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable = false, updatable = false)
@@ -129,6 +146,14 @@ public class BibliographicEntity implements Serializable {
 
     public void setOwningInstitutionBibId(String owningInstitutionBibId) {
         this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public InstitutionEntity getInstitutionEntity() {

@@ -97,8 +97,8 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
-            long bibCount = bibliographicDetailsRepository.count();
-            long itemCount = itemDetailsRepository.count();
+            long bibCount = bibliographicDetailsRepository.countByIsDeletedFalse();
+            long itemCount = itemDetailsRepository.countByIsDeletedFalse();
             ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, bibCount, itemCount);
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
@@ -126,8 +126,8 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
-            long bibCount = bibliographicDetailsRepository.count();
-            long itemCount = itemDetailsRepository.count();
+            long bibCount = bibliographicDetailsRepository.countByIsDeletedFalse();
+            long itemCount = itemDetailsRepository.countByIsDeletedFalse();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
             ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(isbnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, bibCount, itemCount);
@@ -155,8 +155,8 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
-            long bibCount = bibliographicDetailsRepository.count();
-            long itemCount = itemDetailsRepository.count();
+            long bibCount = bibliographicDetailsRepository.countByIsDeletedFalse();
+            long itemCount = itemDetailsRepository.countByIsDeletedFalse();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
             ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(issnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, bibCount, itemCount);
@@ -184,8 +184,8 @@ public class MatchingAlgorithmSaveReport {
             logger.info("Total Time Taken to match : " + stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
-            long bibCount = bibliographicDetailsRepository.count();
-            long itemCount = itemDetailsRepository.count();
+            long bibCount = bibliographicDetailsRepository.countByIsDeletedFalse();
+            long itemCount = itemDetailsRepository.countByIsDeletedFalse();
             matchingAlgorithmHelperService.saveMatchingReportEntity(matchingReportEntityMap);
             matchingAlgorithmHelperService.saveExceptionReportEntity(exceptionReportEntityMap);
             ReportEntity summaryReportEntity = matchingAlgorithmHelperService.getSummaryReportEntity(lccnMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, bibCount, itemCount);

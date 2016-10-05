@@ -26,7 +26,7 @@ public class ItemIndexExecutorService extends IndexExecutorService {
 
     @Override
     protected Integer getTotalDocCount(Integer owningInstitutionId) {
-        Long count = owningInstitutionId == null ? itemDetailsRepository.count() : itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        Long count = owningInstitutionId == null ? itemDetailsRepository.countByIsDeletedFalse() : itemDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
         return count.intValue();
     }
 

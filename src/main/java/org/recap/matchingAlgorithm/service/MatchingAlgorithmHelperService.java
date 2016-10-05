@@ -338,8 +338,8 @@ public class MatchingAlgorithmHelperService {
 
     public void saveSummaryReportEntity(Map<String, Integer> oclcCountMap, Map<String, Integer> isbnCountMap, Map<String, Integer> issnCountMap, Map<String, Integer> lccnCountMap) {
         List<ReportEntity> reportEntities = new ArrayList<>();
-        long bibCount = bibliographicDetailsRepository.count();
-        long itemCount = itemDetailsRepository.count();
+        long bibCount = bibliographicDetailsRepository.countByIsDeletedFalse();
+        long itemCount = itemDetailsRepository.countByIsDeletedFalse();
         reportEntities.add(getSummaryReportEntity(oclcCountMap, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
         reportEntities.add(getSummaryReportEntity(isbnCountMap, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));
         reportEntities.add(getSummaryReportEntity(issnCountMap, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.SUMMARY_REPORT_FILE_NAME, bibCount, itemCount));

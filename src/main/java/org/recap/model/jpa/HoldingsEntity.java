@@ -12,7 +12,15 @@ import java.util.List;
 @Entity
 @Table(name = "holdings_t", schema = "recap", catalog = "")
 @IdClass(HoldingsPK.class)
-public class HoldingsEntity implements Serializable{
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "HoldingsEntity.getNonDeletedItemEntities",
+                query = "SELECT ITEM_T.* FROM ITEM_T, ITEM_HOLDINGS_T WHERE ITEM_HOLDINGS_T.ITEM_INST_ID = ITEM_T.OWNING_INST_ID AND " +
+                        "ITEM_HOLDINGS_T.OWNING_INST_ITEM_ID = ITEM_T.OWNING_INST_ITEM_ID AND ITEM_T.IS_DELETED = 0 AND " +
+                        " ITEM_HOLDINGS_T.OWNING_INST_HOLDINGS_ID = :owningInstitutionHoldingsId AND ITEM_HOLDINGS_T.HOLDINGS_INST_ID = :owningInstitutionId",
+                resultClass = ItemEntity.class)
+})
+public class HoldingsEntity implements Serializable {
 
     @Column(name = "HOLDINGS_ID", insertable = false, updatable = false)
     private Integer holdingsId;
@@ -43,6 +51,9 @@ public class HoldingsEntity implements Serializable{
     @Column(name = "OWNING_INST_HOLDINGS_ID")
     private String owningInstitutionHoldingsId;
 
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "OWNING_INST_ID", insertable = false, updatable = false)
     private InstitutionEntity institutionEntity;
@@ -52,11 +63,11 @@ public class HoldingsEntity implements Serializable{
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "item_holdings_t", joinColumns = {
-            @JoinColumn(name="OWNING_INST_HOLDINGS_ID", referencedColumnName = "OWNING_INST_HOLDINGS_ID"),
-            @JoinColumn(name="HOLDINGS_INST_ID", referencedColumnName = "OWNING_INST_ID")},
+            @JoinColumn(name = "OWNING_INST_HOLDINGS_ID", referencedColumnName = "OWNING_INST_HOLDINGS_ID"),
+            @JoinColumn(name = "HOLDINGS_INST_ID", referencedColumnName = "OWNING_INST_ID")},
             inverseJoinColumns = {
-                    @JoinColumn(name="OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
-                    @JoinColumn(name="ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID") })
+                    @JoinColumn(name = "OWNING_INST_ITEM_ID", referencedColumnName = "OWNING_INST_ITEM_ID"),
+                    @JoinColumn(name = "ITEM_INST_ID", referencedColumnName = "OWNING_INST_ID")})
     private List<ItemEntity> itemEntities;
 
     public HoldingsEntity() {
@@ -124,6 +135,14 @@ public class HoldingsEntity implements Serializable{
 
     public void setOwningInstitutionHoldingsId(String owningInstitutionHoldingsId) {
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public InstitutionEntity getInstitutionEntity() {

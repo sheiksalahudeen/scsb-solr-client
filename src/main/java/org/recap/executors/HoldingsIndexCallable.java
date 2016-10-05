@@ -46,8 +46,8 @@ public class HoldingsIndexCallable implements Callable {
     public Object call() throws Exception {
 
         Page<HoldingsEntity> holdingsEntities = owningInstitutionId == null ?
-                holdingsDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
-                holdingsDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+                holdingsDetailsRepository.findAllByIsDeletedFalse(new PageRequest(pageNum, docsPerPage)) :
+                holdingsDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Holdings Fetched : " + holdingsEntities.getNumberOfElements());
         List<Holdings> holdingsToIndex = new ArrayList<>();

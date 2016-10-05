@@ -39,7 +39,7 @@ public class BibExecutorServiceUT {
     @Test
     public void mergeIndexFrequency() throws Exception {
 
-        Mockito.when(mockBibliographicDetailsRepository.count()).thenReturn(500000L);
+        Mockito.when(mockBibliographicDetailsRepository.countByIsDeletedFalse()).thenReturn(500000L);
         Mockito.when(mockBibIndexCallable.call()).thenReturn(1000);
 
         BibIndexExecutorService bibIndexExecutorService = new MockBibIndexExecutorService();

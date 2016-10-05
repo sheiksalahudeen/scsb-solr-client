@@ -49,7 +49,7 @@ public class ItemIndexExecutorServiceUT {
 
     @Test
     public void mergeIndexFrequency() throws Exception {
-        Mockito.when(mockItemDetailsRepository.count()).thenReturn(500000L);
+        Mockito.when(mockItemDetailsRepository.countByIsDeletedFalse()).thenReturn(500000L);
         Mockito.when(mockItemIndexCallable.call()).thenReturn(1000);
 
         ItemIndexExecutorService itemIndexExecutorService = new MockIndexExecutorService();
