@@ -224,4 +224,9 @@ public class SearchRecordsRequest {
     public void resetPageNumber() {
         this.pageNumber = 0;
     }
+
+    public void reset() {
+        this.totalBibRecordsCount = String.valueOf(0);
+        this.totalItemRecordsCount = String.valueOf(0);
+    }
 }

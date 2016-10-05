@@ -34,6 +34,7 @@ public class RecapConstants {
     public static final String AND = "AND";
     public static final String OR = "OR";
     public static final String ALL_DIACRITICS = "all_diacritics";
+    public static final String ALL_FIELDS = "_text_";
 
     public static final String USE_RESTRICTION = "UseRestriction_search";
     public static final String NO_RESTRICTIONS = "No Restrictions";

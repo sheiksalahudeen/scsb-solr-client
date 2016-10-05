@@ -1,5 +1,6 @@
 package org.recap.repository.solr.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -53,7 +54,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         List<BibItem> bibItems = new ArrayList<>();
         try {
             if (isEmptyField(searchRecordsRequest)) {
-                //TODO: Get BibItems based on empty fieldName with fieldValue
+                searchRecordsRequest.setFieldName(RecapConstants.ALL_FIELDS);
+                bibItems = searchByBib(searchRecordsRequest);
+                if(CollectionUtils.isEmpty(bibItems)) {
+                    bibItems = searchByItem(searchRecordsRequest);
+                }
+                searchRecordsRequest.setFieldName("");
             } else if (isItemField(searchRecordsRequest)) {
                 bibItems = searchByItem(searchRecordsRequest);
             } else {
@@ -82,11 +88,13 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
         SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
-        setCountsByItem(searchRecordsRequest, itemSolrDocumentList);
-        for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
-            SolrDocument itemSolrDocument = iterator.next();
-            Item item = getItem(itemSolrDocument);
-            bibItems.addAll(getBibItems(item));
+        if(CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
+            setCountsByItem(searchRecordsRequest, itemSolrDocumentList);
+            for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument itemSolrDocument = iterator.next();
+                Item item = getItem(itemSolrDocument);
+                bibItems.addAll(getBibItems(item));
+            }
         }
         return bibItems;
     }
@@ -99,13 +107,15 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         queryForParentAndChildCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForParentAndChildCriteria);
         SolrDocumentList bibSolrDocumentList = queryResponse.getResults();
-        setCountsByBib(searchRecordsRequest, bibSolrDocumentList);
-        for (Iterator<SolrDocument> iterator = bibSolrDocumentList.iterator(); iterator.hasNext(); ) {
-            SolrDocument bibSolrDocument = iterator.next();
-            BibItem bibItem = new BibItem();
-            populateBibItem(bibSolrDocument, bibItem);
-            populateItemInfo(bibItem);
-            bibItems.add(bibItem);
+        if(CollectionUtils.isNotEmpty(bibSolrDocumentList)) {
+            setCountsByBib(searchRecordsRequest, bibSolrDocumentList);
+            for (Iterator<SolrDocument> iterator = bibSolrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument bibSolrDocument = iterator.next();
+                BibItem bibItem = new BibItem();
+                populateBibItem(bibSolrDocument, bibItem);
+                populateItemInfo(bibItem);
+                bibItems.add(bibItem);
+            }
         }
         return bibItems;
     }
