@@ -22,7 +22,7 @@ public class SolrQueryBuilderTest {
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -38,7 +38,7 @@ public class SolrQueryBuilderTest {
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -54,7 +54,7 @@ public class SolrQueryBuilderTest {
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -75,7 +75,7 @@ public class SolrQueryBuilderTest {
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getSolrQueryForCriteria(searchRecordsRequest);
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
@@ -91,7 +91,7 @@ public class SolrQueryBuilderTest {
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
 
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
-        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getItemSolrQueryForCriteria("_root_:12",searchRecordsRequest);
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
     }
 
