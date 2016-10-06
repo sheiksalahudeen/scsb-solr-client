@@ -16,7 +16,7 @@ public class ItemEntity implements Serializable {
     @Column(name = "ITEM_ID", insertable = false, updatable = false)
     private Integer itemId;
 
-    @Column(name = "BAR_CODE")
+    @Column(name = "BARCODE")
     private String barcode;
 
     @Column(name = "CUSTOMER_CODE")
