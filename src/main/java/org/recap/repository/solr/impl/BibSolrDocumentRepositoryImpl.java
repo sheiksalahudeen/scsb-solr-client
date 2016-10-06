@@ -11,25 +11,27 @@ import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.resolver.BibValueResolver;
+import org.recap.model.search.resolver.HoldingsValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.Bib.*;
 import org.recap.model.search.resolver.impl.Bib.DocTypeValueResolver;
 import org.recap.model.search.resolver.impl.Bib.IdValueResolver;
+import org.recap.model.search.resolver.impl.holdings.HoldingsIdValueResolver;
+import org.recap.model.search.resolver.impl.holdings.HoldingsRootValueResolver;
+import org.recap.model.search.resolver.impl.holdings.SummaryHoldingsValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.BibItem;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.recap.util.SolrQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.text.CharacterIterator;
 import java.text.NumberFormat;
-import java.text.StringCharacterIterator;
 import java.util.*;
 
 /**
@@ -48,6 +50,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     List<BibValueResolver> bibValueResolvers;
     List<ItemValueResolver> itemValueResolvers;
+    List<HoldingsValueResolver> holdingsValueResolvers;
 
     @Override
     public List<BibItem> search(SearchRecordsRequest searchRecordsRequest) {
@@ -93,7 +96,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument itemSolrDocument = iterator.next();
                 Item item = getItem(itemSolrDocument);
-                bibItems.addAll(getBibItems(item));
+                bibItems.addAll(getBibItemsAndHoldings(item));
             }
         }
         return bibItems;
@@ -113,26 +116,38 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 SolrDocument bibSolrDocument = iterator.next();
                 BibItem bibItem = new BibItem();
                 populateBibItem(bibSolrDocument, bibItem);
-                populateItemInfo(bibItem);
+                populateItemHoldingsInfo(bibItem);
                 bibItems.add(bibItem);
             }
         }
         return bibItems;
     }
 
-    private List<BibItem> getBibItems(Item item) {
+    private List<BibItem> getBibItemsAndHoldings(Item item) {
         List<BibItem> bibItems = new ArrayList<>();
-        SolrQuery solrQueryForBib = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + item.getRoot(), RecapConstants.BIB);
+        SolrQuery solrQueryForBib = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + item.getRoot());
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
             SolrDocumentList solrDocuments = queryResponse.getResults();
+            if(solrDocuments.getNumFound() > 10 ) {
+                solrQueryForBib.setRows((int) solrDocuments.getNumFound());
+                queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
+                solrDocuments = queryResponse.getResults();
+            }
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
+                String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
                 BibItem bibItem = new BibItem();
-                populateBibItem(solrDocument, bibItem);
-                bibItem.setItems(Arrays.asList(item));
-                bibItems.add(bibItem);
+                if (docType.equalsIgnoreCase(RecapConstants.BIB)) {
+                    populateBibItem(solrDocument, bibItem);
+                    bibItem.setItems(Arrays.asList(item));
+                    bibItems.add(bibItem);
+                }
+                if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
+                    Holdings holdings = getHoldings(solrDocument);
+                    bibItem.addHoldings(holdings);
+                }
             }
         } catch (SolrServerException e) {
             log.error(e.getMessage());
@@ -142,16 +157,28 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibItems;
     }
 
-    private void populateItemInfo(BibItem bibItem) {
-        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot(), RecapConstants.ITEM);
+    private void populateItemHoldingsInfo(BibItem bibItem) {
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot());
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
             SolrDocumentList solrDocuments = queryResponse.getResults();
+            if(solrDocuments.getNumFound() > 10 ) {
+                solrQueryForItem.setRows((int) solrDocuments.getNumFound());
+                queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
+                solrDocuments = queryResponse.getResults();
+            }
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
-                Item item = getItem(solrDocument);
-                bibItem.addItem(item);
+                String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
+                if(docType.equalsIgnoreCase(RecapConstants.ITEM)) {
+                    Item item = getItem(solrDocument);
+                    bibItem.addItem(item);
+                }
+                if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
+                    Holdings holdings = getHoldings(solrDocument);
+                    bibItem.addHoldings(holdings);
+                }
             }
         } catch (SolrServerException e) {
             log.error(e.getMessage());
@@ -217,6 +244,23 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return item;
     }
 
+    private Holdings getHoldings(SolrDocument holdingsSolrDocument) {
+        Holdings holdings = new Holdings();
+        Collection<String> fieldNames = holdingsSolrDocument.getFieldNames();
+        List<HoldingsValueResolver> holdingsValueResolvers = getHoldingsValueResolvers();
+        for (Iterator<String> iterator = fieldNames.iterator(); iterator.hasNext(); ) {
+            String fieldName = iterator.next();
+            Object fieldValue = holdingsSolrDocument.getFieldValue(fieldName);
+            for (Iterator<HoldingsValueResolver> holdingsValueResolverIterator = holdingsValueResolvers.iterator(); holdingsValueResolverIterator.hasNext(); ) {
+                HoldingsValueResolver holdingsValueResolver = holdingsValueResolverIterator.next();
+                if(holdingsValueResolver.isInterested(fieldName)) {
+                    holdingsValueResolver.setValue(holdings, fieldValue);
+                }
+            }
+        }
+        return holdings;
+    }
+
     private void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
@@ -280,5 +324,17 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
         }
         return itemValueResolvers;
+    }
+
+    public List<HoldingsValueResolver> getHoldingsValueResolvers() {
+        if(null == holdingsValueResolvers) {
+            holdingsValueResolvers = new ArrayList<>();
+            holdingsValueResolvers.add(new HoldingsRootValueResolver());
+            holdingsValueResolvers.add(new SummaryHoldingsValueResolver());
+            holdingsValueResolvers.add(new org.recap.model.search.resolver.impl.holdings.DocTypeValueResolver());
+            holdingsValueResolvers.add(new org.recap.model.search.resolver.impl.holdings.IdValueResolver());
+            holdingsValueResolvers.add(new HoldingsIdValueResolver());
+        }
+        return holdingsValueResolvers;
     }
 }

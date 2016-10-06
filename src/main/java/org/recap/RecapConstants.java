@@ -11,6 +11,7 @@ public class RecapConstants {
     public static final String DOCTYPE = "DocType";
     public static final String BIB = "Bib";
     public static final String ITEM = "Item";
+    public static final String HOLDINGS = "Holdings";
     public static final String HOLDINGS_ID = "HoldingsId";
     public static final String HOLDING_ID = "HoldingId";
     public static final String ITEM_ID = "ItemId";
@@ -139,7 +140,4 @@ public class RecapConstants {
 
     public static final String SOLR_CORE = "solrCore";
     public static final String SOLR_QUEUE = "seda:solrQ";
-
-    public static final String OPERATION_NEXT = "Next";
-    public static final String OPERATION_PREVIOUS = "Previous";
 }

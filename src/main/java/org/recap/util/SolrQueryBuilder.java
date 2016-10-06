@@ -152,10 +152,9 @@ public class SolrQueryBuilder {
         return "";
     }
 
-    public SolrQuery getSolrQueryForBibItem(String parentQueryString, String docType) {
+    public SolrQuery getSolrQueryForBibItem(String parentQueryString) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(parentQueryString);
-        stringBuilder.append(and).append("DocType:").append(docType);
         return new SolrQuery(stringBuilder.toString());
     }
 

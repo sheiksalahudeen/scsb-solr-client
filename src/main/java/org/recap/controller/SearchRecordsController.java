@@ -6,6 +6,7 @@ import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.model.solr.BibItem;
+import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
@@ -195,6 +196,7 @@ public class SearchRecordsController {
                 searchResultRow.setPublisherDate(bibItem.getPublicationDate());
                 searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
                 searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
+                Holdings holdings = CollectionUtils.isEmpty(bibItem.getHoldingsList()) ? new Holdings() : bibItem.getHoldingsList().get(0);
                 if (null != bibItem.getItems() && bibItem.getItems().size() == 1 && !RecapConstants.SERIAL.equals(bibItem.getLeaderMaterialType())) {
                     Item item = bibItem.getItems().get(0);
                     if (null != item) {
@@ -203,7 +205,7 @@ public class SearchRecordsController {
                         searchResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                         searchResultRow.setBarcode(item.getBarcode());
                         searchResultRow.setAvailability(item.getAvailabilityDisplay());
-                        searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
+                        searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
                     }
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
@@ -221,7 +223,7 @@ public class SearchRecordsController {
                                 searchItemResultRows.add(searchItemResultRow);
                             }
                         }
-                        searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
+                        searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
                         searchResultRow.setShowItems(true);
                         Collections.sort(searchItemResultRows);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);
