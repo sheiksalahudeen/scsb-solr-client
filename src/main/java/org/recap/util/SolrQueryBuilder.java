@@ -140,7 +140,7 @@ public class SolrQueryBuilder {
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
                 && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            return searchRecordsRequest.getFieldName() + ":" + searchRecordsRequest.getFieldValue() + and;
+            return searchRecordsRequest.getFieldName() + ":" + "(" + "\"" +searchRecordsRequest.getFieldValue() + "\"" + ")" + and;
         }
         return "";
     }
