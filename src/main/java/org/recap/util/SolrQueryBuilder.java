@@ -140,7 +140,7 @@ public class SolrQueryBuilder {
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
                 && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            return searchRecordsRequest.getFieldName() + ":" + searchRecordsRequest.getFieldValue() + and;
+            return searchRecordsRequest.getFieldName() + ":" + "(" + "\"" +searchRecordsRequest.getFieldValue() + "\"" + ")" + and;
         }
         return "";
     }
@@ -148,6 +148,10 @@ public class SolrQueryBuilder {
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
+            if(searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ALL_FIELDS)) {
+                stringBuilder.append(and).append(searchRecordsRequest.getFieldName()).append(":").append(searchRecordsRequest.getFieldValue());
+                return stringBuilder.toString();
+            }
             stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(searchRecordsRequest.getFieldValue());
             return stringBuilder.toString();
         }

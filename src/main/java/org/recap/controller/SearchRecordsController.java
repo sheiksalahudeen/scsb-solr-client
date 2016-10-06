@@ -63,6 +63,7 @@ public class SearchRecordsController {
                                   BindingResult result,
                                   Model model) {
         if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.reset();
             searchRecordsRequest.resetPageNumber();
             List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
             buildResults(searchRecordsRequest, bibItems);
