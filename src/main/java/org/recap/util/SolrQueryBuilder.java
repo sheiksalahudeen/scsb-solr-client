@@ -18,8 +18,6 @@ import java.util.List;
 @Component
 public class SolrQueryBuilder {
 
-    String all = "*:*";
-
     String and = " AND ";
 
     String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
@@ -148,10 +146,6 @@ public class SolrQueryBuilder {
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            if(searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ALL_FIELDS)) {
-                stringBuilder.append(and).append(searchRecordsRequest.getFieldName()).append(":").append(searchRecordsRequest.getFieldValue());
-                return stringBuilder.toString();
-            }
             stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(searchRecordsRequest.getFieldValue());
             return stringBuilder.toString();
         }
@@ -166,54 +160,34 @@ public class SolrQueryBuilder {
     }
 
     public SolrQuery getQueryForParentAndChildCriteria(SearchRecordsRequest searchRecordsRequest) {
-
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
-
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
-
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-
         SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
-
         return solrQuery;
     }
 
     public SolrQuery getQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
-
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
-
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
-
         SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + queryForFieldCriteria + queryStringForParentCriteriaForChild);
-
         return solrQuery;
     }
 
     public SolrQuery getCountQueryForParentAndChildCriteria(SearchRecordsRequest searchRecordsRequest) {
-
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreParentFilterQuery);
-
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
-
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-
         SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + queryStringForItemCriteriaForParent + countQueryForFieldCriteria);
-
         return solrQuery;
     }
 
     public SolrQuery getCountQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
-
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreChildFilterQuery);
-
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
-
         SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + queryStringForParentCriteriaForChild + countQueryForFieldCriteria);
-
         return solrQuery;
     }
 }
