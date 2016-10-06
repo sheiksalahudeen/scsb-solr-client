@@ -32,4 +32,8 @@ public interface BibSolrCrudRepository extends SolrCrudRepository<Bib, String> {
     List<Bib> findByTitleDisplayAndLccn(String titleDisplay, String lccn);
 
     Long countByDocType(String docType);
+
+    void deleteByBibId(Integer bibId);
+
+    void deleteByBibIdIn(List<Integer> bibIds);
 }
