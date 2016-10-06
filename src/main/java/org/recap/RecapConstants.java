@@ -26,7 +26,7 @@ public class RecapConstants {
     public static final String TITLE_STARTS_WITH= "TitleStartsWith";
     public static final String TITLE_SORT= "Title_sort";
     public static final String BARCODE = "Barcode";
-    public static final String CALL_NUMBER = "CallNumber";
+    public static final String CALL_NUMBER = "CallNumber_search";
     public static final String NOTES = "Notes";
     public static final String LEADER_MATERIAL_TYPE = "LeaderMaterialType";
     public static final String MONOGRAPH = "Monograph";
@@ -124,6 +124,8 @@ public class RecapConstants {
     public static final String ISBN_CRITERIA = "ISBN";
     public static final String ISSN_CRITERIA = "ISSN";
     public static final String LCCN_CRITERIA = "LCCN";
+
+    public static final String OCLC_NUMBER = "OCLCNumber";
 
     public static final String BIB_COUNT = "bibCount";
     public static final String ITEM_COUNT = "itemCount";

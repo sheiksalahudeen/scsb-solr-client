@@ -34,7 +34,8 @@ public class ItemJSONUtil extends MarcUtil{
             item.setUseRestriction(useRestriction.replaceAll(" ", ""));
             item.setUseRestrictionDisplay(useRestriction);
             item.setVolumePartYear(itemEntity.getVolumePartYear());
-            item.setCallNumber(itemEntity.getCallNumber());
+            item.setCallNumberSearch(itemEntity.getCallNumber().replaceAll(" ", ""));
+            item.setCallNumberDisplay(itemEntity.getCallNumber());
 
             List<Integer> bibIdList = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();

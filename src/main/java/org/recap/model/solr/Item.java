@@ -39,8 +39,11 @@ public class Item {
     @Field("VolumePartYear")
     private String volumePartYear;
 
-    @Field("CallNumber")
-    private String callNumber;
+    @Field("CallNumber_search")
+    private String callNumberSearch;
+
+    @Field("CallNumber_display")
+    private String callNumberDisplay;
 
     @Field("ItemOwningInstitution")
     private String owningInstitution;
@@ -132,12 +135,20 @@ public class Item {
         this.volumePartYear = volumePartYear;
     }
 
-    public String getCallNumber() {
-        return callNumber;
+    public String getCallNumberSearch() {
+        return callNumberSearch;
     }
 
-    public void setCallNumber(String callNumber) {
-        this.callNumber = callNumber;
+    public void setCallNumberSearch(String callNumberSearch) {
+        this.callNumberSearch = callNumberSearch;
+    }
+
+    public String getCallNumberDisplay() {
+        return callNumberDisplay;
+    }
+
+    public void setCallNumberDisplay(String callNumberDisplay) {
+        this.callNumberDisplay = callNumberDisplay;
     }
 
     public String getOwningInstitution() {

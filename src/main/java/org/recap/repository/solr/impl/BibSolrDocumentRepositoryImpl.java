@@ -199,8 +199,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         long numFound = bibSolrDocuments.getNumFound();
         String totalBibCount = NumberFormat.getNumberInstance().format(numFound);
         searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
-        String totalItemCount = NumberFormat.getNumberInstance().format(getItemCountsForBib(searchRecordsRequest));
-        searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
+        searchRecordsRequest.setTotalRecordsCount(totalBibCount);
+        if(!searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ALL_FIELDS)) {
+            String totalItemCount = NumberFormat.getNumberInstance().format(getItemCountsForBib(searchRecordsRequest));
+            searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
+        }
         int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
         searchRecordsRequest.setTotalPageCount(totalPagesCount);
     }
@@ -215,8 +218,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         long numFound = itemSolrDocuments.getNumFound();
         String totalItemCount = NumberFormat.getNumberInstance().format(numFound);
         searchRecordsRequest.setTotalItemRecordsCount(totalItemCount);
-        String totalBibCount = NumberFormat.getNumberInstance().format(getBibCountsForItem(searchRecordsRequest));
-        searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+        searchRecordsRequest.setTotalRecordsCount(totalItemCount);
+        if(!searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ALL_FIELDS)) {
+            String totalBibCount = NumberFormat.getNumberInstance().format(getBibCountsForItem(searchRecordsRequest));
+            searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
+        }
         int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
         searchRecordsRequest.setTotalPageCount(totalPagesCount);
     }
@@ -311,7 +317,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new AvailabilitySearchValueResolver());
             itemValueResolvers.add(new AvailabilityDisplayValueResolver());
             itemValueResolvers.add(new BarcodeValueResolver());
-            itemValueResolvers.add(new CallNumberValueResolver());
+            itemValueResolvers.add(new CallNumberSearchValueResolver());
+            itemValueResolvers.add(new CallNumberDisplayValueResolver());
             itemValueResolvers.add(new CollectionGroupDesignationValueResolver());
             itemValueResolvers.add(new CustomerCodeValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.DocTypeValueResolver());

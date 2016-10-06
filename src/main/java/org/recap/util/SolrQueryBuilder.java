@@ -138,16 +138,22 @@ public class SolrQueryBuilder {
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
         String fieldValue = searchRecordsRequest.getFieldValue().trim();
         StringBuilder stringBuilder = new StringBuilder();
-        if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && StringUtils.isNotBlank(fieldValue)) {
-            String[] fieldValues = fieldValue.split(" ");
-            if(fieldValues.length > 1) {
-                for(String value : fieldValues) {
-                    stringBuilder.append(searchRecordsRequest.getFieldName()).append(":").append("(").append("\"");
-                    stringBuilder.append(value).append("\"").append(")").append(and);
+        String fieldName = searchRecordsRequest.getFieldName();
+        if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
+            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
+                    || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
+                String[] fieldValues = fieldValue.split(" ");
+                if(fieldValues.length > 1) {
+                    for(String value : fieldValues) {
+                        stringBuilder.append(fieldName).append(":").append("(").append("\"");
+                        stringBuilder.append(value).append("\"").append(")").append(and);
+                    }
+                } else {
+                    stringBuilder.append(fieldName).append(":").append("(");
+                    stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
                 }
             } else {
-                stringBuilder.append(searchRecordsRequest.getFieldName()).append(":").append("(");
+                stringBuilder.append(fieldName).append(":").append("(");
                 stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
             }
             return stringBuilder.toString();
@@ -158,14 +164,20 @@ public class SolrQueryBuilder {
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
         String fieldValue = searchRecordsRequest.getFieldValue().trim();
-        if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(fieldValue)) {
-            String[] fieldValues = fieldValue.split(" ");
-            if(fieldValues.length > 1) {
-                for(String value : fieldValues) {
-                    stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(value);
+        String fieldName = searchRecordsRequest.getFieldName();
+        if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
+            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
+                    || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
+                String[] fieldValues = fieldValue.split(" ");
+                if(fieldValues.length > 1) {
+                    for(String value : fieldValues) {
+                        stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(value);
+                    }
+                } else {
+                    stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
                 }
             } else {
-                stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(fieldValue);
+                stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
             }
             return stringBuilder.toString();
         }
