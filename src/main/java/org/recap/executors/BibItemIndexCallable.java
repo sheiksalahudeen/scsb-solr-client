@@ -4,9 +4,8 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.solr.common.SolrInputDocument;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.solr.Bib;
-import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,15 +34,17 @@ public class BibItemIndexCallable implements Callable {
     private String solrURL;
     private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
     private SolrTemplate solrTemplate;
 
-    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
+    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+        this.holdingsDetailsRepository = holdingsDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
         this.producerTemplate = producerTemplate;
         this.solrTemplate = solrTemplate;
@@ -54,8 +54,8 @@ public class BibItemIndexCallable implements Callable {
     public Object call() throws Exception {
 
         Page<BibliographicEntity> bibliographicEntities = owningInstitutionId == null ?
-                bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
-                bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+                bibliographicDetailsRepository.findAllByIsDeletedFalse(new PageRequest(pageNum, docsPerPage)) :
+                bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
@@ -65,7 +65,7 @@ public class BibItemIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while (iterator.hasNext()) {
             BibliographicEntity bibliographicEntity = iterator.next();
-            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, solrTemplate));
+            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository));
             futures.add(submit);
         }
 

@@ -45,7 +45,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         Random random = new Random();
         int owningInstitutionId = 2;
 
-        Long count = itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        Long count = itemDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content".getBytes());
@@ -98,7 +98,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedItemEntity);
         assertNotNull(savedItemEntity.getItemId());
 
-        Long countAfterAdd = itemDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        Long countAfterAdd = itemDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
         assertTrue(countAfterAdd > count);
 
         List<ItemEntity> byOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionId(owningInstitutionId);
@@ -108,7 +108,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         ItemEntity byOwningInstitutionItemId = itemDetailsRepository.findByOwningInstitutionItemId(owningInstitutionItemId);
         assertNotNull(byOwningInstitutionItemId);
 
-        Page<ItemEntity> pageByOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 10), owningInstitutionId);
+        Page<ItemEntity> pageByOwningInstitutionId = itemDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(0, 10), owningInstitutionId);
         assertNotNull(pageByOwningInstitutionId);
         assertTrue(countAfterAdd == pageByOwningInstitutionId.getTotalElements());
 

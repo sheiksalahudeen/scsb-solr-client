@@ -6,9 +6,6 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.BibliographicPK;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.HoldingsDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,7 +49,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         String owningInstitutionBibId = String.valueOf(random.nextInt());
         int owningInstitutionId = 1;
 
-        Page<BibliographicEntity> byOwningInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(0, 10), owningInstitutionId);
+        Page<BibliographicEntity> byOwningInstitutionId = bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(0, 10), owningInstitutionId);
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("Mock Bib Content".getBytes());
@@ -96,14 +93,14 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getBibliographicId());
 
-        Long countByOwningInstitutionIdAfterAdd = bibliographicDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        Long countByOwningInstitutionIdAfterAdd = bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
         assertTrue(countByOwningInstitutionIdAfterAdd > byOwningInstitutionId.getTotalElements());
 
         List<BibliographicEntity> byOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionBibId(owningInstitutionBibId);
         assertNotNull(byOwningInstitutionBibId);
         assertTrue(byOwningInstitutionBibId.size() > 0);
 
-        BibliographicEntity byOwningInstitutionIdAndOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(owningInstitutionId, owningInstitutionBibId);
+        BibliographicEntity byOwningInstitutionIdAndOwningInstitutionBibId = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(owningInstitutionId, owningInstitutionBibId);
         assertNotNull(byOwningInstitutionIdAndOwningInstitutionBibId);
 
         BibliographicPK bibliographicPK = new BibliographicPK();
@@ -131,7 +128,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
 
     @Test
     public void countByOwningInstitutionCode() throws Exception {
-        Long bibCount = bibliographicDetailsRepository.countByOwningInstitutionCode("PUL");
+        Long bibCount = bibliographicDetailsRepository.countByOwningInstitutionCodeAndIsDeletedFalse("PUL");
         assertNotNull(bibCount);
     }
 

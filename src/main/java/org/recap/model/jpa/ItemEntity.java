@@ -65,6 +65,9 @@ public class ItemEntity implements Serializable {
     @Column(name = "OWNING_INST_ITEM_ID")
     private String owningInstitutionItemId;
 
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+
     @ManyToMany(mappedBy = "itemEntities")
     private List<HoldingsEntity> holdingsEntities;
 
@@ -213,6 +216,14 @@ public class ItemEntity implements Serializable {
 
     public void setOwningInstitutionItemId(String owningInstitutionItemId) {
         this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public List<HoldingsEntity> getHoldingsEntities() {

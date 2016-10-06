@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +19,19 @@ public class BibIndexExecutorService extends IndexExecutorService {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
     ProducerTemplate producerTemplate;
 
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
-        return new BibIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, owningInstitutionId, producerTemplate);
+        return new BibIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, owningInstitutionId, producerTemplate);
     }
 
     @Override
     protected Integer getTotalDocCount(Integer owningInstitutionId) {
-        Long count = owningInstitutionId == null ? bibliographicDetailsRepository.count() : bibliographicDetailsRepository.countByOwningInstitutionId(owningInstitutionId);
+        Long count = owningInstitutionId == null ? bibliographicDetailsRepository.countByIsDeletedFalse() : bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
         return count.intValue();
     }
 

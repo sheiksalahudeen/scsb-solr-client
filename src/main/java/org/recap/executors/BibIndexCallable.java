@@ -5,6 +5,7 @@ import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,14 +35,16 @@ public class BibIndexCallable implements Callable {
     private String solrURL;
     private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
 
-    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
+    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
+        this.holdingsDetailsRepository = holdingsDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
         this.producerTemplate = producerTemplate;
     }
@@ -50,8 +53,8 @@ public class BibIndexCallable implements Callable {
     public Object call() throws Exception {
 
         Page<BibliographicEntity> bibliographicEntities = owningInstitutionId == null ?
-                bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
-                bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+                bibliographicDetailsRepository.findAllByIsDeletedFalse(new PageRequest(pageNum, docsPerPage)) :
+                bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         List<Bib> bibsToIndex = new ArrayList<>();
@@ -62,7 +65,7 @@ public class BibIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while(iterator.hasNext()){
             BibliographicEntity bibliographicEntity = iterator.next();
-            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity));
+            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository));
             futures.add(submit);
         }
 

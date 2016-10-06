@@ -12,6 +12,8 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -105,16 +107,17 @@ public class BibJSONUtil extends MarcUtil {
         return issnNumbers;
     }
 
-    public SolrInputDocument generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, SolrTemplate solrTemplate) {
+    public SolrInputDocument generateBibAndItemsForIndex(BibliographicEntity bibliographicEntity, SolrTemplate solrTemplate,
+                                                         BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository) {
 
         Bib bib = generateBib(bibliographicEntity);
         SolrInputDocument bibSolrInputDocument = generateBibSolrInputDocument(bib, solrTemplate);
 
-        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        List<HoldingsEntity> holdingsEntities = bibliographicDetailsRepository.getNonDeletedHoldingsEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         List<SolrInputDocument> holdingsSolrInputDocuments = new ArrayList<>();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             Holdings holdings = new HoldingsJSONUtil().generateHoldingsForIndex(holdingsEntity);
-            List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
+            List<ItemEntity> itemEntities = holdingsDetailsRepository.getNonDeletedItemEntities(holdingsEntity.getOwningInstitutionId(), holdingsEntity.getOwningInstitutionHoldingsId());
             List<SolrInputDocument> itemSolrInputDocuments = new ArrayList<>();
             ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
             for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
@@ -145,17 +148,18 @@ public class BibJSONUtil extends MarcUtil {
         return solrTemplate.convertBeanToSolrInputDocument(bib);
     }
 
-    public Bib generateBibForIndex(BibliographicEntity bibliographicEntity) {
+    public Bib generateBibForIndex(BibliographicEntity bibliographicEntity, BibliographicDetailsRepository bibliographicDetailsRepository,
+                                   HoldingsDetailsRepository holdingsDetailsRepository) {
         Bib bib = generateBib(bibliographicEntity);
 
         List<Integer> holdingsIds = new ArrayList<>();
         List<Integer> itemIds = new ArrayList<>();
 
-        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+        List<ItemEntity> itemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         for (ItemEntity itemEntity : itemEntities) {
             itemIds.add(itemEntity.getItemId());
         }
-        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
+        List<HoldingsEntity> holdingsEntities = bibliographicDetailsRepository.getNonDeletedHoldingsEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             holdingsIds.add(holdingsEntity.getHoldingsId());
         }

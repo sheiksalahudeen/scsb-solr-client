@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
@@ -43,6 +45,12 @@ public class SolrUnicodeAT extends BaseTestCase {
     SolrTemplate solrTemplate;
 
     @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
     BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
@@ -71,14 +79,14 @@ public class SolrUnicodeAT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 
         String fetchedBibContent = new String(fetchedBibliographicEntity.getContent());
         assertEquals(sourceBibContent, fetchedBibContent);
 
-        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
 
         //bibSolrCrudRepository = new BibCrudRepositoryMultiCoreSupport("recap", solrUrl);

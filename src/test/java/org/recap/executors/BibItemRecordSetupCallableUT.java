@@ -4,12 +4,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import java.util.ArrayList;
@@ -23,7 +27,13 @@ import static junit.framework.TestCase.assertNotNull;
 /**
  * Created by premkb on 1/8/16.
  */
-public class BibItemRecordSetupCallableUT {
+public class BibItemRecordSetupCallableUT extends BaseTestCase {
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Mock
     SolrTemplate mockSolrTemplate;
@@ -183,7 +193,7 @@ public class BibItemRecordSetupCallableUT {
 
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
 
-        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate);
+        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         Map<String, List> bibItem = ( Map<String, List>)bibItemRecordSetupCallable.call();
         assertNotNull(bibItem);
         List<Bib> bib = (List<Bib>)bibItem.get("Bib");

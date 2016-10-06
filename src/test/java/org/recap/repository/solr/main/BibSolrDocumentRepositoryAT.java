@@ -14,10 +14,11 @@ import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.RequestMethod;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
@@ -55,6 +56,12 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
     @Autowired
     SolrTemplate solrTemplate;
 
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
     @Test
     public void search() throws Exception {
         Random random = new Random();
@@ -75,11 +82,11 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertNotNull(fetchedBibliographicEntity.getContent());
 
-        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
         assertNotNull(solrInputDocument);
 
         solrTemplate.saveDocument(solrInputDocument);
@@ -141,11 +148,11 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
 
-        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
 
         solrTemplate.saveDocument(solrInputDocument);
@@ -185,12 +192,12 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
 
-        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(1, owningInstitutionBibId);
+        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
         assertNotNull(fetchedBibliographicEntity);
         assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(fetchedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
 
         solrTemplate.saveDocument(solrInputDocument);

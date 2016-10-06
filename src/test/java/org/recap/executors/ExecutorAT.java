@@ -12,6 +12,8 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +63,12 @@ public class ExecutorAT extends BaseTestCase {
 
     @Autowired
     SolrTemplate solrTemplate;
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
 
     private int numThreads = 5;
     private int docsPerThread = 10000;
@@ -192,7 +200,7 @@ public class ExecutorAT extends BaseTestCase {
         solrAdmin.createSolrCores(coreNames);
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         List<Future> futures = new ArrayList<>();
-        Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity));
+        Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository));
         futures.add(submit);
         List<Bib> bibsToIndex = new ArrayList<>();
 
