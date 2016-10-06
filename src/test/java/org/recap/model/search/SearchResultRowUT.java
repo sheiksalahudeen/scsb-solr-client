@@ -38,7 +38,6 @@ public class SearchResultRowUT {
         bibItem.setNotes("Notes");
         bibItem.setOwningInstitution("PUL");
         bibItem.setOwningInstitutionBibId("1");
-        bibItem.setSummaryHoldings("Summary holding");
 
         List<Item> items = new ArrayList<>();
         Item item = new Item();
@@ -89,7 +88,6 @@ public class SearchResultRowUT {
                     searchResultRow.setUseRestriction(item.getUseRestriction());
                     searchResultRow.setBarcode(item.getBarcode());
                     searchResultRow.setAvailability(item.getAvailability());
-                    searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
@@ -104,7 +102,6 @@ public class SearchResultRowUT {
                             searchItemResultRow.setAvailability(item.getAvailability());
                             searchItemResultRows.add(searchItemResultRow);
                         }
-                        searchResultRow.setSummaryHoldings(bibItem.getSummaryHoldings());
                         searchResultRow.setShowItems(true);
                         searchResultRow.setSearchItemResultRows(searchItemResultRows);
                     }

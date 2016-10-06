@@ -34,7 +34,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by rajeshbabuk on 14/7/16.
@@ -106,15 +107,6 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
     public File getUnicodeContentFile() throws URISyntaxException {
         URL resource = getClass().getResource("BibContent.xml");
         return new File(resource.toURI());
-    }
-
-    @Test
-    public void buildCriteriaForTitleStartsWithField() throws Exception {
-        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setFieldName(RecapConstants.TITLE_STARTS_WITH);
-        searchRecordsRequest.setFieldValue("Semiznachnye tabli︠t︡sy");
-        Criteria criteria = bibSolrDocumentRepositoryImpl.getCriteriaForFieldName(searchRecordsRequest);
-        assertNotNull(criteria);
     }
 
     @Test
@@ -291,12 +283,12 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         }
     }
 
-    @Test
+    /*@Test
     public void testGetModifiedText() throws Exception {
         String searchText = "Test-Title.";
-        String modifiedText = bibSolrDocumentRepositoryImpl.getModifiedText(searchText);
+        String modifiedText = solrQueryBuilder.getModifiedText(searchText);
         assertEquals(modifiedText, "Test\\-Title\\.");
-    }
+    }*/
 
     @Test
     public void searchBoundWithDocuments() throws Exception {
@@ -409,15 +401,6 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         map.put("Bibs", Arrays.asList(bib1, bib2));
         map.put("Items", Arrays.asList(item1));
         return map;
-    }
-
-    @Test
-    public void buildCriteriaForTitleTwoWords() throws Exception {
-        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setFieldName("Title_search");
-        searchRecordsRequest.setFieldValue("Population Census");
-        Criteria criteria = bibSolrDocumentRepositoryImpl.getCriteriaForFieldName(searchRecordsRequest);
-        assertNotNull(criteria);
     }
 
     @Test

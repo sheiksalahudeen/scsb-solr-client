@@ -89,10 +89,10 @@ public class BibItem {
     private String root;
 
     @Ignore
-    private String summaryHoldings;
+    private List<Item> items = new ArrayList<>();
 
     @Ignore
-    private List<Item> items = new ArrayList<>();
+    private List<Holdings> holdingsList = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -287,19 +287,14 @@ public class BibItem {
     }
 
     public List<Item> getItems() {
+        if(items == null) {
+            items = new ArrayList<>();
+        }
         return items;
     }
 
     public void setItems(List<Item> items) {
         this.items = items;
-    }
-
-    public String getSummaryHoldings() {
-        return summaryHoldings;
-    }
-
-    public void setSummaryHoldings(String summaryHoldings) {
-        this.summaryHoldings = summaryHoldings;
     }
 
     public String getRoot() {
@@ -310,7 +305,22 @@ public class BibItem {
         this.root = root;
     }
 
+    public List<Holdings> getHoldingsList() {
+        if(holdingsList == null) {
+            holdingsList = new ArrayList<>();
+        }
+        return holdingsList;
+    }
+
+    public void setHoldingsList(List<Holdings> holdingsList) {
+        this.holdingsList = holdingsList;
+    }
+
     public void addItem(Item item) {
         getItems().add(item);
+    }
+
+    public void addHoldings(Holdings holdings) {
+        getHoldingsList().add(holdings);
     }
 }

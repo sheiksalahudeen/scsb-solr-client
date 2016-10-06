@@ -1,5 +1,6 @@
 package org.recap.model.solr;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 
@@ -23,6 +24,9 @@ public class Holdings {
 
     @Field("HoldingsOwningInstitution")
     private String owningInstitution;
+
+    @Ignore
+    private String root;
 
     public String getId() {
         return id;
@@ -62,5 +66,13 @@ public class Holdings {
 
     public void setOwningInstitution(String owningInstitution) {
         this.owningInstitution = owningInstitution;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public void setRoot(String root) {
+        this.root = root;
     }
 }
