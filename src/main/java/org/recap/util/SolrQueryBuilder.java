@@ -136,17 +136,37 @@ public class SolrQueryBuilder {
      * @throws Exception
      */
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
+        String fieldValue = searchRecordsRequest.getFieldValue().trim();
+        StringBuilder stringBuilder = new StringBuilder();
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            return searchRecordsRequest.getFieldName() + ":" + "(" + "\"" +searchRecordsRequest.getFieldValue() + "\"" + ")" + and;
+                && StringUtils.isNotBlank(fieldValue)) {
+            String[] fieldValues = fieldValue.split(" ");
+            if(fieldValues.length > 1) {
+                for(String value : fieldValues) {
+                    stringBuilder.append(searchRecordsRequest.getFieldName()).append(":").append("(").append("\"");
+                    stringBuilder.append(value).append("\"").append(")").append(and);
+                }
+            } else {
+                stringBuilder.append(searchRecordsRequest.getFieldName()).append(":").append("(");
+                stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+            }
+            return stringBuilder.toString();
         }
         return "";
     }
 
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(searchRecordsRequest.getFieldValue())) {
-            stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(searchRecordsRequest.getFieldValue());
+        String fieldValue = searchRecordsRequest.getFieldValue().trim();
+        if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName()) && StringUtils.isNotBlank(fieldValue)) {
+            String[] fieldValues = fieldValue.split(" ");
+            if(fieldValues.length > 1) {
+                for(String value : fieldValues) {
+                    stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(value);
+                }
+            } else {
+                stringBuilder.append(and).append(parentQuery).append(searchRecordsRequest.getFieldName()).append(":").append(fieldValue);
+            }
             return stringBuilder.toString();
         }
         return "";
