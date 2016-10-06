@@ -43,7 +43,7 @@ public class SearchResultRowUT {
         Item item = new Item();
         item.setItemId(1);
         item.setBarcode("BC234");
-        item.setCallNumber("123");
+        item.setCallNumberSearch("123");
         item.setVolumePartYear("V1");
         item.setCustomerCode("NA");
         item.setAvailability("Available");
@@ -93,7 +93,7 @@ public class SearchResultRowUT {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
                         for (Item item : bibItem.getItems()) {
                             SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
-                            searchItemResultRow.setCallNumber(item.getCallNumber());
+                            searchItemResultRow.setCallNumber(item.getCallNumberSearch());
                             searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                             searchItemResultRow.setCustomerCode(item.getCustomerCode());
                             searchItemResultRow.setBarcode(item.getBarcode());

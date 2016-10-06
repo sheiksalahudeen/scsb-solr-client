@@ -107,86 +107,6 @@ public class BibAT extends BaseTestCase {
         assertEquals(indexedBib.getLccn(),"71448228");
     }
 
-//    @Test
-//    public void saveBibAndIndex() throws Exception {
-//        Random random = new Random();
-//        File bibContentFile = getUnicodeContentFile();
-//        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
-//
-//        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-//        bibliographicEntity.setContent(sourceBibContent.getBytes());
-//        bibliographicEntity.setOwningInstitutionId(1);
-//        String owningInstitutionBibId = String.valueOf(random.nextInt());
-//        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
-//        bibliographicEntity.setCreatedDate(new Date());
-//        bibliographicEntity.setCreatedBy("tst");
-//        bibliographicEntity.setLastUpdatedDate(new Date());
-//        bibliographicEntity.setLastUpdatedBy("tst");
-//
-//        HoldingsEntity holdingsEntity = new HoldingsEntity();
-//        holdingsEntity.setContent("mock holdings".getBytes());
-//        holdingsEntity.setCreatedDate(new Date());
-//        holdingsEntity.setCreatedBy("etl");
-//        holdingsEntity.setLastUpdatedDate(new Date());
-//        holdingsEntity.setLastUpdatedBy("etl");
-//        holdingsEntity.setOwningInstitutionId(1);
-//        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
-//
-//        ItemEntity itemEntity = new ItemEntity();
-//        itemEntity.setLastUpdatedDate(new Date());
-//        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
-//        itemEntity.setOwningInstitutionId(1);
-//        itemEntity.setCreatedDate(new Date());
-//        itemEntity.setCreatedBy("etl");
-//        itemEntity.setLastUpdatedDate(new Date());
-//        itemEntity.setLastUpdatedBy("etl");
-//        String barcode = "123";
-//        itemEntity.setBarcode(barcode);
-//        itemEntity.setCallNumber("x.12321");
-//        itemEntity.setCollectionGroupId(1);
-//        itemEntity.setCallNumberType("1");
-//        itemEntity.setCustomerCode("1");
-//        itemEntity.setItemAvailabilityStatusId(1);
-//        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-//        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
-//
-//        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-//        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-//
-//        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-//        entityManager.refresh(savedBibliographicEntity);
-//        assertNotNull(savedBibliographicEntity);
-//
-//        BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(1, owningInstitutionBibId);
-//        assertNotNull(fetchedBibliographicEntity);
-//        assertEquals(owningInstitutionBibId, fetchedBibliographicEntity.getOwningInstitutionBibId());
-//
-//        new BibJSONUtil().generateBibAndItemsForIndex(fetchedBibliographicEntity);
-//        List<Bib> bibs = stringListMap.get("Bib");
-//        assertNotNull(bibs);
-//        assertTrue(bibs.size() == 1);
-//
-//        List<Item> items = stringListMap.get("Item");
-//        assertNotNull(items);
-//        assertTrue(items.size() == 1);
-//
-//        this.bibSolrCrudRepository.save(bibs);
-//        itemCrudRepository.save(items);
-//        solrTemplate.softCommit();
-//
-//        Integer bibId = bibs.get(0).getBibId();
-//        Bib bib = this.bibSolrCrudRepository.findByBibId(bibId);
-//        assertNotNull(bib);
-//        assertEquals(owningInstitutionBibId, bib.getOwningInstitutionBibId());
-//
-//        Integer itemId = bib.getBibItemIdList().get(0);
-//        Item item = itemCrudRepository.findByItemId(itemId);
-//        assertNotNull(item);
-//        assertEquals(barcode, item.getBarcode());
-//        assertNotNull(item.getUseRestriction());
-//        solrTemplate.rollback();
-//    }
-
     @Test
     public void testTitleStartsWith()throws Exception{
 
@@ -348,7 +268,7 @@ public class BibAT extends BaseTestCase {
         item1.setBarcode("1201");
         item1.setAvailability("Available");
         item1.setCollectionGroupDesignation("Shared");
-        item1.setCallNumber("H3");
+        item1.setCallNumberSearch("H3");
         item1.setCustomerCode("Test Cust Code");
         item1.setUseRestriction("In Library Use");
         item1.setVolumePartYear("V.1 1982");
@@ -361,7 +281,7 @@ public class BibAT extends BaseTestCase {
         item2.setBarcode("1201");
         item2.setAvailability("Available");
         item2.setCollectionGroupDesignation("Shared");
-        item2.setCallNumber("H3");
+        item2.setCallNumberSearch("H3");
         item2.setCustomerCode("Test Cust Code");
         item2.setUseRestriction("In Library Use");
         item2.setVolumePartYear("V.1 1982");

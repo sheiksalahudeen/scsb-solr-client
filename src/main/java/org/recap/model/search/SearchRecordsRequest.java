@@ -20,6 +20,7 @@ public class SearchRecordsRequest {
     private Integer totalPageCount = 0;
     private String totalBibRecordsCount = "0";
     private String totalItemRecordsCount = "0";
+    private String totalRecordsCount = "0";
     private Integer pageNumber = 0;
     private Integer pageSize = 10;
 
@@ -181,6 +182,14 @@ public class SearchRecordsRequest {
         this.totalItemRecordsCount = totalItemRecordsCount;
     }
 
+    public String getTotalRecordsCount() {
+        return totalRecordsCount;
+    }
+
+    public void setTotalRecordsCount(String totalRecordsCount) {
+        this.totalRecordsCount = totalRecordsCount;
+    }
+
     public boolean isShowResults() {
         return showResults;
     }
@@ -228,5 +237,6 @@ public class SearchRecordsRequest {
     public void reset() {
         this.totalBibRecordsCount = String.valueOf(0);
         this.totalItemRecordsCount = String.valueOf(0);
+        this.totalRecordsCount = String.valueOf(0);
     }
 }

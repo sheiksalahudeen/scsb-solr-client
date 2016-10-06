@@ -1,7 +1,6 @@
 package org.recap.model.solr;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
@@ -33,7 +32,7 @@ public class ItemAT extends  BaseTestCase {
         item.setItemId(301);
         item.setDocType("Item");
         item.setAvailability("Available");
-        item.setCallNumber("F864");
+        item.setCallNumberSearch("F864");
         item.setCustomerCode("PA");
         item.setCollectionGroupDesignation("Shared");
         item.setUseRestriction("Use Restriction");
@@ -48,7 +47,7 @@ public class ItemAT extends  BaseTestCase {
         assertEquals(indexedItem.getItemId(),new Integer(301));
         assertEquals(indexedItem.getDocType(),"Item");
         assertEquals(indexedItem.getAvailability(),"Available");
-        assertEquals(indexedItem.getCallNumber(),"F864");
+        assertEquals(indexedItem.getCallNumberSearch(),"F864");
         assertEquals(indexedItem.getCustomerCode(),"PA");
         assertEquals(indexedItem.getCollectionGroupDesignation(),"Shared");
         assertEquals(indexedItem.getUseRestriction(),"Use Restriction");

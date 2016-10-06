@@ -381,7 +381,7 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         item1.setBarcode(String.valueOf(barcode));
         item1.setAvailability("Available");
         item1.setCollectionGroupDesignation("Shared");
-        item1.setCallNumber("H3");
+        item1.setCallNumberSearch("H3");
         item1.setCustomerCode("Test Cust Code");
         item1.setUseRestriction("In Library Use");
         item1.setVolumePartYear("V.1 1982");

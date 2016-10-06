@@ -6,14 +6,14 @@ import org.recap.model.solr.Item;
 /**
  * Created by peris on 9/29/16.
  */
-public class CallNumberValueResolver implements ItemValueResolver {
+public class CallNumberDisplayValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("CallNumber");
+        return field.equals("CallNumber_display");
     }
 
     @Override
     public void setValue(Item item, Object value) {
-        item.setCallNumber((String)value);
+        item.setCallNumberDisplay((String)value);
     }
 }

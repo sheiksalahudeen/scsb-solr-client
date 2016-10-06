@@ -58,7 +58,7 @@
                                         <option value="ISSN">ISSN</option>
                                         <option value="OCLCNumber">OCLC Number</option>
                                         <option value="Notes">Notes</option>
-                                        <option value="CallNumber">Call Number</option>
+                                        <option value="CallNumber_search">Call Number</option>
                                         <option value="Barcode">Barcode</option>
                                     </select>
                                 </td>
@@ -188,8 +188,9 @@
                                 </select>
                             </div>
                             <div class="pull-right">
-                                <span align="right" class="pull-right" style="margin-top: -20px; font-weight: bold">Bibliographic Results Found: <span th:text="*{totalBibRecordsCount}"></span></span>
-                                <span align="right" class="pull-right" style="margin-top: 0px; font-weight: bold">Item Results Found: <span th:text="*{totalItemRecordsCount}"></span></span>
+                                <span align="right" class="pull-right" style="margin-top: -20px; font-weight: bold" data-th-if="*{fieldName ne null &amp;&amp; fieldName ne '' }">Bibliographic Results Found: <span th:text="*{totalBibRecordsCount}"></span></span>
+                                <span align="right" class="pull-right" style="margin-top: 0px; font-weight: bold" data-th-if="*{fieldName ne null &amp;&amp; fieldName ne '' }">Item Results Found: <span th:text="*{totalItemRecordsCount}"></span></span>
+                                <span align="right" class="pull-right" style="margin-top: 0px; font-weight: bold" data-th-if="*{fieldName eq null || fieldName eq '' }">Total Results Found: <span th:text="*{totalRecordsCount}"></span></span>
                             </div>
                         </div>
                         <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
@@ -308,8 +309,8 @@
                                                        onclick="enableExportSelectedRecordButton()"/>
                                             </td>
                                             <td data-th-id="'searchItemResultsDataCN-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
-                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].callNumber}"/>
-                                                <span data-th-id="'searchItemResultsDataCNS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumber}"></span>
+                                                <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].callNumberSearch}"/>
+                                                <span data-th-id="'searchItemResultsDataCNS-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}" th:text="${searchItemResult.callNumberSearch}"></span>
                                             </td>
                                             <td data-th-id="'searchItemResultsDataChnEnum-' + ${searchResultStat.index} + '-' + ${searchItemResultStat.index}">
                                                 <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].searchItemResultRows[__${searchItemResultStat.index}__].chronologyAndEnum}"/>
