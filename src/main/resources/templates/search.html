@@ -154,7 +154,7 @@
                                     </button>
                                 </td>
                             </tr>
-                            <tr th:if="*{errorMessage ne null}">
+                            <tr th:if="*{errorMessage ne null &amp;&amp; errorMessage ne ''}">
                                 <td colspan="2">
                                     <br/>
                                 </td>

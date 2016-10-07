@@ -139,6 +139,13 @@ public class RecapConstants {
 
     //Error Message
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";
+    public static final String SERVER_ERROR_MSG = "Server is down for Maintenance Please Try again Later.";
+    public static final String EMPTY_FACET_ERROR_MSG = "At least one Bib Facet Box and one Item Facet Box needs to be checked to get results.";
+
+    //Search Response Types
+    public static final String SEARCH_SUCCESS_RESPONSE = "SuccessResponse";
+    public static final String SEARCH_ERROR_RESPONSE = "ErrorResponse";
+
 
     public static final String SOLR_CORE = "solrCore";
     public static final String SOLR_QUEUE = "seda:solrQ";

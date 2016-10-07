@@ -248,5 +248,6 @@ public class SearchRecordsRequest {
         this.totalItemRecordsCount = String.valueOf(0);
         this.totalRecordsCount = String.valueOf(0);
         this.showTotalCount = false;
+        this.errorMessage = null;
     }
 }
