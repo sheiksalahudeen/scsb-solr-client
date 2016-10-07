@@ -27,6 +27,7 @@ public class SearchRecordsRequest {
     private boolean showResults = false;
     private boolean selectAll = false;
     private boolean selectAllFacets = false;
+    private boolean showTotalCount = false;
 
     private Integer index;
     private String errorMessage;
@@ -214,6 +215,14 @@ public class SearchRecordsRequest {
         this.selectAll = selectAll;
     }
 
+    public boolean isShowTotalCount() {
+        return showTotalCount;
+    }
+
+    public void setShowTotalCount(boolean showTotalCount) {
+        this.showTotalCount = showTotalCount;
+    }
+
     public Integer getIndex() {
         return index;
     }
@@ -238,5 +247,6 @@ public class SearchRecordsRequest {
         this.totalBibRecordsCount = String.valueOf(0);
         this.totalItemRecordsCount = String.valueOf(0);
         this.totalRecordsCount = String.valueOf(0);
+        this.showTotalCount = false;
     }
 }
