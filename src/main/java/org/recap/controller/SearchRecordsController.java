@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
@@ -70,7 +70,7 @@ public class SearchRecordsController {
             buildResults(searchRecordsRequest, bibItems);
             return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
         }
-        searchRecordsRequest.setErrorMessage("At least one Search Facet Box needs to be checked to get results.");
+        searchRecordsRequest.setErrorMessage("At least one Bib Facet Box and one Item Facet Box needs to be checked to get results.");
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -239,6 +239,10 @@ public class SearchRecordsController {
         boolean emptySearch = false;
         if (searchRecordsRequest.getMaterialTypes().size() == 0 && searchRecordsRequest.getAvailability().size() == 0 &&
                 searchRecordsRequest.getCollectionGroupDesignations().size() == 0 && searchRecordsRequest.getOwningInstitutions().size() == 0 && searchRecordsRequest.getUseRestrictions().size() == 0) {
+            emptySearch = true;
+        } else if(!((CollectionUtils.isNotEmpty(searchRecordsRequest.getMaterialTypes()) || CollectionUtils.isNotEmpty(searchRecordsRequest.getOwningInstitutions())) &&
+                (CollectionUtils.isNotEmpty(searchRecordsRequest.getAvailability()) || CollectionUtils.isNotEmpty(searchRecordsRequest.getCollectionGroupDesignations())
+                        || CollectionUtils.isNotEmpty(searchRecordsRequest.getUseRestrictions())))) {
             emptySearch = true;
         }
         return emptySearch;
