@@ -53,8 +53,9 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     List<HoldingsValueResolver> holdingsValueResolvers;
 
     @Override
-    public List<BibItem> search(SearchRecordsRequest searchRecordsRequest) {
+    public Map<String,Object> search(SearchRecordsRequest searchRecordsRequest) {
         List<BibItem> bibItems = new ArrayList<>();
+        Map<String, Object> response = new HashMap<>();
         try {
             if (isEmptyField(searchRecordsRequest)) {
                 searchRecordsRequest.setShowTotalCount(true);
@@ -69,13 +70,15 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             } else {
                 bibItems = searchByBib(searchRecordsRequest);
             }
+            response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
         } catch (SolrServerException e) {
             log.error(e.getMessage());
+            response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         } catch (IOException e) {
             log.error(e.getMessage());
+            response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         }
-
-        return bibItems;
+        return response;
     }
 
     private boolean isEmptyField(SearchRecordsRequest searchRecordsRequest) {
