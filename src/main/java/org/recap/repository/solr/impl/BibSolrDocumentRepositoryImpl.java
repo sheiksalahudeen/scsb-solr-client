@@ -89,6 +89,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         List<BibItem> bibItems = new ArrayList<>();
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
         queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+        queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
         queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
         SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
@@ -108,6 +109,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
         SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
         queryForParentAndChildCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+        queryForParentAndChildCriteria.setRows(searchRecordsRequest.getPageSize());
         queryForParentAndChildCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForParentAndChildCriteria);
         SolrDocumentList bibSolrDocumentList = queryResponse.getResults();
