@@ -57,6 +57,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         List<BibItem> bibItems = new ArrayList<>();
         try {
             if (isEmptyField(searchRecordsRequest)) {
+                searchRecordsRequest.setShowTotalCount(true);
                 searchRecordsRequest.setFieldName(RecapConstants.ALL_FIELDS);
                 bibItems = searchByBib(searchRecordsRequest);
                 if(CollectionUtils.isEmpty(bibItems)) {

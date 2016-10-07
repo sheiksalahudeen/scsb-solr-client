@@ -153,6 +153,9 @@ public class SolrQueryBuilder {
                     stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
                 }
             } else {
+                if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)){
+                    fieldValue = fieldValue.replaceAll(" ", "");
+                }
                 stringBuilder.append(fieldName).append(":").append("(");
                 stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
             }
@@ -177,6 +180,9 @@ public class SolrQueryBuilder {
                     stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
                 }
             } else {
+                if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)) {
+                    fieldValue = fieldValue.replaceAll(" ", "");
+                }
                 stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
             }
             return stringBuilder.toString();
