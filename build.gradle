@@ -85,7 +85,7 @@ dependencies {
 	compile('org.apache.solr:solr-solrj:6.0.1')
 	compile('info.freelibrary:freelib-marc4j:2.6.11')
 	compile(group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0')
-
+	compile('org.springframework.boot:spring-boot-starter-data-rest:1.2.5.RELEASE')
 
 	runtime('mysql:mysql-connector-java')
 
