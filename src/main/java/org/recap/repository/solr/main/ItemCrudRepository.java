@@ -1,6 +1,8 @@
 package org.recap.repository.solr.main;
 
 import org.recap.model.solr.Item;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 /**
  * Created by angelind on 15/6/16.
  */
+@RepositoryRestResource(collectionResourceRel = "itemSolr", path = "itemSolr")
 public interface ItemCrudRepository extends SolrCrudRepository<Item, String> {
 
     Item findByBarcode(String barcode);
@@ -18,7 +21,7 @@ public interface ItemCrudRepository extends SolrCrudRepository<Item, String> {
 
     Long countByItemId(Integer itemId);
 
-    void deleteByItemId(Integer itemId);
+    int deleteByItemId(@Param("itemId") Integer itemId);
 
-    void deleteByItemIdIn(List<Integer> itemIds);
+    int deleteByItemIdIn(@Param("itemIds") List<Integer> itemIds);
 }
