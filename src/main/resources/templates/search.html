@@ -78,14 +78,14 @@
                     <div class="pull-right" style="margin-top: -25px;">
                         <span id="moreFacetsText">Click for more facets</span>
                         <span id="hideFacetsText">Click to hide facets</span>
-                        <input id="showFacets" name="showFacets" type="hidden" th:value="true"/>
+                        <input id="showFacets" name="showFacets" type="hidden" th:value="false"/>
                         <a class="btn" th:onclick="'javascript:toggleFacets()'">
                             <i id="showFacetsIcon" name="showFacetsIcon" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 20px;"></i>
                         </a>
                     </div>
 
                     <table id="searchRecordsFacetTableId" name="searchRecordsFacetTableName"
-                           class="table tableWithoutBorder">
+                           class="table tableWithoutBorder" style="display: table; width: 1155px;">
                         <tbody>
                         <tr>
                             <td colspan="2" align="left">
@@ -129,7 +129,7 @@
                                 </ul>
                             </td>
                             <td class="itemFacet">
-                                <h4 class="rotate" style="margin-top: 25px;">Item Facets</h4>
+                                <h4 class="rotate" style="margin-top: 30px;">Item Facets</h4>
                             </td>
                             <td colspan="2" class="itemFacet">
                                 <label>Collection Group</label>
