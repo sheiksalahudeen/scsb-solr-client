@@ -14,3 +14,25 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 table.tableWithoutBorder tbody tr td{
     border-top: 0;
 }
+
+.rotate {
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+    /* IE */
+    -ms-transform: rotate(-90deg);
+    /* Opera */
+    -o-transform: rotate(-90deg);
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}
+
+.bibFacet {
+    background-color: lightgrey;
+}
+
+.itemFacet {
+    background-color: lightblue;
+}
