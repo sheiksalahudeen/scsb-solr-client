@@ -16,6 +16,8 @@ jQuery(document).ready(function ($) {
             $("#clearSearchText").hide();
         }
     });
+
+    toggleFacets();
 });
 
 function clearSearchText() {
@@ -126,6 +128,27 @@ function selectOrDeselectFacets() {
         $('#noRestriction').prop('checked', false);
         $('#inLibraryUse').prop('checked', false);
         $('#supervisedUse').prop('checked', false);
+    }
+}
+
+function toggleFacets() {
+    var showFacets = $('#showFacets').val();
+    if (showFacets == "false") {
+        $('#showFacets').val("true");
+        $('#showFacetsIcon').removeClass("fa-plus-circle");
+        $('#showFacetsIcon').addClass("fa-minus-circle");
+        $('#showFacetsIcon').css("color", "red");
+        $("#searchRecordsFacetTableId").show();
+        $("#moreFacetsText").hide();
+        $("#hideFacetsText").show();
+    } else {
+        $('#showFacets').val("false");
+        $('#showFacetsIcon').removeClass("fa-minus-circle");
+        $('#showFacetsIcon').addClass("fa-plus-circle");
+        $('#showFacetsIcon').css("color", "green");
+        $("#searchRecordsFacetTableId").hide();
+        $("#moreFacetsText").show();
+        $("#hideFacetsText").hide();
     }
 }
 
