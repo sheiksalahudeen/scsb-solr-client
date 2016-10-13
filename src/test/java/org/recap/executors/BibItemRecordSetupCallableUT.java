@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,6 +39,8 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
     @Mock
     SolrTemplate mockSolrTemplate;
 
+    @Autowired
+    ProducerTemplate producerTemplate;
 
     private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
             "                <record>\n"+
@@ -193,7 +196,7 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
 
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
 
-        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate);
         Map<String, List> bibItem = ( Map<String, List>)bibItemRecordSetupCallable.call();
         assertNotNull(bibItem);
         List<Bib> bib = (List<Bib>)bibItem.get("Bib");

@@ -59,7 +59,7 @@ public class ItemIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while (iterator.hasNext()) {
             ItemEntity itemEntity = iterator.next();
-            Future submit = executorService.submit(new ItemRecordSetupCallable(itemEntity));
+            Future submit = executorService.submit(new ItemRecordSetupCallable(itemEntity, producerTemplate));
             futures.add(submit);
         }
 
@@ -67,7 +67,7 @@ public class ItemIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Item item = (Item) future.get();
-                itemsToIndex.add(item);
+                if(item != null) itemsToIndex.add(item);
             } catch (Exception e) {
                 logger.error("Exception : " + e.getMessage());
             }

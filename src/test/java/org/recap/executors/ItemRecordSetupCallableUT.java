@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.recap.BaseTestCase;
@@ -7,6 +8,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +22,9 @@ import static junit.framework.TestCase.assertNotNull;
  * Created by premkb on 1/8/16.
  */
 public class ItemRecordSetupCallableUT extends BaseTestCase{
+
+    @Autowired
+    ProducerTemplate producerTemplate;
 
     private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
             "                <record>\n"+
@@ -162,7 +167,7 @@ public class ItemRecordSetupCallableUT extends BaseTestCase{
         itemEntity.setBibliographicEntities(bibliographicEntities);
 
 
-        ItemRecordSetupCallable itemRecordSetupCallable = new ItemRecordSetupCallable(itemEntity);
+        ItemRecordSetupCallable itemRecordSetupCallable = new ItemRecordSetupCallable(itemEntity, producerTemplate);
         Item item = (Item) itemRecordSetupCallable.call();
         assertNotNull(item);
     }

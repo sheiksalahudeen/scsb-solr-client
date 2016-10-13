@@ -1,6 +1,7 @@
 package org.recap.executors;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
@@ -18,19 +19,23 @@ public class BibItemRecordSetupCallable implements Callable {
     private final SolrTemplate solrTemplate;
     BibliographicDetailsRepository bibliographicDetailsRepository;
     HoldingsDetailsRepository holdingsDetailsRepository;
+    ProducerTemplate producerTemplate;
 
 
     public BibItemRecordSetupCallable(BibliographicEntity bibliographicEntity, SolrTemplate solrTemplate, BibliographicDetailsRepository bibliographicDetailsRepository,
-                                      HoldingsDetailsRepository holdingsDetailsRepository) {
+                                      HoldingsDetailsRepository holdingsDetailsRepository, ProducerTemplate producerTemplate) {
         this.bibliographicEntity = bibliographicEntity;
         this.solrTemplate = solrTemplate;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.holdingsDetailsRepository = holdingsDetailsRepository;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
     public Object call() throws Exception {
-        SolrInputDocument solrInputDocument = new BibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        bibJSONUtil.setProducerTemplate(producerTemplate);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         return solrInputDocument ;
     }
 }

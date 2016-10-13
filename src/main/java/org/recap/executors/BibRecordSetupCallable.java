@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -16,17 +17,21 @@ public class BibRecordSetupCallable implements Callable {
     BibliographicEntity bibliographicEntity;
     BibliographicDetailsRepository bibliographicDetailsRepository;
     HoldingsDetailsRepository holdingsDetailsRepository;
+    ProducerTemplate producerTemplate;
 
     public BibRecordSetupCallable(BibliographicEntity bibliographicEntity, BibliographicDetailsRepository bibliographicDetailsRepository,
-                                  HoldingsDetailsRepository holdingsDetailsRepository) {
+                                  HoldingsDetailsRepository holdingsDetailsRepository, ProducerTemplate producerTemplate) {
         this.bibliographicEntity = bibliographicEntity;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.holdingsDetailsRepository = holdingsDetailsRepository;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
     public Object call() throws Exception {
-        Bib bib = new BibJSONUtil().generateBibForIndex(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository);
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        bibJSONUtil.setProducerTemplate(producerTemplate);
+        Bib bib = bibJSONUtil.generateBibForIndex(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository);
         return bib ;
     }
 }

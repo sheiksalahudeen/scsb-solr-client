@@ -8,6 +8,7 @@ import org.recap.executors.BibIndexExecutorService;
 import org.recap.executors.BibItemIndexExecutorService;
 import org.recap.executors.HoldingsIndexExecutorService;
 import org.recap.executors.ItemIndexExecutorService;
+import org.recap.matchingAlgorithm.report.ReportGenerator;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -59,6 +62,9 @@ public class SolrIndexController {
 
     @Value("${commit.indexes.interval}")
     public Integer commitIndexesInterval;
+
+    @Autowired
+    ReportGenerator reportGenerator;
 
     @RequestMapping("/")
     public String solrIndexer(Model model){
@@ -122,5 +128,50 @@ public class SolrIndexController {
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
     public String report(String status) {
         return StringUtils.isBlank(status) ? "Index process initiated!" : status;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/solrIndexer/generateReports", method = RequestMethod.POST)
+    public String generateReports(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
+                                         BindingResult result,
+                                         Model model) {
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Date createdDate = solrIndexRequest.getCreatedDate();
+        if(createdDate == null) {
+            createdDate = new Date();
+        }
+        String reportType = solrIndexRequest.getReportType();
+        String generatedReportFileName = null;
+        String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
+        String status = "";
+        generatedReportFileName = reportGenerator.generateReport(RecapConstants.SOLR_INDEX_FAILURE_REPORT, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(createdDate));
+        if(StringUtils.isEmpty(generatedReportFileName)) {
+            status = "Report wasn't generated! Please contact help desk!";
+        } else {
+            status = "The Generated Report File Name : " + generatedReportFileName;
+        }
+        stopWatch.stop();
+        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        return status;
+    }
+
+    public Date getFromDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return  cal.getTime();
+    }
+
+    public Date getToDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        return cal.getTime();
     }
 }

@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.solr.Holdings;
 import org.recap.util.HoldingsJSONUtil;
@@ -12,14 +13,18 @@ import java.util.concurrent.Callable;
 public class HoldingsRecordSetupCallable implements Callable {
 
     HoldingsEntity holdingsEntity;
+    ProducerTemplate producerTemplate;
 
-    public HoldingsRecordSetupCallable(HoldingsEntity holdingsEntity) {
+    public HoldingsRecordSetupCallable(HoldingsEntity holdingsEntity, ProducerTemplate producerTemplate) {
         this.holdingsEntity = holdingsEntity;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
     public Object call() throws Exception {
-        Holdings holdings = new HoldingsJSONUtil().generateHoldingsForIndex(holdingsEntity);
+        HoldingsJSONUtil holdingsJSONUtil = new HoldingsJSONUtil();
+        holdingsJSONUtil.setProducerTemplate(producerTemplate);
+        Holdings holdings = holdingsJSONUtil.generateHoldingsForIndex(holdingsEntity);
         return holdings ;
     }
 }

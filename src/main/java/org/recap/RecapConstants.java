@@ -18,6 +18,7 @@ public class RecapConstants {
     public static final String BIB_OWNING_INSTITUTION = "BibOwningInstitution";
     public static final String HOLDINGS_OWNING_INSTITUTION = "HoldingsOwningInstitution";
     public static final String ITEM_OWNING_INSTITUTION = "ItemOwningInstitution";
+    public static final String OWNING_INSTITUTION = "OwningInstitution";
     public static final String COLLECTION_GROUP_DESIGNATION = "CollectionGroupDesignation";
     public static final String AVAILABILITY = "Availability_search";
     public static final String TITLE_SEARCH = "Title_search";
@@ -47,13 +48,19 @@ public class RecapConstants {
     //Matching Algorithm Constants
     public static final String CSV_MATCHING_ALGO_REPORT_Q = "seda:csvMatchingAlgoReportQ";
     public static final String CSV_SUMMARY_ALGO_REPORT_Q = "seda:csvSummaryAlgoReportQ";
+    public static final String CSV_SOLR_EXCEPTION_REPORT_Q = "seda:csvSolrExceptionReportQ";
     public static final String FTP_MATCHING_ALGO_REPORT_Q = "seda:ftpMatchingAlgoReportQ";
     public static final String FTP_SUMMARY_ALGO_REPORT_Q = "seda:ftpSummaryAlgoReportQ";
+    public static final String FTP_SOLR_EXCEPTION_REPORT_Q = "seda:ftpSolrExceptionReportQ";
+    public static final String REPORT_Q= "seda:reportQ";
 
     public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
     public static final String CSV_SUMMARY_ALGO_REPORT_ROUTE_ID = "csvSummaryAlgoReportRoute";
+    public static final String CSV_SOLR_EXCEPTION_REPORT_ROUTE_ID = "csvSolrExceptionReportRoute";
     public static final String FTP_MATCHING_ALGO_REPORT_ROUTE_ID = "ftpMatchingAlgoReportRoute";
     public static final String FTP_SUMMARY_ALGO_REPORT_ROUTE_ID = "ftpSummaryAlgoReportRoute";
+    public static final String FTP_SOLR_EXCEPTION_REPORT_ROUTE_ID = "ftpSolrExceptionReportRoute";
+    public static final String REPORT_ROUTE_ID = "reportQRoute";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
     public static final String MATCHING_ALGO_OCLC_FILE_NAME = "Matching_Algo_OCLC";
@@ -149,4 +156,10 @@ public class RecapConstants {
 
     public static final String SOLR_CORE = "solrCore";
     public static final String SOLR_QUEUE = "seda:solrQ";
+
+    public static final String SOLR_INDEX_FAILURE_REPORT = "Solr_Index_Failure_Report";
+    public static final String SOLR_INDEX_EXCEPTION = "SolrIndexException";
+    public static final String OWNING_INST_BIB_ID = "OwningInstitutionBibId";
+    public static final String BIB_ID = "BibId";
+    public static final String NA = "NA";
 }

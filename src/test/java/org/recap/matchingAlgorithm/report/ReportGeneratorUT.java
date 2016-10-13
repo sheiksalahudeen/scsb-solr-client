@@ -27,7 +27,7 @@ public class ReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
-    @Value("${solr.report.directory}")
+    @Value("${matching.report.directory}")
     String matchingReportsDirectory;
 
     @Autowired
@@ -42,7 +42,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         Date createdDate = reportEntity1.getCreatedDate();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
         stopWatch.stop();
         System.out.println("Total Time taken to generate matching report : " + stopWatch.getTotalTimeSeconds());
@@ -57,7 +57,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity2 = saveExceptionReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
@@ -72,7 +72,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity3 = saveMatchingReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
@@ -84,7 +84,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity2 = saveExceptionReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);

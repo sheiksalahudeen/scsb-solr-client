@@ -58,7 +58,7 @@ public class HoldingsIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while (iterator.hasNext()) {
             HoldingsEntity holdingsEntity = iterator.next();
-            Future submit = executorService.submit(new HoldingsRecordSetupCallable(holdingsEntity));
+            Future submit = executorService.submit(new HoldingsRecordSetupCallable(holdingsEntity, producerTemplate));
             futures.add(submit);
         }
 
@@ -66,7 +66,7 @@ public class HoldingsIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Holdings holdings = (Holdings) future.get();
-                holdingsToIndex.add(holdings);
+                if(holdings != null) holdingsToIndex.add(holdings);
             } catch (Exception e) {
                 logger.error("Exception : " + e.getMessage());
             }

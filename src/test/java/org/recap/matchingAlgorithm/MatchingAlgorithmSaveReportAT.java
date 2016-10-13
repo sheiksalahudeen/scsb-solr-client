@@ -1,5 +1,6 @@
 package org.recap.matchingAlgorithm;
 
+import org.codehaus.jettison.json.JSONException;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -18,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MatchingAlgorithmSaveReportAT extends BaseTestCase {
 
-    @Value("${solr.report.directory}")
+    @Value("${matching.report.directory}")
     String reportDirectoryPath;
 
     @Autowired
@@ -85,5 +87,24 @@ public class MatchingAlgorithmSaveReportAT extends BaseTestCase {
         assertNotNull(reportEntityList);
         stopWatch.stop();
         System.out.println("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void getMatchesByFacetQuery() throws JSONException {
+        String fieldName = RecapConstants.MATCH_POINT_FIELD_OCLC;
+        Map<String, Integer> duplicateOCLCMap = matchingAlgorithmSaveReport.getMatchesByFacetQuery(fieldName);
+        assertNotNull(duplicateOCLCMap);
+
+        fieldName = RecapConstants.MATCH_POINT_FIELD_ISBN;
+        Map<String, Integer> duplicateISBNMap = matchingAlgorithmSaveReport.getMatchesByFacetQuery(fieldName);
+        assertNotNull(duplicateISBNMap);
+
+        fieldName = RecapConstants.MATCH_POINT_FIELD_ISSN;
+        Map<String, Integer> duplicateISSNMap = matchingAlgorithmSaveReport.getMatchesByFacetQuery(fieldName);
+        assertNotNull(duplicateISSNMap);
+
+        fieldName = RecapConstants.MATCH_POINT_FIELD_LCCN;
+        Map<String, Integer> duplicateLCCNMap = matchingAlgorithmSaveReport.getMatchesByFacetQuery(fieldName);
+        assertNotNull(duplicateLCCNMap);
     }
 }

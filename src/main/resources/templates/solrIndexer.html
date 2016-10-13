@@ -25,7 +25,7 @@
     <ul class="nav nav-tabs nav-justified">
         <li class="active"><a data-toggle="tab" href="#solrIndex">Solr Index</a></li>
         <li><a data-toggle="tab" href="#matchingAlgorithmSaveReport">Matching Algorithm Save Reports</a></li>
-        <li><a data-toggle="tab" href="#matchingAlgorithmGenerateReports">Matching Algorithm Generate Reports</a></li>
+        <li><a data-toggle="tab" href="#generateReports"> Generate Reports</a></li>
     </ul>
 
     <div class="tab-content">
@@ -224,7 +224,7 @@
             </div>
         </div>
 
-        <div id="matchingAlgorithmGenerateReports" class="tab-pane fade">
+        <div id="generateReports" class="tab-pane fade">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-4">
@@ -233,13 +233,23 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <div th:fragment="matchingReports-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
-                                            <form id="matchingReports-form" name="matchingReports-form" class="form-horizontal" action="#"
+                                        <div th:fragment="reports-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+                                            <form id="reports-form" name="reports-form" class="form-horizontal" action="#"
                                                   th:object="${solrIndexRequest}" method="post" enctype="multipart/form-data">
 
                                                 <fieldset>
-
                                                     <div class="form-group">
+                                                        <label for="processType" class="col-sm-4">Process Type</label>
+                                                        <div class="col-sm-8">
+                                                            <select id="processType" class="form-control" style="width: 160px;" th:onchange="'javascript:showOrHideFields()'"
+                                                                    th:field="*{processType}">
+                                                                <option value="SolrIndex">Solr Index</option>
+                                                                <option value="MatchingAlgorithm">Matching Algorithm</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="matchingCriteriaDiv" class="form-group">
                                                         <label for="matchingCriteriaForReports" class="col-sm-4">Matching Criterias</label>
                                                         <div class="col-sm-8">
                                                             <select id="matchingCriteriaForReports"
@@ -263,9 +273,26 @@
                                                                     class="form-control"
                                                                     style="width: 160px;"
                                                                     th:field="*{reportType}">
+                                                                <option value="SolrIndexException">SolrIndexException</option>
                                                                 <option value="Matching">Matching</option>
                                                                 <option value="Exception">Exception</option>
                                                                 <option value="Summary">Summary</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="reportInstitutionNameDiv" class="form-group">
+                                                        <label for="reportInstitutionName" class="col-sm-4">Institution</label>
+
+                                                        <div class="col-sm-4">
+                                                            <select id="reportInstitutionName"
+                                                                    class="form-control"
+                                                                    style="width: 160px;"
+                                                                    th:field="*{owningInstitutionCode}">
+                                                                <option value="ALL">ALL</option>
+                                                                <option value="PUL">PUL</option>
+                                                                <option value="CUL">CUL</option>
+                                                                <option value="NYPL">NYPL</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -306,8 +333,8 @@
 
                                                     <br/><br/><br/>
                                                     <div class="form-group col-sm-12">
-                                                        <textarea class="form-control" id="matchingAlgoReportStatus" rows="5"
-                                                                  placeholder="Matching Algorithm Status" readonly="true"></textarea>
+                                                        <textarea class="form-control" id="reportStatus" rows="5"
+                                                                  placeholder="Report Status" readonly="true"></textarea>
                                                     </div>
 
                                                 </fieldset>

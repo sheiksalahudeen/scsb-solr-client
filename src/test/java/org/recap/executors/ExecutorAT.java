@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
@@ -52,8 +53,8 @@ public class ExecutorAT extends BaseTestCase {
     @Autowired
     ItemIndexExecutorService itemIndexExecutorService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    ProducerTemplate producerTemplate;
 
     @Value("${solr.server.protocol}")
     String solrServerProtocol;
@@ -200,7 +201,7 @@ public class ExecutorAT extends BaseTestCase {
         solrAdmin.createSolrCores(coreNames);
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         List<Future> futures = new ArrayList<>();
-        Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository));
+        Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate));
         futures.add(submit);
         List<Bib> bibsToIndex = new ArrayList<>();
 
