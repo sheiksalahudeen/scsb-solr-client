@@ -1,6 +1,8 @@
 package org.recap.matchingAlgorithm.report;
 
-import java.util.Date;
+import org.recap.model.jpa.ReportEntity;
+
+import java.util.List;
 
 /**
  * Created by angelind on 23/8/16.
@@ -11,6 +13,6 @@ public interface ReportGeneratorInterface {
 
     boolean isTransmitted(String transmissionType);
 
-    String generateReport(String fileName, String reportType, Date from, Date to);
+    String generateReport(String fileName, List<ReportEntity> reportEntityList);
 
 }

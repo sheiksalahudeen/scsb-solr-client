@@ -35,7 +35,7 @@ public class CSVSummaryReportGeneratorTest extends BaseTestCase{
     public void testSummaryReportForFileSystem() throws Exception{
         ReportEntity reportEntity1 = saveSummaryReportEntity();
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.SUMMARY_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.SUMMARY_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
@@ -45,7 +45,7 @@ public class CSVSummaryReportGeneratorTest extends BaseTestCase{
     public void testSummaryReportForFtp() throws Exception{
         ReportEntity reportEntity1 = saveSummaryReportEntity();
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.SUMMARY_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.SUMMARY_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);

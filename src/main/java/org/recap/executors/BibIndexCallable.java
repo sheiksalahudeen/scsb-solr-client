@@ -65,7 +65,7 @@ public class BibIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while(iterator.hasNext()){
             BibliographicEntity bibliographicEntity = iterator.next();
-            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository));
+            Future submit = executorService.submit(new BibRecordSetupCallable(bibliographicEntity, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate));
             futures.add(submit);
         }
 
@@ -73,7 +73,7 @@ public class BibIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Bib bib = (Bib) future.get();
-                bibsToIndex.add(bib);
+                if(bib != null) bibsToIndex.add(bib);
             } catch (Exception e) {
                 logger.error("Exception : " + e.getMessage());
             }

@@ -1,9 +1,8 @@
 package org.recap.executors;
 
-import org.recap.model.jpa.HoldingsEntity;
+import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
-import org.recap.util.BibJSONUtil;
 import org.recap.util.ItemJSONUtil;
 
 import java.util.concurrent.Callable;
@@ -14,14 +13,18 @@ import java.util.concurrent.Callable;
 public class ItemRecordSetupCallable implements Callable {
 
     private final ItemEntity itemEntity;
+    ProducerTemplate producerTemplate;
 
-    public ItemRecordSetupCallable(ItemEntity itemEntity) {
+    public ItemRecordSetupCallable(ItemEntity itemEntity, ProducerTemplate producerTemplate) {
         this.itemEntity = itemEntity;
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
     public Object call() throws Exception {
-        Item item = new ItemJSONUtil().generateItemForIndex(itemEntity);
+        ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
+        itemJSONUtil.setProducerTemplate(producerTemplate);
+        Item item = itemJSONUtil.generateItemForIndex(itemEntity);
         return item;
     }
 }

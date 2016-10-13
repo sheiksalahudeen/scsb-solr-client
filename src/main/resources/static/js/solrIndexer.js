@@ -9,7 +9,7 @@ jQuery(document).ready(function ($) {
         fullIndex();
     });
 
-    $("#matchingReports-form").submit(function (event) {
+    $("#reports-form").submit(function (event) {
         event.preventDefault();
         generateReport();
     });
@@ -21,6 +21,7 @@ jQuery(document).ready(function ($) {
     $('#createdDate').datepicker({
         format: "yyyy/mm/dd"
     });
+    showOrHideFields();
 });
 
 
@@ -94,21 +95,26 @@ function saveReport() {
 }
 
 function generateReport() {
-    var $form = $('#matchingReports-form');
+    var $form = $('#reports-form');
     $("#report").attr('disabled', 'disabled');
-    document.getElementById("matchingAlgoReportStatus").value = '';
+    document.getElementById("reportStatus").value = '';
     var criteria = $('#matchingCriteriaForReports').val();
+    var processType = $('#processType').val();
     var url = '';
-    if(criteria === 'ALL') {
-        url = "/matchingAlgorithm/generateReports/full";
-    } else if(criteria === 'OCLC') {
-        url = "/matchingAlgorithm/generateReports/oclc";
-    } else if(criteria === 'ISBN') {
-        url = "/matchingAlgorithm/generateReports/isbn";
-    } else if(criteria === 'ISSN') {
-        url = "/matchingAlgorithm/generateReports/issn";
-    } else if(criteria === 'LCCN') {
-        url = "/matchingAlgorithm/generateReports/lccn";
+    if(processType === 'SolrIndex') {
+        url = "/solrIndexer/generateReports";
+    } else {
+        if(criteria === 'ALL') {
+            url = "/matchingAlgorithm/generateReports/full";
+        } else if(criteria === 'OCLC') {
+            url = "/matchingAlgorithm/generateReports/oclc";
+        } else if(criteria === 'ISBN') {
+            url = "/matchingAlgorithm/generateReports/isbn";
+        } else if(criteria === 'ISSN') {
+            url = "/matchingAlgorithm/generateReports/issn";
+        } else if(criteria === 'LCCN') {
+            url = "/matchingAlgorithm/generateReports/lccn";
+        }
     }
     if(url !== '') {
         var request = $.ajax({
@@ -121,7 +127,18 @@ function generateReport() {
             }
         });
         request.done(function (msg) {
-            document.getElementById("matchingAlgoReportStatus").value = msg;
+            document.getElementById("reportStatus").value = msg;
         })
+    }
+}
+
+function showOrHideFields() {
+    var processType = $('#processType').val();
+    if(processType === 'MatchingAlgorithm') {
+        $('#matchingCriteriaDiv').show();
+        $('#reportInstitutionNameDiv').hide();
+    } else {
+        $('#matchingCriteriaDiv').hide();
+        $('#reportInstitutionNameDiv').show();
     }
 }

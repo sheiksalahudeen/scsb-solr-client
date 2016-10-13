@@ -21,7 +21,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -59,9 +61,9 @@ public class SearchRecordsControllerUT extends BaseControllerUT{
 
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(searchRecordsController).build();
-        List<BibItem> bibItems = new ArrayList<>();
-        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(bibItems);
-        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(bibItems);
+        Map searchRecordsMap = new HashMap();
+        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(searchRecordsMap);
+        when(bibSolrDocumentRepository.search(getSearchRecordsRequest())).thenReturn(searchRecordsMap);
     }
 
 

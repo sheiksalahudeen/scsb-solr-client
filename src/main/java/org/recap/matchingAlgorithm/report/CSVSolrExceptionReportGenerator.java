@@ -2,10 +2,10 @@ package org.recap.matchingAlgorithm.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.model.csv.SummaryReportReCAPCSVRecord;
+import org.recap.model.csv.SolrExceptionReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
-import org.recap.util.ReCAPCSVSummaryRecordGenerator;
+import org.recap.util.ReCAPCSVSolrExceptionRecordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by angelind on 31/8/16.
+ * Created by angelind on 30/9/16.
  */
 
 @Component
-public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
+public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
+    Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -36,12 +36,12 @@ public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
 
     @Override
     public boolean isInterested(String reportType) {
-        return RecapConstants.SUMMARY_TYPE.equalsIgnoreCase(reportType) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.SOLR_INDEX_EXCEPTION) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return RecapConstants.FTP.equalsIgnoreCase(transmissionType) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FILE_SYSTEM) ? true : false;
     }
 
     @Override
@@ -49,24 +49,20 @@ public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        List<SummaryReportReCAPCSVRecord> summaryReportReCAPCSVRecords = new ArrayList<>();
+        List<SolrExceptionReportReCAPCSVRecord> solrExceptionReportReCAPCSVRecords = new ArrayList<>();
 
-        ReCAPCSVSummaryRecordGenerator reCAPCSVSummaryRecordGenerator = new ReCAPCSVSummaryRecordGenerator();
-        if(!CollectionUtils.isEmpty(reportEntityList)) {
-            for(ReportEntity reportEntity : reportEntityList) {
-                SummaryReportReCAPCSVRecord summaryReportReCAPCSVRecord = reCAPCSVSummaryRecordGenerator.prepareSummaryReportReCAPCSVRecord(reportEntity, new SummaryReportReCAPCSVRecord());
-                summaryReportReCAPCSVRecords.add(summaryReportReCAPCSVRecord);
-            }
+        ReCAPCSVSolrExceptionRecordGenerator reCAPCSVSolrExceptionRecordGenerator = new ReCAPCSVSolrExceptionRecordGenerator();
+        for(ReportEntity reportEntity : reportEntityList) {
+            SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord = reCAPCSVSolrExceptionRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new SolrExceptionReportReCAPCSVRecord());
+            solrExceptionReportReCAPCSVRecords.add(solrExceptionReportReCAPCSVRecord);
         }
 
         stopWatch.stop();
         logger.info("Total time taken to prepare CSVRecords : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : " + summaryReportReCAPCSVRecords.size());
+        logger.info("Total Num of CSVRecords Prepared : " + solrExceptionReportReCAPCSVRecords.size());
 
-        if(!CollectionUtils.isEmpty(summaryReportReCAPCSVRecords)) {
-
-            producer.sendBodyAndHeader(RecapConstants.FTP_SUMMARY_ALGO_REPORT_Q, summaryReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
-
+        if(!CollectionUtils.isEmpty(solrExceptionReportReCAPCSVRecords)) {
+            producer.sendBodyAndHeader(RecapConstants.CSV_SOLR_EXCEPTION_REPORT_Q, solrExceptionReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
             return generatedFileName;
@@ -74,6 +70,4 @@ public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
 
         return null;
     }
-
-
 }

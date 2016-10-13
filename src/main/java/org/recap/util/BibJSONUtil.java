@@ -1,14 +1,12 @@
 package org.recap.util;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
@@ -27,6 +25,8 @@ import java.util.*;
 public class BibJSONUtil extends MarcUtil {
 
     Logger logger = LoggerFactory.getLogger(BibJSONUtil.class);
+
+    private ProducerTemplate producerTemplate;
 
     public String getPublisherValue(Record record) {
         String publisherValue = null;
@@ -111,29 +111,37 @@ public class BibJSONUtil extends MarcUtil {
                                                          BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository) {
 
         Bib bib = generateBib(bibliographicEntity);
+        if(bib != null) {
         SolrInputDocument bibSolrInputDocument = generateBibSolrInputDocument(bib, solrTemplate);
-
         List<HoldingsEntity> holdingsEntities = bibliographicDetailsRepository.getNonDeletedHoldingsEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         List<SolrInputDocument> holdingsSolrInputDocuments = new ArrayList<>();
+        HoldingsJSONUtil holdingsJSONUtil = new HoldingsJSONUtil();
+        holdingsJSONUtil.setProducerTemplate(producerTemplate);
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
-            Holdings holdings = new HoldingsJSONUtil().generateHoldingsForIndex(holdingsEntity);
-            List<ItemEntity> itemEntities = holdingsDetailsRepository.getNonDeletedItemEntities(holdingsEntity.getOwningInstitutionId(), holdingsEntity.getOwningInstitutionHoldingsId());
-            List<SolrInputDocument> itemSolrInputDocuments = new ArrayList<>();
-            ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
-            for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
-                ItemEntity itemEntity = iterator.next();
-                Item item = itemJSONUtil.generateItemForIndex(itemEntity);
-                SolrInputDocument itemSolrInputDocument = generateItemSolrInputDocument(item, solrTemplate);
-                itemSolrInputDocuments.add(itemSolrInputDocument);
+            Holdings holdings = holdingsJSONUtil.generateHoldingsForIndex(holdingsEntity);
+            if (holdings != null) {
+                List<ItemEntity> itemEntities = holdingsDetailsRepository.getNonDeletedItemEntities(holdingsEntity.getOwningInstitutionId(), holdingsEntity.getOwningInstitutionHoldingsId());
+                List<SolrInputDocument> itemSolrInputDocuments = new ArrayList<>();
+                ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
+                itemJSONUtil.setProducerTemplate(producerTemplate);
+                for (Iterator<ItemEntity> iterator = itemEntities.iterator(); iterator.hasNext(); ) {
+                    ItemEntity itemEntity = iterator.next();
+                    Item item = itemJSONUtil.generateItemForIndex(itemEntity);
+                    if (item != null) {
+                        SolrInputDocument itemSolrInputDocument = generateItemSolrInputDocument(item, solrTemplate);
+                        itemSolrInputDocuments.add(itemSolrInputDocument);
+                    }
+                }
+                SolrInputDocument holdingsSolrInputDocument = generateHoldingsSolrInputDocument(holdings, solrTemplate);
+                if (!CollectionUtils.isEmpty(itemSolrInputDocuments))
+                    holdingsSolrInputDocument.addChildDocuments(itemSolrInputDocuments);
+                holdingsSolrInputDocuments.add(holdingsSolrInputDocument);
             }
-            SolrInputDocument holdingsSolrInputDocument = generateHoldingsSolrInputDocument(holdings, solrTemplate);
-            holdingsSolrInputDocument.addChildDocuments(itemSolrInputDocuments);
-            holdingsSolrInputDocuments.add(holdingsSolrInputDocument);
         }
-
-        bibSolrInputDocument.addChildDocuments(holdingsSolrInputDocuments);
-
-        return bibSolrInputDocument;
+            if(!CollectionUtils.isEmpty(holdingsSolrInputDocuments)) bibSolrInputDocument.addChildDocuments(holdingsSolrInputDocuments);
+            return bibSolrInputDocument;
+        }
+        return null;
     }
 
     private SolrInputDocument generateItemSolrInputDocument(Item item, SolrTemplate solrTemplate) {
@@ -152,8 +160,9 @@ public class BibJSONUtil extends MarcUtil {
                                    HoldingsDetailsRepository holdingsDetailsRepository) {
         Bib bib = generateBib(bibliographicEntity);
 
-        List<Integer> holdingsIds = new ArrayList<>();
-        List<Integer> itemIds = new ArrayList<>();
+        if(bib != null) {
+            List<Integer> holdingsIds = new ArrayList<>();
+            List<Integer> itemIds = new ArrayList<>();
 
         List<ItemEntity> itemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
         for (ItemEntity itemEntity : itemEntities) {
@@ -164,46 +173,96 @@ public class BibJSONUtil extends MarcUtil {
             holdingsIds.add(holdingsEntity.getHoldingsId());
         }
 
-        bib.setHoldingsIdList(holdingsIds);
-        bib.setBibItemIdList(itemIds);
+            bib.setHoldingsIdList(holdingsIds);
+            bib.setBibItemIdList(itemIds);
+        }
         return bib;
     }
 
     private Bib generateBib(BibliographicEntity bibliographicEntity) {
-        Bib bib = new Bib();
-        Integer bibliographicId = bibliographicEntity.getBibliographicId();
-        bib.setBibId(bibliographicId);
+        try {
+            Bib bib = new Bib();
+            Integer bibliographicId = bibliographicEntity.getBibliographicId();
+            bib.setBibId(bibliographicId);
 
-        bib.setDocType("Bib");
-        bib.setContentType("parent");
-        bib.setId(bibliographicEntity.getOwningInstitutionId()+bibliographicEntity.getOwningInstitutionBibId());
-        String bibContent = new String(bibliographicEntity.getContent());
-        List<Record> records = convertMarcXmlToRecord(bibContent);
-        Record marcRecord = records.get(0);
+            bib.setDocType(RecapConstants.BIB);
+            bib.setContentType("parent");
+            bib.setId(bibliographicEntity.getOwningInstitutionId()+bibliographicEntity.getOwningInstitutionBibId());
+            String bibContent = new String(bibliographicEntity.getContent());
+            List<Record> records = convertMarcXmlToRecord(bibContent);
+            Record marcRecord = records.get(0);
 
+            InstitutionEntity institutionEntity = bibliographicEntity.getInstitutionEntity();
+            String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
+
+            bib.setOwningInstitution(institutionCode);
+            bib.setTitle(getTitle(marcRecord));
+            bib.setTitleDisplay(getTitleDisplay(marcRecord));
+            bib.setTitleStartsWith(getTitleStartsWith(marcRecord));
+            bib.setTitleSort(getTitleSort(marcRecord, bib.getTitleDisplay()));
+            bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
+            bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
+            bib.setPublisher(getPublisherValue(marcRecord));
+            bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
+            bib.setPublicationDate(getPublicationDateValue(marcRecord));
+            bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
+            bib.setIsbn(getISBNNumber(marcRecord));
+            bib.setIssn(getISSNNumber(marcRecord));
+            bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode.toString()));
+            bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
+            bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
+            bib.setLccn(getLCCNValue(marcRecord));
+            bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
+            bib.setLeaderMaterialType(getLeaderMaterialType(marcRecord.getLeader()));
+            return bib;
+        } catch (Exception e) {
+            saveExceptionReportForBib(bibliographicEntity, e);
+        }
+        return null;
+    }
+
+    private void saveExceptionReportForBib(BibliographicEntity bibliographicEntity, Exception e) {
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType(RecapConstants.SOLR_INDEX_EXCEPTION);
+        reportEntity.setFileName(RecapConstants.SOLR_INDEX_FAILURE_REPORT);
         InstitutionEntity institutionEntity = bibliographicEntity.getInstitutionEntity();
-        String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
+        String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : RecapConstants.NA;
+        reportEntity.setInstitutionName(institutionCode);
 
-        bib.setOwningInstitution(institutionCode);
-        bib.setTitle(getTitle(marcRecord));
-        bib.setTitleDisplay(getTitleDisplay(marcRecord));
-        bib.setTitleStartsWith(getTitleStartsWith(marcRecord));
-        bib.setTitleSort(getTitleSort(marcRecord, bib.getTitleDisplay()));
-        bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
-        bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
-        bib.setPublisher(getPublisherValue(marcRecord));
-        bib.setPublicationPlace(getPublicationPlaceValue(marcRecord));
-        bib.setPublicationDate(getPublicationDateValue(marcRecord));
-        bib.setSubject(getDataFieldValueStartsWith(marcRecord, "6"));
-        bib.setIsbn(getISBNNumber(marcRecord));
-        bib.setIssn(getISSNNumber(marcRecord));
-        bib.setOclcNumber(getOCLCNumbers(marcRecord, institutionCode.toString()));
-        bib.setMaterialType(getDataFieldValue(marcRecord, "245", null, null, "h"));
-        bib.setNotes(getDataFieldValueStartsWith(marcRecord, "5"));
-        bib.setLccn(getLCCNValue(marcRecord));
-        bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
-        bib.setLeaderMaterialType(getLeaderMaterialType(marcRecord.getLeader()));
-        return bib;
+        ReportDataEntity docTypeDataEntity = new ReportDataEntity();
+        docTypeDataEntity.setHeaderName(RecapConstants.DOCTYPE);
+        docTypeDataEntity.setHeaderValue(RecapConstants.BIB);
+        reportDataEntities.add(docTypeDataEntity);
+
+        ReportDataEntity owningInstDataEntity = new ReportDataEntity();
+        owningInstDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION);
+        owningInstDataEntity.setHeaderValue(institutionCode);
+        reportDataEntities.add(owningInstDataEntity);
+
+        ReportDataEntity exceptionMsgDataEntity = new ReportDataEntity();
+        exceptionMsgDataEntity.setHeaderName(RecapConstants.EXCEPTION_MSG);
+        exceptionMsgDataEntity.setHeaderValue(StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : e.toString());
+        reportDataEntities.add(exceptionMsgDataEntity);
+
+        if(bibliographicEntity.getBibliographicId() != null) {
+            ReportDataEntity bibIdDataEntity = new ReportDataEntity();
+            bibIdDataEntity.setHeaderName(RecapConstants.BIB_ID);
+            bibIdDataEntity.setHeaderValue(String.valueOf(bibliographicEntity.getBibliographicId()));
+            reportDataEntities.add(bibIdDataEntity);
+        }
+
+        if(StringUtils.isNotBlank(bibliographicEntity.getOwningInstitutionBibId())) {
+            ReportDataEntity owningInstBibIdDataEntity = new ReportDataEntity();
+            owningInstBibIdDataEntity.setHeaderName(RecapConstants.OWNING_INST_BIB_ID);
+            owningInstBibIdDataEntity.setHeaderValue(bibliographicEntity.getOwningInstitutionBibId());
+            reportDataEntities.add(owningInstBibIdDataEntity);
+        }
+
+        reportEntity.addAll(reportDataEntities);
+        producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
     private String getLeaderMaterialType(Leader leader) {
@@ -293,4 +352,11 @@ public class BibJSONUtil extends MarcUtil {
         return "";
     }
 
+    public ProducerTemplate getProducerTemplate() {
+        return producerTemplate;
+    }
+
+    public void setProducerTemplate(ProducerTemplate producerTemplate) {
+        this.producerTemplate = producerTemplate;
+    }
 }

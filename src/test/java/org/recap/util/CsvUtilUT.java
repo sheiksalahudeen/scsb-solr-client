@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * Created by premkb on 29/7/16.
  */
 public class CsvUtilUT extends BaseTestCase {
-    @Value("${solr.report.directory}")
+    @Value("${matching.report.directory}")
     private String reportDirectoryPath;
 
     @Autowired

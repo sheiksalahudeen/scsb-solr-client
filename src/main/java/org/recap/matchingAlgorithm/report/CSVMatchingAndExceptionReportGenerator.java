@@ -51,26 +51,22 @@ public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorIn
     }
 
     @Override
-    public String generateReport(String fileName, String reportType, Date from, Date to) {
+    public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+
         List<MatchingReportReCAPCSVRecord> matchingReportReCAPCSVRecords = new ArrayList<>();
 
-        List<ReportEntity> reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, RecapConstants.ALL_INST, reportType, from, to);
-
-        stopWatch.stop();
-        logger.info("Total Time taken to fetch Report Entities From DB : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of Report Entities Fetched From DB : " + reportEntityList.size());
-
-        stopWatch = new StopWatch();
-        stopWatch.start();
-
         ReCAPCSVMatchingRecordGenerator reCAPCSVMatchingRecordGenerator = new ReCAPCSVMatchingRecordGenerator();
-        for(ReportEntity reportEntity : reportEntityList) {
-            MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new MatchingReportReCAPCSVRecord());
-            matchingReportReCAPCSVRecord.setTitleWithoutSymbols(matchingReportReCAPCSVRecord.getTitle().replaceAll("[^\\w\\s]", "").trim());
-            matchingReportReCAPCSVRecord.setTitle(matchingReportReCAPCSVRecord.getTitle().replaceAll("\"", "\"\""));
-            matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
+        String reportType = "";
+        if(!CollectionUtils.isEmpty(reportEntityList)) {
+            reportType = reportEntityList.get(0).getType();
+            for(ReportEntity reportEntity : reportEntityList) {
+                MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord = reCAPCSVMatchingRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new MatchingReportReCAPCSVRecord());
+                matchingReportReCAPCSVRecord.setTitleWithoutSymbols(matchingReportReCAPCSVRecord.getTitle().replaceAll("[^\\w\\s]", "").trim());
+                matchingReportReCAPCSVRecord.setTitle(matchingReportReCAPCSVRecord.getTitle().replaceAll("\"", "\"\""));
+                matchingReportReCAPCSVRecords.add(matchingReportReCAPCSVRecord);
+            }
         }
 
         stopWatch.stop();

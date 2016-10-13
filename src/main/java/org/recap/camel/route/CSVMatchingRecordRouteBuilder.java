@@ -19,7 +19,7 @@ import java.io.File;
 public class CSVMatchingRecordRouteBuilder {
 
     @Autowired
-    public CSVMatchingRecordRouteBuilder(CamelContext context, @Value("${solr.report.directory}") String matchingReportsDirectory) {
+    public CSVMatchingRecordRouteBuilder(CamelContext context, @Value("${matching.report.directory}") String matchingReportsDirectory) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override

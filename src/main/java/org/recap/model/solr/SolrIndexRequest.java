@@ -18,6 +18,7 @@ public class SolrIndexRequest {
     private String reportType;
     private String transmissionType;
     private Date createdDate;
+    private String processType;
 
     public String getDocType() {
         return docType;
@@ -105,5 +106,13 @@ public class SolrIndexRequest {
 
     public void setDateFrom(String dateFrom) {
         this.dateFrom = dateFrom;
+    }
+
+    public String getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(String processType) {
+        this.processType = processType;
     }
 }

@@ -6,6 +6,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
@@ -17,10 +18,7 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -191,7 +189,8 @@ public class BibAT extends BaseTestCase {
         String searchFieldValue = "Test";
         searchRecordsRequest.setFieldValue(searchFieldValue.split(" ")[0]);
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems.get(0));
     }
 

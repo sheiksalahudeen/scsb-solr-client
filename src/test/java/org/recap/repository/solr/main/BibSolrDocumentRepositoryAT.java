@@ -97,7 +97,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName("BibId");
         searchRecordsRequest.setFieldValue(String.valueOf(fetchedBibliographicEntity.getBibliographicId()));
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertEquals(bibliographicEntity.getOwningInstitutionBibId(), bibItems.get(0).getOwningInstitutionBibId());
@@ -114,7 +115,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         searchRecordsRequest.setFieldName(RecapConstants.TITLE_STARTS_WITH);
         searchRecordsRequest.setFieldValue("Semiznachnye tabli︠t︡sy");
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
     }
 
@@ -153,7 +155,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName(null); // All fields.
         searchRecordsRequest.setFieldValue(barcode);
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertEquals(bibliographicEntity.getOwningInstitutionBibId(), bibItems.get(0).getOwningInstitutionBibId());
@@ -198,7 +201,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldName(null); // All fields.
         searchRecordsRequest.setFieldValue("al-Ḥuṭayʼah :");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertTrue(bibItems.size() > 0);
         assertTrue(bibliographicEntity.getItemEntities().size() > 0);
@@ -307,7 +311,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue(item1.getBarcode());
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 2);
     }
@@ -413,7 +418,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue("lincoln inn");
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        List<BibItem> bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        Map searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 1);
 
@@ -422,7 +428,8 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         searchRecordsRequest.setFieldValue("lincoln inn");
         searchRecordsRequest.getOwningInstitutions().add("CUL");
 
-        bibItems = bibSolrDocumentRepository.search(searchRecordsRequest);
+        searchRecordMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        bibItems = (List<BibItem>) searchRecordMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
         assertNotNull(bibItems);
         assertEquals(bibItems.size(), 1);
 

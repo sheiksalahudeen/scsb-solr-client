@@ -44,24 +44,17 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
     }
 
     @Override
-    public String generateReport(String fileName, String reportType, Date from, Date to) {
+    public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         List<SummaryReportReCAPCSVRecord> summaryReportReCAPCSVRecords = new ArrayList<>();
 
-        List<ReportEntity> reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, RecapConstants.ALL_INST, reportType, from, to);
-
-        stopWatch.stop();
-        logger.info("Total Time taken to fetch Report Entities From DB : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of Report Entities Fetched From DB : " + reportEntityList.size());
-
-        stopWatch = new StopWatch();
-        stopWatch.start();
-
         ReCAPCSVSummaryRecordGenerator reCAPCSVSummaryRecordGenerator = new ReCAPCSVSummaryRecordGenerator();
-        for(ReportEntity reportEntity : reportEntityList) {
-            SummaryReportReCAPCSVRecord summaryReportReCAPCSVRecord = reCAPCSVSummaryRecordGenerator.prepareSummaryReportReCAPCSVRecord(reportEntity, new SummaryReportReCAPCSVRecord());
-            summaryReportReCAPCSVRecords.add(summaryReportReCAPCSVRecord);
+        if(!CollectionUtils.isEmpty(reportEntityList)) {
+            for(ReportEntity reportEntity : reportEntityList) {
+                SummaryReportReCAPCSVRecord summaryReportReCAPCSVRecord = reCAPCSVSummaryRecordGenerator.prepareSummaryReportReCAPCSVRecord(reportEntity, new SummaryReportReCAPCSVRecord());
+                summaryReportReCAPCSVRecords.add(summaryReportReCAPCSVRecord);
+            }
         }
 
         stopWatch.stop();

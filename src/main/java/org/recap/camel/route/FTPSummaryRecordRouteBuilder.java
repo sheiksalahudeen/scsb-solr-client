@@ -17,7 +17,7 @@ public class FTPSummaryRecordRouteBuilder {
 
     @Autowired
     public FTPSummaryRecordRouteBuilder(CamelContext context,
-                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.remote.server}") String ftpRemoteServer,
+                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.matchingAlgorithm.remote.server}") String ftpRemoteServer,
                                          @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
 
         try {

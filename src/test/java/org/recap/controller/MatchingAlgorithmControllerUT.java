@@ -87,13 +87,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         solrIndexRequest.setReportType(RecapConstants.MATCHING_TYPE);
         solrIndexRequest.setMatchingCriteria(RecapConstants.ALL_INST);
         solrIndexRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
-        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME);
         String response = matchingAlgorithmController.generateReportsForAll(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME));
 
         solrIndexRequest.setReportType(RecapConstants.EXCEPTION_TYPE);
-        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.EXCEPTION_REPORT_FILE_NAME);
         response = matchingAlgorithmController.generateReportsForAll(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.EXCEPTION_REPORT_FILE_NAME));
@@ -106,13 +106,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         solrIndexRequest.setReportType(RecapConstants.MATCHING_TYPE);
         solrIndexRequest.setMatchingCriteria(RecapConstants.OCLC_CRITERIA);
         solrIndexRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
-        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME);
         String response = matchingAlgorithmController.generateReportsForOclc(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME));
 
         solrIndexRequest.setReportType(RecapConstants.EXCEPTION_TYPE);
-        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME);
         response = matchingAlgorithmController.generateReportsForOclc(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME));
@@ -125,13 +125,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         solrIndexRequest.setReportType(RecapConstants.MATCHING_TYPE);
         solrIndexRequest.setMatchingCriteria(RecapConstants.ISBN_CRITERIA);
         solrIndexRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
-        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME);
         String response = matchingAlgorithmController.generateReportsForIsbn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME));
 
         solrIndexRequest.setReportType(RecapConstants.EXCEPTION_TYPE);
-        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME);
         response = matchingAlgorithmController.generateReportsForIsbn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME));
@@ -144,13 +144,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         solrIndexRequest.setReportType(RecapConstants.MATCHING_TYPE);
         solrIndexRequest.setMatchingCriteria(RecapConstants.ISSN_CRITERIA);
         solrIndexRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
-        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME);
         String response = matchingAlgorithmController.generateReportsForIssn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME));
 
         solrIndexRequest.setReportType(RecapConstants.EXCEPTION_TYPE);
-        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME);
         response = matchingAlgorithmController.generateReportsForIssn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME));
@@ -163,13 +163,13 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         solrIndexRequest.setReportType(RecapConstants.MATCHING_TYPE);
         solrIndexRequest.setMatchingCriteria(RecapConstants.LCCN_CRITERIA);
         solrIndexRequest.setTransmissionType(RecapConstants.FILE_SYSTEM);
-        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME);
         String response = matchingAlgorithmController.generateReportsForLccn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME));
 
         solrIndexRequest.setReportType(RecapConstants.EXCEPTION_TYPE);
-        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
+        when(reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, matchingAlgorithmController.getFromDate(solrIndexRequest.getCreatedDate()),
                 matchingAlgorithmController.getToDate(solrIndexRequest.getCreatedDate()))).thenReturn(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME);
         response = matchingAlgorithmController.generateReportsForLccn(solrIndexRequest, bindingResult, model);
         assertTrue(response.contains(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME));

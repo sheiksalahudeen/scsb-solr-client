@@ -27,8 +27,8 @@ import java.util.concurrent.Future;
 public class BibItemIndexCallable implements Callable {
 
     Logger logger = LoggerFactory.getLogger(BibItemIndexCallable.class);
-    private final int pageNum;
 
+    private final int pageNum;
     private final int docsPerPage;
     private String coreName;
     private String solrURL;
@@ -65,7 +65,7 @@ public class BibItemIndexCallable implements Callable {
         List<Future> futures = new ArrayList<>();
         while (iterator.hasNext()) {
             BibliographicEntity bibliographicEntity = iterator.next();
-            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository));
+            Future submit = executorService.submit(new BibItemRecordSetupCallable(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate));
             futures.add(submit);
         }
 
@@ -76,7 +76,7 @@ public class BibItemIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 SolrInputDocument solrInputDocument = (SolrInputDocument) future.get();
-                solrInputDocumentsToIndex.add(solrInputDocument);
+                if(solrInputDocument != null) solrInputDocumentsToIndex.add(solrInputDocument);
             } catch (Exception e) {
                 logger.error("Exception : " + e.getMessage());
             }
