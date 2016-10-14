@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -109,7 +110,6 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private List<BibItem> searchByBib(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
-
         SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
         queryForParentAndChildCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         queryForParentAndChildCriteria.setRows(searchRecordsRequest.getPageSize());
@@ -349,5 +349,26 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             holdingsValueResolvers.add(new HoldingsIdValueResolver());
         }
         return holdingsValueResolvers;
+    }
+
+    public Integer getPageNumberOnPageSizeChange(SearchRecordsRequest searchRecordsRequest) {
+        int totalRecordsCount;
+        Integer pageNumber = searchRecordsRequest.getPageNumber();
+        try {
+            if (isEmptyField(searchRecordsRequest)) {
+                totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalRecordsCount()).intValue();
+            } else if (isItemField(searchRecordsRequest)) {
+                totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalItemRecordsCount()).intValue();
+            } else {
+                totalRecordsCount = NumberFormat.getNumberInstance().parse(searchRecordsRequest.getTotalBibRecordsCount()).intValue();
+            }
+            int totalPagesCount = (int) Math.ceil((double) totalRecordsCount / (double) searchRecordsRequest.getPageSize());
+            if (totalPagesCount > 0 && pageNumber >= totalPagesCount) {
+                pageNumber = totalPagesCount - 1;
+            }
+        } catch (ParseException e) {
+            log.error(e.getMessage());
+        }
+        return pageNumber;
     }
 }
