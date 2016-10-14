@@ -10,4 +10,6 @@ import java.util.Map;
 public interface CustomDocumentRepository {
 
     Map<String,Object> search(SearchRecordsRequest searchRecordsRequest);
+
+    Integer getPageNumberOnPageSizeChange(SearchRecordsRequest searchRecordsRequest);
 }

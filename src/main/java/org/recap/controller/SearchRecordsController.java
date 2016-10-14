@@ -83,8 +83,13 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchAndBuildResults(searchRecordsRequest);
+        if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.reset();
+            searchRecordsRequest.setSearchResultRows(null);
+            searchAndBuildResults(searchRecordsRequest);
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
+        }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -93,8 +98,13 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchAndBuildResults(searchRecordsRequest);
+        if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.setSearchResultRows(null);
+            searchRecordsRequest.reset();
+            searchAndBuildResults(searchRecordsRequest);
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
+        }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -103,16 +113,21 @@ public class SearchRecordsController {
     public ModelAndView searchFirst(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.resetPageNumber();
-        Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-        String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-        if(errorResponse != null) {
-            searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-        } else {
-            List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            buildResults(searchRecordsRequest, bibItems);
+        if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.setSearchResultRows(null);
+            searchRecordsRequest.reset();
+            searchRecordsRequest.resetPageNumber();
+            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
+            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
+            if(errorResponse != null) {
+                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
+            } else {
+                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
+                buildResults(searchRecordsRequest, bibItems);
+            }
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
         }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -121,16 +136,21 @@ public class SearchRecordsController {
     public ModelAndView searchLast(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
-        Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-        String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-        if(errorResponse != null) {
-            searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-        } else {
-            List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            buildResults(searchRecordsRequest, bibItems);
+        if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.reset();
+            searchRecordsRequest.setSearchResultRows(null);
+            searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
+            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
+            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
+            if(errorResponse != null) {
+                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
+            } else {
+                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
+                buildResults(searchRecordsRequest, bibItems);
+            }
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
         }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -187,14 +207,19 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-        String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-        if(errorResponse != null) {
-            searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-        } else {
-            List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            buildResults(searchRecordsRequest, bibItems);
+        if(!isEmptySearch(searchRecordsRequest)){
+            searchRecordsRequest.setPageNumber(bibSolrDocumentRepository.getPageNumberOnPageSizeChange(searchRecordsRequest));
+            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
+            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
+            if(errorResponse != null) {
+                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
+            } else {
+                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
+                buildResults(searchRecordsRequest, bibItems);
+            }
+            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
         }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 

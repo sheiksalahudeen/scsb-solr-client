@@ -143,14 +143,19 @@ public class SolrQueryBuilder {
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
                     || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
                 String[] fieldValues = fieldValue.split(" ");
-                if(fieldValues.length > 1) {
-                    for(String value : fieldValues) {
-                        stringBuilder.append(fieldName).append(":").append("(").append("\"");
-                        stringBuilder.append(value).append("\"").append(")").append(and);
-                    }
-                } else {
+                if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
                     stringBuilder.append(fieldName).append(":").append("(");
-                    stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                    stringBuilder.append("\"").append(fieldValues[0]).append("\"").append(")").append(and);
+                } else {
+                    if(fieldValues.length > 1) {
+                        for(String value : fieldValues) {
+                            stringBuilder.append(fieldName).append(":").append("(").append("\"");
+                            stringBuilder.append(value).append("\"").append(")").append(and);
+                        }
+                    } else {
+                        stringBuilder.append(fieldName).append(":").append("(");
+                        stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                    }
                 }
             } else {
                 if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)){
@@ -172,12 +177,16 @@ public class SolrQueryBuilder {
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
                     || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
                 String[] fieldValues = fieldValue.split(" ");
-                if(fieldValues.length > 1) {
-                    for(String value : fieldValues) {
-                        stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(value);
-                    }
+                if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
+                    stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValues[0]);
                 } else {
-                    stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
+                    if(fieldValues.length > 1) {
+                        for(String value : fieldValues) {
+                            stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(value);
+                        }
+                    } else {
+                        stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
+                    }
                 }
             } else {
                 if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)) {
