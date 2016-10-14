@@ -1,18 +1,28 @@
 package org.recap.model.search;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rajeshbabuk on 11/7/16.
  */
+@ApiModel(value="SearchResultRow", description="Model for Displaying Search Result")
 public class SearchResultRow {
 
+    @ApiModelProperty(position = 0)
     private Integer bibId;
+    @ApiModelProperty(position = 1)
     private String title;
+    @ApiModelProperty(position = 2)
     private String author;
+    @ApiModelProperty(position = 3)
     private String publisher;
+    @ApiModelProperty(position = 4)
     private String publisherDate;
+    @ApiModelProperty(position = 1)
     private String owningInstitution;
     private String customerCode;
     private String collectionGroupDesignation;

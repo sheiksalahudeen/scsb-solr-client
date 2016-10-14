@@ -1,35 +1,84 @@
 package org.recap.model.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
  */
-public class SearchRecordsRequest {
+@ApiModel(value="SearchRecordsRequest", description="Model for showing user details")
+public class SearchRecordsRequest implements Serializable {
 
+
+    @ApiModelProperty(name= "SearchValue", value= "Search Value",  position = 0)
     private String fieldValue = "";
-    private String fieldName;
-    private List<String> owningInstitutions = null;
-    private List<String> collectionGroupDesignations = null;
-    private List<String> availability = null;
-    private List<String> materialTypes = null;
-    private List<String> useRestrictions = null;
-    private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
+    @ApiModelProperty(position = 1)
+    private String fieldName;
+
+    @ApiModelProperty(name= "owningInstitutions", value= "Publications Owning Instutions", position = 3, allowableValues="PUL,NYPL,CUL")
+    private List<String> owningInstitutions = null;
+
+    @ApiModelProperty(position = 4)
+    private List<String> collectionGroupDesignations = null;
+
+    @ApiModelProperty(position = 5)
+    private List<String> availability = null;
+    @JsonProperty
+    @ApiModelProperty(position = 6)
+    private List<String> materialTypes = null;
+    @JsonProperty
+    @ApiModelProperty(position = 7)
+    private List<String> useRestrictions = null;
+    @JsonProperty
+    @ApiModelProperty(position = 8)
+    private List<SearchResultRow> searchResultRows = new ArrayList<>();
+    @JsonProperty
+    @ApiModelProperty(position = 9)
     private Integer totalPageCount = 0;
+
+    @JsonProperty
+    @ApiModelProperty(position = 10)
     private String totalBibRecordsCount = "0";
+
+    @JsonProperty
+    @ApiModelProperty(position = 11)
     private String totalItemRecordsCount = "0";
+    @JsonProperty
+    @ApiModelProperty(position = 12)
     private String totalRecordsCount = "0";
+
+    @JsonProperty
+    @ApiModelProperty(position = 13)
     private Integer pageNumber = 0;
+
+    @JsonProperty
+    @ApiModelProperty(position = 14)
     private Integer pageSize = 10;
 
+    @JsonProperty
+    @ApiModelProperty(position = 15)
     private boolean showResults = false;
+    @JsonProperty
+    @ApiModelProperty(position = 16)
     private boolean selectAll = false;
+    @JsonProperty
+    @ApiModelProperty(position = 17)
     private boolean selectAllFacets = false;
+    @JsonProperty
+    @ApiModelProperty(position = 18)
     private boolean showTotalCount = false;
 
+    @JsonProperty
+    @ApiModelProperty(position = 19)
     private Integer index;
+
+    @ApiModelProperty(position = 20)
     private String errorMessage;
 
     public SearchRecordsRequest() {
@@ -62,7 +111,7 @@ public class SearchRecordsRequest {
     }
 
     public String getFieldValue() {
-        return fieldValue;
+        return fieldName;
     }
 
     public void setFieldValue(String fieldValue) {
