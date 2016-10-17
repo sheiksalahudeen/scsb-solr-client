@@ -1,13 +1,7 @@
 package org.recap.controller;
 
 import org.apache.commons.compress.utils.IOUtils;
-import org.recap.RecapConstants;
-import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
-import org.recap.model.search.SearchResultRow;
-import org.recap.model.solr.BibItem;
-import org.recap.model.solr.Holdings;
-import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.recap.util.CsvUtil;
@@ -28,9 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.apache.commons.collections.CollectionUtils;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
