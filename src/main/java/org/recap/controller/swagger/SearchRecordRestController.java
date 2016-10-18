@@ -26,7 +26,8 @@ import java.util.List;
 public class SearchRecordRestController {
 
     private Logger logger = LoggerFactory.getLogger(SearchRecordsController.class);
-
+    @Autowired
+    SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
 
     @RequestMapping(value="/search", method = RequestMethod.GET)
     @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search", position = 0, consumes="application/json")
@@ -34,7 +35,7 @@ public class SearchRecordRestController {
     public List<SearchResultRow> searchRecordsServiceGetParam(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestParam String requestJson) {
 
 //        logger.info("Get " +requestJson);
-        SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
+
         ObjectMapper mapper = new ObjectMapper();
         SearchRecordsRequest searchRecordsRequest = null;
         try {

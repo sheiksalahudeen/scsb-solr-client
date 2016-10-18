@@ -20,20 +20,28 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
 
-
+    @Autowired
     private SearchRecordRestController searchRecordRestController;
 
     @Before
     public void setUp() {
-        searchRecordRestController = new SearchRecordRestController();
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(searchRecordRestController).build();
     }
 
     @Test
+    public void searchRestfulApiEmpty() throws Exception {
+        String paramString="sdaasdadad{}{[[[]]";
+        MvcResult mvcResult = this.mockMvc.perform(get("/searchService/search")
+                .param("requestJson",paramString))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertTrue(status == 200);
+    }
+
+    @Test
     public void searchRestfulApi() throws Exception {
         String paramString="{\"owningInstitutions\" : [\"PUL\" ],\"materialTypes\" : [ \"Other\" ],\"useRestrictions\" : [\"NoRestrictions\" ,\"InLibraryUse\", \"SupervisedUse\" ] ,\"pageSize\": 10}";
-
         MvcResult mvcResult = this.mockMvc.perform(get("/searchService/search").param("requestJson",paramString)).andReturn();
         int status = mvcResult.getResponse().getStatus();
 

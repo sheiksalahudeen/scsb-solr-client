@@ -18,67 +18,61 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "SearchValue", value= "Search Value",  position = 0)
     private String fieldValue = "";
 
-    @ApiModelProperty(position = 1)
+    @ApiModelProperty(name ="fieldName", value= "Select a field name",position = 1)
     private String fieldName;
 
-    @ApiModelProperty(name= "owningInstitutions", value= "Publications Owning Instutions", position = 3, allowableValues="PUL,NYPL,CUL")
+    @ApiModelProperty(name= "owningInstitutions", value= "Publications Owning Instutions", position = 3, allowableValues="PUL, NYPL, CUL")
     private List<String> owningInstitutions = null;
 
-    @ApiModelProperty(position = 4)
+    @ApiModelProperty(name= "collectionGroupDesignations", value= "Collection Group Designations",position = 4)
     private List<String> collectionGroupDesignations = null;
 
-    @ApiModelProperty(position = 5)
+    @ApiModelProperty(name= "availability", value= "Availability of books in ReCAP",position = 5)
     private List<String> availability = null;
-    @JsonProperty
-    @ApiModelProperty(position = 6)
+
+    @ApiModelProperty(name= "materialTypes", value= "Material Types",position = 6)
     private List<String> materialTypes = null;
-    @JsonProperty
-    @ApiModelProperty(position = 7)
+
+    @ApiModelProperty(name= "useRestrictions", value= "Book Use Restrictions",position = 7)
     private List<String> useRestrictions = null;
-    @JsonProperty
-    @ApiModelProperty(position = 8)
+
+    @ApiModelProperty(name= "searchResultRows", value= "Search Response",position = 8)
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
-    @JsonProperty
-    @ApiModelProperty(position = 9)
+
+    @ApiModelProperty(name= "totalPageCount", value= "Total Page Count",position = 9)
     private Integer totalPageCount = 0;
 
-    @JsonProperty
-    @ApiModelProperty(position = 10)
+    @ApiModelProperty(name= "totalBibRecordsCount", value= "Total Bibliograph Records Count",position = 10)
     private String totalBibRecordsCount = "0";
 
-    @JsonProperty
-    @ApiModelProperty(position = 11)
+    @ApiModelProperty(name= "totalItemRecordsCount", value= "Total Item Count",position = 11)
     private String totalItemRecordsCount = "0";
-    @JsonProperty
-    @ApiModelProperty(position = 12)
+
+    @ApiModelProperty(name= "totalRecordsCount", value= "Total Records Count",position = 12)
     private String totalRecordsCount = "0";
 
-    @JsonProperty
-    @ApiModelProperty(position = 13)
+    @ApiModelProperty(name= "pageNumber", value= "Current Page Number",position = 13)
     private Integer pageNumber = 0;
 
-    @JsonProperty
-    @ApiModelProperty(position = 14)
+    @ApiModelProperty(name= "pageSize", value= "Total records to show is page",position = 14)
     private Integer pageSize = 10;
 
-    @JsonProperty
-    @ApiModelProperty(position = 15)
+    @ApiModelProperty(name= "showResults", value= "Show Results",position = 15)
     private boolean showResults = false;
-    @JsonProperty
-    @ApiModelProperty(position = 16)
+
+    @ApiModelProperty(name= "selectAll", value= "select All Fields",position = 16)
     private boolean selectAll = false;
-    @JsonProperty
-    @ApiModelProperty(position = 17)
+
+    @ApiModelProperty(name= "selectAllFacets", value= "Select All Facets",position = 17)
     private boolean selectAllFacets = false;
-    @JsonProperty
-    @ApiModelProperty(position = 18)
+
+    @ApiModelProperty(name= "showTotalCount", value= "Show Total Count",position = 18)
     private boolean showTotalCount = false;
 
-    @JsonProperty
-    @ApiModelProperty(position = 19)
+    @ApiModelProperty(name= "index", value= "index",position = 19)
     private Integer index;
 
-    @ApiModelProperty(position = 20)
+    @ApiModelProperty(name= "errorMessage", value= "Error Message",position = 20)
     private String errorMessage;
 
     public SearchRecordsRequest() {
