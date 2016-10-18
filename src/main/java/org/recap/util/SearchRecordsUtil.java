@@ -26,35 +26,33 @@ public final class SearchRecordsUtil {
     @Autowired
     private BibSolrDocumentRepository bibSolrDocumentRepository;
 
-    public SearchRecordsRequest searchRecords(SearchRecordsRequest searchRecordsRequest) {
+    public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) {
 
         if(!isEmptySearch(searchRecordsRequest)){
             searchRecordsRequest.reset();
             searchRecordsRequest.resetPageNumber();
-            searchAndBuildResults(searchRecordsRequest);
-            return searchRecordsRequest;
+            return searchAndBuildResults(searchRecordsRequest);
         }
         searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
-        return searchRecordsRequest;
+        return new ArrayList<>();
     }
 
-    public void searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
+    public List<SearchResultRow> searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
         Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
         String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
         if(errorResponse != null) {
             searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
         } else {
             List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            buildResults(searchRecordsRequest, bibItems);
+            return buildResults(bibItems);
         }
+
+        return new ArrayList<>();
     }
 
-    private void buildResults(SearchRecordsRequest searchRecordsRequest, List<BibItem> bibItems) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.setShowResults(true);
-        searchRecordsRequest.setSelectAll(false);
+    private List<SearchResultRow> buildResults(List<BibItem> bibItems) {
+        List<SearchResultRow> searchResultRows = new ArrayList<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
-            List<SearchResultRow> searchResultRows = new ArrayList<>();
             for (BibItem bibItem : bibItems) {
                 SearchResultRow searchResultRow = new SearchResultRow();
                 searchResultRow.setBibId(bibItem.getBibId());
@@ -99,8 +97,8 @@ public final class SearchRecordsUtil {
                 }
                 searchResultRows.add(searchResultRow);
             }
-            searchRecordsRequest.setSearchResultRows(searchResultRows);
         }
+        return searchResultRows;
     }
 
     private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {

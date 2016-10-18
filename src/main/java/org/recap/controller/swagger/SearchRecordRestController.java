@@ -46,7 +46,7 @@ public class SearchRecordRestController {
         if (searchRecordsRequest ==null){
             searchRecordsRequest = new SearchRecordsRequest();
         }
-        searchRecordsRequest = searchRecordsUtil.searchRecords(searchRecordsRequest);
-        return searchRecordsRequest.getSearchResultRows();
+        List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+        return searchResultRows;
     }
 }
