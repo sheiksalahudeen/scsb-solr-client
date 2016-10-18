@@ -1,16 +1,11 @@
 package org.recap.controller;
 
 import org.apache.commons.compress.utils.IOUtils;
-import org.recap.RecapConstants;
-import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
-import org.recap.model.search.SearchResultRow;
-import org.recap.model.solr.BibItem;
-import org.recap.model.solr.Holdings;
-import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
 import org.recap.util.CsvUtil;
+import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.apache.commons.collections.CollectionUtils;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
@@ -47,6 +41,9 @@ public class SearchRecordsController {
     ItemCrudRepository itemCrudRepository;
 
     @Autowired
+    SearchRecordsUtil searchRecordsUtil;
+
+    @Autowired
     private CsvUtil csvUtil;
 
     @RequestMapping("/search")
@@ -61,21 +58,7 @@ public class SearchRecordsController {
     public ModelAndView search(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.reset();
-            searchRecordsRequest.resetPageNumber();
-            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-            if(errorResponse != null) {
-                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-            } else {
-                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-                buildResults(searchRecordsRequest, bibItems);
-            }
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
-        return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
+        return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsUtil.searchRecords(searchRecordsRequest));
     }
 
     @ResponseBody
@@ -83,13 +66,8 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.reset();
-            searchRecordsRequest.setSearchResultRows(null);
-            searchAndBuildResults(searchRecordsRequest);
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        searchRecordsRequest.setSearchResultRows(null);
+        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -98,13 +76,8 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.setSearchResultRows(null);
-            searchRecordsRequest.reset();
-            searchAndBuildResults(searchRecordsRequest);
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        searchRecordsRequest.setSearchResultRows(null);
+        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -113,21 +86,9 @@ public class SearchRecordsController {
     public ModelAndView searchFirst(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.setSearchResultRows(null);
-            searchRecordsRequest.reset();
-            searchRecordsRequest.resetPageNumber();
-            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-            if(errorResponse != null) {
-                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-            } else {
-                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-                buildResults(searchRecordsRequest, bibItems);
-            }
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        searchRecordsRequest.setSearchResultRows(null);
+        searchRecordsRequest.resetPageNumber();
+        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -136,21 +97,9 @@ public class SearchRecordsController {
     public ModelAndView searchLast(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.reset();
-            searchRecordsRequest.setSearchResultRows(null);
-            searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
-            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-            if(errorResponse != null) {
-                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-            } else {
-                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-                buildResults(searchRecordsRequest, bibItems);
-            }
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        searchRecordsRequest.setSearchResultRows(null);
+        searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
+        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -207,98 +156,8 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.setPageNumber(bibSolrDocumentRepository.getPageNumberOnPageSizeChange(searchRecordsRequest));
-            Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-            if(errorResponse != null) {
-                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-            } else {
-                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-                buildResults(searchRecordsRequest, bibItems);
-            }
-            return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-        }
-        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
-    }
-
-    private void searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
-        Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
-        String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
-        if(errorResponse != null) {
-            searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
-        } else {
-            List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            buildResults(searchRecordsRequest, bibItems);
-        }
-    }
-
-    private void buildResults(SearchRecordsRequest searchRecordsRequest, List<BibItem> bibItems) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsRequest.setShowResults(true);
-        searchRecordsRequest.setSelectAll(false);
-        if (!CollectionUtils.isEmpty(bibItems)) {
-            List<SearchResultRow> searchResultRows = new ArrayList<>();
-            for (BibItem bibItem : bibItems) {
-                SearchResultRow searchResultRow = new SearchResultRow();
-                searchResultRow.setBibId(bibItem.getBibId());
-                searchResultRow.setTitle(bibItem.getTitleDisplay());
-                searchResultRow.setAuthor(bibItem.getAuthorDisplay());
-                searchResultRow.setPublisher(bibItem.getPublisher());
-                searchResultRow.setPublisherDate(bibItem.getPublicationDate());
-                searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
-                searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
-                Holdings holdings = CollectionUtils.isEmpty(bibItem.getHoldingsList()) ? new Holdings() : bibItem.getHoldingsList().get(0);
-                if (null != bibItem.getItems() && bibItem.getItems().size() == 1 && !RecapConstants.SERIAL.equals(bibItem.getLeaderMaterialType())) {
-                    Item item = bibItem.getItems().get(0);
-                    if (null != item) {
-                        searchResultRow.setCustomerCode(item.getCustomerCode());
-                        searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                        searchResultRow.setUseRestriction(item.getUseRestrictionDisplay());
-                        searchResultRow.setBarcode(item.getBarcode());
-                        searchResultRow.setAvailability(item.getAvailabilityDisplay());
-                        searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
-                    }
-                } else {
-                    if (!CollectionUtils.isEmpty(bibItem.getItems())) {
-                        List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
-                        for (Item item : bibItem.getItems()) {
-                            if (null != item) {
-                                SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
-                                searchItemResultRow.setCallNumber(item.getCallNumberDisplay());
-                                searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
-                                searchItemResultRow.setCustomerCode(item.getCustomerCode());
-                                searchItemResultRow.setBarcode(item.getBarcode());
-                                searchItemResultRow.setUseRestriction(item.getUseRestrictionDisplay());
-                                searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
-                                searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
-                                searchItemResultRows.add(searchItemResultRow);
-                            }
-                        }
-                        searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
-                        searchResultRow.setShowItems(true);
-                        Collections.sort(searchItemResultRows);
-                        searchResultRow.setSearchItemResultRows(searchItemResultRows);
-                    }
-                }
-                searchResultRows.add(searchResultRow);
-            }
-            searchRecordsRequest.setSearchResultRows(searchResultRows);
-        }
-    }
-
-    private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {
-        boolean emptySearch = false;
-        if (searchRecordsRequest.getMaterialTypes().size() == 0 && searchRecordsRequest.getAvailability().size() == 0 &&
-                searchRecordsRequest.getCollectionGroupDesignations().size() == 0 && searchRecordsRequest.getOwningInstitutions().size() == 0 && searchRecordsRequest.getUseRestrictions().size() == 0) {
-            emptySearch = true;
-        } else if(!((CollectionUtils.isNotEmpty(searchRecordsRequest.getMaterialTypes()) || CollectionUtils.isNotEmpty(searchRecordsRequest.getOwningInstitutions())) &&
-                (CollectionUtils.isNotEmpty(searchRecordsRequest.getAvailability()) || CollectionUtils.isNotEmpty(searchRecordsRequest.getCollectionGroupDesignations())
-                        || CollectionUtils.isNotEmpty(searchRecordsRequest.getUseRestrictions())))) {
-            emptySearch = true;
-        }
-        return emptySearch;
     }
 
     @InitBinder

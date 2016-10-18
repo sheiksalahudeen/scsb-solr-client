@@ -1,35 +1,78 @@
 package org.recap.model.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
  */
-public class SearchRecordsRequest {
+@ApiModel(value="SearchRecordsRequest", description="Model for showing user details")
+public class SearchRecordsRequest implements Serializable {
 
+
+    @ApiModelProperty(name= "SearchValue", value= "Search Value",  position = 0)
     private String fieldValue = "";
+
+    @ApiModelProperty(name ="fieldName", value= "Select a field name",position = 1)
     private String fieldName;
+
+    @ApiModelProperty(name= "owningInstitutions", value= "Publications Owning Instutions", position = 3, allowableValues="PUL, NYPL, CUL")
     private List<String> owningInstitutions = null;
+
+    @ApiModelProperty(name= "collectionGroupDesignations", value= "Collection Group Designations",position = 4)
     private List<String> collectionGroupDesignations = null;
+
+    @ApiModelProperty(name= "availability", value= "Availability of books in ReCAP",position = 5)
     private List<String> availability = null;
+
+    @ApiModelProperty(name= "materialTypes", value= "Material Types",position = 6)
     private List<String> materialTypes = null;
+
+    @ApiModelProperty(name= "useRestrictions", value= "Book Use Restrictions",position = 7)
     private List<String> useRestrictions = null;
+
+    @ApiModelProperty(name= "searchResultRows", value= "Search Response",position = 8)
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
+    @ApiModelProperty(name= "totalPageCount", value= "Total Page Count",position = 9)
     private Integer totalPageCount = 0;
+
+    @ApiModelProperty(name= "totalBibRecordsCount", value= "Total Bibliograph Records Count",position = 10)
     private String totalBibRecordsCount = "0";
+
+    @ApiModelProperty(name= "totalItemRecordsCount", value= "Total Item Count",position = 11)
     private String totalItemRecordsCount = "0";
+
+    @ApiModelProperty(name= "totalRecordsCount", value= "Total Records Count",position = 12)
     private String totalRecordsCount = "0";
+
+    @ApiModelProperty(name= "pageNumber", value= "Current Page Number",position = 13)
     private Integer pageNumber = 0;
+
+    @ApiModelProperty(name= "pageSize", value= "Total records to show is page",position = 14)
     private Integer pageSize = 10;
 
+    @ApiModelProperty(name= "showResults", value= "Show Results",position = 15)
     private boolean showResults = false;
+
+    @ApiModelProperty(name= "selectAll", value= "select All Fields",position = 16)
     private boolean selectAll = false;
+
+    @ApiModelProperty(name= "selectAllFacets", value= "Select All Facets",position = 17)
     private boolean selectAllFacets = false;
+
+    @ApiModelProperty(name= "showTotalCount", value= "Show Total Count",position = 18)
     private boolean showTotalCount = false;
 
+    @ApiModelProperty(name= "index", value= "index",position = 19)
     private Integer index;
+
+    @ApiModelProperty(name= "errorMessage", value= "Error Message",position = 20)
     private String errorMessage;
 
     public SearchRecordsRequest() {
@@ -62,7 +105,7 @@ public class SearchRecordsRequest {
     }
 
     public String getFieldValue() {
-        return fieldValue;
+        return fieldName;
     }
 
     public void setFieldValue(String fieldValue) {

@@ -86,7 +86,9 @@ dependencies {
 	compile('info.freelibrary:freelib-marc4j:2.6.11')
 	compile(group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0')
 	compile('org.springframework.boot:spring-boot-starter-data-rest:1.2.5.RELEASE')
-
+	compile('io.springfox:springfox-swagger-ui:2.5.0')
+	compile('io.springfox:springfox-swagger2:2.5.0')
+	compile('org.codehaus.jackson:jackson-mapper-asl:1.9.13')
 	runtime('mysql:mysql-connector-java')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
