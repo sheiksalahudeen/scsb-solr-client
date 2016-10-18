@@ -28,9 +28,7 @@ public final class SearchRecordsUtil {
 
     public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) {
 
-        if(!isEmptySearch(searchRecordsRequest)){
-            searchRecordsRequest.reset();
-            searchRecordsRequest.resetPageNumber();
+        if (!isEmptySearch(searchRecordsRequest)) {
             return searchAndBuildResults(searchRecordsRequest);
         }
         searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
