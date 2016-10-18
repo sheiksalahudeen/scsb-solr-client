@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:margin-right="http://www.w3.org/1999/xhtml">
 <head>
-
+     <title></title>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </head>
 <body>
-<div class="container col-sm-6" style="margin-top: 30px;">
-<div th:replace="recapHeader :: #recapPageHeaderId"></div>
-<form id="marcRecord-form" name="marcRecord-form" class="form-horizontal" action="#"
-      th:action="@{/openMarcRecord}"
-      th:object="${bibliographicMarcRecord}" method="post">
-     <div class="container" style="margin-top: 40px;">
-          <div class="form-group">
-               <span th:text="${bibliographicMarcRecord.errorMessage}"></span>
-          </div>
-     </div>
-</form>
+<div class="container col-sm-12">
+     <div th:replace="recapHeader :: #recapPageHeaderId"></div>
+          <form id="marcRecord-form" name="marcRecord-form" class="form-horizontal" action="#"
+                th:action="@{/openMarcRecord}"
+                th:object="${bibliographicMarcRecord}" method="post">
+               <div class="col-md-12" style="margin-top: 40px;">
+                    <div class="form-group">
+                         <span class="pull-left" th:text="${bibliographicMarcRecord.errorMessage}" style="font-size: 16px"></span>
+                    </div>
+
+               </div>
+          </form>
+
 </div>
 
 </body>
