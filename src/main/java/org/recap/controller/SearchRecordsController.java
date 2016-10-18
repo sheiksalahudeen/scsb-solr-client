@@ -58,7 +58,9 @@ public class SearchRecordsController {
     public ModelAndView search(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
-        return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsUtil.searchRecords(searchRecordsRequest));
+        searchRecordsRequest.resetPageNumber();
+        searchAndSetResults(searchRecordsRequest);
+        return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
     @ResponseBody
@@ -66,8 +68,7 @@ public class SearchRecordsController {
     public ModelAndView searchPrevious(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                BindingResult result,
                                Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
+        searchAndSetResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -76,8 +77,7 @@ public class SearchRecordsController {
     public ModelAndView searchNext(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                    BindingResult result,
                                    Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
-        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
+        searchAndSetResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -86,9 +86,8 @@ public class SearchRecordsController {
     public ModelAndView searchFirst(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.resetPageNumber();
-        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
+        searchAndSetResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -97,9 +96,8 @@ public class SearchRecordsController {
     public ModelAndView searchLast(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                        BindingResult result,
                                        Model model) {
-        searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
-        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
+        searchAndSetResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -156,8 +154,17 @@ public class SearchRecordsController {
     public ModelAndView onPageSizeChange(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                          BindingResult result,
                                          Model model) throws Exception {
-        searchRecordsUtil.searchAndBuildResults(searchRecordsRequest);
+        searchRecordsRequest.setPageNumber(bibSolrDocumentRepository.getPageNumberOnPageSizeChange(searchRecordsRequest));
+        searchAndSetResults(searchRecordsRequest);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
+    }
+
+    private void searchAndSetResults(SearchRecordsRequest searchRecordsRequest) {
+        searchRecordsRequest.reset();
+        searchRecordsRequest.setSearchResultRows(null);
+        searchRecordsRequest.setShowResults(true);
+        searchRecordsRequest.setSelectAll(false);
+        searchRecordsRequest.setSearchResultRows(searchRecordsUtil.searchRecords(searchRecordsRequest));
     }
 
     @InitBinder

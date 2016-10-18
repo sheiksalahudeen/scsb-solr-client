@@ -15,7 +15,7 @@ import java.util.List;
 public class SearchRecordsRequest implements Serializable {
 
 
-    @ApiModelProperty(name= "SearchValue", value= "Search Value",  position = 0)
+    @ApiModelProperty(name= "fieldValue", value= "Search Value",  position = 0)
     private String fieldValue = "";
 
     @ApiModelProperty(name ="fieldName", value= "Select a field name",position = 1)
@@ -105,7 +105,7 @@ public class SearchRecordsRequest implements Serializable {
     }
 
     public String getFieldValue() {
-        return fieldName;
+        return fieldValue;
     }
 
     public void setFieldValue(String fieldValue) {
