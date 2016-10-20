@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(classes = Main.class)
 @WebAppConfiguration
 @Transactional
-@Rollback(false)
+@Rollback()
 public class BaseTestCase {
 
     @Autowired
@@ -60,6 +60,9 @@ public class BaseTestCase {
 
     @Autowired
     public CollectionGroupDetailsRepository collectionGroupDetailRepository;
+
+    @Autowired
+    public CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
     @Autowired
     public ItemCrudRepository itemCrudRepository;
