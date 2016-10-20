@@ -13,7 +13,7 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "bibSolr", path = "bibSolr")
 public interface BibSolrCrudRepository extends SolrCrudRepository<Bib, String> {
 
-    Bib findByBibId(Integer bibId);
+    Bib findByBibId(@Param("bibId") Integer bibId);
 
     List<Bib> findByOclcNumber(String oclcNumber);
 

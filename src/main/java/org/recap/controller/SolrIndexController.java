@@ -1,6 +1,9 @@
 package org.recap.controller;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.plexus.util.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
@@ -9,21 +12,23 @@ import org.recap.executors.BibItemIndexExecutorService;
 import org.recap.executors.HoldingsIndexExecutorService;
 import org.recap.executors.ItemIndexExecutorService;
 import org.recap.matchingAlgorithm.report.ReportGenerator;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.util.BibJSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -65,6 +70,21 @@ public class SolrIndexController {
 
     @Autowired
     ReportGenerator reportGenerator;
+
+    @Autowired
+    SolrTemplate solrTemplate;
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
+    ProducerTemplate producerTemplate;
+
+    @Value("${solr.parent.core}")
+    String solrCore;
 
     @RequestMapping("/")
     public String solrIndexer(Model model){
@@ -173,5 +193,18 @@ public class SolrIndexController {
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         return cal.getTime();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/solrIndexer/indexByBibliographicId", method = RequestMethod.POST)
+    public void indexByBibliographicId(@RequestBody Integer bibliographicId) {
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        bibJSONUtil.setProducerTemplate(producerTemplate);
+        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+        if (solrInputDocument !=null) {
+            solrTemplate.saveDocument(solrInputDocument);
+            solrTemplate.commit();
+        }
     }
 }
