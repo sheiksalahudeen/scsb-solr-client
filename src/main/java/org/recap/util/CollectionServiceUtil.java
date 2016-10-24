@@ -8,7 +8,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.ChangeLogEntity;
+import org.recap.model.jpa.ItemChangeLogEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.search.BibliographicMarcForm;
 import org.recap.repository.jpa.*;
@@ -53,7 +53,7 @@ public class CollectionServiceUtil {
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    ChangeLogDetailsRepository changeLogDetailsRepository;
+    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired
     ItemCrudRepository itemSolrCrudRepository;
@@ -67,7 +67,7 @@ public class CollectionServiceUtil {
         try {
             updateCGDForItemInDB(bibliographicMarcForm, userName, lastUpdatedDate);
             updateCGDForItemInSolr(bibliographicMarcForm);
-            saveChangeLogEntity(bibliographicMarcForm.getItemId(), userName, lastUpdatedDate, RecapConstants.UPDATE_CGD, bibliographicMarcForm.getCgdChangeNotes());
+            saveItemChangeLogEntity(bibliographicMarcForm.getItemId(), userName, lastUpdatedDate, RecapConstants.UPDATE_CGD, bibliographicMarcForm.getCgdChangeNotes());
             bibliographicMarcForm.setSubmitted(true);
             bibliographicMarcForm.setMessage(RecapConstants.CGD_UPDATE_SUCCESSFUL);
         } catch (Exception e) {
@@ -100,14 +100,14 @@ public class CollectionServiceUtil {
         solrTemplate.commit();
     }
 
-    private void saveChangeLogEntity(Integer recordId, String userName, Date lastUpdatedDate, String operationType, String notes) {
-        ChangeLogEntity changeLogEntity = new ChangeLogEntity();
-        changeLogEntity.setUpdatedBy(userName);
-        changeLogEntity.setUpdatedDate(lastUpdatedDate);
-        changeLogEntity.setOperationType(operationType);
-        changeLogEntity.setRecordId(recordId);
-        changeLogEntity.setNotes(notes);
-        changeLogDetailsRepository.save(changeLogEntity);
+    private void saveItemChangeLogEntity(Integer recordId, String userName, Date lastUpdatedDate, String operationType, String notes) {
+        ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
+        itemChangeLogEntity.setUpdatedBy(userName);
+        itemChangeLogEntity.setUpdatedDate(lastUpdatedDate);
+        itemChangeLogEntity.setOperationType(operationType);
+        itemChangeLogEntity.setRecordId(recordId);
+        itemChangeLogEntity.setNotes(notes);
+        itemChangeLogDetailsRepository.save(itemChangeLogEntity);
     }
 
     public void deaccessionItem(BibliographicMarcForm bibliographicMarcForm) {
@@ -133,7 +133,7 @@ public class CollectionServiceUtil {
                 if (RecapConstants.SUCCESS.equals(resultMessage)) {
                     String userName = RecapConstants.GUEST;
                     Date lastUpdatedDate = new Date();
-                    saveChangeLogEntity(bibliographicMarcForm.getItemId(), userName, lastUpdatedDate, RecapConstants.DEACCESSION, bibliographicMarcForm.getDeaccessionNotes());
+                    saveItemChangeLogEntity(bibliographicMarcForm.getItemId(), userName, lastUpdatedDate, RecapConstants.DEACCESSION, bibliographicMarcForm.getDeaccessionNotes());
                     bibliographicMarcForm.setSubmitted(true);
                     bibliographicMarcForm.setMessage(RecapConstants.DEACCESSION_SUCCESSFUL);
                 } else {

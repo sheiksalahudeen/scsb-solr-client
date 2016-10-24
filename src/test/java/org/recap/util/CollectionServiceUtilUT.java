@@ -177,7 +177,7 @@ public class CollectionServiceUtilUT extends BaseTestCase {
 
     @Test
     public void updateCGDForItem() throws Exception {
-        long beforeCountForChangeLog = changeLogDetailsRepository.count();
+        long beforeCountForChangeLog = itemChangeLogDetailsRepository.count();
 
         BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
@@ -223,7 +223,7 @@ public class CollectionServiceUtilUT extends BaseTestCase {
         assertEquals(itemId, fetchedItemSolrAfterUpdate.getItemId());
         assertEquals("Private", fetchedItemSolrAfterUpdate.getCollectionGroupDesignation());
 
-        long afterCountForChangeLog = changeLogDetailsRepository.count();
+        long afterCountForChangeLog = itemChangeLogDetailsRepository.count();
 
         assertEquals(afterCountForChangeLog, beforeCountForChangeLog + 1);
     }

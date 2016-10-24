@@ -8,12 +8,12 @@ import java.util.Date;
  * Created by rajeshbabuk on 18/10/16.
  */
 @Entity
-@Table(name = "change_log_t", schema = "recap", catalog = "")
-public class ChangeLogEntity implements Serializable {
+@Table(name = "ITEM_CHANGE_LOG_T", schema = "recap", catalog = "")
+public class ItemChangeLogEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "CHANGE_LOG_ID")
+    @Column(name = "ITEM_CHANGE_LOG_ID")
     private Integer changeLogId;
 
     @Column(name = "UPDATED_BY")
