@@ -12,7 +12,7 @@ import static junit.framework.TestCase.assertNotNull;
 /**
  * Created by premkb on 2/8/16.
  */
-public class BibliographicMarcRecordUT {
+public class BibliographicMarcFormUT {
 
     private String bibContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n"+
             "                <record>\n"+
@@ -118,28 +118,28 @@ public class BibliographicMarcRecordUT {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
-        BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
-        assertNotNull(bibliographicMarcRecord);
-        assertEquals("Rih Husayn Muhammad    Travels of Ibn Jubayr. \"E.J.W. Gibb memorial\" series ; ",bibliographicMarcRecord.getTitle());
-        assertEquals("Ibn Jubayr 1145-1217.   ",bibliographicMarcRecord.getAuthor());
-        assertEquals("AMS Press,",bibliographicMarcRecord.getPublisher());
-        assertEquals("1973] 1907.",bibliographicMarcRecord.getPublishedDate());
-        assertEquals("01814cam a2200409 450000",bibliographicMarcRecord.getTag000());
-        assertEquals("NYPG002000036-B",bibliographicMarcRecord.getControlNumber001());
-        assertEquals("20001116192424.2",bibliographicMarcRecord.getControlNumber005());
-        assertEquals("850225r19731907nyu b 001 0 ara",bibliographicMarcRecord.getControlNumber008());
+        BibliographicMarcForm bibliographicMarcForm = buildBibliographicMarcForm(marcRecord, bibJSONUtil);
+        assertNotNull(bibliographicMarcForm);
+        assertEquals("Rih Husayn Muhammad    Travels of Ibn Jubayr. \"E.J.W. Gibb memorial\" series ; ", bibliographicMarcForm.getTitle());
+        assertEquals("Ibn Jubayr 1145-1217.   ", bibliographicMarcForm.getAuthor());
+        assertEquals("AMS Press,", bibliographicMarcForm.getPublisher());
+        assertEquals("1973] 1907.", bibliographicMarcForm.getPublishedDate());
+        assertEquals("01814cam a2200409 450000", bibliographicMarcForm.getTag000());
+        assertEquals("NYPG002000036-B", bibliographicMarcForm.getControlNumber001());
+        assertEquals("20001116192424.2", bibliographicMarcForm.getControlNumber005());
+        assertEquals("850225r19731907nyu b 001 0 ara", bibliographicMarcForm.getControlNumber008());
     }
 
-    private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
-        BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
-        bibliographicMarcRecord.setTitle(bibJSONUtil.getTitle(marcRecord));
-        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
-        bibliographicMarcRecord.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
-        bibliographicMarcRecord.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
-        bibliographicMarcRecord.setTag000(bibJSONUtil.getLeader(marcRecord));
-        bibliographicMarcRecord.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
-        bibliographicMarcRecord.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));
-        bibliographicMarcRecord.setControlNumber008(bibJSONUtil.getControlFieldValue(marcRecord, "008"));
-        return bibliographicMarcRecord;
+    private BibliographicMarcForm buildBibliographicMarcForm(Record marcRecord, BibJSONUtil bibJSONUtil) {
+        BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
+        bibliographicMarcForm.setTitle(bibJSONUtil.getTitle(marcRecord));
+        bibliographicMarcForm.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
+        bibliographicMarcForm.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
+        bibliographicMarcForm.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
+        bibliographicMarcForm.setTag000(bibJSONUtil.getLeader(marcRecord));
+        bibliographicMarcForm.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
+        bibliographicMarcForm.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));
+        bibliographicMarcForm.setControlNumber008(bibJSONUtil.getControlFieldValue(marcRecord, "008"));
+        return bibliographicMarcForm;
     }
 }

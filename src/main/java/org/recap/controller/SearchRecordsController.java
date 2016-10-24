@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
@@ -50,6 +51,7 @@ public class SearchRecordsController {
     public String searchRecords(Model model) {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
         model.addAttribute("searchRecordsRequest", searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return "searchRecords";
     }
 
@@ -60,6 +62,7 @@ public class SearchRecordsController {
                                   Model model) {
         searchRecordsRequest.resetPageNumber();
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -69,6 +72,7 @@ public class SearchRecordsController {
                                BindingResult result,
                                Model model) {
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -78,6 +82,7 @@ public class SearchRecordsController {
                                    BindingResult result,
                                    Model model) {
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -88,6 +93,7 @@ public class SearchRecordsController {
                                        Model model) {
         searchRecordsRequest.resetPageNumber();
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -98,6 +104,7 @@ public class SearchRecordsController {
                                        Model model) {
         searchRecordsRequest.setPageNumber(searchRecordsRequest.getTotalPageCount() - 1);
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 
@@ -114,6 +121,7 @@ public class SearchRecordsController {
         searchRecordsRequest.setMaterialTypes(new ArrayList<>());
         searchRecordsRequest.setUseRestrictions(new ArrayList<>());
         searchRecordsRequest.setShowResults(false);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords");
     }
 
@@ -124,6 +132,7 @@ public class SearchRecordsController {
                                   Model model) {
         searchRecordsRequest = new SearchRecordsRequest();
         model.addAttribute("searchRecordsRequest", searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords");
     }
 
@@ -132,6 +141,7 @@ public class SearchRecordsController {
     public ModelAndView requestRecords(@Valid @ModelAttribute("searchRecordsRequest") SearchRecordsRequest searchRecordsRequest,
                                   BindingResult result,
                                   Model model) {
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords");
     }
 
@@ -146,6 +156,7 @@ public class SearchRecordsController {
         byte[] fileContent = IOUtils.toByteArray(new FileInputStream(csvFile));
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileNameWithExtension + "\"");
         response.setContentLength(fileContent.length);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return fileContent;
     }
 
@@ -156,6 +167,7 @@ public class SearchRecordsController {
                                          Model model) throws Exception {
         searchRecordsRequest.setPageNumber(bibSolrDocumentRepository.getPageNumberOnPageSizeChange(searchRecordsRequest));
         searchAndSetResults(searchRecordsRequest);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
         return new ModelAndView("searchRecords", "searchRecordsRequest", searchRecordsRequest);
     }
 

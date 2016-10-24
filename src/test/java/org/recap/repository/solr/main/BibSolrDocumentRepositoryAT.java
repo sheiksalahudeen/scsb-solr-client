@@ -464,4 +464,15 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         return bib;
     }
 
+    @Test
+    public void testMultipleBarcodeSearch() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("Barcode");
+        searchRecordsRequest.setFieldValue("33433009087036, 33433021391382");
+
+        Map<String, Object> searchMap = bibSolrDocumentRepository.search(searchRecordsRequest);
+        List<BibItem> bibItems = (List<BibItem>) searchMap.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
+        assertNotNull(bibItems);
+    }
+
 }

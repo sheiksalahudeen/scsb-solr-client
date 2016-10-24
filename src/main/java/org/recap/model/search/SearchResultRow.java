@@ -46,6 +46,8 @@ public class SearchResultRow {
     private boolean selectAllItems = false;
     @ApiModelProperty(name= "searchItemResultRows", value= "Item Results",position = 16)
     private List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
+    @ApiModelProperty(name= "itemId", value= "Item Id",position = 17)
+    private Integer itemId;
 
     public Integer getBibId() {
         return bibId;
@@ -181,5 +183,13 @@ public class SearchResultRow {
 
     public void setSelectAllItems(boolean selectAllItems) {
         this.selectAllItems = selectAllItems;
+    }
+
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
     }
 }

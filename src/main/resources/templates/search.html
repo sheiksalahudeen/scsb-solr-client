@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Search</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-</head>
-<body>
-<div id="searchContentId" name="searchContentName" th:fragment="searchContent">
+<div id="searchContentId" name="searchContentName" th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <link rel="stylesheet" th:href="@{../css/search.css}"/>
+    <script type="text/javascript" th:src="@{../js/search.js}"></script>
     <div id="searchFormDivId" name="searchFormDivName" th:fragment="search-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
         <form id="search-form" name="search-form" class="form-horizontal" action="#"
               th:action="@{/search}"
@@ -382,5 +376,3 @@
         </form>
     </div>
 </div>
-</body>
-</html>

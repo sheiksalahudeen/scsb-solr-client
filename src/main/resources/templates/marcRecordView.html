@@ -18,20 +18,20 @@
              th:remove="tag">
             <form id="marcRecord-form" name="marcRecord-form" class="form-horizontal" action="#"
                   th:action="@{/openMarcRecord}"
-                  th:object="${bibliographicMarcRecord}" method="post">
+                  th:object="${bibliographicMarcForm}" method="post">
                 <fieldset>
                     <div id="marcRecordDivId" name="marcRecordDivName">
                         <div class="container">
                             <div class="form-group">
-                                <h3 style="font-weight: bold;"><span th:text="${bibliographicMarcRecord.title}"></span></h3>
+                                <h3 style="font-weight: bold;"><span th:text="${bibliographicMarcForm.title}"></span></h3>
                             </div>
                             <br/>
                             <div class="form-group">
-                                <span style="font-weight: bold;">Author : </span><span th:text="${bibliographicMarcRecord.author}"></span><br/>
-                                <span style="font-weight: bold;">Publisher : </span><span th:text="${bibliographicMarcRecord.publisher}"></span><br/>
-                                <span style="font-weight: bold;">Published Date : </span><span th:text="${bibliographicMarcRecord.publishedDate}"></span><br/>
-                                <span style="font-weight: bold;">Owning Institution : </span><span th:text="${bibliographicMarcRecord.owningInstitution}"></span><br/>
-                                <span style="font-weight: bold;">Call Number : </span><span th:text="${bibliographicMarcRecord.callNumber}"></span><br/>
+                                <span style="font-weight: bold;">Author : </span><span th:text="${bibliographicMarcForm.author}"></span><br/>
+                                <span style="font-weight: bold;">Publisher : </span><span th:text="${bibliographicMarcForm.publisher}"></span><br/>
+                                <span style="font-weight: bold;">Published Date : </span><span th:text="${bibliographicMarcForm.publishedDate}"></span><br/>
+                                <span style="font-weight: bold;">Owning Institution : </span><span th:text="${bibliographicMarcForm.owningInstitution}"></span><br/>
+                                <span style="font-weight: bold;">Call Number : </span><span th:text="${bibliographicMarcForm.callNumber}"></span><br/>
                             </div>
                             <div class="form-group">
                                 <span style="font-weight: bold;">MARC Content : </span>
@@ -45,19 +45,19 @@
                                     <tbody>
                                     <tr>
                                         <td><span>tag000</span></td>
-                                        <td><span th:text="${bibliographicMarcRecord.tag000}"></span></td>
+                                        <td><span th:text="${bibliographicMarcForm.tag000}"></span></td>
                                     </tr>
                                     <tr>
                                         <td><span>Control Number (001)</span></td>
-                                        <td><span th:text="${bibliographicMarcRecord.controlNumber001}"></span></td>
+                                        <td><span th:text="${bibliographicMarcForm.controlNumber001}"></span></td>
                                     </tr>
                                     <tr>
                                         <td><span>Date and Time (005)</span></td>
-                                        <td><span th:text="${bibliographicMarcRecord.controlNumber005}"></span></td>
+                                        <td><span th:text="${bibliographicMarcForm.controlNumber005}"></span></td>
                                     </tr>
                                     <tr>
                                         <td><span>Fixed Length Data Element (008)</span></td>
-                                        <td><span th:text="${bibliographicMarcRecord.controlNumber008}"></span></td>
+                                        <td><span th:text="${bibliographicMarcForm.controlNumber008}"></span></td>
                                     </tr>
                                     <tr th:each="bibDataField : *{bibDataFields}">
                                         <td>

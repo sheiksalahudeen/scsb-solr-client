@@ -15,6 +15,7 @@ public class RecapConstants {
     public static final String HOLDINGS_ID = "HoldingsId";
     public static final String HOLDING_ID = "HoldingId";
     public static final String ITEM_ID = "ItemId";
+    public static final String SEARCH = "search";
     public static final String BIB_OWNING_INSTITUTION = "BibOwningInstitution";
     public static final String HOLDINGS_OWNING_INSTITUTION = "HoldingsOwningInstitution";
     public static final String ITEM_OWNING_INSTITUTION = "ItemOwningInstitution";
@@ -162,4 +163,29 @@ public class RecapConstants {
     public static final String OWNING_INST_BIB_ID = "OwningInstitutionBibId";
     public static final String BIB_ID = "BibId";
     public static final String NA = "NA";
+
+    //Collection
+    public static final String UPDATE_CGD = "Update CGD";
+    public static final String DEACCESSION = "Deaccession";
+    public static final String TEMPLATE = "template";
+    public static final String COLLECTION = "collection";
+    public static final String GUEST = "guest";
+    public static final String ITEM_BARCODES = "itemBarcodes";
+    public static final String API_KEY = "api_key";
+    public static final String RECAP = "recap";
+    public static final String AVAILABLE = "Available";
+    public static final String NOT_AVAILABLE = "Not Available";
+    public static final String PERMANENT_WITHDRAWL_DIRECT = "Permanent Withdrawl Direct (PWD)";
+    public static final String PERMANENT_WITHDRAWL_INDIRECT = "Permanent Withdrawl Indirect (PWI)";
+
+    public static final String DEACCESSION_URL = "sharedCollection/deAccession";
+
+    public static final String SUCCESS = "Success";
+    public static final String FAILURE = "Failure";
+    public static final String NO_RESULTS_FOUND = "No results found.";
+    public static final String BARCODES_NOT_FOUND = "Barcode(s) not found";
+    public static final String CGD_UPDATE_SUCCESSFUL = "The CGD has been successfully updated.";
+    public static final String CGD_UPDATE_FAILED = "Updating CGD failed";
+    public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
+    public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
 }

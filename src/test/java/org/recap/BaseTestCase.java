@@ -62,6 +62,9 @@ public class BaseTestCase {
     public CollectionGroupDetailsRepository collectionGroupDetailRepository;
 
     @Autowired
+    public ChangeLogDetailsRepository changeLogDetailsRepository;
+
+    @Autowired
     public CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
     @Autowired

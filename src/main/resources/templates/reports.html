@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Reports</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+</head>
+<body>
+<div id="reportsContentId" name="reportsContentName" th:fragment="content">
+    <div id="reportsFormDivId" name="reportsFormDivName" th:fragment="reports-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+        <form id="reports-form" name="reports-form" class="form-horizontal" action="#"
+              th:action="@{/reports}"
+              th:object="${reportsForm}" method="post">
+            <fieldset>
+                <div id="reportsRecordsDivId" name="reportsRecordsDivName" class="container-fluid">
+                    <div class="col-md-12">
+                        <h3 style="color: dodgerblue">Reports</h3>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+</body>
+</html>
