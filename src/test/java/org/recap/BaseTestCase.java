@@ -18,10 +18,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -62,7 +58,7 @@ public class BaseTestCase {
     public CollectionGroupDetailsRepository collectionGroupDetailRepository;
 
     @Autowired
-    public ChangeLogDetailsRepository changeLogDetailsRepository;
+    public ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired
     public CustomerCodeDetailsRepository customerCodeDetailsRepository;
