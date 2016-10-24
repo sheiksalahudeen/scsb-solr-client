@@ -11,10 +11,10 @@
      <div th:replace="recapHeader :: #recapPageHeaderId"></div>
           <form id="marcRecord-form" name="marcRecord-form" class="form-horizontal" action="#"
                 th:action="@{/openMarcRecord}"
-                th:object="${bibliographicMarcRecord}" method="post">
+                th:object="${bibliographicMarcForm}" method="post">
                <div class="col-md-12" style="margin-top: 40px;">
                     <div class="form-group">
-                         <span class="pull-left" th:text="${bibliographicMarcRecord.errorMessage}" style="font-size: 16px"></span>
+                         <span class="pull-left" th:text="${bibliographicMarcForm.errorMessage}" style="font-size: 16px"></span>
                     </div>
 
                </div>

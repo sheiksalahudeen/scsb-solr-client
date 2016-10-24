@@ -1,5 +1,6 @@
 package org.recap.repository.jpa;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
@@ -13,6 +14,9 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -124,4 +128,85 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertTrue(savedItemEntity.getCollectionGroupId() == 1);
     }
 
+    @Test
+    public void updateCollectionGroupIdByItemId() throws Exception {
+        BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
+        assertNotNull(savedBibliographicEntity.getItemEntities());
+        assertEquals("Shared", savedBibliographicEntity.getItemEntities().get(0).getCollectionGroupEntity().getCollectionGroupCode());
+
+        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
+        int updatedItem = itemDetailsRepository.updateCollectionGroupIdByItemId(2, itemId, "guest", new Date());
+        assertEquals(1, updatedItem);
+
+        ItemEntity fetchedItemEntity = itemDetailsRepository.findByItemId(itemId);
+        entityManager.refresh(fetchedItemEntity);
+        assertNotNull(fetchedItemEntity);
+        assertNotNull(fetchedItemEntity.getItemId());
+        assertEquals(itemId, fetchedItemEntity.getItemId());
+        assertEquals("Open", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+    }
+
+    public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
+        Random random = new Random();
+        File bibContentFile = getBibContentFile();
+        File holdingsContentFile = getHoldingsContentFile();
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        String sourceHoldingsContent = FileUtils.readFileToString(holdingsContentFile, "UTF-8");
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setDeleted(false);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(sourceHoldingsContent.getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity.setDeleted(false);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("123");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        itemEntity.setDeleted(false);
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        return bibliographicEntity;
+    }
+
+    public File getBibContentFile() throws URISyntaxException {
+        URL resource = getClass().getResource("BibContent.xml");
+        return new File(resource.toURI());
+    }
+
+    public File getHoldingsContentFile() throws URISyntaxException {
+        URL resource = getClass().getResource("HoldingsContent.xml");
+        return new File(resource.toURI());
+    }
 }

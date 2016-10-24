@@ -1,6 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
@@ -8,6 +9,7 @@ import org.recap.model.search.SearchRecordsRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -123,7 +125,7 @@ public class SolrQueryBuilder {
         List<String> modifiedValues = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(values)) {
             for (String value : values) {
-                modifiedValues.add("\"" + value + "\"");
+                modifiedValues.add("\"" + value.trim() + "\"");
             }
         }
         return fieldName + ":" + "(" + StringUtils.join(modifiedValues, " ") + ")";
@@ -161,8 +163,15 @@ public class SolrQueryBuilder {
                 if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)){
                     fieldValue = fieldValue.replaceAll(" ", "");
                 }
-                stringBuilder.append(fieldName).append(":").append("(");
-                stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                if (fieldName.equalsIgnoreCase(RecapConstants.BARCODE)) {
+                    String[] fieldValues = fieldValue.split(",");
+                    if (ArrayUtils.isNotEmpty(fieldValues)) {
+                        stringBuilder.append(buildQueryForMatchChildReturnParent(fieldName, Arrays.asList(fieldValues))).append(and);
+                    }
+                } else {
+                    stringBuilder.append(fieldName).append(":").append("(");
+                    stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                }
             }
             return stringBuilder.toString();
         }

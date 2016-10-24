@@ -6,35 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{../css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{../css/font-awesome.min.css}"/>
-    <link rel="stylesheet" th:href="@{../css/searchRecords.css}"/>
     <script th:src="@{../js/jquery.min.js}"></script>
     <script th:src="@{../js/bootstrap.min.js}"></script>
     <script type="text/javascript" th:src="@{../js/jquery.tablesorter.js}"></script>
-    <script type="text/javascript" th:src="@{../js/searchRecords.js}"></script>
 </head>
 <body>
+<div th:replace="recapHeader :: #recapPageHeaderId"></div>
 <div class="container col-xs-12">
-    <div th:replace="recapHeader :: #recapPageHeaderId"></div>
-    <ul class="nav nav-tabs nav-justified">
-        <li class="active"><a data-toggle="tab" href="#searchId">Search</a></li>
-        <li><a data-toggle="tab" href="#collectionId">Collection</a></li>
-        <li><a data-toggle="tab" href="#requestId">Request</a></li>
-        <li><a data-toggle="tab" href="#reportsId">Reports</a></li>
+    <ul class="nav nav-tabs nav-justified" id="searchTabs">
+        <li th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}"><a href="/search">Search</a></li>
+        <li th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}"><a href="/collection">Collection</a></li>
+        <li th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}"><a href="/request">Request</a></li>
+        <li th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}"><a href="/reports">Reports</a></li>
     </ul>
 
     <div class="tab-content">
-        <div id="searchId" name="searchPage" class="tab-pane fade in active">
-            <div th:include="search :: searchContent"></div>
-        </div>
-        <div id="collectionId" name="collectionPage" class="tab-pane fade">
-            <h3>Collection</h3>
-        </div>
-        <div id="requestId" name="requestPage" class="tab-pane fade">
-            <h3>Request</h3>
-        </div>
-        <div id="reportsId" name="reportsPage" class="tab-pane fade">
-            <h3>Reports</h3>
-        </div>
+        <div th:replace="${template} :: content"></div>
     </div>
 </div>
 </body>

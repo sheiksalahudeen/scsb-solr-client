@@ -1,6 +1,5 @@
 package org.recap.model.search;
 
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
@@ -124,28 +123,28 @@ public class BibDataFieldUT {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
-        BibliographicMarcRecord bibliographicMarcRecord = buildBibliographicMarcRecord(marcRecord, bibJSONUtil);
-        assertNotNull(bibliographicMarcRecord);
-        assertNotNull(bibliographicMarcRecord.getBibDataFields());
-        assertEquals("010",bibliographicMarcRecord.getBibDataFields().get(0).getDataFieldTag());
-        assertEquals("_",String.valueOf(bibliographicMarcRecord.getBibDataFields().get(0).getIndicator1()));
-        assertEquals("_",String.valueOf(bibliographicMarcRecord.getBibDataFields().get(0).getIndicator2()));
-        assertEquals("|a 77173005 ",bibliographicMarcRecord.getBibDataFields().get(0).getDataFieldValue());
+        BibliographicMarcForm bibliographicMarcForm = buildBibliographicMarcForm(marcRecord, bibJSONUtil);
+        assertNotNull(bibliographicMarcForm);
+        assertNotNull(bibliographicMarcForm.getBibDataFields());
+        assertEquals("010", bibliographicMarcForm.getBibDataFields().get(0).getDataFieldTag());
+        assertEquals("_",String.valueOf(bibliographicMarcForm.getBibDataFields().get(0).getIndicator1()));
+        assertEquals("_",String.valueOf(bibliographicMarcForm.getBibDataFields().get(0).getIndicator2()));
+        assertEquals("|a 77173005 ", bibliographicMarcForm.getBibDataFields().get(0).getDataFieldValue());
 
     }
 
-    private BibliographicMarcRecord buildBibliographicMarcRecord(Record marcRecord, BibJSONUtil bibJSONUtil) {
-        BibliographicMarcRecord bibliographicMarcRecord = new BibliographicMarcRecord();
-        bibliographicMarcRecord.setTitle(bibJSONUtil.getTitle(marcRecord));
-        bibliographicMarcRecord.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
-        bibliographicMarcRecord.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
-        bibliographicMarcRecord.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
-        bibliographicMarcRecord.setTag000(bibJSONUtil.getLeader(marcRecord));
-        bibliographicMarcRecord.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
-        bibliographicMarcRecord.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));
-        bibliographicMarcRecord.setControlNumber008(bibJSONUtil.getControlFieldValue(marcRecord, "008"));
-        bibliographicMarcRecord.setBibDataFields(buildBibDataFields(marcRecord));
-        return bibliographicMarcRecord;
+    private BibliographicMarcForm buildBibliographicMarcForm(Record marcRecord, BibJSONUtil bibJSONUtil) {
+        BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
+        bibliographicMarcForm.setTitle(bibJSONUtil.getTitle(marcRecord));
+        bibliographicMarcForm.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
+        bibliographicMarcForm.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
+        bibliographicMarcForm.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
+        bibliographicMarcForm.setTag000(bibJSONUtil.getLeader(marcRecord));
+        bibliographicMarcForm.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
+        bibliographicMarcForm.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));
+        bibliographicMarcForm.setControlNumber008(bibJSONUtil.getControlFieldValue(marcRecord, "008"));
+        bibliographicMarcForm.setBibDataFields(buildBibDataFields(marcRecord));
+        return bibliographicMarcForm;
     }
 
     private List<BibDataField> buildBibDataFields(Record marcRecord) {
