@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.jms.JmsQueueEndpoint;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.component.solr.SolrConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -138,11 +139,11 @@ public abstract class IndexExecutorService {
                         }
                     }
 
-                    SedaEndpoint solrQSedaEndPoint = (SedaEndpoint) producerTemplate.getCamelContext().getEndpoint(RecapConstants.SOLR_QUEUE);
-                    Integer solrQSize = solrQSedaEndPoint.getExchanges().size();
+                    JmsQueueEndpoint solrQJmsEndPoint = (JmsQueueEndpoint) producerTemplate.getCamelContext().getEndpoint(RecapConstants.SOLR_QUEUE);
+                    Integer solrQSize = solrQJmsEndPoint.getExchanges().size();
                     logger.info("Solr Queue size : " + solrQSize);
                     while (solrQSize != 0) {
-                        solrQSize = solrQSedaEndPoint.getExchanges().size();
+                        solrQSize = solrQJmsEndPoint.getExchanges().size();
                     }
                     Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUri + "/" + coreName, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
                     while (!future.isDone()) {
