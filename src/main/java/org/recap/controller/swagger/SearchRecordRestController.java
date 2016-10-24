@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,7 +47,12 @@ public class SearchRecordRestController {
         if (searchRecordsRequest ==null){
             searchRecordsRequest = new SearchRecordsRequest();
         }
-        List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+        List<SearchResultRow> searchResultRows = null;
+        try {
+            searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+        } catch (Exception e) {
+            searchResultRows = new ArrayList<>();
+        }
         return searchResultRows;
     }
 }

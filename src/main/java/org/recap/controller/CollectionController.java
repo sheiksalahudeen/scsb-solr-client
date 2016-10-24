@@ -46,13 +46,13 @@ public class CollectionController {
     @RequestMapping(value = "/collection", method = RequestMethod.POST, params = "action=displayRecords")
     public ModelAndView displayRecords(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
                                BindingResult result,
-                               Model model) {
+                               Model model) throws Exception {
         searchAndSetResults(collectionForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
         return new ModelAndView("searchRecords", "collectionForm", collectionForm);
     }
 
-    private void searchAndSetResults(CollectionForm collectionForm) {
+    private void searchAndSetResults(CollectionForm collectionForm) throws Exception {
         String itemBarcodesString = collectionForm.getItemBarcodes();
         if (StringUtils.isNotBlank(itemBarcodesString)) {
             SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();

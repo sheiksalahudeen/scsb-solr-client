@@ -188,4 +188,7 @@ public class RecapConstants {
     public static final String CGD_UPDATE_FAILED = "Updating CGD failed";
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
+
+    public static final String SEARCH_RESULT_ERROR_NO_RECORDS_FOUND="No search results found. Please refine search conditions.";
+    public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
 }

@@ -26,7 +26,7 @@ public final class SearchRecordsUtil {
     @Autowired
     private BibSolrDocumentRepository bibSolrDocumentRepository;
 
-    public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) {
+    public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) throws Exception{
 
         if (!isEmptySearch(searchRecordsRequest)) {
             return searchAndBuildResults(searchRecordsRequest);
@@ -35,7 +35,7 @@ public final class SearchRecordsUtil {
         return new ArrayList<>();
     }
 
-    public List<SearchResultRow> searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) {
+    public List<SearchResultRow> searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) throws Exception{
         Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
         String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
         if(errorResponse != null) {
