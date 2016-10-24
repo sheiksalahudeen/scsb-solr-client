@@ -47,13 +47,13 @@ public class RecapConstants {
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
     //Matching Algorithm Constants
-    public static final String CSV_MATCHING_ALGO_REPORT_Q = "seda:csvMatchingAlgoReportQ";
-    public static final String CSV_SUMMARY_ALGO_REPORT_Q = "seda:csvSummaryAlgoReportQ";
-    public static final String CSV_SOLR_EXCEPTION_REPORT_Q = "seda:csvSolrExceptionReportQ";
-    public static final String FTP_MATCHING_ALGO_REPORT_Q = "seda:ftpMatchingAlgoReportQ";
-    public static final String FTP_SUMMARY_ALGO_REPORT_Q = "seda:ftpSummaryAlgoReportQ";
-    public static final String FTP_SOLR_EXCEPTION_REPORT_Q = "seda:ftpSolrExceptionReportQ";
-    public static final String REPORT_Q= "seda:reportQ";
+    public static final String CSV_MATCHING_ALGO_REPORT_Q = "scsbactivemq:queue:csvMatchingAlgoReportQ";
+    public static final String CSV_SUMMARY_ALGO_REPORT_Q = "scsbactivemq:queue:csvSummaryAlgoReportQ";
+    public static final String CSV_SOLR_EXCEPTION_REPORT_Q = "scsbactivemq:queue:csvSolrExceptionReportQ";
+    public static final String FTP_MATCHING_ALGO_REPORT_Q = "scsbactivemq:queue:ftpMatchingAlgoReportQ";
+    public static final String FTP_SUMMARY_ALGO_REPORT_Q = "scsbactivemq:queue:ftpSummaryAlgoReportQ";
+    public static final String FTP_SOLR_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSolrExceptionReportQ";
+    public static final String REPORT_Q= "scsbactivemq:queue:reportQ";
 
     public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
     public static final String CSV_SUMMARY_ALGO_REPORT_ROUTE_ID = "csvSummaryAlgoReportRoute";
@@ -156,7 +156,7 @@ public class RecapConstants {
 
 
     public static final String SOLR_CORE = "solrCore";
-    public static final String SOLR_QUEUE = "seda:solrQ";
+    public static final String SOLR_QUEUE = "scsbactivemq:queue:solrQ";
 
     public static final String SOLR_INDEX_FAILURE_REPORT = "Solr_Index_Failure_Report";
     public static final String SOLR_INDEX_EXCEPTION = "SolrIndexException";
