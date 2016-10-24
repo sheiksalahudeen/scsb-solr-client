@@ -6,12 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by peris on 9/30/16.
@@ -20,11 +23,15 @@ import java.util.List;
 @Component
 public class SolrQueryBuilder {
 
+    private Logger logger = LoggerFactory.getLogger(SolrQueryBuilder.class);
+
     String and = " AND ";
 
     String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
     String coreChildFilterQuery = "{!child of=\"ContentType:parent\"}";
+
+    private Pattern regexPattern = Pattern.compile("([&\\|\\!\\(\\}\\[\\]\\<\\>\\~\\*\\+\\?\\:])");
 
     public String getQueryStringForItemCriteriaForParent(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -138,7 +145,7 @@ public class SolrQueryBuilder {
      * @throws Exception
      */
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
-        String fieldValue = searchRecordsRequest.getFieldValue().trim();
+        String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
         StringBuilder stringBuilder = new StringBuilder();
         String fieldName = searchRecordsRequest.getFieldName();
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
@@ -180,7 +187,7 @@ public class SolrQueryBuilder {
 
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
-        String fieldValue = searchRecordsRequest.getFieldValue().trim();
+        String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
         String fieldName = searchRecordsRequest.getFieldName();
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
@@ -244,5 +251,30 @@ public class SolrQueryBuilder {
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
         SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + queryStringForParentCriteriaForChild + countQueryForFieldCriteria);
         return solrQuery;
+    }
+
+    /*
+       Escape Special Characters
+       Escaped      = & ! ( } [ ] < > ~ * + ? : \ ^
+       Un-Escaped   = “ ) \ ^ {
+     */
+    private String parseSearchRequest(String fieldValue){
+
+        logger.info(fieldValue);
+        try {
+            // Remove extra space between words
+            fieldValue =fieldValue.replaceAll("\\s+", " ");
+            /* Strip Characters*/
+            fieldValue =fieldValue.replaceAll("\"", "");
+            // Escape Characters
+            fieldValue=regexPattern.matcher(fieldValue).replaceAll("\\\\$1");
+            fieldValue = fieldValue.replaceAll("-", "'-'");
+            fieldValue = fieldValue.replaceAll("/", "'/'");
+            fieldValue = fieldValue.replaceAll("\\{", "'{'");
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+        logger.info(fieldValue);
+        return fieldValue;
     }
 }

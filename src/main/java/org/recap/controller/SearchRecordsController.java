@@ -172,11 +172,28 @@ public class SearchRecordsController {
     }
 
     private void searchAndSetResults(SearchRecordsRequest searchRecordsRequest) {
+        boolean errorStatus=false;
         searchRecordsRequest.reset();
         searchRecordsRequest.setSearchResultRows(null);
         searchRecordsRequest.setShowResults(true);
         searchRecordsRequest.setSelectAll(false);
-        searchRecordsRequest.setSearchResultRows(searchRecordsUtil.searchRecords(searchRecordsRequest));
+
+        try {
+            searchRecordsRequest.setSearchResultRows(searchRecordsUtil.searchRecords(searchRecordsRequest));
+        } catch (Exception e) {
+            errorStatus=true;
+            searchRecordsRequest.setShowResults(false);
+            logger.error(""+e.getMessage());
+        }
+        if(searchRecordsRequest.getSearchResultRows() !=null && searchRecordsRequest.getSearchResultRows().size()<=0) {
+            if (errorStatus){
+                searchRecordsRequest.setErrorMessage(RecapConstants.SEARCH_RESULT_ERROR_INVALID_CHARACTERS);
+            }else{
+                if(searchRecordsRequest.getErrorMessage() == null ) {
+                    searchRecordsRequest.setErrorMessage(RecapConstants.SEARCH_RESULT_ERROR_NO_RECORDS_FOUND);
+                }
+            }
+        }
     }
 
     @InitBinder

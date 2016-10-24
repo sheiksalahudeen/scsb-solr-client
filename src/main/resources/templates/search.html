@@ -201,10 +201,6 @@
                                 <span align="right" class="pull-right" style="margin-top: 0px; font-weight: bold" data-th-if="*{showTotalCount}">Total Results Found: <span th:text="*{totalRecordsCount}"></span></span>
                             </div>
                         </div>
-                        <div id="searchResultsMsgId" name="searchResultsMsgName" class="form-group col-sm-12"
-                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}" style="margin-top: -40px;">
-                            <span>No search results found. Please refine search conditions.</span>
-                        </div>
                         <div id="searchResultsDiv" class="form-group col-sm-12 table-responsive"
                              data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}" style="margin-top: -10px;">
                             <table id="searchResults" name="searchResults" class="table table-hover tablesorter">
