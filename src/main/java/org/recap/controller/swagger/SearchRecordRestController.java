@@ -9,14 +9,13 @@ import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sudhish on 13/10/16.
@@ -54,5 +53,24 @@ public class SearchRecordRestController {
             searchResultRows = new ArrayList<>();
         }
         return searchResultRows;
+    }
+
+
+    @RequestMapping(value="/searchRecords", method = RequestMethod.POST)
+    @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", position = 0, consumes="application/json")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
+    public Map searchRecords(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestBody SearchRecordsRequest searchRecordsRequest) {
+        List<SearchResultRow> searchResultRows = null;
+        Map responseMap = new HashMap();
+        try {
+            searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+            responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
+            responseMap.put("totalBibsCount", searchRecordsRequest.getTotalBibRecordsCount());
+            responseMap.put("totalItemsCount", searchRecordsRequest.getTotalItemRecordsCount());
+            responseMap.put("searchResultRows", searchResultRows);
+        } catch (Exception e) {
+            logger.info("search : "+e.getMessage());
+        }
+        return responseMap;
     }
 }
