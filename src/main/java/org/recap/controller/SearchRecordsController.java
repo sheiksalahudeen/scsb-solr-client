@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.IOUtils;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
@@ -185,7 +186,10 @@ public class SearchRecordsController {
             searchRecordsRequest.setShowResults(false);
             logger.error(""+e.getMessage());
         }
-        if(searchRecordsRequest.getSearchResultRows() !=null && searchRecordsRequest.getSearchResultRows().size()<=0) {
+        if(CollectionUtils.isEmpty(searchRecordsRequest.getSearchResultRows())) {
+            searchRecordsRequest.setTotalRecordsCount(String.valueOf(0));
+            searchRecordsRequest.setTotalBibRecordsCount(String.valueOf(0));
+            searchRecordsRequest.setTotalItemRecordsCount(String.valueOf(0));
             if (errorStatus){
                 searchRecordsRequest.setErrorMessage(RecapConstants.SEARCH_RESULT_ERROR_INVALID_CHARACTERS);
             }else{
