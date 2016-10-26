@@ -144,7 +144,7 @@
                                     </tr>
                                     <tr id="updateCGDNewRow">
                                         <td><span>New CGD</span><span style="color: red">*</span></td>
-                                        <td>
+                                        <td style="padding-bottom: 10px;">
                                             <select id="newCgdField"
                                                     class="form-control"
                                                     th:field="*{newCollectionGroupDesignation}"
@@ -155,14 +155,12 @@
                                                 <option value="Open">Open</option>
                                             </select>
                                             <span th:if="*{submitted}" th:text="${bibliographicMarcForm.newCollectionGroupDesignation}"></span>
-                                        </td>
-                                        <td id="cgdErrorMessage">
-                                            <span style="color: red;">Choose new CGD.</span>
+                                            <span id="cgdErrorMessage" style="color: red;">Choose a new CGD.</span>
                                         </td>
                                     </tr>
                                     <tr id="updateCGDNotesRow">
                                         <td><span>CGD Change Notes</span><span style="color: red">*</span></td>
-                                        <td>
+                                        <td style="padding-bottom: 10px;">
                                             <textarea id="cgdChangeNotesField"
                                                       class="form-control"
                                                       th:field="*{cgdChangeNotes}"
@@ -170,14 +168,12 @@
                                                       rows="3">
                                             </textarea>
                                             <span th:if="*{submitted}" th:text="${bibliographicMarcForm.cgdChangeNotes}"></span>
-                                        </td>
-                                        <td id="cgdNotesErrorMessage">
-                                            <span style="color: red;">This is a mandatory field.</span>
+                                            <span id="cgdNotesErrorMessage" style="color: red;">Please enter CGD Change Notes.</span>
                                         </td>
                                     </tr>
                                     <tr id="deaccessionTypeRow">
                                         <td><span>Deaccession Type</span></td>
-                                        <td>
+                                        <td style="padding-bottom: 10px;">
                                             <input type="text"
                                                    id="deaccessionType"
                                                    name="deaccessionType"
@@ -192,7 +188,7 @@
                                     </tr>
                                     <tr id="deaccessionLocationRow">
                                         <td><span>Delivery Location</span><span style="color: red">*</span></td>
-                                        <td>
+                                        <td style="padding-bottom: 10px;">
                                             <select id="deliveryLocation"
                                                     name="deliveryLocation"
                                                     class="form-control"
@@ -204,14 +200,12 @@
                                                 <option th:each="location : *{deliveryLocations}" th:value="${location}" th:text="${location}"></option>
                                             </select>
                                             <span th:if="*{submitted}" th:text="${bibliographicMarcForm.deliveryLocation}"></span>
-                                        </td>
-                                        <td id="locationErrorMessage">
-                                            <span style="color: red;">This is a mandatory field.</span>
+                                            <span id="locationErrorMessage" style="color: red;">This is a mandatory field.</span>
                                         </td>
                                     </tr>
                                     <tr id="deaccessionNotesRow">
                                         <td><span>Deaccession Notes</span><span style="color: red">*</span></td>
-                                        <td>
+                                        <td style="padding-bottom: 10px;">
                                             <textarea id="deaccessionNotesField"
                                                       name="deaccessionNotesField"
                                                       class="form-control"
@@ -220,15 +214,13 @@
                                                       rows="3">
                                             </textarea>
                                             <span th:if="*{submitted}" th:text="${bibliographicMarcForm.deaccessionNotes}"></span>
-                                        </td>
-                                        <td id="deaccessionNotesErrorMessage">
-                                            <span style="color: red;">This is a mandatory field.</span>
+                                            <span id="deaccessionNotesErrorMessage" style="color: red;">Please enter Deaccession Notes.</span>
                                         </td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="form-group" align="center">
+                            <div class="form-group" align="center" style="margin-bottom: 40px;">
                                 <button id="hiddenCollectionUpdateButton"
                                         type="submit"
                                         name="action"
