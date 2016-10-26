@@ -76,7 +76,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         SolrDocumentList bibSolrDocumentList = queryResponse.getResults();
         if(CollectionUtils.isNotEmpty(bibSolrDocumentList)) {
             long numFound = bibSolrDocumentList.getNumFound();
-            String totalBibCount = NumberFormat.getNumberInstance().format(numFound);
+            String totalBibCount = String.valueOf(numFound);
             searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
             searchRecordsRequest.setTotalRecordsCount(totalBibCount);
             int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
