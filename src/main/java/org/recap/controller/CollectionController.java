@@ -67,7 +67,7 @@ public class CollectionController {
                 collectionForm.setSelectAll(false);
             }
 
-            List<String> missingBarcodes = getMissingBarcodes(collectionForm);
+            Set<String> missingBarcodes = getMissingBarcodes(collectionForm);
             if (CollectionUtils.isNotEmpty(missingBarcodes)) {
                 collectionForm.setErrorMessage(RecapConstants.BARCODES_NOT_FOUND + " - " + StringUtils.join(missingBarcodes, ","));
             }
@@ -76,12 +76,14 @@ public class CollectionController {
         }
     }
 
-    private List<String> getMissingBarcodes(CollectionForm collectionForm) {
+    private Set<String> getMissingBarcodes(CollectionForm collectionForm) {
         String[] barcodes = collectionForm.getItemBarcodes().split(",");
-        List<String> missingBarcodes = new ArrayList<>();
+        Set<String> missingBarcodes = new HashSet<>();
         for (String barcode : barcodes) {
-            String itemBarcode = barcode.trim();
-            missingBarcodes.add(itemBarcode);
+            if (StringUtils.isNotBlank(barcode)) {
+                String itemBarcode = barcode.trim();
+                missingBarcodes.add(itemBarcode);
+            }
         }
         for (SearchResultRow searchResultRow : collectionForm.getSearchResultRows()) {
             String barcode = searchResultRow.getBarcode().trim();

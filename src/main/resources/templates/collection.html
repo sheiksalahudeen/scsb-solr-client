@@ -1,4 +1,5 @@
 <div id="collectionContentId" name="collectionContentName" th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <link rel="stylesheet" th:href="@{../css/collection.css}"/>
     <script type="text/javascript" th:src="@{../js/collection.js}"></script>
     <div id="collectionFormDivId" name="collectionFormDivName" th:fragment="collection-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
         <form id="collection-form" name="collection-form" class="form-horizontal" action="#"
@@ -48,12 +49,7 @@
                     </div>
 
                     <div data-th-if="*{showResults}">
-                        <div id="collectionResultsMsgId" name="collectionResultsMsgName" class="form-group col-sm-12"
-                             data-th-if="*{searchResultRows.size() == 0 &amp;&amp; showResults}">
-                            <span>No results found.</span>
-                        </div>
-                        <div id="collectionResultsDiv" class="form-group col-sm-12 table-responsive"
-                             data-th-if="*{searchResultRows.size() > 0 &amp;&amp; showResults}">
+                        <div id="collectionResultsDiv" class="form-group col-sm-12 table-responsive">
                             <table id="collectionResults" name="collectionResults" class="table table-hover">
                                 <thead style="background-color: grey; color: white; height: 60px;">
                                 <tr>
