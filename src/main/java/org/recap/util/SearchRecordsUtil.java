@@ -2,6 +2,7 @@ package org.recap.util;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
+import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
@@ -9,6 +10,7 @@ import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
+import org.recap.repository.solr.main.DataDumpSolrDocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,9 @@ public final class SearchRecordsUtil {
     @Autowired
     private BibSolrDocumentRepository bibSolrDocumentRepository;
 
+    @Autowired
+    private DataDumpSolrDocumentRepository dataDumpSolrDocumentRepository;
+
     public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) throws Exception{
 
         if (!isEmptySearch(searchRecordsRequest)) {
@@ -42,13 +47,28 @@ public final class SearchRecordsUtil {
             searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
         } else {
             List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
-            return buildResults(bibItems);
+            return buildGeneralResults(bibItems);
         }
 
         return new ArrayList<>();
     }
 
-    private List<SearchResultRow> buildResults(List<BibItem> bibItems) {
+    public List<DataDumpSearchResult> searchRecordsForDataDump(SearchRecordsRequest searchRecordsRequest) throws Exception{
+        if (!isEmptySearch(searchRecordsRequest)) {
+            Map<String, Object> searchResponse = dataDumpSolrDocumentRepository.search(searchRecordsRequest);
+            String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
+            if(errorResponse != null) {
+                searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
+            } else {
+                List<BibItem> bibItems = (List<BibItem>) searchResponse.get(RecapConstants.SEARCH_SUCCESS_RESPONSE);
+                return buildResultsForDataDump(bibItems);
+            }
+        }
+        searchRecordsRequest.setErrorMessage(RecapConstants.EMPTY_FACET_ERROR_MSG);
+        return new ArrayList<>();
+    }
+
+    private List<SearchResultRow> buildGeneralResults(List<BibItem> bibItems) {
         List<SearchResultRow> searchResultRows = new ArrayList<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {
@@ -98,6 +118,27 @@ public final class SearchRecordsUtil {
             }
         }
         return searchResultRows;
+    }
+
+    private List<DataDumpSearchResult> buildResultsForDataDump(List<BibItem> bibItems) {
+        List<DataDumpSearchResult> dataDumpSearchResults = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(bibItems)) {
+            for (BibItem bibItem : bibItems) {
+                DataDumpSearchResult dataDumpSearchResult = new DataDumpSearchResult();
+                dataDumpSearchResult.setBibId(bibItem.getBibId());
+                if (!CollectionUtils.isEmpty(bibItem.getItems())) {
+                    List<Integer> itemIds = new ArrayList<>();
+                    for (Item item : bibItem.getItems()) {
+                        if (null != item) {
+                            itemIds.add(item.getItemId());
+                        }
+                    }
+                    dataDumpSearchResult.setItemIds(itemIds);
+                }
+                dataDumpSearchResults.add(dataDumpSearchResult);
+            }
+        }
+        return dataDumpSearchResults;
     }
 
     private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {

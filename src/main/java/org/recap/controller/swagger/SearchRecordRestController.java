@@ -3,6 +3,7 @@ package org.recap.controller.swagger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.recap.controller.SearchRecordsController;
+import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.util.SearchRecordsUtil;
@@ -60,14 +61,13 @@ public class SearchRecordRestController {
     @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", position = 0, consumes="application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
     public Map searchRecords(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestBody SearchRecordsRequest searchRecordsRequest) {
-        List<SearchResultRow> searchResultRows = null;
+        List<DataDumpSearchResult> dataDumpSearchResults = null;
         Map responseMap = new HashMap();
         try {
-            searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+            dataDumpSearchResults = searchRecordsUtil.searchRecordsForDataDump(searchRecordsRequest);
             responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
             responseMap.put("totalBibsCount", searchRecordsRequest.getTotalBibRecordsCount());
-            responseMap.put("totalItemsCount", searchRecordsRequest.getTotalItemRecordsCount());
-            responseMap.put("searchResultRows", searchResultRows);
+            responseMap.put("dataDumpSearchResults", dataDumpSearchResults);
         } catch (Exception e) {
             logger.info("search : "+e.getMessage());
         }
