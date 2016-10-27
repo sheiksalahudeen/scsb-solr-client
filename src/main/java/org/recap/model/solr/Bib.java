@@ -4,6 +4,7 @@ package org.recap.model.solr;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -95,6 +96,18 @@ public class Bib {
 
     @Field("Title_sort")
     private String titleSort;
+
+    @Field("BibCreatedBy")
+    private String bibCreatedBy;
+
+    @Field("BibCreatedDate")
+    private Date bibCreatedDate;
+
+    @Field("BibLastUpdatedBy")
+    private String bibLastUpdatedBy;
+
+    @Field("BibLastUpdatedDate")
+    private Date bibLastUpdatedDate;
 
     public String getId() {
         return id;
@@ -318,6 +331,38 @@ public class Bib {
 
     public void setTitleSort(String titleSort) {
         this.titleSort = titleSort;
+    }
+
+    public String getBibCreatedBy() {
+        return bibCreatedBy;
+    }
+
+    public void setBibCreatedBy(String bibCreatedBy) {
+        this.bibCreatedBy = bibCreatedBy;
+    }
+
+    public Date getBibCreatedDate() {
+        return bibCreatedDate;
+    }
+
+    public void setBibCreatedDate(Date bibCreatedDate) {
+        this.bibCreatedDate = bibCreatedDate;
+    }
+
+    public String getBibLastUpdatedBy() {
+        return bibLastUpdatedBy;
+    }
+
+    public void setBibLastUpdatedBy(String bibLastUpdatedBy) {
+        this.bibLastUpdatedBy = bibLastUpdatedBy;
+    }
+
+    public Date getBibLastUpdatedDate() {
+        return bibLastUpdatedDate;
+    }
+
+    public void setBibLastUpdatedDate(Date bibLastUpdatedDate) {
+        this.bibLastUpdatedDate = bibLastUpdatedDate;
     }
 
     @Override

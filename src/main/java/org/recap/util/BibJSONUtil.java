@@ -214,6 +214,10 @@ public class BibJSONUtil extends MarcUtil {
             bib.setLccn(getLCCNValue(marcRecord));
             bib.setOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionBibId());
             bib.setLeaderMaterialType(getLeaderMaterialType(marcRecord.getLeader()));
+            bib.setBibCreatedBy(bibliographicEntity.getCreatedBy());
+            bib.setBibCreatedDate(bibliographicEntity.getCreatedDate());
+            bib.setBibLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
+            bib.setBibLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
             return bib;
         } catch (Exception e) {
             saveExceptionReportForBib(bibliographicEntity, e);

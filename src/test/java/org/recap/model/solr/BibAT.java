@@ -1,15 +1,22 @@
 package org.recap.model.solr;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
+import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 
@@ -382,5 +389,117 @@ public class BibAT extends BaseTestCase {
         solrQuery.setRows(2);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         assertNotNull(queryResponse);
+    }
+
+    @Test
+    public void saveBibAndIndex() throws Exception {
+        BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity);
+        Integer bibliographicId = savedBibliographicEntity.getBibliographicId();
+        assertNotNull(bibliographicId);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
+        assertTrue(savedBibliographicEntity.getHoldingsEntities().size() == 1);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0));
+        Integer holdingsId = savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId();
+        assertNotNull(holdingsId);
+        assertNotNull(savedBibliographicEntity.getItemEntities());
+        assertTrue(savedBibliographicEntity.getItemEntities().size() == 1);
+        assertNotNull(savedBibliographicEntity.getItemEntities().get(0));
+        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
+        assertNotNull(itemId);
+
+        BibJSONUtil bibJSONUtil = new BibJSONUtil();
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(savedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
+        solrTemplate.saveDocument(solrInputDocument);
+        solrTemplate.commit();
+
+        Bib fetchedBibFromSolr = bibSolrCrudRepository.findByBibId(bibliographicId);
+        assertNotNull(fetchedBibFromSolr);
+        assertNotNull(fetchedBibFromSolr.getBibId());
+        assertEquals(bibliographicId, fetchedBibFromSolr.getBibId());
+        assertEquals(bibliographicEntity.getCreatedBy(), fetchedBibFromSolr.getBibCreatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedBibFromSolr.getBibCreatedDate(), Calendar.SECOND));
+        assertEquals(bibliographicEntity.getLastUpdatedBy(), fetchedBibFromSolr.getBibLastUpdatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedBibFromSolr.getBibLastUpdatedDate(), Calendar.SECOND));
+
+        Holdings fetchedHoldingsFromSolr = holdingsSolrCrudRepository.findByHoldingsId(holdingsId);
+        assertNotNull(fetchedHoldingsFromSolr);
+        assertNotNull(fetchedHoldingsFromSolr.getHoldingsId());
+        assertEquals(holdingsId, fetchedHoldingsFromSolr.getHoldingsId());
+        assertEquals(bibliographicEntity.getHoldingsEntities().get(0).getCreatedBy(), fetchedHoldingsFromSolr.getHoldingsCreatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getHoldingsEntities().get(0).getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedHoldingsFromSolr.getHoldingsCreatedDate(), Calendar.SECOND));
+        assertEquals(bibliographicEntity.getHoldingsEntities().get(0).getLastUpdatedBy(), fetchedHoldingsFromSolr.getHoldingsLastUpdatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getHoldingsEntities().get(0).getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedHoldingsFromSolr.getHoldingsLastUpdatedDate(), Calendar.SECOND));
+
+        Item fetchedItemFromSolr = itemCrudRepository.findByItemId(itemId);
+        assertNotNull(fetchedItemFromSolr);
+        assertNotNull(fetchedItemFromSolr.getItemId());
+        assertEquals(itemId, fetchedItemFromSolr.getItemId());
+        assertEquals(bibliographicEntity.getItemEntities().get(0).getCreatedBy(), fetchedItemFromSolr.getItemCreatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getItemEntities().get(0).getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedItemFromSolr.getItemCreatedDate(), Calendar.SECOND));
+        assertEquals(bibliographicEntity.getItemEntities().get(0).getLastUpdatedBy(), fetchedItemFromSolr.getItemLastUpdatedBy());
+        assertEquals(DateUtils.round(bibliographicEntity.getItemEntities().get(0).getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedItemFromSolr.getItemLastUpdatedDate(), Calendar.SECOND));
+    }
+
+    public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
+        Random random = new Random();
+        File bibContentFile = getBibContentFile();
+        File holdingsContentFile = getHoldingsContentFile();
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        String sourceHoldingsContent = FileUtils.readFileToString(holdingsContentFile, "UTF-8");
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity.setDeleted(false);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(sourceHoldingsContent.getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity.setDeleted(false);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode(String.valueOf(random.nextInt()));
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setDeleted(false);
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        return bibliographicEntity;
+    }
+
+    public File getBibContentFile() throws URISyntaxException {
+        URL resource = getClass().getResource("BibContent.xml");
+        return new File(resource.toURI());
+    }
+
+    public File getHoldingsContentFile() throws URISyntaxException {
+        URL resource = getClass().getResource("HoldingsContent.xml");
+        return new File(resource.toURI());
     }
 }
