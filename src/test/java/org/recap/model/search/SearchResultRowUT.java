@@ -63,7 +63,6 @@ public class SearchResultRowUT {
         assertNotNull("1998",searchRecordsRequest.getSearchResultRows().get(0).getPublisherDate());
         assertNotNull("PUL",searchRecordsRequest.getSearchResultRows().get(0).getOwningInstitution());
         assertNotNull("1",searchRecordsRequest.getSearchResultRows().get(0).getOwningInstitution());
-        assertNotNull("Summary holding",searchRecordsRequest.getSearchResultRows().get(0).getSummaryHoldings());
         assertNotNull("Available",searchRecordsRequest.getSearchResultRows().get(0).getAvailability());
     }
 

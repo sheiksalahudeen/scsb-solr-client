@@ -1,7 +1,6 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.solr.common.SolrInputDocument;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -12,25 +11,21 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
-import org.recap.model.solr.Holdings;
-import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
- * Created by premkb on 1/8/16.
+ * Created by hemalathas on 31/10/16.
  */
-public class BibItemRecordSetupCallableUT extends BaseTestCase {
+public class BibRecordSetupCallableUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -43,9 +38,6 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
 
     @Mock
     HoldingsDetailsRepository mockHoldingsDetailsRepository;
-
-    @Autowired
-    SolrTemplate mockSolrTemplate;
 
     @Autowired
     ProducerTemplate producerTemplate;
@@ -165,8 +157,9 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        Mockito.when(mockBibliographicDetailsRepository.getNonDeletedHoldingsEntities(3,"NYPG88-B90417")).thenReturn(getHoldingEntityList());
-        Mockito.when(mockHoldingsDetailsRepository.getNonDeletedItemEntities(3,"NYPG88-B90418")).thenReturn(getItemEntityList());
+        //Mockito.when(mockBibliographicDetailsRepository.getNonDeletedHoldingsEntities(3,"NYPG88-B90417")).thenReturn(getHoldingEntityList());
+        //Mockito.when(mockHoldingsDetailsRepository.getNonDeletedItemEntities(3,"NYPG88-B90418")).thenReturn(getItemEntityList());
+        //Mock.when(bibliographicDetailsRepository.getNonDeletedHoldingsEntities(3,"NYPG88-B90417")).thenReturn(new ArrayList<HoldingsEntity>());
     }
 
 
@@ -210,95 +203,8 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
 
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
 
-        BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate, mockBibliographicDetailsRepository, mockHoldingsDetailsRepository, producerTemplate);
-        SolrInputDocument bibItem = (SolrInputDocument) bibItemRecordSetupCallable.call();
-        assertNotNull(bibItem);
-        assertEquals(new Integer(1),bibItem.get("BibId").getValue());
-        assertNotNull(bibItem.getChildDocuments());
-        assertEquals(new Integer(1),bibItem.getChildDocuments().get(0).get("HoldingId").getValue());
-        assertNotNull(bibItem.getChildDocuments().get(0).getChildDocuments());
-        assertEquals(new Integer(1),bibItem.getChildDocuments().get(0).getChildDocuments().get(0).get("ItemId").getValue());
-    }
-
-    public List<HoldingsEntity> getHoldingEntityList(){
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(1);
-        bibliographicEntity.setOwningInstitutionId(3);
-        bibliographicEntity.setOwningInstitutionBibId("NYPG88-B90417");
-        bibliographicEntity.setContent(bibContent.getBytes());
-        bibliographicEntities.add(bibliographicEntity);
-
-        List<ItemEntity> itemEntities =  new ArrayList<>();
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
-        itemEntity.setBarcode("CU54519993");
-        itemEntity.setCustomerCode("NA");
-        itemEntity.setCallNumber("JFN 73-43");
-        itemEntity.setCallNumberType("CT");
-        itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCopyNumber(12);
-        itemEntity.setOwningInstitutionId(1);
-        itemEntity.setCreatedDate(new Date());
-        itemEntity.setCreatedBy("tst");
-        itemEntity.setLastUpdatedDate(new Date());
-        itemEntity.setLastUpdatedBy("tst");
-        itemEntities.add(itemEntity);
-        bibliographicEntity.setItemEntities(itemEntities);
-
-        itemEntity.setBibliographicEntities(bibliographicEntities);
-
-        List<HoldingsEntity> holdingsEntities = new ArrayList<>();
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
-        holdingsEntity.setOwningInstitutionId(3);
-        holdingsEntity.setOwningInstitutionHoldingsId("NYPG88-B90418");
-        holdingsEntity.setContent(holdingContent.getBytes());
-        holdingsEntities.add(holdingsEntity);
-        bibliographicEntity.setHoldingsEntities(holdingsEntities);
-
-        holdingsEntity.setBibliographicEntities(bibliographicEntities);
-        return holdingsEntities;
-    }
-
-    public List<ItemEntity> getItemEntityList(){
-        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(1);
-        bibliographicEntity.setOwningInstitutionId(3);
-        bibliographicEntity.setOwningInstitutionBibId("NYPG88-B90417");
-        bibliographicEntity.setContent(bibContent.getBytes());
-        bibliographicEntities.add(bibliographicEntity);
-
-        List<ItemEntity> itemEntities =  new ArrayList<>();
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
-        itemEntity.setBarcode("CU54519993");
-        itemEntity.setCustomerCode("NA");
-        itemEntity.setCallNumber("JFN 73-43");
-        itemEntity.setCallNumberType("CT");
-        itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCopyNumber(12);
-        itemEntity.setOwningInstitutionId(1);
-        itemEntity.setCreatedDate(new Date());
-        itemEntity.setCreatedBy("tst");
-        itemEntity.setLastUpdatedDate(new Date());
-        itemEntity.setLastUpdatedBy("tst");
-        itemEntities.add(itemEntity);
-        bibliographicEntity.setItemEntities(itemEntities);
-
-        itemEntity.setBibliographicEntities(bibliographicEntities);
-
-        List<HoldingsEntity> holdingsEntities = new ArrayList<>();
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
-        holdingsEntity.setOwningInstitutionId(3);
-        holdingsEntity.setOwningInstitutionHoldingsId("NYPG88-B90418");
-        holdingsEntity.setContent(holdingContent.getBytes());
-        holdingsEntities.add(holdingsEntity);
-        bibliographicEntity.setHoldingsEntities(holdingsEntities);
-
-        holdingsEntity.setBibliographicEntities(bibliographicEntities);
-        return itemEntities;
-    }
-}
+        BibRecordSetupCallable bibRecordSetupCallable = new BibRecordSetupCallable(bibliographicEntity,bibliographicDetailsRepository,holdingsDetailsRepository,producerTemplate);
+        Bib bib = (Bib) bibRecordSetupCallable.call();
+        assertNotNull(bib);
+        assertEquals(new Integer(1),bib.getBibId());
+}}
