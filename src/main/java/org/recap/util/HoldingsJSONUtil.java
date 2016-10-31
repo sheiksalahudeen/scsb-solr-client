@@ -38,6 +38,10 @@ public class HoldingsJSONUtil extends MarcUtil {
             InstitutionEntity institutionEntity = holdingsEntity.getInstitutionEntity();
             String institutionCode = null != institutionEntity ? institutionEntity.getInstitutionCode() : "";
             holdings.setOwningInstitution(institutionCode);
+            holdings.setHoldingsCreatedBy(holdingsEntity.getCreatedBy());
+            holdings.setHoldingsCreatedDate(holdingsEntity.getCreatedDate());
+            holdings.setHoldingsLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
+            holdings.setHoldingsLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
             return holdings;
         } catch (Exception e) {
             saveExceptionReportForHoldings(holdingsEntity, e);

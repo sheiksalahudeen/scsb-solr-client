@@ -4,6 +4,7 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,6 +60,21 @@ public class Item {
 
     @Field("UseRestriction_display")
     private String useRestrictionDisplay;
+
+    @Field("CopyNumber")
+    private String copyNumber;
+
+    @Field("ItemCreatedBy")
+    private String itemCreatedBy;
+
+    @Field("ItemCreatedDate")
+    private Date itemCreatedDate;
+
+    @Field("ItemLastUpdatedBy")
+    private String itemLastUpdatedBy;
+
+    @Field("ItemLastUpdatedDate")
+    private Date itemLastUpdatedDate;
 
     @Ignore
     private String root;
@@ -197,5 +213,45 @@ public class Item {
 
     public void setRoot(String root) {
         this.root = root;
+    }
+
+    public String getCopyNumber() {
+        return copyNumber;
+    }
+
+    public void setCopyNumber(String copyNumber) {
+        this.copyNumber = copyNumber;
+    }
+
+    public String getItemCreatedBy() {
+        return itemCreatedBy;
+    }
+
+    public void setItemCreatedBy(String itemCreatedBy) {
+        this.itemCreatedBy = itemCreatedBy;
+    }
+
+    public Date getItemCreatedDate() {
+        return itemCreatedDate;
+    }
+
+    public void setItemCreatedDate(Date itemCreatedDate) {
+        this.itemCreatedDate = itemCreatedDate;
+    }
+
+    public String getItemLastUpdatedBy() {
+        return itemLastUpdatedBy;
+    }
+
+    public void setItemLastUpdatedBy(String itemLastUpdatedBy) {
+        this.itemLastUpdatedBy = itemLastUpdatedBy;
+    }
+
+    public Date getItemLastUpdatedDate() {
+        return itemLastUpdatedDate;
+    }
+
+    public void setItemLastUpdatedDate(Date itemLastUpdatedDate) {
+        this.itemLastUpdatedDate = itemLastUpdatedDate;
     }
 }

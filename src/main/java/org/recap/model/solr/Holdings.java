@@ -4,6 +4,8 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 
+import java.util.Date;
+
 /**
  * Created by rajeshbabuk on 13/9/16.
  */
@@ -24,6 +26,18 @@ public class Holdings {
 
     @Field("HoldingsOwningInstitution")
     private String owningInstitution;
+
+    @Field("HoldingsCreatedBy")
+    private String holdingsCreatedBy;
+
+    @Field("HoldingsCreatedDate")
+    private Date holdingsCreatedDate;
+
+    @Field("HoldingsLastUpdatedBy")
+    private String holdingsLastUpdatedBy;
+
+    @Field("HoldingsLastUpdatedDate")
+    private Date holdingsLastUpdatedDate;
 
     @Ignore
     private String root;
@@ -74,5 +88,37 @@ public class Holdings {
 
     public void setRoot(String root) {
         this.root = root;
+    }
+
+    public String getHoldingsCreatedBy() {
+        return holdingsCreatedBy;
+    }
+
+    public void setHoldingsCreatedBy(String holdingsCreatedBy) {
+        this.holdingsCreatedBy = holdingsCreatedBy;
+    }
+
+    public Date getHoldingsCreatedDate() {
+        return holdingsCreatedDate;
+    }
+
+    public void setHoldingsCreatedDate(Date holdingsCreatedDate) {
+        this.holdingsCreatedDate = holdingsCreatedDate;
+    }
+
+    public String getHoldingsLastUpdatedBy() {
+        return holdingsLastUpdatedBy;
+    }
+
+    public void setHoldingsLastUpdatedBy(String holdingsLastUpdatedBy) {
+        this.holdingsLastUpdatedBy = holdingsLastUpdatedBy;
+    }
+
+    public Date getHoldingsLastUpdatedDate() {
+        return holdingsLastUpdatedDate;
+    }
+
+    public void setHoldingsLastUpdatedDate(Date holdingsLastUpdatedDate) {
+        this.holdingsLastUpdatedDate = holdingsLastUpdatedDate;
     }
 }

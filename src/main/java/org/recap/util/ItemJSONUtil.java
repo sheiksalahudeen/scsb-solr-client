@@ -40,6 +40,10 @@ public class ItemJSONUtil extends MarcUtil{
             item.setVolumePartYear(itemEntity.getVolumePartYear());
             item.setCallNumberSearch(itemEntity.getCallNumber().replaceAll(" ", ""));
             item.setCallNumberDisplay(itemEntity.getCallNumber());
+            item.setItemCreatedBy(itemEntity.getCreatedBy());
+            item.setItemCreatedDate(itemEntity.getCreatedDate());
+            item.setItemLastUpdatedBy(itemEntity.getLastUpdatedBy());
+            item.setItemLastUpdatedDate(itemEntity.getLastUpdatedDate());
 
             List<Integer> bibIdList = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();
