@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Random;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,10 +66,6 @@ public class SolrIndexControllerUT extends BaseControllerUT{
     @Before
     public void setUp()throws Exception {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(bibSolrCrudRepository).deleteAll();
-        doNothing().when(itemCrudRepository).deleteAll();
-        doNothing().when(solrAdmin).unloadTempCores();
-        doNothing().when(bibItemIndexExecutorService).index(getSolrIndexRequest());
     }
 
     @Test
@@ -87,7 +83,7 @@ public class SolrIndexControllerUT extends BaseControllerUT{
     public void fullIndex()throws Exception{
         String response =solrIndexController.fullIndex(getSolrIndexRequest(),bindingResult,model);
         assertNotNull(response);
-        assertEquals("solrIndexer",response);
+        assertTrue(response.contains("Total number of records processed :"));
     }
 
     @Test
@@ -99,6 +95,8 @@ public class SolrIndexControllerUT extends BaseControllerUT{
 
     private SolrIndexRequest getSolrIndexRequest(){
         SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(5);
+        solrIndexRequest.setNumberOfDocs(1000);
         solrIndexRequest.setDocType("");
         return solrIndexRequest;
     }

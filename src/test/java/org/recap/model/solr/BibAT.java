@@ -57,6 +57,7 @@ public class BibAT extends BaseTestCase {
         itemIdList.add(302);
 
         Bib bib = new Bib();
+        bib.setId("1");
         bib.setBibId(101);
         bib.setDocType("Bib");
         bib.setTitle("Middleware for ReCAP");
@@ -216,6 +217,7 @@ public class BibAT extends BaseTestCase {
         Integer itemId1 = random.nextInt();
 
         Bib bib1 = new Bib();
+        bib1.setId("2");
         bib1.setBibId(bibId1);
         bib1.setDocType("Bib");
         bib1.setTitle("Test Bib Doc 1");
@@ -240,6 +242,7 @@ public class BibAT extends BaseTestCase {
         Integer bibId2 = random.nextInt();
 
         Bib bib2 = new Bib();
+        bib2.setId("3");
         bib2.setBibId(bibId2);
         bib2.setDocType("Bib");
         bib2.setTitle("Test Bib Doc 2");
@@ -334,7 +337,7 @@ public class BibAT extends BaseTestCase {
 
     @Test
     public void allFieldsNoValue() throws Exception {
-        String itemQueryCriteria = "CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\")+AND+Availability:(\"Available\"+\"Not+Available\")+AND+UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
+        String itemQueryCriteria = "CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\")+AND+Availability_search:(\"Available\"+\"Not+Available\")+AND+UseRestriction_search:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
         SolrQuery solrQuery = new SolrQuery("{!parent which=\"DocType:Bib\"}*:*+AND+"+itemQueryCriteria);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         assertNotNull(queryResponse);
@@ -376,7 +379,7 @@ public class BibAT extends BaseTestCase {
 
     @Test
     public void childrenForParents() throws Exception {
-        String query = "_root_:(\"3.b10719868x\" \"3.b127185884\") Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
+        String query = "_root_:(\"3.b10719868x\" \"3.b127185884\")Availability_search:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction_search:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability_search:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction_search:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")Availability_search:(\"Available\"+\"Not+Available\") CollectionGroupDesignation:(\"Shared\"+\"Private\"+\"Open\") UseRestriction_search:(\"No+Restrictions\"+\"In+Library+Use\"+\"Supervised+Use\")";
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.setStart(0);
         solrQuery.setRows(2);
