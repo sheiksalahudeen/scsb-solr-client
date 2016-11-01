@@ -27,6 +27,8 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
     private String availability;
     @ApiModelProperty(name= "selectedItem", value= "selected Item",position = 7)
     private boolean selectedItem = false;
+    @ApiModelProperty(name= "itemId", value= "Item Id",position = 8)
+    private Integer itemId;
 
     public String getCallNumber() {
         return callNumber;
@@ -90,6 +92,14 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
 
     public void setSelectedItem(boolean selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
     }
 
     @Override

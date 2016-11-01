@@ -98,6 +98,7 @@ public final class SearchRecordsUtil {
                         for (Item item : bibItem.getItems()) {
                             if (null != item) {
                                 SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
+                                searchItemResultRow.setItemId(item.getItemId());
                                 searchItemResultRow.setCallNumber(item.getCallNumberDisplay());
                                 searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                                 searchItemResultRow.setCustomerCode(item.getCustomerCode());

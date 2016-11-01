@@ -7,13 +7,13 @@
               th:object="${collectionForm}" method="post">
             <fieldset>
                 <div id="collectionRecordsDivId" name="collectionRecordsDivName" class="container-fluid">
-                    <div class="form-group col-md-12">
+                    <div id="collectionSearchCriteriaId" class="form-group col-md-12">
                         <br/>
                         <table id="collectionRecordsTableId" name="collectionRecordsTableName" class="table tableWithoutBorder">
                             <tbody>
                             <tr>
                                 <td colspan="1" style="padding-left: 0px;">
-                                    <label for="barcodeFieldId" style="margin-top: 10px;">Barcode(s)</label>
+                                    <label id="barcodeLabelId" for="barcodeFieldId" style="margin-top: 10px;">Barcode(s)</label>
                                 </td>
                                 <td colspan="10" class="form-group has-feedback" style="width: 1000px;">
                                     <input id="barcodeFieldId" name="barcodeFieldName" type="text" th:field="*{itemBarcodes}" class="form-control">
@@ -34,8 +34,8 @@
                             </tbody>
                         </table>
 
-                        <div>
-                            <span>NOTE: Multiple item barcodes separated by commas(,) can be added to retrieve the records.</span>
+                        <div id="noteTextDivId">
+                            <span id="noteTextSpanId">NOTE: Multiple item barcodes separated by commas(,) can be added to retrieve the records.</span>
                         </div>
 
                     </div>
@@ -44,8 +44,8 @@
                         <hr style="border-top-width: 3px;"/>
                     </div>
 
-                    <div class="form-group col-sm-12" data-th-if="*{errorMessage ne null &amp;&amp; errorMessage ne ''}" style="margin-top: -10px;">
-                        <span style="font-weight: bold; color: red;" th:text="*{errorMessage}"></span>
+                    <div id="errorMessageId" class="form-group col-sm-12" data-th-if="*{errorMessage ne null &amp;&amp; errorMessage ne ''}" style="margin-top: -10px;">
+                        <span id="errorMessageSpanId" style="font-weight: bold; color: red;" th:text="*{errorMessage}"></span>
                     </div>
 
                     <div data-th-if="*{showResults}">
@@ -64,33 +64,33 @@
                                     <input data-th-id="'displayRowBibId-'+ ${searchResultStat.index}" name="displayRowBibId" type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].bibId}"/>
                                     <input data-th-id="'displayRowItemId-'+ ${searchResultStat.index}" name="displayRowItemId" type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].itemId}"/>
                                     <td>
-                                        <img src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Available'}"/>
-                                        <img src="images/out.png" alt="Out" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Not Available'}"/>
+                                        <img id="inRecapImg" src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Available'}"/>
+                                        <img id="outImg" src="images/out.png" alt="Out" style="width:20px;height:25px;" th:if="${searchResult.availability == 'Not Available'}"/>
                                     </td>
                                     <td>
                                         <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].barcode}"/>
-                                        <span th:text="${searchResult.barcode}"></span>
+                                        <span id="barcodeSpanId" th:text="${searchResult.barcode}"></span>
                                     </td>
                                     <td>
                                         <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].title}"/>
-                                        <a th:href="@{/collectionUpdate(bibId=${searchResult.bibId},itemId=${searchResult.itemId})}" target="_blank" th:text="${searchResult.title}"></a>
+                                        <a id="titleLinkId" th:href="@{/collectionUpdate(bibId=${searchResult.bibId},itemId=${searchResult.itemId})}" target="_blank" th:text="${searchResult.title}"></a>
                                     </td>
                                     <td>
                                         <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].collectionGroupDesignation}"/>
-                                        <span th:text="${searchResult.collectionGroupDesignation}"></span>
+                                        <span id="cgdSpanId" th:text="${searchResult.collectionGroupDesignation}"></span>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
 
-                        <div class="col-md-12 form-group">
-                            <span>CGD - Collection Group Designation</span>
+                        <div id="columnNames" class="col-md-12 form-group">
+                            <span id="cgdColumnName">CGD - Collection Group Designation</span>
                         </div>
-                        <div class="col-md-12 form-group">
-                            <img src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;"/>
+                        <div id="imgDivId" class="col-md-12 form-group">
+                            <img id="inRecapImgId" src="images/inRecap.png" alt="In ReCAP" style="width:20px;height:25px;"/>
                             <span> In ReCAP </span>
-                            <img src="images/out.png" alt="Out" style="width:20px;height:25px;"/>
+                            <img id="outImgId" src="images/out.png" alt="Out" style="width:20px;height:25px;"/>
                             <span> Out </span>
                         </div>
                     </div>

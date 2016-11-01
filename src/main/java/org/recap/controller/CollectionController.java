@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.search.CollectionForm;
+import org.recap.model.search.SearchItemResultRow;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.util.SearchRecordsUtil;
@@ -86,7 +87,16 @@ public class CollectionController {
             }
         }
         for (SearchResultRow searchResultRow : collectionForm.getSearchResultRows()) {
-            String barcode = searchResultRow.getBarcode().trim();
+            String barcode = searchResultRow.getBarcode();
+            if (StringUtils.isBlank(barcode)) {
+                if (CollectionUtils.isNotEmpty(searchResultRow.getSearchItemResultRows())) {
+                    SearchItemResultRow searchItemResultRow = searchResultRow.getSearchItemResultRows().get(0);
+                    barcode = searchItemResultRow.getBarcode();
+                    searchResultRow.setBarcode(barcode);
+                    searchResultRow.setItemId(searchItemResultRow.getItemId());
+                    searchResultRow.setCollectionGroupDesignation(searchItemResultRow.getCollectionGroupDesignation());
+                }
+            }
             missingBarcodes.remove(barcode);
         }
         return missingBarcodes;

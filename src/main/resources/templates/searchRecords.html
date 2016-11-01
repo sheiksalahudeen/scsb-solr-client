@@ -14,10 +14,18 @@
 <div th:replace="recapHeader :: #recapPageHeaderId"></div>
 <div class="container col-xs-12">
     <ul class="nav nav-tabs nav-justified" id="searchTabs">
-        <li th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}"><a href="/search">Search</a></li>
-        <li th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}"><a href="/collection">Collection</a></li>
-        <li th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}"><a href="/request">Request</a></li>
-        <li th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}"><a href="/reports">Reports</a></li>
+        <li id="searchTabListId" name="searchTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}">
+            <a id="searchTabId" name="searchTabName" href="/search">Search</a>
+        </li>
+        <li id="collectionTabListId" name="collectionTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
+            <a id="collectionTabId" name="collectionTabName" href="/collection">Collection</a>
+        </li>
+        <li id="requestTabListId" name="requestTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
+            <a id="requestTabId" name="requestTabName" href="/request">Request</a>
+        </li>
+        <li id="reportsTabListId" name="reportsTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
+            <a id="reportsTabId" name="reportsTabName" href="/reports">Reports</a>
+        </li>
     </ul>
 
     <div class="tab-content">
