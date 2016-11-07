@@ -29,6 +29,7 @@ import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class BibAT extends BaseTestCase {
@@ -426,6 +427,7 @@ public class BibAT extends BaseTestCase {
         assertEquals(DateUtils.round(bibliographicEntity.getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedBibFromSolr.getBibCreatedDate(), Calendar.SECOND));
         assertEquals(bibliographicEntity.getLastUpdatedBy(), fetchedBibFromSolr.getBibLastUpdatedBy());
         assertEquals(DateUtils.round(bibliographicEntity.getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedBibFromSolr.getBibLastUpdatedDate(), Calendar.SECOND));
+        assertFalse(fetchedBibFromSolr.isDeletedBib());
 
         Holdings fetchedHoldingsFromSolr = holdingsSolrCrudRepository.findByHoldingsId(holdingsId);
         assertNotNull(fetchedHoldingsFromSolr);
@@ -435,6 +437,7 @@ public class BibAT extends BaseTestCase {
         assertEquals(DateUtils.round(bibliographicEntity.getHoldingsEntities().get(0).getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedHoldingsFromSolr.getHoldingsCreatedDate(), Calendar.SECOND));
         assertEquals(bibliographicEntity.getHoldingsEntities().get(0).getLastUpdatedBy(), fetchedHoldingsFromSolr.getHoldingsLastUpdatedBy());
         assertEquals(DateUtils.round(bibliographicEntity.getHoldingsEntities().get(0).getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedHoldingsFromSolr.getHoldingsLastUpdatedDate(), Calendar.SECOND));
+        assertFalse(fetchedHoldingsFromSolr.isDeletedHoldings());
 
         Item fetchedItemFromSolr = itemCrudRepository.findByItemId(itemId);
         assertNotNull(fetchedItemFromSolr);
@@ -444,6 +447,7 @@ public class BibAT extends BaseTestCase {
         assertEquals(DateUtils.round(bibliographicEntity.getItemEntities().get(0).getCreatedDate(), Calendar.SECOND), DateUtils.round(fetchedItemFromSolr.getItemCreatedDate(), Calendar.SECOND));
         assertEquals(bibliographicEntity.getItemEntities().get(0).getLastUpdatedBy(), fetchedItemFromSolr.getItemLastUpdatedBy());
         assertEquals(DateUtils.round(bibliographicEntity.getItemEntities().get(0).getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedItemFromSolr.getItemLastUpdatedDate(), Calendar.SECOND));
+        assertFalse(fetchedItemFromSolr.isDeletedItem());
     }
 
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {

@@ -218,6 +218,7 @@ public class BibJSONUtil extends MarcUtil {
             bib.setBibCreatedDate(bibliographicEntity.getCreatedDate());
             bib.setBibLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
             bib.setBibLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
+            bib.setDeletedBib(bibliographicEntity.isDeleted());
             return bib;
         } catch (Exception e) {
             saveExceptionReportForBib(bibliographicEntity, e);

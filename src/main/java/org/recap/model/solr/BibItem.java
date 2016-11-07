@@ -98,6 +98,9 @@ public class BibItem {
     @Field("BibLastUpdatedDate")
     private Date bibLastUpdatedDate;
 
+    @Field("IsDeletedBib")
+    private boolean isDeletedBib = false;
+
     @Ignore
     private String root;
 
@@ -329,6 +332,14 @@ public class BibItem {
 
     public void setBibLastUpdatedDate(Date bibLastUpdatedDate) {
         this.bibLastUpdatedDate = bibLastUpdatedDate;
+    }
+
+    public boolean isDeletedBib() {
+        return isDeletedBib;
+    }
+
+    public void setDeletedBib(boolean deletedBib) {
+        isDeletedBib = deletedBib;
     }
 
     public List<Item> getItems() {
