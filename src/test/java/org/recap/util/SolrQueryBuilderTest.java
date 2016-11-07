@@ -95,5 +95,21 @@ public class SolrQueryBuilderTest {
         System.out.println(quryForAllFieldsNoValue);
     }
 
+    @Test
+    public void dataDumpQueryForIncremental() throws Exception {
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("BibLastUpdatedDate");
+        searchRecordsRequest.setFieldValue("2016-10-21T14:30Z TO NOW");
+        searchRecordsRequest.getOwningInstitutions().addAll(Arrays.asList("CUL", "PUL"));
+        searchRecordsRequest.getCollectionGroupDesignations().addAll(Arrays.asList("Shared", "Private", "Open"));
+        searchRecordsRequest.getAvailability().addAll(Arrays.asList("Available", "Not Available"));
+        searchRecordsRequest.getUseRestrictions().addAll(Arrays.asList("No Restrictions", "In Library Use", "Supervised Use"));
+        searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
+
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
+        System.out.println(quryForAllFieldsNoValue);
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package org.recap.camel.activemq;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.jms.JmsComponent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class ActivemqRegistrar {
     @Autowired
     public ActivemqRegistrar(CamelContext camelContext , @Value("${activemq.broker.url}") String defaultBrokerURL) throws JMSException {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(defaultBrokerURL);
-        camelContext.addComponent("scsbactivemq", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
+        ActiveMQComponent activeMQComponent = new ActiveMQComponent();
+        activeMQComponent.setConnectionFactory(connectionFactory);
+        camelContext.addComponent("scsbactivemq", activeMQComponent);
     }
 }

@@ -145,13 +145,24 @@ public class SolrQueryBuilder {
      * @throws Exception
      */
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
-        String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
+        String fieldValue = searchRecordsRequest.getFieldValue();
         StringBuilder stringBuilder = new StringBuilder();
         String fieldName = searchRecordsRequest.getFieldName();
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
+            //The following "if" condition is for exact match (i.e string data type fields in Solr)
+            //Author, Title, Publisher, Publication Place, Publication date, Subjet & Notes.
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
                     || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
+
+                if(fieldName.contains("Date")){
+                    stringBuilder.append(fieldName).append(":").append("[");
+                    stringBuilder.append(fieldValue).append("]").append(and);
+                    return stringBuilder.toString();
+                }
+
+                fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
                 String[] fieldValues = fieldValue.split(" ");
+
                 if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
                     stringBuilder.append(fieldName).append(":").append("(");
                     stringBuilder.append("\"").append(fieldValues[0]).append("\"").append(")").append(and);
@@ -167,6 +178,7 @@ public class SolrQueryBuilder {
                     }
                 }
             } else {
+                //Check for item fields.
                 if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)){
                     fieldValue = fieldValue.replaceAll(" ", "");
                 }
@@ -175,7 +187,9 @@ public class SolrQueryBuilder {
                     if (ArrayUtils.isNotEmpty(fieldValues)) {
                         stringBuilder.append(buildQueryForMatchChildReturnParent(fieldName, Arrays.asList(fieldValues))).append(and);
                     }
-                } else {
+                }
+                //Check for Bib fields.
+                else {
                     stringBuilder.append(fieldName).append(":").append("(");
                     stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
                 }

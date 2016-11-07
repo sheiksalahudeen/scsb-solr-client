@@ -1,6 +1,7 @@
 package org.recap.repository.solr.impl;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -49,11 +50,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
 
     @Override
     public Map<String, Object> search(SearchRecordsRequest searchRecordsRequest) {
-        List<BibItem> bibItems = new ArrayList<>();
+        List<BibItem> bibItems;
         Map<String, Object> response = new HashMap<>();
         try {
             searchRecordsRequest.setShowTotalCount(true);
-            searchRecordsRequest.setFieldName(RecapConstants.ALL_FIELDS);
+            searchRecordsRequest.setFieldName(StringUtils.isEmpty(searchRecordsRequest.getFieldName()) ? RecapConstants.ALL_FIELDS : searchRecordsRequest.getFieldName());
             bibItems = searchByBib(searchRecordsRequest);
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
         } catch (SolrServerException e) {
