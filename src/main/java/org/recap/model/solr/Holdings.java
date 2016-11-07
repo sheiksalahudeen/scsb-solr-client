@@ -39,6 +39,9 @@ public class Holdings {
     @Field("HoldingsLastUpdatedDate")
     private Date holdingsLastUpdatedDate;
 
+    @Field("IsDeletedHoldings")
+    private boolean isDeletedHoldings = false;
+
     @Ignore
     private String root;
 
@@ -120,5 +123,13 @@ public class Holdings {
 
     public void setHoldingsLastUpdatedDate(Date holdingsLastUpdatedDate) {
         this.holdingsLastUpdatedDate = holdingsLastUpdatedDate;
+    }
+
+    public boolean isDeletedHoldings() {
+        return isDeletedHoldings;
+    }
+
+    public void setDeletedHoldings(boolean deletedHoldings) {
+        isDeletedHoldings = deletedHoldings;
     }
 }

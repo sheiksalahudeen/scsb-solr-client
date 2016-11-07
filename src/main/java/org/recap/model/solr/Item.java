@@ -76,6 +76,9 @@ public class Item {
     @Field("ItemLastUpdatedDate")
     private Date itemLastUpdatedDate;
 
+    @Field("IsDeletedItem")
+    private boolean isDeletedItem = false;
+
     @Ignore
     private String root;
 
@@ -253,5 +256,13 @@ public class Item {
 
     public void setItemLastUpdatedDate(Date itemLastUpdatedDate) {
         this.itemLastUpdatedDate = itemLastUpdatedDate;
+    }
+
+    public boolean isDeletedItem() {
+        return isDeletedItem;
+    }
+
+    public void setDeletedItem(boolean deletedItem) {
+        isDeletedItem = deletedItem;
     }
 }

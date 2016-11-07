@@ -138,12 +138,12 @@ public class CollectionServiceUtil {
                     bibliographicMarcForm.setMessage(RecapConstants.DEACCESSION_SUCCESSFUL);
                 } else {
                     String failureMessage = resultMessage.replace(RecapConstants.FAILURE + " -", "");
-                    bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + "-" + failureMessage);
+                    bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + " - " + failureMessage);
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
-            bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + "-" + e.getMessage());
+            bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + " - " + e.getMessage());
         }
     }
 }

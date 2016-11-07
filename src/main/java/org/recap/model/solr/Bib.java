@@ -109,6 +109,9 @@ public class Bib {
     @Field("BibLastUpdatedDate")
     private Date bibLastUpdatedDate;
 
+    @Field("IsDeletedBib")
+    private boolean isDeletedBib = false;
+
     public String getId() {
         return id;
     }
@@ -363,6 +366,14 @@ public class Bib {
 
     public void setBibLastUpdatedDate(Date bibLastUpdatedDate) {
         this.bibLastUpdatedDate = bibLastUpdatedDate;
+    }
+
+    public boolean isDeletedBib() {
+        return isDeletedBib;
+    }
+
+    public void setDeletedBib(boolean deletedBib) {
+        isDeletedBib = deletedBib;
     }
 
     @Override

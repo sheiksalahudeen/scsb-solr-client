@@ -42,6 +42,7 @@ public class HoldingsJSONUtil extends MarcUtil {
             holdings.setHoldingsCreatedDate(holdingsEntity.getCreatedDate());
             holdings.setHoldingsLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
             holdings.setHoldingsLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
+            holdings.setDeletedHoldings(holdingsEntity.isDeleted());
             return holdings;
         } catch (Exception e) {
             saveExceptionReportForHoldings(holdingsEntity, e);
