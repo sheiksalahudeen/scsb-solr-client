@@ -54,8 +54,8 @@ public class BibItemIndexCallable implements Callable {
     public Object call() throws Exception {
 
         Page<BibliographicEntity> bibliographicEntities = owningInstitutionId == null ?
-                bibliographicDetailsRepository.findAllByIsDeletedFalse(new PageRequest(pageNum, docsPerPage)) :
-                bibliographicDetailsRepository.findByOwningInstitutionIdAndIsDeletedFalse(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+                bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
+                bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
