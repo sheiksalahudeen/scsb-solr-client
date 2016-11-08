@@ -1,5 +1,6 @@
 package org.recap.repository.jpa;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
@@ -130,6 +131,20 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
     public void countByOwningInstitutionCode() throws Exception {
         Long bibCount = bibliographicDetailsRepository.countByOwningInstitutionCodeAndIsDeletedFalse("PUL");
         assertNotNull(bibCount);
+    }
+
+    @Test
+    public void findByLastUpdatedDateAfter() throws Exception {
+        Date fromDate = DateUtils.addDays(new Date(), -1);
+        Page<BibliographicEntity> byCreatedDateAfterAndIsDeletedFalse = bibliographicDetailsRepository.findByLastUpdatedDateAfter(new PageRequest(0, 10), fromDate);
+        assertNotNull(byCreatedDateAfterAndIsDeletedFalse);
+    }
+
+    @Test
+    public void findByOwningInstitutionIdAndLastUpdatedDateAfter() throws Exception {
+        Date fromDate = DateUtils.addDays(new Date(), -1);
+        Page<BibliographicEntity> byCreatedDateAfterAndIsDeletedFalse = bibliographicDetailsRepository.findByOwningInstitutionIdAndLastUpdatedDateAfter(new PageRequest(0, 10), 1, fromDate);
+        assertNotNull(byCreatedDateAfterAndIsDeletedFalse);
     }
 
 }

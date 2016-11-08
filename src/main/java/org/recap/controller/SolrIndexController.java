@@ -111,12 +111,6 @@ public class SolrIndexController {
                 + "   Commit Interval :" + commitInterval
                 + "   From Date : " + solrIndexRequest.getDateFrom());
 
-        Date fromDate = null;
-        if (StringUtils.isNotBlank(solrIndexRequest.getDateFrom())) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.INCREMENTAL_DATE_FORMAT);
-            fromDate = dateFormatter.parse(solrIndexRequest.getDateFrom());
-        }
-
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();
             itemCrudRepository.deleteAll();
@@ -128,17 +122,8 @@ public class SolrIndexController {
                 e.printStackTrace();
             }
         }
-        Integer totalProcessedRecords = 0;
-        if (solrIndexRequest.getDocType().equalsIgnoreCase("Bibs")) {
-            totalProcessedRecords = bibIndexExecutorService.index(solrIndexRequest);
-        } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Holdings")) {
-            totalProcessedRecords = holdingsIndexExecutorService.index(solrIndexRequest);
-        } else if (solrIndexRequest.getDocType().equalsIgnoreCase("Items")) {
-            totalProcessedRecords = itemIndexExecutorService.index(solrIndexRequest);
-        } else {
-            totalProcessedRecords = bibItemIndexExecutorService.index(solrIndexRequest);
-        }
 
+        Integer totalProcessedRecords = bibItemIndexExecutorService.index(solrIndexRequest);
         String status = "Total number of records processed : " + totalProcessedRecords;
 
         return report(status);

@@ -113,14 +113,14 @@ public class BibJSONUtil extends MarcUtil {
         Bib bib = generateBib(bibliographicEntity);
         if(bib != null) {
         SolrInputDocument bibSolrInputDocument = generateBibSolrInputDocument(bib, solrTemplate);
-        List<HoldingsEntity> holdingsEntities = bibliographicDetailsRepository.getNonDeletedHoldingsEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         List<SolrInputDocument> holdingsSolrInputDocuments = new ArrayList<>();
         HoldingsJSONUtil holdingsJSONUtil = new HoldingsJSONUtil();
         holdingsJSONUtil.setProducerTemplate(producerTemplate);
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             Holdings holdings = holdingsJSONUtil.generateHoldingsForIndex(holdingsEntity);
             if (holdings != null) {
-                List<ItemEntity> itemEntities = holdingsDetailsRepository.getNonDeletedItemEntities(holdingsEntity.getOwningInstitutionId(), holdingsEntity.getOwningInstitutionHoldingsId());
+                List<ItemEntity> itemEntities = holdingsEntity.getItemEntities();
                 List<SolrInputDocument> itemSolrInputDocuments = new ArrayList<>();
                 ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
                 itemJSONUtil.setProducerTemplate(producerTemplate);
@@ -164,11 +164,11 @@ public class BibJSONUtil extends MarcUtil {
             List<Integer> holdingsIds = new ArrayList<>();
             List<Integer> itemIds = new ArrayList<>();
 
-        List<ItemEntity> itemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
         for (ItemEntity itemEntity : itemEntities) {
             itemIds.add(itemEntity.getItemId());
         }
-        List<HoldingsEntity> holdingsEntities = bibliographicDetailsRepository.getNonDeletedHoldingsEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+        List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
         for (HoldingsEntity holdingsEntity : holdingsEntities) {
             holdingsIds.add(holdingsEntity.getHoldingsId());
         }

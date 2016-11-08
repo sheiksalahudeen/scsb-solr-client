@@ -14,6 +14,7 @@ import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -59,7 +60,7 @@ public class BibItemIndexExecutorServiceUT extends BaseTestCase{
 
     private class MockBibItemIndexExecutorService extends BibItemIndexExecutorService {
         @Override
-        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId) {
+        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId, Date fromDate) {
             return mockBibItemIndexCallable;
         }
 

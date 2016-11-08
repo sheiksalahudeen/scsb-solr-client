@@ -18,10 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -67,23 +65,25 @@ public abstract class IndexExecutorService {
         Integer docsPerThread = solrIndexRequest.getNumberOfDocs();
         Integer commitIndexesInterval = solrIndexRequest.getCommitInterval();
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
+        String fromDate = solrIndexRequest.getDateFrom();
         Integer owningInstitutionId = null;
+        Date from = null;
         String coreName = solrCore;
-
         Integer totalBibsProcessed = 0;
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-            Integer totalDocCount = 0;
-            if (StringUtils.isBlank(owningInstitutionCode)) {
-                totalDocCount = getTotalDocCount(null);
-            } else {
+            if (StringUtils.isNotBlank(owningInstitutionCode)) {
                 InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(owningInstitutionCode);
                 if (null != institutionEntity) {
                     owningInstitutionId = institutionEntity.getInstitutionId();
-                    totalDocCount = getTotalDocCount(owningInstitutionId);
                 }
             }
+            if (StringUtils.isNotBlank(fromDate)) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.INCREMENTAL_DATE_FORMAT);
+                from = dateFormatter.parse(fromDate);
+            }
+            Integer totalDocCount = getTotalDocCount(owningInstitutionId, from);
             logger.info("Total Document Count From DB : " + totalDocCount);
 
             if (totalDocCount > 0) {
@@ -104,7 +104,7 @@ public abstract class IndexExecutorService {
 
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                    Callable callable = getCallable(coreName, pageNum, docsPerThread, owningInstitutionId);
+                    Callable callable = getCallable(coreName, pageNum, docsPerThread, owningInstitutionId, from);
                     callables.add(callable);
                 }
 
@@ -197,9 +197,9 @@ public abstract class IndexExecutorService {
         this.solrAdmin = solrAdmin;
     }
 
-    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, Integer owningInstitutionId);
+    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, Integer owningInstitutionId, Date fromDate);
 
-    protected abstract Integer getTotalDocCount(Integer owningInstitutionId);
+    protected abstract Integer getTotalDocCount(Integer owningInstitutionId, Date fromDate);
 
     protected abstract String getResourceURL();
 }
