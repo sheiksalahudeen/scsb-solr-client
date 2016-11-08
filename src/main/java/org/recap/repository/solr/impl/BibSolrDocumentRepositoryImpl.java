@@ -18,6 +18,7 @@ import org.recap.model.search.resolver.impl.Bib.DocTypeValueResolver;
 import org.recap.model.search.resolver.impl.Bib.IdValueResolver;
 import org.recap.model.search.resolver.impl.holdings.HoldingsIdValueResolver;
 import org.recap.model.search.resolver.impl.holdings.HoldingsRootValueResolver;
+import org.recap.model.search.resolver.impl.holdings.IsDeletedHoldingsValueResolver;
 import org.recap.model.search.resolver.impl.holdings.SummaryHoldingsValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.BibItem;
@@ -146,13 +147,19 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
                 BibItem bibItem = new BibItem();
                 if (docType.equalsIgnoreCase(RecapConstants.BIB)) {
-                    populateBibItem(solrDocument, bibItem);
-                    bibItem.setItems(Arrays.asList(item));
-                    bibItems.add(bibItem);
+                    boolean isDeletedBib = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_BIB);
+                    if(!isDeletedBib) {
+                        populateBibItem(solrDocument, bibItem);
+                        bibItem.setItems(Arrays.asList(item));
+                        bibItems.add(bibItem);
+                    }
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
-                    Holdings holdings = getHoldings(solrDocument);
-                    bibItem.addHoldings(holdings);
+                    boolean isDeletedHoldings = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_HOLDINGS);
+                    if(isDeletedHoldings) {
+                        Holdings holdings = getHoldings(solrDocument);
+                        bibItem.addHoldings(holdings);
+                    }
                 }
             }
         } catch (SolrServerException e) {
@@ -178,12 +185,18 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 SolrDocument solrDocument = iterator.next();
                 String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
                 if(docType.equalsIgnoreCase(RecapConstants.ITEM)) {
-                    Item item = getItem(solrDocument);
-                    bibItem.addItem(item);
+                    boolean isDeletedItem = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_ITEM);
+                    if(!isDeletedItem) {
+                        Item item = getItem(solrDocument);
+                        bibItem.addItem(item);
+                    }
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
-                    Holdings holdings = getHoldings(solrDocument);
-                    bibItem.addHoldings(holdings);
+                    boolean isDeletedHoldings = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_HOLDINGS);
+                    if(!isDeletedHoldings) {
+                        Holdings holdings = getHoldings(solrDocument);
+                        bibItem.addHoldings(holdings);
+                    }
                 }
             }
         } catch (SolrServerException e) {
@@ -313,6 +326,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             bibValueResolvers.add(new TitleDisplayValueResolver());
             bibValueResolvers.add(new TitleSearchValueResolver());
             bibValueResolvers.add(new TitleSortValueResolver());
+            bibValueResolvers.add(new IsDeletedBibValueResolver());
         }
         return bibValueResolvers;
     }
@@ -335,6 +349,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new ItemRootValueResolver());
             itemValueResolvers.add(new ItemIdValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
+            itemValueResolvers.add(new IsDeletedItemValueResolver());
         }
         return itemValueResolvers;
     }
@@ -347,6 +362,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             holdingsValueResolvers.add(new org.recap.model.search.resolver.impl.holdings.DocTypeValueResolver());
             holdingsValueResolvers.add(new org.recap.model.search.resolver.impl.holdings.IdValueResolver());
             holdingsValueResolvers.add(new HoldingsIdValueResolver());
+            holdingsValueResolvers.add(new IsDeletedHoldingsValueResolver());
         }
         return holdingsValueResolvers;
     }
