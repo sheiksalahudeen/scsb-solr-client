@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CoreAdminParams;
@@ -10,6 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.SolrIndexRequest;
@@ -26,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -252,6 +255,26 @@ public class ExecutorAT extends BaseTestCase {
         bibItemIndexExecutorService.indexByOwningInstitutionId(solrIndexRequest);
         stopWatch.stop();
         System.out.println("Total time taken:" + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void testIncrementalIndex() throws Exception {
+        SolrIndexRequest solrIndexRequest = new SolrIndexRequest();
+        solrIndexRequest.setNumberOfThreads(numThreads);
+        solrIndexRequest.setNumberOfDocs(docsPerThread);
+        solrIndexRequest.setCommitInterval(commitInterval);
+        //solrIndexRequest.setDateFrom("27-10-2016 01:00:00");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.INCREMENTAL_DATE_FORMAT);
+        Date from = DateUtils.addDays(new Date(), -1);
+        solrIndexRequest.setDateFrom(dateFormatter.format(from));
+        long dbCount = bibliographicDetailsRepository.countByLastUpdatedDateAfter(from);
+        bibSolrCrudRepository.deleteAll();
+        itemCrudRepository.deleteAll();
+        indexDocuments(solrIndexRequest);
+        solrTemplate.commit();
+        Thread.sleep(5000);
+        long solrCount = bibSolrCrudRepository.countByDocType("Bib");
+        assertEquals(dbCount, solrCount);
     }
 
 }

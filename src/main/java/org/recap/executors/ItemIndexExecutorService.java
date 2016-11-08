@@ -5,6 +5,7 @@ import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -20,12 +21,12 @@ public class ItemIndexExecutorService extends IndexExecutorService {
     ProducerTemplate producerTemplate;
 
     @Override
-    public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId) {
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId, Date fromDate) {
         return new ItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, itemDetailsRepository, owningInstitutionId, producerTemplate);
     }
 
     @Override
-    protected Integer getTotalDocCount(Integer owningInstitutionId) {
+    protected Integer getTotalDocCount(Integer owningInstitutionId, Date fromDate) {
         Long count = owningInstitutionId == null ? itemDetailsRepository.countByIsDeletedFalse() : itemDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(owningInstitutionId);
         return count.intValue();
     }

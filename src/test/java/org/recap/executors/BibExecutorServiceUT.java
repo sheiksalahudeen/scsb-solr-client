@@ -10,6 +10,7 @@ import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 import static junit.framework.TestCase.assertEquals;
@@ -55,7 +56,7 @@ public class BibExecutorServiceUT {
 
     private class MockBibIndexExecutorService extends BibIndexExecutorService {
         @Override
-        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId) {
+        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId, Date fromDate) {
             return mockBibIndexCallable;
         }
 

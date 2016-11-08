@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,6 +19,16 @@ import java.util.List;
 public interface BibliographicDetailsRepository extends JpaRepository<BibliographicEntity, BibliographicPK> {
 
     Long countByIsDeletedFalse();
+
+    Long countByOwningInstitutionId(Integer owningInstitutionId);
+
+    Long countByLastUpdatedDateAfter(Date createdDate);
+
+    Long countByOwningInstitutionIdAndLastUpdatedDateAfter(Integer owningInstitutionId, Date createdDate);
+
+    Page<BibliographicEntity> findByLastUpdatedDateAfter(Pageable pageable, Date createdDate);
+
+    Page<BibliographicEntity> findByOwningInstitutionIdAndLastUpdatedDateAfter(Pageable pageable, Integer institutionId, Date createdDate);
 
     Long countByOwningInstitutionIdAndIsDeletedFalse(Integer owningInstitutionId);
 

@@ -15,6 +15,7 @@ import org.recap.repository.solr.temp.ItemCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -65,7 +66,7 @@ public class ItemIndexExecutorServiceUT {
 
     private class MockIndexExecutorService extends ItemIndexExecutorService{
         @Override
-        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId){
+        public Callable getCallable(String coreName, int startingPage, int numRecordsPerPage, Integer owningInstitutionId, Date fromDate){
             return mockItemIndexCallable;
         }
 

@@ -14,6 +14,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,12 +34,13 @@ public class BibItemIndexCallable implements Callable {
     private String coreName;
     private String solrURL;
     private Integer owningInstitutionId;
+    private Date fromDate;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
     private SolrTemplate solrTemplate;
 
-    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
+    public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, Date fromDate, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
         this.pageNum = pageNum;
@@ -46,6 +48,7 @@ public class BibItemIndexCallable implements Callable {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.holdingsDetailsRepository = holdingsDetailsRepository;
         this.owningInstitutionId = owningInstitutionId;
+        this.fromDate = fromDate;
         this.producerTemplate = producerTemplate;
         this.solrTemplate = solrTemplate;
     }
@@ -53,9 +56,16 @@ public class BibItemIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        Page<BibliographicEntity> bibliographicEntities = owningInstitutionId == null ?
-                bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage)) :
-                bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+        Page<BibliographicEntity> bibliographicEntities = null;
+        if (null == owningInstitutionId && null == fromDate) {
+            bibliographicEntities = bibliographicDetailsRepository.findAll(new PageRequest(pageNum, docsPerPage));
+        } else if (null != owningInstitutionId && null == fromDate) {
+            bibliographicEntities = bibliographicDetailsRepository.findByOwningInstitutionId(new PageRequest(pageNum, docsPerPage), owningInstitutionId);
+        } else if (null == owningInstitutionId && null != fromDate) {
+            bibliographicEntities = bibliographicDetailsRepository.findByLastUpdatedDateAfter(new PageRequest(pageNum, docsPerPage), fromDate);
+        } else if (null != owningInstitutionId && null != fromDate) {
+            bibliographicEntities = bibliographicDetailsRepository.findByOwningInstitutionIdAndLastUpdatedDateAfter(new PageRequest(pageNum, docsPerPage), owningInstitutionId, fromDate);
+        }
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();
