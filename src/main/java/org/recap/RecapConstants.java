@@ -38,6 +38,10 @@ public class RecapConstants {
     public static final String OR = "OR";
     public static final String ALL_DIACRITICS = "all_diacritics";
     public static final String ALL_FIELDS = "_text_";
+    public static final String IS_DELETED_BIB = "IsDeletedBib";
+    public static final String IS_DELETED_HOLDINGS = "IsDeletedHoldings";
+    public static final String IS_DELETED_ITEM = "IsDeletedItem";
+    public static final String PUBLICATION_DATE = "PublicationDate";
 
     public static final String USE_RESTRICTION = "UseRestriction_search";
     public static final String NO_RESTRICTIONS = "No Restrictions";
