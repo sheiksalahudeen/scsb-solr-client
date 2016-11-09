@@ -12,10 +12,8 @@ import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
-import org.recap.model.search.resolver.impl.Bib.BibIdValueResolver;
-import org.recap.model.search.resolver.impl.Bib.DocTypeValueResolver;
-import org.recap.model.search.resolver.impl.Bib.IdValueResolver;
-import org.recap.model.search.resolver.impl.Bib.RootValueResolver;
+import org.recap.model.search.resolver.impl.Bib.*;
+import org.recap.model.search.resolver.impl.item.IsDeletedItemValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemIdValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemRootValueResolver;
 import org.recap.model.solr.BibItem;
@@ -95,7 +93,8 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
 
     public void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot() + " AND " + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + " AND " + queryStringForMatchParentReturnChild);
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot() + " AND " + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + " AND "
+                + queryStringForMatchParentReturnChild + " AND " + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted());
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
@@ -159,6 +158,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             bibValueResolvers.add(new BibIdValueResolver());
             bibValueResolvers.add(new DocTypeValueResolver());
             bibValueResolvers.add(new IdValueResolver());
+            bibValueResolvers.add(new IsDeletedBibValueResolver());
         }
         return bibValueResolvers;
     }
@@ -170,6 +170,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             itemValueResolvers.add(new ItemRootValueResolver());
             itemValueResolvers.add(new ItemIdValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
+            itemValueResolvers.add(new IsDeletedItemValueResolver());
         }
         return itemValueResolvers;
     }
