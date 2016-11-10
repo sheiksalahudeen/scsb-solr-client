@@ -209,4 +209,57 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
+
+    @Test
+    public void getItemStatusByBarcodeAndIsDeletedFalse() throws Exception {
+        saveSingleBibHoldingsItem();
+        String itemStatus = itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse("12316433");
+        assertEquals(itemStatus, "Available");
+    }
+
+    private BibliographicEntity saveSingleBibHoldingsItem() {
+        Random random = new Random();
+        Date today = new Date();
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent("mock Content".getBytes());
+        bibliographicEntity.setCreatedDate(today);
+        bibliographicEntity.setCreatedBy("etl");
+        bibliographicEntity.setLastUpdatedBy("etl");
+        bibliographicEntity.setLastUpdatedDate(today);
+        bibliographicEntity.setOwningInstitutionId(1);
+        String owningInstitutionBibId = String.valueOf(random.nextInt());
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(today);
+        holdingsEntity.setCreatedBy("etl");
+        holdingsEntity.setLastUpdatedDate(today);
+        holdingsEntity.setLastUpdatedBy("etl");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setCallNumberType("0");
+        itemEntity.setCallNumber("callNum");
+        itemEntity.setCopyNumber(1);
+        itemEntity.setCreatedDate(today);
+        itemEntity.setCreatedBy("etl");
+        itemEntity.setLastUpdatedDate(today);
+        itemEntity.setLastUpdatedBy("etl");
+        itemEntity.setBarcode("12316433");
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCustomerCode("PA");
+        itemEntity.setItemAvailabilityStatusId(1);
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        return savedBibliographicEntity;
+    }
 }
