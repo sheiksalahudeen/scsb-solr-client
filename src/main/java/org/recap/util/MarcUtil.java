@@ -4,13 +4,19 @@ import info.freelibrary.marc4j.impl.ControlFieldImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.MarcReader;
+import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
-import org.marc4j.marc.DataField;
-import org.marc4j.marc.Record;
-import org.marc4j.marc.Subfield;
-import org.marc4j.marc.VariableField;
+import org.marc4j.MarcXmlWriter;
+import org.marc4j.marc.*;
+import org.recap.model.marc.BibMarcRecord;
+import org.recap.model.marc.HoldingsMarcRecord;
+import org.recap.model.marc.ItemMarcRecord;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +24,7 @@ import java.util.List;
 /**
  * Created by pvsubrah on 6/15/16.
  */
+@Service
 public class MarcUtil {
 
     public List<Record> convertMarcXmlToRecord(String marcXml) {
@@ -167,6 +174,142 @@ public class MarcUtil {
             }
         }
         return 0;
+    }
+
+    public List<Record> readMarcXml(String marcXmlString) {
+        List<Record> recordList = new ArrayList<>();
+        InputStream in = new ByteArrayInputStream(marcXmlString.getBytes());
+        MarcReader reader = new MarcXmlReader(in);
+        while (reader.hasNext()) {
+            Record record = reader.next();
+            recordList.add(record);
+        }
+        return recordList;
+    }
+
+    public String getDataFieldValue(Record record, String field, char subField) {
+        DataField dataField = getDataField(record, field);
+        if (dataField != null) {
+            Subfield subfield = dataField.getSubfield(subField);
+            if (subfield != null) {
+                return subfield.getData();
+            }
+        }
+        return null;
+    }
+
+    private String getDataFieldValue(DataField dataField, char subField) {
+        Subfield subfield = dataField.getSubfield(subField);
+        if (subfield != null) {
+            return subfield.getData();
+        }
+        return null;
+    }
+
+    public boolean isSubFieldExists(Record record, String field) {
+        DataField dataField = getDataField(record, field);
+        if (dataField != null) {
+            List<Subfield> subfields = dataField.getSubfields();
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(subfields)) {
+                for (Subfield subfield : subfields) {
+                    String data = subfield.getData();
+                    if (StringUtils.isNotBlank(data)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public DataField getDataField(Record record, String field) {
+        VariableField variableField = record.getVariableField(field);
+        if (variableField != null) {
+            DataField dataField = (DataField) variableField;
+            if (dataField != null) {
+                return dataField;
+            }
+        }
+        return null;
+    }
+
+    public Character getInd1(Record record, String field, char subField) {
+        DataField dataField = getDataField(record, field);
+        if (dataField != null) {
+            Subfield subfield = dataField.getSubfield(subField);
+            if (subfield != null) {
+                return dataField.getIndicator1();
+            }
+        }
+        return null;
+    }
+
+    public BibMarcRecord buildBibMarcRecord(Record record) {
+        Record bibRecord = record;
+        List<VariableField> holdingsVariableFields = new ArrayList<>();
+        List<VariableField> itemVariableFields = new ArrayList<>();
+        String[] holdingsTags = {"852"};
+        String[] itemTags = {"876"};
+        holdingsVariableFields.addAll(bibRecord.getVariableFields(holdingsTags));
+        itemVariableFields.addAll(bibRecord.getVariableFields(itemTags));
+
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(holdingsVariableFields)) {
+            for (VariableField holdingsVariableField : holdingsVariableFields) {
+                bibRecord.removeVariableField(holdingsVariableField);
+            }
+        }
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(itemVariableFields)) {
+            for (VariableField itemVariableField : itemVariableFields) {
+                bibRecord.removeVariableField(itemVariableField);
+            }
+        }
+        BibMarcRecord bibMarcRecord = new BibMarcRecord();
+        bibMarcRecord.setBibRecord(bibRecord);
+
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(holdingsVariableFields)) {
+            MarcFactory marcFactory = MarcFactory.newInstance();
+            List<HoldingsMarcRecord> holdingsMarcRecordList = new ArrayList<>();
+            for (VariableField holdingsVariableField : holdingsVariableFields) {
+                List<ItemMarcRecord> itemMarcRecords = new ArrayList<>();
+                DataField holdingsDataField = (DataField) holdingsVariableField;
+
+                String holdingsData = getDataFieldValue(holdingsDataField, '0');
+                if (StringUtils.isNotBlank(holdingsData)) {
+                    HoldingsMarcRecord holdingsMarcRecord = new HoldingsMarcRecord();
+                    Record holdingsRecord = marcFactory.newRecord();
+                    holdingsRecord.getDataFields().add(holdingsDataField);
+                    holdingsMarcRecord.setHoldingsRecord(holdingsRecord);
+
+                    if (org.apache.commons.collections.CollectionUtils.isNotEmpty(itemVariableFields)) {
+                        for (VariableField itemVariableField : itemVariableFields) {
+                            DataField itemDataField = (DataField) itemVariableField;
+                            String itemData = getDataFieldValue(itemDataField, '0');
+                            if (StringUtils.isNotBlank(itemData) && itemData.equalsIgnoreCase(holdingsData)) {
+                                ItemMarcRecord itemMarcRecord = new ItemMarcRecord();
+                                Record itemRecord = marcFactory.newRecord();
+                                itemRecord.getDataFields().add(itemDataField);
+                                itemMarcRecord.setItemRecord(itemRecord);
+                                itemMarcRecords.add(itemMarcRecord);
+                            }
+                        }
+                    }
+                    holdingsMarcRecord.setItemMarcRecordList(itemMarcRecords);
+                    holdingsMarcRecordList.add(holdingsMarcRecord);
+                }
+            }
+            bibMarcRecord.setHoldingsMarcRecords(holdingsMarcRecordList);
+        }
+        return bibMarcRecord;
+    }
+
+    public String writeMarcXml(Record record) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        MarcWriter marcWriter = new MarcXmlWriter(byteArrayOutputStream, true);
+        marcWriter.write(record);
+        marcWriter.close();
+        String content = new String(byteArrayOutputStream.toByteArray());
+        content = content.replaceAll("marcxml:", "");
+        return content;
     }
 
 }

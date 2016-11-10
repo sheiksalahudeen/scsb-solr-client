@@ -179,17 +179,4 @@ public class SolrIndexController {
         cal.set(Calendar.SECOND, 59);
         return cal.getTime();
     }
-
-    @ResponseBody
-    @RequestMapping(value = "/solrIndexer/indexByBibliographicId", method = RequestMethod.POST)
-    public void indexByBibliographicId(@RequestBody Integer bibliographicId) {
-        BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        bibJSONUtil.setProducerTemplate(producerTemplate);
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
-        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-        if (solrInputDocument !=null) {
-            solrTemplate.saveDocument(solrInputDocument);
-            solrTemplate.commit();
-        }
-    }
 }

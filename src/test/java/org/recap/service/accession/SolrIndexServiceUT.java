@@ -1,21 +1,14 @@
-package org.recap.controller.swagger;
+package org.recap.service.accession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.recap.controller.BaseControllerUT;
-import org.recap.model.accession.AccessionRequest;
+import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.model.solr.Bib;
+import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,67 +19,37 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Created by chenchulakshmig on 14/10/16.
+ * Created by rajeshbabuk on 10/11/16.
  */
-public class SharedCollectionRestControllerUT extends BaseControllerUT {
-
-    @Value("${scsb.solr.client.url}")
-    String scsbSolrClientUrl;
+public class SolrIndexServiceUT extends BaseTestCase {
 
     @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
+    SolrIndexService solrIndexService;
 
     @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    private ItemDetailsRepository itemDetailsRepository;
+    EntityManager entityManager;
 
     @Test
-    public void itemAvailabilityStatus() throws Exception {
-        TestRestTemplate testRestTemplate = new TestRestTemplate();
+    public void indexByBibliographicId() throws Exception {
+        BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
 
-        String itemBarcode = "32101056185125";
-        saveBibEntityWithHoldingsAndItem(itemBarcode);
-        itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
-        String itemAvailabilityStatus = testRestTemplate
-                .getForObject(scsbSolrClientUrl+"/sharedCollection/itemAvailabilityStatus?itemBarcode="+itemBarcode,  String.class);
-        assertNotNull(itemAvailabilityStatus);
-        assertEquals(itemAvailabilityStatus, "Available");
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        Integer bibliographicId = savedBibliographicEntity.getBibliographicId();
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
+        assertNotNull(savedBibliographicEntity.getItemEntities());
+
+        solrIndexService.indexByBibliographicId(bibliographicId);
+
+        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
+        assertNotNull(bib);
     }
 
-    @Test
-    public void accession() throws Exception {
-        AccessionRequest accessionRequest = new AccessionRequest();
-        accessionRequest.setCustomerCode("PB");
-        accessionRequest.setItemBarcode("32101095533293");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        MvcResult mvcResult = this.mockMvc.perform(post("/sharedCollection/accession")
-                .headers(getHttpHeaders())
-                .contentType(contentType)
-                .content(objectMapper.writeValueAsString(accessionRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-        assertEquals(result, "Success");
-    }
-
-    private HttpHeaders getHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("api_key", "recap");
-        return headers;
-    }
-
-    private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {
+    private BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
         Random random = new Random();
         File bibContentFile = getBibContentFile();
         File holdingsContentFile = getHoldingsContentFile();
@@ -117,7 +80,8 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
-        itemEntity.setBarcode(itemBarcode);
+        String barcode = String.valueOf(random.nextInt());
+        itemEntity.setBarcode(barcode);
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
@@ -131,9 +95,8 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        return savedBibliographicEntity;
+
+        return bibliographicEntity;
     }
 
     private File getBibContentFile() throws URISyntaxException {
@@ -145,5 +108,4 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
-
 }

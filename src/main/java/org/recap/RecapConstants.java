@@ -196,6 +196,19 @@ public class RecapConstants {
     public static final String SEARCH_RESULT_ERROR_NO_RECORDS_FOUND="No search results found. Please refine search conditions.";
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
 
+    public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
+    public static final String COLUMBIA = "CUL";
+    public static final String PRINCETON = "PUL";
+    public static final String NYPL = "NYPL";
+    public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
+    public static final String TITLE = "Title";
+    public static final String OWNING_INSTITUTION_HOLDINGS_ID = "OwningInstitutionHoldingsId";
+    public static final String LOCAL_ITEM_ID = "LocalItemId";
+    public static final String ITEM_BARCODE = "ItemBarcode";
+    public static final String CUSTOMER_CODE = "CustomerCode";
+    public static final String CREATE_DATE_ITEM = "CreateDateItem";
+    public static final String LAST_UPDATED_DATE_ITEM = "LastUpdatedDateItem";
+    public static final String ERROR_DESCRIPTION = "ErrorDescription";
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
 
