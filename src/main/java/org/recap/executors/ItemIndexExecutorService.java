@@ -31,11 +31,6 @@ public class ItemIndexExecutorService extends IndexExecutorService {
         return count.intValue();
     }
 
-    @Override
-    protected String getResourceURL() {
-        return itemResourceURL;
-    }
-
     public void setItemDetailsRepository(ItemDetailsRepository itemDetailsRepository) {
         this.itemDetailsRepository = itemDetailsRepository;
     }

@@ -52,7 +52,7 @@ public class CollectionUpdateController {
         if (RecapConstants.UPDATE_CGD.equalsIgnoreCase(bibliographicMarcForm.getCollectionAction())) {
             collectionServiceUtil.updateCGDForItem(bibliographicMarcForm);
         } else if (RecapConstants.DEACCESSION.equalsIgnoreCase(bibliographicMarcForm.getCollectionAction())) {
-            collectionServiceUtil.deaccessionItem(bibliographicMarcForm);
+            collectionServiceUtil.deAccessionItem(bibliographicMarcForm);
         }
         return new ModelAndView("collectionUpdateView", "bibliographicMarcForm", bibliographicMarcForm);
     }

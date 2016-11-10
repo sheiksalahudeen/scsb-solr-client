@@ -48,11 +48,6 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
         return count.intValue();
     }
 
-    @Override
-    protected String getResourceURL() {
-        return bibResourceURL;
-    }
-
     public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }

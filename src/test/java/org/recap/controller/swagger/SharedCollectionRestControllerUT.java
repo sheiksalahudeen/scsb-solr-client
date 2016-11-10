@@ -5,11 +5,14 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.controller.BaseControllerUT;
 import org.recap.model.accession.AccessionRequest;
+import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.TestRestTemplate;
@@ -28,6 +31,7 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,9 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by chenchulakshmig on 14/10/16.
  */
 public class SharedCollectionRestControllerUT extends BaseControllerUT {
-
-    @Value("${scsb.solr.client.url}")
-    String scsbSolrClientUrl;
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -48,17 +49,20 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
 
+    @Autowired
+    SolrIndexService solrIndexService;
+
     @Test
     public void itemAvailabilityStatus() throws Exception {
-        TestRestTemplate testRestTemplate = new TestRestTemplate();
-
         String itemBarcode = "32101056185125";
         saveBibEntityWithHoldingsAndItem(itemBarcode);
-        itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
-        String itemAvailabilityStatus = testRestTemplate
-                .getForObject(scsbSolrClientUrl+"/sharedCollection/itemAvailabilityStatus?itemBarcode="+itemBarcode,  String.class);
-        assertNotNull(itemAvailabilityStatus);
-        assertEquals(itemAvailabilityStatus, "Available");
+        String itemAvailabilityStatusCode = itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
+        MvcResult mvcResult = this.mockMvc.perform(get("/sharedCollection/itemAvailabilityStatus")
+                .param("itemBarcode",itemBarcode))
+                .andReturn();
+        assertNotNull(mvcResult);
+        assertNotNull(mvcResult.getResponse());
+        assertEquals(mvcResult.getResponse().getContentAsString(), itemAvailabilityStatusCode);
     }
 
     @Test
@@ -77,6 +81,40 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
 
         String result = mvcResult.getResponse().getContentAsString();
         assertEquals(result, "Success");
+    }
+
+    @Test
+    public void deAccession() throws Exception {
+        Random random = new Random();
+        String itemBarcode = String.valueOf(random.nextInt());
+        BibliographicEntity bibliographicEntity = saveBibEntityWithHoldingsAndItem(itemBarcode);
+
+        assertNotNull(bibliographicEntity);
+        Integer bibliographicId = bibliographicEntity.getBibliographicId();
+        assertNotNull(bibliographicId);
+
+        BibliographicEntity byBibliographicId = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
+        assertNotNull(byBibliographicId);
+
+        solrIndexService.indexByBibliographicId(bibliographicId);
+
+        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
+        assertNotNull(bib);
+        assertEquals(bib.getBibId(), bibliographicId);
+
+        DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
+        deAccessionRequest.setItemBarcodes(Arrays.asList(itemBarcode));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        MvcResult mvcResult = this.mockMvc.perform(post("/sharedCollection/deAccession")
+                .headers(getHttpHeaders())
+                .contentType(contentType)
+                .content(objectMapper.writeValueAsString(deAccessionRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String result = mvcResult.getResponse().getContentAsString();
+        assertEquals(result, "{\"" + itemBarcode + "\":\"Success\"}");
     }
 
     private HttpHeaders getHttpHeaders() {

@@ -45,12 +45,6 @@ public abstract class IndexExecutorService {
     @Value("${solr.parent.core}")
     String solrCore;
 
-    @Value("${bib.rest.url}")
-    public String bibResourceURL;
-
-    @Value("${item.rest.url}")
-    public String itemResourceURL;
-
     @Value("${solr.url}")
     String solrUri;
 
@@ -200,6 +194,4 @@ public abstract class IndexExecutorService {
     public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, Integer owningInstitutionId, Date fromDate);
 
     protected abstract Integer getTotalDocCount(Integer owningInstitutionId, Date fromDate);
-
-    protected abstract String getResourceURL();
 }
