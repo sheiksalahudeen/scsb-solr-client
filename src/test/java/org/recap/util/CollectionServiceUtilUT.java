@@ -13,7 +13,9 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.BibliographicMarcForm;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -46,15 +48,6 @@ public class CollectionServiceUtilUT extends BaseTestCase {
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
 
-    @Value("${solr.server.protocol}")
-    String serverProtocol;
-
-    @Value("${scsb.url}")
-    String scsbUrl;
-
-    @Value("${scsb.persistence.url}")
-    String scsbPersistenceUrl;
-
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -64,11 +57,14 @@ public class CollectionServiceUtilUT extends BaseTestCase {
     @Autowired
     CollectionServiceUtil collectionServiceUtil;
 
-    @InjectMocks
-    RestTemplate restTemplate;
-
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    SolrIndexService solrIndexService;
 
     @Before
     public void setup() throws Exception {
@@ -229,33 +225,13 @@ public class CollectionServiceUtilUT extends BaseTestCase {
     }
 
     @Test
-    public void testRestApiForDeaccession() throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
-        String itemBarcode = "32101052040282889";
-        String url = serverProtocol + scsbUrl + "sharedCollection/deAccession";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("api_key", "recap");
-
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(itemBarcode);
-        jsonObject.put("itemBarcodes", jsonArray);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonObject.toString(), headers);
-        String result = restTemplate.postForObject(url, entity, String.class);
-
-        assertNotNull(result);
-    }
-
-    @Test
     public void deaccessionItem() throws Exception {
         BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
 
-        RestTemplate restTemplate = new RestTemplate();
-        String createUrl = serverProtocol + scsbPersistenceUrl + "bibliographic/create";
-        Integer bibliographicId = restTemplate.postForObject(createUrl, bibliographicEntity, Integer.class);
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(bibliographicEntity);
+        Integer bibliographicId = bibliographicEntity.getBibliographicId();
         assertNotNull(bibliographicId);
 
         BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
@@ -276,9 +252,7 @@ public class CollectionServiceUtilUT extends BaseTestCase {
         assertEquals(itemId, fetchedItemEntity.getItemId());
         assertEquals(Boolean.FALSE, fetchedItemEntity.isDeleted());
 
-        this.mockMvc.perform(post("/solrIndexer/indexByBibliographicId")
-                .contentType(contentType)
-                .content(String.valueOf(bibliographicId)));
+        solrIndexService.indexByBibliographicId(bibliographicId);
 
         Item fetchedItemSolr = itemCrudRepository.findByItemId(itemId);
         assertNotNull(fetchedItemSolr);
@@ -291,7 +265,7 @@ public class CollectionServiceUtilUT extends BaseTestCase {
         bibliographicMarcForm.setBarcode(barcode);
         bibliographicMarcForm.setCgdChangeNotes("Notes for deaccession");
 
-        collectionServiceUtil.deaccessionItem(bibliographicMarcForm);
+        collectionServiceUtil.deAccessionItem(bibliographicMarcForm);
 
         ItemEntity fetchedItemEntityAfterDeaccession = itemDetailsRepository.findByItemId(itemId);
         entityManager.refresh(fetchedItemEntityAfterDeaccession);

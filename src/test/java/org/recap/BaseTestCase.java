@@ -72,12 +72,6 @@ public class BaseTestCase {
     @Autowired
     public SolrTemplate solrTemplate;
 
-    @Value("${bib.rest.url}")
-    public String bibResourceURL;
-
-    @Value(("${item.rest.url}"))
-    public String itemResourceURL;
-
     @Test
     public void loadContexts() {
         System.out.println();

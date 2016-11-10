@@ -48,6 +48,10 @@ public class RecapConstants {
     public static final String IN_LIBRARY_USE = "In Library Use";
     public static final String SUPERVISED_USE = "Supervised Use";
 
+    public static final String COLLECTION_GROUP_CODE = "CollectionGroupCode";
+    public static final String STATUS = "Status";
+    public static final String REASON_FOR_FAILURE = "ReasonForFailure";
+
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
     //Matching Algorithm Constants
@@ -211,5 +215,18 @@ public class RecapConstants {
     public static final String ERROR_DESCRIPTION = "ErrorDescription";
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
+
+    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been DeAccessioned.";
+    public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
+
+    public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
+    public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpDeAccessionSummaryReportQ";
+
+    public static final String FS_DE_ACCESSION_SUMMARY_REPORT_ID = "fsDeAccessionSummaryReportQ";
+    public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_ID = "ftpDeAccessionSummaryReportQ";
+
+    public static final String DEACCESION_DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyyHHmmss";
+    public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
+    public static final String DEACCESSION_REPORT = "DeAccession_Report";
 
 }

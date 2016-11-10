@@ -1,6 +1,7 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by chenchulakshmig on 21/6/16.
  */
-public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, Integer> {
+public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEntity, ItemPK> {
 
     Long countByIsDeletedFalse();
 
@@ -35,6 +36,13 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
     @Transactional
     @Query("update ItemEntity item set item.collectionGroupId = :collectionGroupId, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate where item.itemId = :itemId")
     int updateCollectionGroupIdByItemId(@Param("collectionGroupId") Integer collectionGroupId, @Param("itemId") Integer itemId, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
+
+    List<ItemEntity> findByBarcodeIn(@Param("barcodes") List<String> barcodes);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE ItemEntity item SET item.isDeleted = true WHERE item.itemId = :itemId")
+    int markItemAsDeleted(@Param("itemId") Integer itemId);
 
     @Query(value = "select itemStatus.statusCode from ItemEntity item, ItemStatusEntity itemStatus where item.itemAvailabilityStatusId = itemStatus.itemStatusId and item.barcode = :barcode and item.isDeleted = 0")
     String getItemStatusByBarcodeAndIsDeletedFalse(@Param("barcode") String barcode);

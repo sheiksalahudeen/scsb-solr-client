@@ -32,11 +32,6 @@ public class HoldingsIndexExecutorService extends IndexExecutorService {
         return count.intValue();
     }
 
-    @Override
-    protected String getResourceURL() {
-        return null;
-    }
-
     public void setBibliographicDetailsRepository(HoldingsDetailsRepository holdingsDetailsRepository) {
         this.holdingsDetailsRepository = holdingsDetailsRepository;
     }
