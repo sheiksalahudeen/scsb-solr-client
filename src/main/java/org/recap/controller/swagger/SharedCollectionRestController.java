@@ -3,15 +3,18 @@ package org.recap.controller.swagger;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.service.ItemAvailabilityService;
+import org.recap.service.accession.AccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by chenchulakshmig on 6/10/16.
@@ -29,6 +32,9 @@ public class SharedCollectionRestController {
 
     @Autowired
     private ItemAvailabilityService itemAvailabilityService;
+
+    @Autowired
+    AccessionService accessionService;
 
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.GET)
     @ApiOperation(value = "itemAvailabilityStatus",
@@ -48,6 +54,23 @@ public class SharedCollectionRestController {
             return responseEntity;
         } else {
             ResponseEntity responseEntity = new ResponseEntity(itemStatus, getHttpHeaders(), HttpStatus.OK);
+            return responseEntity;
+        }
+    }
+
+    @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "accession",
+            notes = "Accession", nickname = "accession", position = 0)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK")})
+    @ResponseBody
+    public ResponseEntity accession(@ApiParam(value = "Item Barcode and Customer Code", required = true, name = "Item Barcode And Customer Code") @RequestBody AccessionRequest accessionRequest) {
+        String owningInstitution = accessionService.getOwningInstitution(accessionRequest.getCustomerCode());
+        if (StringUtils.isBlank(owningInstitution)) {
+            ResponseEntity responseEntity = new ResponseEntity(RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
+            return responseEntity;
+        } else {
+            String response = accessionService.processRequest(accessionRequest.getItemBarcode(), owningInstitution);
+            ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
             return responseEntity;
         }
     }
