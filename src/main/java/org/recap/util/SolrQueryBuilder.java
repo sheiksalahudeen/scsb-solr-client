@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -146,8 +148,8 @@ public class SolrQueryBuilder {
      * @throws Exception
      */
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
-        String fieldValue = searchRecordsRequest.getFieldValue();
         StringBuilder stringBuilder = new StringBuilder();
+        String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
         String fieldName = searchRecordsRequest.getFieldName();
 
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
@@ -162,8 +164,7 @@ public class SolrQueryBuilder {
                     return stringBuilder.toString();
                 }
 
-                fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
-                String[] fieldValues = fieldValue.split(" ");
+                String[] fieldValues = fieldValue.split("\\s+");
 
                 if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
                     stringBuilder.append(fieldName).append(":").append("(");
@@ -208,23 +209,29 @@ public class SolrQueryBuilder {
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
                     || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
-                String[] fieldValues = fieldValue.split(" ");
+                String[] fieldValues = fieldValue.split("\\s+");
                 if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
-                    stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValues[0]);
+                    stringBuilder.append(parentQuery).append(fieldName).append(":").append(fieldValues[0]);
                 } else {
                     if(fieldValues.length > 1) {
-                        for(String value : fieldValues) {
-                            stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(value);
+                        List<String> fieldValuesList = Arrays.asList(fieldValues);
+                        stringBuilder.append(parentQuery);
+                        for (Iterator<String> iterator = fieldValuesList.iterator(); iterator.hasNext(); ) {
+                            String value = iterator.next();
+                            stringBuilder.append(fieldName).append(":").append(value);
+                            if (iterator.hasNext()) {
+                                stringBuilder.append(and);
+                            }
                         }
                     } else {
-                        stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
+                        stringBuilder.append(parentQuery).append(fieldName).append(":").append(fieldValue);
                     }
                 }
             } else {
                 if(fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER)) {
                     fieldValue = fieldValue.replaceAll(" ", "");
                 }
-                stringBuilder.append(and).append(parentQuery).append(fieldName).append(":").append(fieldValue);
+                stringBuilder.append(parentQuery).append(fieldName).append(":").append(fieldValue);
             }
             return stringBuilder.toString();
         }
@@ -257,7 +264,8 @@ public class SolrQueryBuilder {
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreParentFilterQuery);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() + and + queryStringForItemCriteriaForParent + countQueryForFieldCriteria);
+        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() + and + queryStringForItemCriteriaForParent);
+        solrQuery.setFilterQueries(countQueryForFieldCriteria);
         return solrQuery;
     }
 
@@ -265,32 +273,73 @@ public class SolrQueryBuilder {
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreChildFilterQuery);
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryStringForParentCriteriaForChild + countQueryForFieldCriteria);
+        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryStringForParentCriteriaForChild);
+        solrQuery.setFilterQueries(countQueryForFieldCriteria);
         return solrQuery;
     }
 
-    /*
-       Escape Special Characters
-       Escaped      = & ! ( } [ ] < > ~ * + ? : \ ^
-       Un-Escaped   = “ ) \ ^ {
+    /**
+     * This method escapes the special characters.
+     * @param searchText
+     * @return
      */
-    private String parseSearchRequest(String fieldValue){
-
-        logger.info(fieldValue);
-        try {
-            // Remove extra space between words
-            fieldValue =fieldValue.replaceAll("\\s+", " ");
-            /* Strip Characters*/
-            fieldValue =fieldValue.replaceAll("\"", "");
-            // Escape Characters
-            fieldValue=regexPattern.matcher(fieldValue).replaceAll("\\\\$1");
-            fieldValue = fieldValue.replaceAll("-", "'-'");
-            fieldValue = fieldValue.replaceAll("/", "'/'");
-            fieldValue = fieldValue.replaceAll("\\{", "'{'");
-        } catch (Exception e) {
-            logger.info(e.getMessage());
+    public String parseSearchRequest(String searchText) {
+        StringBuffer modifiedText = new StringBuffer();
+        StringCharacterIterator stringCharacterIterator = new StringCharacterIterator(searchText);
+        char character = stringCharacterIterator.current();
+        while (character != CharacterIterator.DONE) {
+            if (character == '\\') {
+                modifiedText.append("\\\\");
+            } else if (character == '?') {
+                modifiedText.append("\\?");
+            } else if (character == '*') {
+                modifiedText.append("\\*");
+            } else if (character == '+') {
+                modifiedText.append("\\+");
+            } else if (character == ':') {
+                modifiedText.append("\\:");
+            } else if (character == '{') {
+                modifiedText.append("\\{");
+            } else if (character == '}') {
+                modifiedText.append("\\}");
+            } else if (character == '[') {
+                modifiedText.append("\\[");
+            } else if (character == ']') {
+                modifiedText.append("\\]");
+            } else if (character == '(') {
+                modifiedText.append("\\(");
+            } else if (character == ')') {
+                modifiedText.append("\\)");
+            } else if (character == '^') {
+                modifiedText.append("\\^");
+            } else if (character == '~') {
+                modifiedText.append("\\~");
+            } else if (character == '-') {
+                modifiedText.append("\\-");
+            } else if (character == '!') {
+                modifiedText.append("\\!");
+            } else if (character == '\'') {
+                modifiedText.append("\\'");
+            } else if (character == '@') {
+                modifiedText.append("\\@");
+            } else if (character == '#') {
+                modifiedText.append("\\#");
+            } else if (character == '$') {
+                modifiedText.append("\\$");
+            } else if (character == '%') {
+                modifiedText.append("\\%");
+            } else if (character == '/') {
+                modifiedText.append("\\/");
+            } else if (character == '"') {
+                modifiedText.append("\\\"");
+            } else if (character == '.') {
+                modifiedText.append("\\.");
+            }
+            else {
+                modifiedText.append(character);
+            }
+            character = stringCharacterIterator.next();
         }
-        logger.info(fieldValue);
-        return fieldValue;
+        return modifiedText.toString();
     }
 }

@@ -509,4 +509,23 @@ public class BibAT extends BaseTestCase {
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
+
+    @Test(expected = Exception.class)
+    public void searchWithSpecialCharacters() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("Availability_search:(\"Available\" \"NotAvailable\") AND CollectionGroupDesignation:(\"Shared\" \"Private\" \"Open\") AND UseRestriction_search:(\"NoRestrictions\" \"InLibraryUse\" \"SupervisedUse\") AND IsDeletedItem:false&fq=({!child of=\"ContentType:parent\"}BibOwningInstitution:NYPL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:CUL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:PUL) AND ({!child of=\"ContentType:parent\"}LeaderMaterialType:Monograph OR {!child of=\"ContentType:parent\"}LeaderMaterialType:Serial OR {!child of=\"ContentType:parent\"}LeaderMaterialType:Other) AND {!child of=\"ContentType:parent\"}IsDeletedBib:false AND {!child of=\"ContentType:parent\"}Title_search:test\\)");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+    }
+
+    @Test
+    public void searchSpecialCharactersWithFilterQuery() throws Exception {
+        SolrQuery solrQuery = new SolrQuery("Availability_search:(\"Available\" \"NotAvailable\") AND CollectionGroupDesignation:(\"Shared\" \"Private\" \"Open\") AND UseRestriction_search:(\"NoRestrictions\" \"InLibraryUse\" \"SupervisedUse\") AND IsDeletedItem:false AND ({!child of=\"ContentType:parent\"}BibOwningInstitution:NYPL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:CUL OR {!child of=\"ContentType:parent\"}BibOwningInstitution:PUL) AND ({!child of=\"ContentType:parent\"}LeaderMaterialType:Monograph OR {!child of=\"ContentType:parent\"}LeaderMaterialType:Serial OR {!child of=\"ContentType:parent\"}LeaderMaterialType:Other) AND {!child of=\"ContentType:parent\"}IsDeletedBib:false");
+        solrQuery.setFilterQueries("{!child of=\"ContentType:parent\"}Title_search:test\\)");
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        assertNotNull(queryResponse);
+        SolrDocumentList results = queryResponse.getResults();
+        assertNotNull(results);
+    }
 }
