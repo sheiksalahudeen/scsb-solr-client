@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
@@ -24,9 +24,9 @@ import java.util.List;
  */
 
 @Component
-public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface{
+public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
+    Logger logger = LoggerFactory.getLogger(FTPSolrExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -41,7 +41,7 @@ public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase(RecapConstants.FILE_SYSTEM) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface
         logger.info("Total Num of CSVRecords Prepared : " + solrExceptionReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(solrExceptionReportReCAPCSVRecords)) {
-            producer.sendBodyAndHeader(RecapConstants.CSV_SOLR_EXCEPTION_REPORT_Q, solrExceptionReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
+            producer.sendBodyAndHeader(RecapConstants.FTP_SOLR_EXCEPTION_REPORT_Q, solrExceptionReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
             return generatedFileName;

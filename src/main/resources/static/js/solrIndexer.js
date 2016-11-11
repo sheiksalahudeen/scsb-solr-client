@@ -101,8 +101,8 @@ function generateReport() {
     var criteria = $('#matchingCriteriaForReports').val();
     var processType = $('#processType').val();
     var url = '';
-    if(processType === 'SolrIndex') {
-        url = "/solrIndexer/generateReports";
+    if(processType === 'SolrIndex' || processType === 'DeAccession_Summary_Report') {
+        url = "/reportGeneration/generateReports";
     } else {
         if(criteria === 'ALL') {
             url = "/matchingAlgorithm/generateReports/full";
