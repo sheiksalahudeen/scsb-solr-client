@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.MatchingAlgorithmSaveReport;
-import org.recap.matchingAlgorithm.report.ReportGenerator;
+import org.recap.report.ReportGenerator;
 import org.recap.model.solr.SolrIndexRequest;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

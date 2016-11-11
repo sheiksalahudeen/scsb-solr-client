@@ -2,7 +2,7 @@ package org.recap.controller;
 
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.MatchingAlgorithmSaveReport;
-import org.recap.matchingAlgorithm.report.ReportGenerator;
+import org.recap.report.ReportGenerator;
 import org.recap.model.solr.SolrIndexRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

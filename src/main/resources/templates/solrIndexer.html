@@ -228,6 +228,7 @@
                                                             <select id="processType" class="form-control" style="width: 160px;" th:onchange="'javascript:showOrHideFields()'"
                                                                     th:field="*{processType}">
                                                                 <option value="SolrIndex">Solr Index</option>
+                                                                <option value="SolrIndex">DeAccession</option>
                                                                 <option value="MatchingAlgorithm">Matching Algorithm</option>
                                                             </select>
                                                         </div>
@@ -258,6 +259,7 @@
                                                                     style="width: 160px;"
                                                                     th:field="*{reportType}">
                                                                 <option value="SolrIndexException">SolrIndexException</option>
+                                                                <option value="DeAccession_Summary_Report">DeAccession Summary Report</option>
                                                                 <option value="Matching">Matching</option>
                                                                 <option value="Exception">Exception</option>
                                                                 <option value="Summary">Summary</option>

@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.report;
 
 import org.recap.model.jpa.ReportEntity;
 

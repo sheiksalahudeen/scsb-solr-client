@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
@@ -22,8 +22,9 @@ import java.util.List;
 /**
  * Created by angelind on 31/8/16.
  */
+
 @Component
-public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
+public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
 
     Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
 
@@ -40,13 +41,14 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return RecapConstants.FILE_SYSTEM.equalsIgnoreCase(transmissionType) ? true : false;
+        return RecapConstants.FTP.equalsIgnoreCase(transmissionType) ? true : false;
     }
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+
         List<SummaryReportReCAPCSVRecord> summaryReportReCAPCSVRecords = new ArrayList<>();
 
         ReCAPCSVSummaryRecordGenerator reCAPCSVSummaryRecordGenerator = new ReCAPCSVSummaryRecordGenerator();
@@ -63,7 +65,7 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
 
         if(!CollectionUtils.isEmpty(summaryReportReCAPCSVRecords)) {
 
-            producer.sendBodyAndHeader(RecapConstants.CSV_SUMMARY_ALGO_REPORT_Q, summaryReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
+            producer.sendBodyAndHeader(RecapConstants.FTP_SUMMARY_ALGO_REPORT_Q, summaryReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
 
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
             String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
@@ -72,4 +74,6 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
 
         return null;
     }
+
+
 }

@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.report;
 
 import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportEntity;
@@ -47,6 +47,12 @@ public class ReportGenerator {
     @Autowired
     FTPSolrExceptionReportGenerator ftpSolrExceptionReportGenerator;
 
+    @Autowired
+    FSDeAccessionReportGenerator fsDeAccessionReportGenerator;
+
+    @Autowired
+    FTPDeAccessionReportGenerator ftpDeAccessionReportGenerator;
+
     public String generateReport(String fileName, String institutionName, String reportType, String transmissionType, Date from, Date to) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -82,6 +88,8 @@ public class ReportGenerator {
             reportGenerators.add(ftpSummaryReportGenerator);
             reportGenerators.add(csvSolrExceptionReportGenerator);
             reportGenerators.add(ftpSolrExceptionReportGenerator);
+            reportGenerators.add(fsDeAccessionReportGenerator);
+            reportGenerators.add(ftpDeAccessionReportGenerator);
         }
         return reportGenerators;
     }
