@@ -6,6 +6,7 @@ import org.recap.RecapConstants;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
@@ -136,7 +137,9 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         cal.set(Calendar.SECOND, 59);
         to = cal.getTime();
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByTypeAndDateRange(reportEntity.getType(), from, to);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+
+        List<ReportEntity> reportEntities = reportDetailRepository.findByTypeAndDateRange(reportEntity.getType(), simpleDateFormat.format(from), simpleDateFormat.format(to));
         assertNotNull(reportEntities);
         assertNotNull(reportEntities.get(0));
     }

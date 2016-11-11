@@ -1,6 +1,7 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.HoldingsPK;
 import org.recap.model.jpa.ItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.List;
 /**
  * Created by hemalathas on 21/6/16.
  */
-public interface HoldingsDetailsRepository extends JpaRepository<HoldingsEntity, String> {
+@RepositoryRestResource(collectionResourceRel = "holdings", path = "holdings")
+public interface HoldingsDetailsRepository extends JpaRepository<HoldingsEntity, HoldingsPK> {
 
     Long countByIsDeletedFalse();
 
