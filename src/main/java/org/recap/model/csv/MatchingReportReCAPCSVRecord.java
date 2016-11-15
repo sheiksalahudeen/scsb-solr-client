@@ -42,6 +42,9 @@ public class MatchingReportReCAPCSVRecord implements Serializable{
     @Ignore
     private String localBibId;
 
+    @Ignore
+    private String materialType;
+
     public String getBibId() {
         return bibId;
     }
@@ -144,5 +147,13 @@ public class MatchingReportReCAPCSVRecord implements Serializable{
 
     public void setTitleWithoutSymbols(String titleWithoutSymbols) {
         this.titleWithoutSymbols = titleWithoutSymbols;
+    }
+
+    public String getMaterialType() {
+        return materialType;
+    }
+
+    public void setMaterialType(String materialType) {
+        this.materialType = materialType;
     }
 }
