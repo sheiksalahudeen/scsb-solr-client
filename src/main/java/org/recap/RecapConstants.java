@@ -218,7 +218,7 @@ public class RecapConstants {
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
 
-    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been DeAccessioned.";
+    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
 
     public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
