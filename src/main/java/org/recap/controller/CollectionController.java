@@ -46,16 +46,43 @@ public class CollectionController {
     @ResponseBody
     @RequestMapping(value = "/collection", method = RequestMethod.POST, params = "action=displayRecords")
     public ModelAndView displayRecords(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
-                               BindingResult result,
-                               Model model) throws Exception {
+                                       BindingResult result,
+                                       Model model) throws Exception {
         searchAndSetResults(collectionForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
         return new ModelAndView("searchRecords", "collectionForm", collectionForm);
     }
 
     private void searchAndSetResults(CollectionForm collectionForm) throws Exception {
-        String itemBarcodesString = collectionForm.getItemBarcodes();
-        if (StringUtils.isNotBlank(itemBarcodesString)) {
+        trimBarcodes(collectionForm);
+        limitBarcodes(collectionForm);
+        buildResultRows(collectionForm);
+        buildMissingBarcodes(collectionForm);
+    }
+
+    private void limitBarcodes(CollectionForm collectionForm) {
+        String[] barcodeArray = collectionForm.getItemBarcodes().split(",");
+        if (barcodeArray.length > RecapConstants.BARCODE_LIMIT) {
+            barcodeArray = Arrays.copyOfRange(barcodeArray, 0, RecapConstants.BARCODE_LIMIT);
+            collectionForm.setErrorMessage(RecapConstants.BARCODE_LIMIT_ERROR);
+        }
+        collectionForm.setItemBarcodes(StringUtils.join(barcodeArray, ","));
+    }
+
+    private void trimBarcodes(CollectionForm collectionForm) {
+        List<String> barcodeList = new ArrayList<>();
+        String[] barcodeArray = collectionForm.getItemBarcodes().split(",");
+        for (String barcode : barcodeArray) {
+            if (StringUtils.isNotBlank(barcode)) {
+                String itemBarcode = barcode.trim();
+                barcodeList.add(itemBarcode);
+            }
+        }
+        collectionForm.setItemBarcodes(StringUtils.join(barcodeList, ","));
+    }
+
+    private void buildResultRows(CollectionForm collectionForm) throws Exception {
+        if (StringUtils.isNotBlank(collectionForm.getItemBarcodes())) {
             SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
             searchRecordsRequest.setFieldName(RecapConstants.BARCODE);
             searchRecordsRequest.setFieldValue(collectionForm.getItemBarcodes());
@@ -67,38 +94,38 @@ public class CollectionController {
                 collectionForm.setShowResults(true);
                 collectionForm.setSelectAll(false);
             }
-
-            Set<String> missingBarcodes = getMissingBarcodes(collectionForm);
-            if (CollectionUtils.isNotEmpty(missingBarcodes)) {
-                collectionForm.setErrorMessage(RecapConstants.BARCODES_NOT_FOUND + " - " + StringUtils.join(missingBarcodes, ","));
-            }
         } else {
             collectionForm.setErrorMessage(RecapConstants.NO_RESULTS_FOUND);
         }
     }
 
+    private void buildMissingBarcodes(CollectionForm collectionForm) {
+        Set<String> missingBarcodes = getMissingBarcodes(collectionForm);
+        if (CollectionUtils.isNotEmpty(missingBarcodes)) {
+            String errorMessage = (StringUtils.isNotBlank(collectionForm.getErrorMessage()) ? collectionForm.getErrorMessage() + System.lineSeparator() : "") + RecapConstants.BARCODES_NOT_FOUND + " - " + StringUtils.join(missingBarcodes, ",");
+            collectionForm.setErrorMessage(errorMessage);
+        }
+    }
+
     private Set<String> getMissingBarcodes(CollectionForm collectionForm) {
-        String[] barcodes = collectionForm.getItemBarcodes().split(",");
-        Set<String> missingBarcodes = new HashSet<>();
-        for (String barcode : barcodes) {
-            if (StringUtils.isNotBlank(barcode)) {
-                String itemBarcode = barcode.trim();
-                missingBarcodes.add(itemBarcode);
-            }
-        }
-        for (SearchResultRow searchResultRow : collectionForm.getSearchResultRows()) {
-            String barcode = searchResultRow.getBarcode();
-            if (StringUtils.isBlank(barcode)) {
-                if (CollectionUtils.isNotEmpty(searchResultRow.getSearchItemResultRows())) {
-                    SearchItemResultRow searchItemResultRow = searchResultRow.getSearchItemResultRows().get(0);
-                    barcode = searchItemResultRow.getBarcode();
-                    searchResultRow.setBarcode(barcode);
-                    searchResultRow.setItemId(searchItemResultRow.getItemId());
-                    searchResultRow.setCollectionGroupDesignation(searchItemResultRow.getCollectionGroupDesignation());
+        if (StringUtils.isNotBlank(collectionForm.getItemBarcodes())) {
+            String[] barcodeArray = collectionForm.getItemBarcodes().split(",");
+            Set<String> missingBarcodes = new HashSet<>(Arrays.asList(barcodeArray));
+            for (SearchResultRow searchResultRow : collectionForm.getSearchResultRows()) {
+                String barcode = searchResultRow.getBarcode();
+                if (StringUtils.isBlank(barcode)) {
+                    if (CollectionUtils.isNotEmpty(searchResultRow.getSearchItemResultRows())) {
+                        SearchItemResultRow searchItemResultRow = searchResultRow.getSearchItemResultRows().get(0);
+                        barcode = searchItemResultRow.getBarcode();
+                        searchResultRow.setBarcode(barcode);
+                        searchResultRow.setItemId(searchItemResultRow.getItemId());
+                        searchResultRow.setCollectionGroupDesignation(searchItemResultRow.getCollectionGroupDesignation());
+                    }
                 }
+                missingBarcodes.remove(barcode);
             }
-            missingBarcodes.remove(barcode);
+            return missingBarcodes;
         }
-        return missingBarcodes;
+        return Collections.EMPTY_SET;
     }
 }

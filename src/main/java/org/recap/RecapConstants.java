@@ -196,6 +196,8 @@ public class RecapConstants {
     public static final String CGD_UPDATE_FAILED = "Updating CGD failed";
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
+    public static final String BARCODE_LIMIT_ERROR = "Barcodes more than limit 10 are ignored.";
+    public static final int BARCODE_LIMIT = 10;
 
     public static final String SEARCH_RESULT_ERROR_NO_RECORDS_FOUND="No search results found. Please refine search conditions.";
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
@@ -216,7 +218,7 @@ public class RecapConstants {
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
 
-    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been DeAccessioned.";
+    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
 
     public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
@@ -228,5 +230,4 @@ public class RecapConstants {
     public static final String DEACCESION_DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyyHHmmss";
     public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
     public static final String DEACCESSION_REPORT = "DeAccession_Report";
-
 }

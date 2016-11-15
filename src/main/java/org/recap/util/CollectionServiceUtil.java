@@ -117,6 +117,10 @@ public class CollectionServiceUtil {
                     saveItemChangeLogEntity(bibliographicMarcForm.getItemId(), userName, lastUpdatedDate, RecapConstants.DEACCESSION, bibliographicMarcForm.getDeaccessionNotes());
                     bibliographicMarcForm.setSubmitted(true);
                     bibliographicMarcForm.setMessage(RecapConstants.DEACCESSION_SUCCESSFUL);
+                } else if (resultMessage.contains(RecapConstants.REQUESTED_ITEM_DEACCESSIONED)) {
+                    bibliographicMarcForm.setSubmitted(true);
+                    String failureMessage = resultMessage.replace(RecapConstants.FAILURE + " -", "");
+                    bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + " - " + failureMessage);
                 } else {
                     String failureMessage = resultMessage.replace(RecapConstants.FAILURE + " -", "");
                     bibliographicMarcForm.setErrorMessage(RecapConstants.DEACCESSION_FAILED + " - " + failureMessage);
