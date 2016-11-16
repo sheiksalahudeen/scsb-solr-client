@@ -35,4 +35,11 @@ public class ItemStatusDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(byStatusCode);
     }
 
+    @Test
+    public void testItemStatus(){
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByItemStatusId(1);
+        assertNotNull(itemStatusEntity);
+        assertEquals(itemStatusEntity.getStatusCode(),"Available");
+    }
+
 }
