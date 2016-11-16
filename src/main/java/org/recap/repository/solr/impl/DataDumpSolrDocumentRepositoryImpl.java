@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -36,6 +35,8 @@ import java.util.*;
 public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     Logger log = Logger.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
+
+    String and = " AND ";
 
     @Resource
     private SolrTemplate solrTemplate;
@@ -53,7 +54,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         try {
             searchRecordsRequest.setShowTotalCount(true);
             searchRecordsRequest.setFieldName(StringUtils.isEmpty(searchRecordsRequest.getFieldName()) ? RecapConstants.ALL_FIELDS : searchRecordsRequest.getFieldName());
-            bibItems = searchByBib(searchRecordsRequest);
+            if(searchRecordsRequest.isDeleted()) {
+                bibItems = searchByItem(searchRecordsRequest);
+            } else {
+                bibItems = searchByBib(searchRecordsRequest);
+            }
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
         } catch (SolrServerException e) {
             log.error(e.getMessage());
@@ -76,7 +81,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         if(CollectionUtils.isNotEmpty(bibSolrDocumentList)) {
             long numFound = bibSolrDocumentList.getNumFound();
             String totalBibCount = String.valueOf(numFound);
-            searchRecordsRequest.setTotalBibRecordsCount(totalBibCount);
             searchRecordsRequest.setTotalRecordsCount(totalBibCount);
             int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
             searchRecordsRequest.setTotalPageCount(totalPagesCount);
@@ -91,10 +95,33 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
+    public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
+        List<BibItem> bibItems = new ArrayList<>();
+        SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest);
+        queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+        queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
+        queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
+        SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
+        if(CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
+            long numFound = itemSolrDocumentList.getNumFound();
+            String totalItemCount = String.valueOf(numFound);
+            searchRecordsRequest.setTotalRecordsCount(totalItemCount);
+            int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
+            searchRecordsRequest.setTotalPageCount(totalPagesCount);
+            for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument itemSolrDocument = iterator.next();
+                Item item = getItem(itemSolrDocument);
+                bibItems.addAll(getBibForItems(item));
+            }
+        }
+        return bibItems;
+    }
+
     public void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot() + " AND " + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + " AND "
-                + queryStringForMatchParentReturnChild + " AND " + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted());
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot() + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
+                + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted());
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
@@ -114,6 +141,33 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private List<BibItem> getBibForItems(Item item) {
+        List<BibItem> bibItems = new ArrayList<>();
+        SolrQuery solrQueryForBib = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + item.getRoot() + and + RecapConstants.DOCTYPE + ":" + RecapConstants.BIB);
+        QueryResponse queryResponse = null;
+        try {
+            queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
+            SolrDocumentList solrDocuments = queryResponse.getResults();
+            if(solrDocuments.getNumFound() > 10 ) {
+                solrQueryForBib.setRows((int) solrDocuments.getNumFound());
+                queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
+                solrDocuments = queryResponse.getResults();
+            }
+            for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
+                SolrDocument solrDocument = iterator.next();
+                BibItem bibItem = new BibItem();
+                populateBib(solrDocument, bibItem);
+                bibItem.setItems(Arrays.asList(item));
+                bibItems.add(bibItem);
+            }
+        } catch (SolrServerException e) {
+            log.error(e.getMessage());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return bibItems;
     }
 
     public void populateBib(SolrDocument solrDocument, BibItem bibItem) {
