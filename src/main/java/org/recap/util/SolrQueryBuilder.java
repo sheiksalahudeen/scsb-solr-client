@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,5 +342,24 @@ public class SolrQueryBuilder {
             character = stringCharacterIterator.next();
         }
         return modifiedText.toString();
+    }
+
+    public SolrQuery solrQueryToFetchBibDetails(List<MatchingMatchPointsEntity> matchingMatchPointsEntities, List<String> matchCriteriaValues, String matchingCriteria) {
+        Integer rows = 0;
+        for (MatchingMatchPointsEntity matchingMatchPointsEntity : matchingMatchPointsEntities) {
+            String criteriaValue = matchingMatchPointsEntity.getCriteriaValue();
+            if(criteriaValue.contains("\\")) {
+                criteriaValue = criteriaValue.replaceAll("\\\\", "\\\\\\\\");
+            }
+            matchCriteriaValues.add(criteriaValue);
+            rows = rows + matchingMatchPointsEntity.getCriteriaValueCount();
+        }
+        StringBuilder query = new StringBuilder();
+        if (CollectionUtils.isNotEmpty(matchCriteriaValues)) {
+            query.append(buildQueryForMatchChildReturnParent(matchingCriteria, matchCriteriaValues));
+        }
+        SolrQuery solrQuery = new SolrQuery(query.toString());
+        solrQuery.setRows(rows);
+        return solrQuery;
     }
 }
