@@ -11,6 +11,7 @@ import org.recap.admin.SolrAdmin;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.temp.BibCrudRepositoryMultiCoreSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public abstract class IndexExecutorService {
 
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Autowired
+    BibSolrCrudRepository bibSolrCrudRepository;
 
     @Value("${solr.url}")
     String solrUrl;
@@ -146,6 +150,8 @@ public abstract class IndexExecutorService {
                     logger.info("Commit future done : " + future.isDone());
                     logger.info("Num of Bibs Processed and indexed to core " + coreName + " on commit interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and indexed to core " + coreName + " : " + totalBibsProcessed);
+                    Long solrBibCount = bibSolrCrudRepository.countByDocType(RecapConstants.BIB);
+                    logger.info("Total number of Bibs in Solr : " + solrBibCount);
                 }
                 logger.info("Total futures executed: " + futureCount);
                 stopWatch.stop();
