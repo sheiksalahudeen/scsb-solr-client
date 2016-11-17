@@ -64,6 +64,13 @@ public class SolrQueryBuilder {
     public String getQueryStringForParentCriteriaForChild(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder.append(buildQueryForBibFacetCriteria(searchRecordsRequest));
+        stringBuilder.append(and).append(coreChildFilterQuery).append(RecapConstants.IS_DELETED_BIB).append(":").append(searchRecordsRequest.isDeleted());
+        return stringBuilder.toString();
+    }
+
+    private String buildQueryForBibFacetCriteria(SearchRecordsRequest searchRecordsRequest) {
+        StringBuilder stringBuilder = new StringBuilder();
         List<String> owningInstitutions = searchRecordsRequest.getOwningInstitutions();
         List<String> materialTypes = searchRecordsRequest.getMaterialTypes();
 
@@ -75,7 +82,6 @@ public class SolrQueryBuilder {
         } else if (CollectionUtils.isNotEmpty(materialTypes)) {
             stringBuilder.append(buildQueryForParentGivenChild(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes, coreChildFilterQuery));
         }
-        stringBuilder.append(and).append(coreChildFilterQuery).append(RecapConstants.IS_DELETED_BIB).append(":").append(searchRecordsRequest.isDeleted());
         return stringBuilder.toString();
     }
 
@@ -258,6 +264,14 @@ public class SolrQueryBuilder {
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
         SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryStringForParentCriteriaForChild);
+        return solrQuery;
+    }
+
+    public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest) {
+        String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
+        String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
+        String queryForBibCriteria = buildQueryForBibFacetCriteria(searchRecordsRequest);
+        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryForBibCriteria);
         return solrQuery;
     }
 
