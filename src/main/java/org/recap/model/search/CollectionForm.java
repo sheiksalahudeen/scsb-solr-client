@@ -12,6 +12,8 @@ public class CollectionForm {
     private boolean showResults = false;
     private boolean selectAll = false;
     private String errorMessage;
+    private String barcodesNotFoundErrorMessage;
+    private String ignoredBarcodesErrorMessage;
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
 
     public String getItemBarcodes() {
@@ -44,6 +46,22 @@ public class CollectionForm {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public String getBarcodesNotFoundErrorMessage() {
+        return barcodesNotFoundErrorMessage;
+    }
+
+    public void setBarcodesNotFoundErrorMessage(String barcodesNotFoundErrorMessage) {
+        this.barcodesNotFoundErrorMessage = barcodesNotFoundErrorMessage;
+    }
+
+    public String getIgnoredBarcodesErrorMessage() {
+        return ignoredBarcodesErrorMessage;
+    }
+
+    public void setIgnoredBarcodesErrorMessage(String ignoredBarcodesErrorMessage) {
+        this.ignoredBarcodesErrorMessage = ignoredBarcodesErrorMessage;
     }
 
     public List<SearchResultRow> getSearchResultRows() {
