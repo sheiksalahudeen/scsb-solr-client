@@ -1,5 +1,6 @@
 package org.recap.repository.solr.impl;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -37,6 +38,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
     Logger log = Logger.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
 
     String and = " AND ";
+    String or = " OR ";
 
     @Resource
     private SolrTemplate solrTemplate;
@@ -88,11 +90,20 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 SolrDocument bibSolrDocument = iterator.next();
                 BibItem bibItem = new BibItem();
                 populateBib(bibSolrDocument, bibItem);
-                populateItemInfo(bibItem, searchRecordsRequest);
                 bibItems.add(bibItem);
             }
+
+            List<List<BibItem>> partitionedBibItems = Lists.partition(bibItems, 500);
+            for (Iterator<List<BibItem>> iterator = partitionedBibItems.iterator(); iterator.hasNext(); ) {
+                List<BibItem> bibItemList = iterator.next();
+                populateItemInfo(bibItemList, searchRecordsRequest);
+            }
+
+
         }
+
         return bibItems;
+
     }
 
     public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
@@ -118,9 +129,10 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
-    public void populateItemInfo(BibItem bibItem, SearchRecordsRequest searchRecordsRequest) {
+    public void populateItemInfo(List<BibItem> bibItems, SearchRecordsRequest searchRecordsRequest) {
+
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot() + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + getRootIds(bibItems) + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
                 + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted());
         QueryResponse queryResponse = null;
         try {
@@ -131,16 +143,46 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
                 solrDocuments = queryResponse.getResults();
             }
+
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
                 Item item = getItem(solrDocument);
-                bibItem.addItem(item);
+                if (bibItems.contains(item.getRoot())) {
+                    BibItem bibItem = findBibItem(bibItems, item.getRoot());
+                    if (null != bibItem) {
+                        bibItem.addItem(item);
+                    }
+                }
             }
         } catch (SolrServerException e) {
             log.error(e.getMessage());
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private BibItem findBibItem(List<BibItem> bibItems, String root) {
+        for (Iterator<BibItem> iterator = bibItems.iterator(); iterator.hasNext(); ) {
+            BibItem bibItem = iterator.next();
+            if(bibItem.getRoot().equals(root)){
+                return bibItem;
+            }
+        }
+        return null;
+    }
+
+    private String getRootIds(List<BibItem> bibItems) {
+        StringBuilder rootIds = new StringBuilder();
+        rootIds.append("(");
+        for (Iterator<BibItem> iterator = bibItems.iterator(); iterator.hasNext(); ) {
+            BibItem bibItem = iterator.next();
+            rootIds.append(bibItem.getRoot());
+            if(iterator.hasNext()){
+                rootIds.append(or);
+            }
+        }
+        rootIds.append(")");
+        return rootIds.toString();
     }
 
     private List<BibItem> getBibForItems(Item item) {
