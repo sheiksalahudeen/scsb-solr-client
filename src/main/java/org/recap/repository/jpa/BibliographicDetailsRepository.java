@@ -46,6 +46,8 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     BibliographicEntity findByBibliographicId(@Param("bibliographicId") Integer bibliographicId);
 
+    BibliographicEntity findByBibliographicIdAndIsDeletedFalse(@Param("bibliographicId") Integer bibliographicId);
+
     BibliographicEntity findByOwningInstitutionIdAndOwningInstitutionBibId(@Param("owningInstitutionId") Integer owningInstitutionId, @Param("owningInstitutionBibId") String owningInstitutionBibId);
 
     List<BibliographicEntity> findByOwningInstitutionBibId(String owningInstitutionBibId);
