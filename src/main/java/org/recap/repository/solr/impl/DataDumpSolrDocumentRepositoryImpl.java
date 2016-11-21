@@ -15,6 +15,7 @@ import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.Bib.*;
 import org.recap.model.search.resolver.impl.item.IsDeletedItemValueResolver;
+import org.recap.model.search.resolver.impl.item.ItemBibIdValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemIdValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemRootValueResolver;
 import org.recap.model.solr.BibItem;
@@ -98,12 +99,9 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 List<BibItem> bibItemList = iterator.next();
                 populateItemInfo(bibItemList, searchRecordsRequest);
             }
-
-
         }
 
         return bibItems;
-
     }
 
     public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
@@ -114,6 +112,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
         SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
+        Map<Integer, BibItem> bibItemMap = new HashMap<>();
         if(CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
             long numFound = itemSolrDocumentList.getNumFound();
             String totalItemCount = String.valueOf(numFound);
@@ -123,7 +122,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument itemSolrDocument = iterator.next();
                 Item item = getItem(itemSolrDocument);
-                bibItems.addAll(getBibForItems(item));
+                getBibForItems(item, bibItemMap);
+            }
+            for (Iterator<Integer> bibIdList = bibItemMap.keySet().iterator(); bibIdList.hasNext(); ) {
+                Integer bibId = bibIdList.next();
+                bibItems.add(bibItemMap.get(bibId));
             }
         }
         return bibItems;
@@ -185,31 +188,25 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return rootIds.toString();
     }
 
-    private List<BibItem> getBibForItems(Item item) {
-        List<BibItem> bibItems = new ArrayList<>();
-        SolrQuery solrQueryForBib = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + item.getRoot() + and + RecapConstants.DOCTYPE + ":" + RecapConstants.BIB);
-        QueryResponse queryResponse = null;
+    private void getBibForItems(Item item, Map<Integer, BibItem> bibItemMap) {
         try {
-            queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
-            SolrDocumentList solrDocuments = queryResponse.getResults();
-            if(solrDocuments.getNumFound() > 10 ) {
-                solrQueryForBib.setRows((int) solrDocuments.getNumFound());
-                queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
-                solrDocuments = queryResponse.getResults();
+            List<Integer> itemBibIdList = item.getItemBibIdList();
+            if(CollectionUtils.isNotEmpty(itemBibIdList)) {
+                for(Integer bibId : itemBibIdList) {
+                    if(bibItemMap.containsKey(bibId)) {
+                        BibItem bibItem = bibItemMap.get(bibId);
+                        bibItem.addItem(item);
+                    } else {
+                        BibItem bibItem = new BibItem();
+                        bibItem.setBibId(bibId);
+                        bibItem.addItem(item);
+                        bibItemMap.put(bibId, bibItem);
+                    }
+                }
             }
-            for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
-                SolrDocument solrDocument = iterator.next();
-                BibItem bibItem = new BibItem();
-                populateBib(solrDocument, bibItem);
-                bibItem.setItems(Arrays.asList(item));
-                bibItems.add(bibItem);
-            }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return bibItems;
     }
 
     public void populateBib(SolrDocument solrDocument, BibItem bibItem) {
@@ -267,6 +264,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             itemValueResolvers.add(new ItemIdValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
             itemValueResolvers.add(new IsDeletedItemValueResolver());
+            itemValueResolvers.add(new ItemBibIdValueResolver());
         }
         return itemValueResolvers;
     }
