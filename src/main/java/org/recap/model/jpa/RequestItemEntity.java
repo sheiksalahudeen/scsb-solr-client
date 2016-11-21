@@ -26,7 +26,7 @@ public class RequestItemEntity {
     private Date requestExpirationDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "CREATD_DATE")
+    @Column(name = "CREATED_DATE")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)

@@ -94,7 +94,7 @@ public class DeAccessionService {
                         Integer itemId = itemEntity.getItemId();
                         List<Integer> holdingsIds = processHoldings(holdingsEntities);
                         List<Integer> bibliographicIds = processBibs(bibliographicEntities);
-                        itemDetailsRepository.markItemAsDeleted(itemId);
+                        itemDetailsRepository.markItemAsDeleted(itemId, RecapConstants.GUEST, new Date());
 
                         deAccessionDBResponseEntity = prepareSuccessResponse(barcode, itemEntity, holdingsIds, bibliographicIds);
                         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
@@ -257,7 +257,7 @@ public class DeAccessionService {
             }
         }
         if (CollectionUtils.isNotEmpty(bibliographicIds)) {
-            bibliographicDetailsRepository.markBibsAsDeleted(bibliographicIds);
+            bibliographicDetailsRepository.markBibsAsDeleted(bibliographicIds, RecapConstants.GUEST, new Date());
         }
         return bibliographicIds;
     }
@@ -273,7 +273,7 @@ public class DeAccessionService {
             }
         }
         if (CollectionUtils.isNotEmpty(holdingIds)) {
-            holdingsDetailsRepository.markHoldingsAsDeleted(holdingIds);
+            holdingsDetailsRepository.markHoldingsAsDeleted(holdingIds, RecapConstants.GUEST, new Date());
         }
         return holdingIds;
     }

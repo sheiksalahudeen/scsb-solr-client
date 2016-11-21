@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +40,6 @@ public interface HoldingsDetailsRepository extends JpaRepository<HoldingsEntity,
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = true WHERE holdings.holdingsId IN :holdingIds")
-    int markHoldingsAsDeleted(@Param("holdingIds") List<Integer> holdingIds);
+    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = true, holdings.lastUpdatedBy = :lastUpdatedBy, holdings.lastUpdatedDate = :lastUpdatedDate WHERE holdings.holdingsId IN :holdingIds")
+    int markHoldingsAsDeleted(@Param("holdingIds") List<Integer> holdingIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 }
