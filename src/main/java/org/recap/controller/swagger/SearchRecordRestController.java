@@ -63,7 +63,7 @@ public class SearchRecordRestController {
         try {
             dataDumpSearchResults = searchRecordsUtil.searchRecordsForDataDump(searchRecordsRequest);
             responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
-            responseMap.put("totalBibsCount", searchRecordsRequest.getTotalBibRecordsCount());
+            responseMap.put("totalRecordsCount", searchRecordsRequest.getTotalRecordsCount());
             responseMap.put("dataDumpSearchResults", dataDumpSearchResults);
         } catch (Exception e) {
             logger.info("search : "+e.getMessage());

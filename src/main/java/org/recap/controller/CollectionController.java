@@ -55,18 +55,18 @@ public class CollectionController {
 
     private void searchAndSetResults(CollectionForm collectionForm) throws Exception {
         trimBarcodes(collectionForm);
-        limitBarcodes(collectionForm);
         buildResultRows(collectionForm);
         buildMissingBarcodes(collectionForm);
     }
 
-    private void limitBarcodes(CollectionForm collectionForm) {
+    private String limitedBarcodes(CollectionForm collectionForm) {
         String[] barcodeArray = collectionForm.getItemBarcodes().split(",");
         if (barcodeArray.length > RecapConstants.BARCODE_LIMIT) {
-            barcodeArray = Arrays.copyOfRange(barcodeArray, 0, RecapConstants.BARCODE_LIMIT);
-            collectionForm.setErrorMessage(RecapConstants.BARCODE_LIMIT_ERROR);
+            String[] limitBarcodeArray = Arrays.copyOfRange(barcodeArray, 0, RecapConstants.BARCODE_LIMIT);
+            collectionForm.setIgnoredBarcodesErrorMessage(RecapConstants.BARCODE_LIMIT_ERROR + " - " + StringUtils.join(Arrays.copyOfRange(barcodeArray, RecapConstants.BARCODE_LIMIT, barcodeArray.length), ","));
+            return StringUtils.join(limitBarcodeArray, ",");
         }
-        collectionForm.setItemBarcodes(StringUtils.join(barcodeArray, ","));
+        return StringUtils.join(barcodeArray, ",");
     }
 
     private void trimBarcodes(CollectionForm collectionForm) {
@@ -85,7 +85,7 @@ public class CollectionController {
         if (StringUtils.isNotBlank(collectionForm.getItemBarcodes())) {
             SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
             searchRecordsRequest.setFieldName(RecapConstants.BARCODE);
-            searchRecordsRequest.setFieldValue(collectionForm.getItemBarcodes());
+            searchRecordsRequest.setFieldValue(limitedBarcodes(collectionForm));
 
             List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
             collectionForm.setSearchResultRows(Collections.EMPTY_LIST);
@@ -102,14 +102,16 @@ public class CollectionController {
     private void buildMissingBarcodes(CollectionForm collectionForm) {
         Set<String> missingBarcodes = getMissingBarcodes(collectionForm);
         if (CollectionUtils.isNotEmpty(missingBarcodes)) {
-            String errorMessage = (StringUtils.isNotBlank(collectionForm.getErrorMessage()) ? collectionForm.getErrorMessage() + System.lineSeparator() : "") + RecapConstants.BARCODES_NOT_FOUND + " - " + StringUtils.join(missingBarcodes, ",");
-            collectionForm.setErrorMessage(errorMessage);
+            collectionForm.setBarcodesNotFoundErrorMessage(RecapConstants.BARCODES_NOT_FOUND + " - " + StringUtils.join(missingBarcodes, ","));
         }
     }
 
     private Set<String> getMissingBarcodes(CollectionForm collectionForm) {
         if (StringUtils.isNotBlank(collectionForm.getItemBarcodes())) {
             String[] barcodeArray = collectionForm.getItemBarcodes().split(",");
+            if (barcodeArray.length > RecapConstants.BARCODE_LIMIT) {
+                barcodeArray = Arrays.copyOfRange(barcodeArray, 0, RecapConstants.BARCODE_LIMIT);
+            }
             Set<String> missingBarcodes = new HashSet<>(Arrays.asList(barcodeArray));
             for (SearchResultRow searchResultRow : collectionForm.getSearchResultRows()) {
                 String barcode = searchResultRow.getBarcode();

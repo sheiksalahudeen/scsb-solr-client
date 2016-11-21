@@ -48,13 +48,27 @@ public class DeAccessionServiceUT extends BaseTestCase{
         entityManager.refresh(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getBibliographicId());
-
+        Thread.sleep(3000);
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = deAccessionService.deAccessionItemsInDB(Arrays.asList(itemBarcode));
         assertNotNull(deAccessionDBResponseEntities);
         assertTrue(deAccessionDBResponseEntities.size()==1);
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = deAccessionDBResponseEntities.get(0);
         assertNotNull(deAccessionDBResponseEntity);
         assertEquals(deAccessionDBResponseEntity.getStatus(), RecapConstants.SUCCESS);
+
+        List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcodeIn(Arrays.asList(itemBarcode));
+        entityManager.refresh(fetchedItemEntities.get(0));
+        assertNotNull(fetchedItemEntities);
+        assertTrue(fetchedItemEntities.size() == 1);
+        assertEquals(Boolean.TRUE, fetchedItemEntities.get(0).isDeleted());
+        assertNotNull(fetchedItemEntities.get(0).getLastUpdatedBy());
+        assertEquals(RecapConstants.GUEST, fetchedItemEntities.get(0).getLastUpdatedBy());
+        assertNotNull(fetchedItemEntities.get(0).getLastUpdatedDate());
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
+        assertTrue(savedBibliographicEntity.getHoldingsEntities().size() == 1);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getItemEntities());
+        assertTrue(savedBibliographicEntity.getHoldingsEntities().get(0).getItemEntities().size() == 1);
+        assertNotEquals(savedBibliographicEntity.getHoldingsEntities().get(0).getItemEntities().get(0).getLastUpdatedDate(), fetchedItemEntities.get(0).getLastUpdatedDate());
     }
 
     @Test

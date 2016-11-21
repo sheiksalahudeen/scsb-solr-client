@@ -46,6 +46,8 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     BibliographicEntity findByBibliographicId(@Param("bibliographicId") Integer bibliographicId);
 
+    BibliographicEntity findByBibliographicIdAndIsDeletedFalse(@Param("bibliographicId") Integer bibliographicId);
+
     BibliographicEntity findByOwningInstitutionIdAndOwningInstitutionBibId(@Param("owningInstitutionId") Integer owningInstitutionId, @Param("owningInstitutionBibId") String owningInstitutionBibId);
 
     List<BibliographicEntity> findByOwningInstitutionBibId(String owningInstitutionBibId);
@@ -64,7 +66,7 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE BibliographicEntity bib SET bib.isDeleted = true WHERE bib.bibliographicId IN :bibliographicIds")
-    int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds);
+    @Query("UPDATE BibliographicEntity bib SET bib.isDeleted = true, bib.lastUpdatedBy = :lastUpdatedBy, bib.lastUpdatedDate = :lastUpdatedDate WHERE bib.bibliographicId IN :bibliographicIds")
+    int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
 }

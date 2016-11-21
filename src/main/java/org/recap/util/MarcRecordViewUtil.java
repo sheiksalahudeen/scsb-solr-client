@@ -33,7 +33,7 @@ public class MarcRecordViewUtil {
     public BibliographicMarcForm buildBibliographicMarcForm(Integer bibId, Integer itemId) {
         BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
         bibliographicMarcForm.setCollectionAction(RecapConstants.UPDATE_CGD);
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
+        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicIdAndIsDeletedFalse(bibId);
         if (null == bibliographicEntity) {
             bibliographicMarcForm.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
         } else {

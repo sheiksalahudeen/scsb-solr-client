@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,13 @@ public class SolrQueryBuilder {
     public String getQueryStringForParentCriteriaForChild(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder.append(buildQueryForBibFacetCriteria(searchRecordsRequest));
+        stringBuilder.append(and).append(coreChildFilterQuery).append(RecapConstants.IS_DELETED_BIB).append(":").append(searchRecordsRequest.isDeleted());
+        return stringBuilder.toString();
+    }
+
+    private String buildQueryForBibFacetCriteria(SearchRecordsRequest searchRecordsRequest) {
+        StringBuilder stringBuilder = new StringBuilder();
         List<String> owningInstitutions = searchRecordsRequest.getOwningInstitutions();
         List<String> materialTypes = searchRecordsRequest.getMaterialTypes();
 
@@ -74,7 +82,6 @@ public class SolrQueryBuilder {
         } else if (CollectionUtils.isNotEmpty(materialTypes)) {
             stringBuilder.append(buildQueryForParentGivenChild(RecapConstants.LEADER_MATERIAL_TYPE, materialTypes, coreChildFilterQuery));
         }
-        stringBuilder.append(and).append(coreChildFilterQuery).append(RecapConstants.IS_DELETED_BIB).append(":").append(searchRecordsRequest.isDeleted());
         return stringBuilder.toString();
     }
 
@@ -260,6 +267,14 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest) {
+        String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
+        String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
+        String queryForBibCriteria = buildQueryForBibFacetCriteria(searchRecordsRequest);
+        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryForBibCriteria);
+        return solrQuery;
+    }
+
     public SolrQuery getCountQueryForParentAndChildCriteria(SearchRecordsRequest searchRecordsRequest) {
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreParentFilterQuery);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
@@ -341,5 +356,24 @@ public class SolrQueryBuilder {
             character = stringCharacterIterator.next();
         }
         return modifiedText.toString();
+    }
+
+    public SolrQuery solrQueryToFetchBibDetails(List<MatchingMatchPointsEntity> matchingMatchPointsEntities, List<String> matchCriteriaValues, String matchingCriteria) {
+        Integer rows = 0;
+        for (MatchingMatchPointsEntity matchingMatchPointsEntity : matchingMatchPointsEntities) {
+            String criteriaValue = matchingMatchPointsEntity.getCriteriaValue();
+            if(criteriaValue.contains("\\")) {
+                criteriaValue = criteriaValue.replaceAll("\\\\", "\\\\\\\\");
+            }
+            matchCriteriaValues.add(criteriaValue);
+            rows = rows + matchingMatchPointsEntity.getCriteriaValueCount();
+        }
+        StringBuilder query = new StringBuilder();
+        if (CollectionUtils.isNotEmpty(matchCriteriaValues)) {
+            query.append(buildQueryForMatchChildReturnParent(matchingCriteria, matchCriteriaValues));
+        }
+        SolrQuery solrQuery = new SolrQuery(query.toString());
+        solrQuery.setRows(rows);
+        return solrQuery;
     }
 }

@@ -103,6 +103,7 @@ public class RecapConstants {
     public static final String MATCHING_LCCN = "Lccn";
     public static final String MATCHING_USE_RESTRICTIONS = "UseRestrictions";
     public static final String MATCHING_SUMMARY_HOLDINGS = "SummaryHoldings";
+    public static final String MATCHING_MATERIAL_TYPE = "MaterialType";
 
     public static final String SUMMARY_NUM_BIBS_IN_TABLE = "CountOfBibsInTable";
     public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "CountOfItemsInTable";
@@ -192,11 +193,11 @@ public class RecapConstants {
     public static final String FAILURE = "Failure";
     public static final String NO_RESULTS_FOUND = "No results found.";
     public static final String BARCODES_NOT_FOUND = "Barcode(s) not found";
+    public static final String BARCODE_LIMIT_ERROR = "A maximum of only 10 items can be retrieved. Ignored barcode(s)";
     public static final String CGD_UPDATE_SUCCESSFUL = "The CGD has been successfully updated.";
     public static final String CGD_UPDATE_FAILED = "Updating CGD failed";
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
-    public static final String BARCODE_LIMIT_ERROR = "Barcodes more than limit 10 are ignored.";
     public static final int BARCODE_LIMIT = 10;
 
     public static final String SEARCH_RESULT_ERROR_NO_RECORDS_FOUND="No search results found. Please refine search conditions.";

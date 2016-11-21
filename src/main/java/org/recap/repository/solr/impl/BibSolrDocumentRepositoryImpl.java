@@ -170,7 +170,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibItems;
     }
 
-    private void populateItemHoldingsInfo(BibItem bibItem) {
+    public void populateItemHoldingsInfo(BibItem bibItem) {
         SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot());
         QueryResponse queryResponse = null;
         try {
@@ -252,7 +252,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return queryResponse.getResults().getNumFound();
     }
 
-    private Item getItem(SolrDocument itemSolrDocument) {
+    public Item getItem(SolrDocument itemSolrDocument) {
         Item item = new Item();
         Collection<String> fieldNames = itemSolrDocument.getFieldNames();
         List<ItemValueResolver> itemValueResolvers = getItemValueResolvers();
@@ -269,7 +269,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return item;
     }
 
-    private Holdings getHoldings(SolrDocument holdingsSolrDocument) {
+    public Holdings getHoldings(SolrDocument holdingsSolrDocument) {
         Holdings holdings = new Holdings();
         Collection<String> fieldNames = holdingsSolrDocument.getFieldNames();
         List<HoldingsValueResolver> holdingsValueResolvers = getHoldingsValueResolvers();
@@ -286,7 +286,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return holdings;
     }
 
-    private void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
+    public void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
             String fieldName = stringIterator.next();
