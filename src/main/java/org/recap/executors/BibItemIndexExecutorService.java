@@ -30,7 +30,7 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
 
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId, Date fromDate) {
-        return new BibItemIndexCallable(solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, owningInstitutionId, fromDate, producerTemplate, solrTemplate);
+        return new BibItemIndexCallable(solrServerProtocol + solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, owningInstitutionId, fromDate, producerTemplate, solrTemplate);
     }
 
     @Override
