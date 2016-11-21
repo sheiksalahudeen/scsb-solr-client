@@ -94,7 +94,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 bibItems.add(bibItem);
             }
 
-            List<List<BibItem>> partitionedBibItems = Lists.partition(bibItems, 500);
+            List<List<BibItem>> partitionedBibItems = Lists.partition(bibItems, 300);
             for (Iterator<List<BibItem>> iterator = partitionedBibItems.iterator(); iterator.hasNext(); ) {
                 List<BibItem> bibItemList = iterator.next();
                 populateItemInfo(bibItemList, searchRecordsRequest);
