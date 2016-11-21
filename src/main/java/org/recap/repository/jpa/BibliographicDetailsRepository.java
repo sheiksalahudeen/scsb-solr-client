@@ -66,7 +66,7 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE BibliographicEntity bib SET bib.isDeleted = true WHERE bib.bibliographicId IN :bibliographicIds")
-    int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds);
+    @Query("UPDATE BibliographicEntity bib SET bib.isDeleted = true, bib.lastUpdatedBy = :lastUpdatedBy, bib.lastUpdatedDate = :lastUpdatedDate WHERE bib.bibliographicId IN :bibliographicIds")
+    int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
 }

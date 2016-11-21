@@ -43,8 +43,8 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE ItemEntity item SET item.isDeleted = true WHERE item.itemId = :itemId")
-    int markItemAsDeleted(@Param("itemId") Integer itemId);
+    @Query("UPDATE ItemEntity item SET item.isDeleted = true, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate WHERE item.itemId = :itemId")
+    int markItemAsDeleted(@Param("itemId") Integer itemId, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
     @Query(value = "select itemStatus.statusCode from ItemEntity item, ItemStatusEntity itemStatus where item.itemAvailabilityStatusId = itemStatus.itemStatusId and item.barcode = :barcode and item.isDeleted = 0")
     String getItemStatusByBarcodeAndIsDeletedFalse(@Param("barcode") String barcode);
