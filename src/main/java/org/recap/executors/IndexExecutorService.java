@@ -68,6 +68,7 @@ public abstract class IndexExecutorService {
         Date from = null;
         String coreName = solrCore;
         Integer totalBibsProcessed = 0;
+        boolean isIncremental = StringUtils.isNotBlank(fromDate) ? Boolean.TRUE : Boolean.FALSE;
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
@@ -77,7 +78,7 @@ public abstract class IndexExecutorService {
                     owningInstitutionId = institutionEntity.getInstitutionId();
                 }
             }
-            if (StringUtils.isNotBlank(fromDate)) {
+            if (isIncremental) {
                 SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.INCREMENTAL_DATE_FORMAT);
                 from = dateFormatter.parse(fromDate);
             }
@@ -98,8 +99,10 @@ public abstract class IndexExecutorService {
                 logger.info("Number of callables to execute to commit indexes : " + callableCountByCommitInterval);
 
                 List<String> coreNames = new ArrayList<>();
-                setupCoreNames(numThreads, coreNames);
-                solrAdmin.createSolrCores(coreNames);
+                if (!isIncremental) {
+                    setupCoreNames(numThreads, coreNames);
+                    solrAdmin.createSolrCores(coreNames);
+                }
 
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
@@ -107,9 +110,12 @@ public abstract class IndexExecutorService {
                 int coreNum = 0;
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                    Callable callable = getCallable(coreNames.get(coreNum), pageNum, docsPerThread, owningInstitutionId, from);
+                    if (!isIncremental) {
+                        coreName = coreNames.get(coreNum);
+                        coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
+                    }
+                    Callable callable = getCallable(coreName, pageNum, docsPerThread, owningInstitutionId, from);
                     callables.add(callable);
-                    coreNum = coreNum < numThreads - 1 ? coreNum + 1 : 0;
                 }
 
                 int futureCount = 0;
@@ -142,21 +148,25 @@ public abstract class IndexExecutorService {
                             e.printStackTrace();
                         }
                     }
-                    solrAdmin.mergeCores(coreNames);
-                    logger.info("Solr core status : " + solrAdmin.getCoresStatus());
-                    while (solrAdmin.getCoresStatus() != 0) {
+                    if (!isIncremental) {
+                        solrAdmin.mergeCores(coreNames);
                         logger.info("Solr core status : " + solrAdmin.getCoresStatus());
+                        while (solrAdmin.getCoresStatus() != 0) {
+                            logger.info("Solr core status : " + solrAdmin.getCoresStatus());
+                        }
+                        deleteTempIndexes(coreNames, solrServerProtocol + solrUrl);
                     }
-                    deleteTempIndexes(coreNames, solrServerProtocol + solrUrl);
                     logger.info("Num of Bibs Processed and indexed to core " + coreName + " on commit interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and indexed to core " + coreName + " : " + totalBibsProcessed);
                     Long solrBibCount = bibSolrCrudRepository.countByDocType(RecapConstants.BIB);
-                    logger.info("Total number of Bibs in Solr : " + solrBibCount);
+                    logger.info("Total number of Bibs in Solr in recap core : " + solrBibCount);
                 }
                 logger.info("Total futures executed: " + futureCount);
                 stopWatch.stop();
-                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index to core " + coreName + " : " + stopWatch.getTotalTimeSeconds() + " seconds");
-                solrAdmin.unLoadCores(coreNames);
+                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index to recap core : " + stopWatch.getTotalTimeSeconds() + " seconds");
+                if (!isIncremental) {
+                    solrAdmin.unLoadCores(coreNames);
+                }
                 executorService.shutdown();
             } else {
                 logger.info("No records found to index for the criteria");
