@@ -79,6 +79,9 @@ public class Item {
     @Field("IsDeletedItem")
     private boolean isDeletedItem = false;
 
+    @Field("Title_sort")
+    private String titleSort;
+
     @Ignore
     private String root;
 
@@ -264,5 +267,13 @@ public class Item {
 
     public void setDeletedItem(boolean deletedItem) {
         isDeletedItem = deletedItem;
+    }
+
+    public String getTitleSort() {
+        return titleSort;
+    }
+
+    public void setTitleSort(String titleSort) {
+        this.titleSort = titleSort;
     }
 }

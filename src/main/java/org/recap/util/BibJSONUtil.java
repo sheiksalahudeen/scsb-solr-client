@@ -128,6 +128,7 @@ public class BibJSONUtil extends MarcUtil {
                     ItemEntity itemEntity = iterator.next();
                     Item item = itemJSONUtil.generateItemForIndex(itemEntity);
                     if (item != null) {
+                        item.setTitleSort(bib.getTitleSort());
                         SolrInputDocument itemSolrInputDocument = generateItemSolrInputDocument(item, solrTemplate);
                         itemSolrInputDocuments.add(itemSolrInputDocument);
                     }
