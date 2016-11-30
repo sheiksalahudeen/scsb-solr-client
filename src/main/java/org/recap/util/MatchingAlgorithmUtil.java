@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,45 +38,73 @@ public class MatchingAlgorithmUtil {
     @Autowired
     BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
 
+    String or = " OR ";
+
     public List<ReportEntity> populateReportEntities(List<MatchingBibEntity> matchingBibEntities) throws IOException, SolrServerException {
-        Map<Integer, List<ReportEntity>> reportEntityMap = new HashMap<>();
+
         List<ReportEntity> reportEntityList = new ArrayList<>();
-        for (MatchingBibEntity matchingBibEntity : matchingBibEntities) {
-            Integer bibId = matchingBibEntity.getBibId();
-            if (reportEntityMap.containsKey(bibId)) {
-                List<ReportEntity> reportEntities = reportEntityMap.get(bibId);
-                ReportDataEntity reportDataEntityForCriteria = getReportDataEntityForCriteria(matchingBibEntity);
-                for (ReportEntity reportEntity : reportEntities) {
-                    reportEntity.addAll(Arrays.asList(reportDataEntityForCriteria));
-                }
-                reportEntityMap.put(bibId, reportEntities);
-            } else {
-                List<Item> itemList = new ArrayList<>();
-                List<Holdings> holdingsList = new ArrayList<>();
-                SolrQuery solrQuery = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + matchingBibEntity.getRoot());
-                QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-                SolrDocumentList solrDocuments = queryResponse.getResults();
-                if (solrDocuments.getNumFound() > 10) {
-                    solrQuery.setRows((int) solrDocuments.getNumFound());
-                    queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-                    solrDocuments = queryResponse.getResults();
-                }
-                populateItemHoldingsInfo(itemList, holdingsList, solrDocuments);
-                List<ReportEntity> reportEntities = new ArrayList<>();
-                if (CollectionUtils.isNotEmpty(itemList)) {
-                    Holdings holdings = CollectionUtils.isNotEmpty(holdingsList) ? holdingsList.get(0) : new Holdings();
-                    for (Item item : itemList) {
-                        reportEntities.add(populateReportEntity(matchingBibEntity, item, holdings));
-                    }
-                }
-                reportEntityMap.put(bibId, reportEntities);
+        Map<Integer, List<ReportEntity>> reportEntityMap = new HashMap<>();
+        Map<String, List<Item>> itemMap = new HashMap<>();
+        Map<String, List<Holdings>> holdingsMap = new HashMap<>();
+        List<List<MatchingBibEntity>> partitionedBibItems = Lists.partition(matchingBibEntities, 300);
+        for (Iterator<List<MatchingBibEntity>> iterator = partitionedBibItems.iterator(); iterator.hasNext(); ) {
+            List<MatchingBibEntity> matchingBibEntityList = iterator.next();
+            SolrQuery solrQuery = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + getRootIds(matchingBibEntityList));
+            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+            SolrDocumentList solrDocuments = queryResponse.getResults();
+            if (solrDocuments.getNumFound() > 10) {
+                solrQuery.setRows((int) solrDocuments.getNumFound());
+                queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+                solrDocuments = queryResponse.getResults();
             }
+            populateItemHoldingsInfo(itemMap, holdingsMap, solrDocuments);
         }
+
+        getReportEntityMap(matchingBibEntities, reportEntityMap, itemMap, holdingsMap);
+
         for (Iterator<Integer> iterator = reportEntityMap.keySet().iterator(); iterator.hasNext(); ) {
             Integer bibId = iterator.next();
             reportEntityList.addAll(reportEntityMap.get(bibId));
         }
         return reportEntityList;
+    }
+
+    private void getReportEntityMap(List<MatchingBibEntity> matchingBibEntities, Map<Integer, List<ReportEntity>> reportEntityMap, Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap) {
+        for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
+            List<Item> itemList = itemMap.get(matchingBibEntity.getRoot());
+            List<Holdings> holdingsList = holdingsMap.get(matchingBibEntity.getRoot());
+            Integer bibId = matchingBibEntity.getBibId();
+            if(reportEntityMap.containsKey(bibId)) {
+                List<ReportEntity> reportEntities = reportEntityMap.get(bibId);
+                for(ReportEntity reportEntity : reportEntities) {
+                    ReportDataEntity reportDataEntityForCriteria = getReportDataEntityForCriteria(matchingBibEntity);
+                    reportEntity.addAll(Arrays.asList(reportDataEntityForCriteria));
+                }
+            } else {
+                List<ReportEntity> reportEntities = new ArrayList<>();
+                if(CollectionUtils.isNotEmpty(itemList)) {
+                    Holdings holdings = CollectionUtils.isNotEmpty(holdingsList) ? holdingsList.get(0) : new Holdings();
+                    for(Item item : itemList) {
+                        reportEntities.add(populateReportEntity(matchingBibEntity, item, holdings));
+                    }
+                    reportEntityMap.put(bibId, reportEntities);
+                }
+            }
+        }
+    }
+
+    private String getRootIds(List<MatchingBibEntity> matchingBibEntities) {
+        StringBuilder rootIds = new StringBuilder();
+        rootIds.append("(");
+        for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
+            MatchingBibEntity matchingBibEntity = iterator.next();
+            rootIds.append(matchingBibEntity.getRoot());
+            if(iterator.hasNext()){
+                rootIds.append(or);
+            }
+        }
+        rootIds.append(")");
+        return rootIds.toString();
     }
 
     public ReportEntity populateReportEntity(MatchingBibEntity matchingBibEntity, Item item, Holdings holdings) {
@@ -133,18 +162,18 @@ public class MatchingAlgorithmUtil {
         String criteria = matchingBibEntity.getMatching();
         ReportDataEntity reportDataEntity = null;
         if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-            reportDataEntity = getReportDataEntity(criteria, matchingBibEntity.getOclc());
+            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_OCLC, matchingBibEntity.getOclc());
         } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-            reportDataEntity = getReportDataEntity(criteria, matchingBibEntity.getIsbn());
+            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_ISBN, matchingBibEntity.getIsbn());
         } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-            reportDataEntity = getReportDataEntity(criteria, matchingBibEntity.getIssn());
+            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_ISSN, matchingBibEntity.getIssn());
         } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
-            reportDataEntity = getReportDataEntity(criteria, matchingBibEntity.getLccn());
+            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_LCCN, matchingBibEntity.getLccn());
         }
         return reportDataEntity;
     }
 
-    private void populateItemHoldingsInfo(List<Item> itemList, List<Holdings> holdingsList, SolrDocumentList solrDocuments) {
+    private void populateItemHoldingsInfo(Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap, SolrDocumentList solrDocuments) {
         for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
             SolrDocument solrDocument = iterator.next();
             String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
@@ -152,12 +181,32 @@ public class MatchingAlgorithmUtil {
                 String fieldValue = (String) solrDocument.getFieldValue(RecapConstants.COLLECTION_GROUP_DESIGNATION);
                 if (fieldValue.equalsIgnoreCase(RecapConstants.SHARED_CGD)) {
                     Item item = bibSolrDocumentRepository.getItem(solrDocument);
-                    itemList.add(item);
+                    String itemRoot = item.getRoot();
+                    if(itemMap.containsKey(itemRoot)) {
+                        List<Item> itemList = new ArrayList<>();
+                        itemList.addAll(itemMap.get(itemRoot));
+                        if(!itemList.contains(item.getItemId())) {
+                            itemList.add(item);
+                            itemMap.put(itemRoot, itemList);
+                        }
+                    } else {
+                        itemMap.put(itemRoot, Arrays.asList(item));
+                    }
                 }
             }
             if (docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
                 Holdings holdings = bibSolrDocumentRepository.getHoldings(solrDocument);
-                holdingsList.add(holdings);
+                String holdingsRoot = holdings.getRoot();
+                if(holdingsMap.containsKey(holdingsRoot)) {
+                    List<Holdings> holdingsList = new ArrayList<>();
+                    holdingsList.addAll(holdingsMap.get(holdingsRoot));
+                    if(!holdingsList.contains(holdings.getHoldingsId())) {
+                        holdingsList.add(holdings);
+                        holdingsMap.put(holdingsRoot, holdingsList);
+                    }
+                } else {
+                    holdingsMap.put(holdingsRoot, Arrays.asList(holdings));
+                }
             }
         }
     }
