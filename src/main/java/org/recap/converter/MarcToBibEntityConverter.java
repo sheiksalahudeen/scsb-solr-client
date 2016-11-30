@@ -9,6 +9,7 @@ import org.recap.model.jpa.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
@@ -40,11 +41,16 @@ public class MarcToBibEntityConverter {
     @Autowired
     ItemStatusDetailsRepository itemStatusDetailsRepository;
 
+    @Autowired
+    BibliographicDetailsRepository bibliographicDetailsRepository;
+
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private Map institutionEntityMap;
-
     public Map convert(Record record, String institutionName) {
+            int failedItemCount = 0;
+            int successItemCount = 0;
+            String reasonForFailureItem = "";
         Map<String, Object> map = new HashMap<>();
         boolean processBib = false;
 
@@ -66,6 +72,10 @@ public class MarcToBibEntityConverter {
         } else {
             processBib = true;
         }
+        map.put(RecapConstants.FAILED_BIB_COUNT,((int)bibMap.get(RecapConstants.FAILED_BIB_COUNT)));
+        map.put(RecapConstants.SUCCESS_BIB_COUNT , (int)bibMap.get(RecapConstants.SUCCESS_BIB_COUNT));
+        map.put(RecapConstants.REASON_FOR_BIB_FAILURE ,(String)bibMap.get(RecapConstants.REASON_FOR_BIB_FAILURE));
+        map.put(RecapConstants.EXIST_BIB_COUNT ,(int)bibMap.get(RecapConstants.EXIST_BIB_COUNT));
 
         List<HoldingsMarcRecord> holdingsMarcRecords = bibMarcRecord.getHoldingsMarcRecords();
         if (CollectionUtils.isNotEmpty(holdingsMarcRecords)) {
@@ -89,6 +99,26 @@ public class MarcToBibEntityConverter {
                     for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
                         Record itemRecord = itemMarcRecord.getItemRecord();
                         Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord);
+                        if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
+                            failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
+                        }
+                        if(itemMap.containsKey(RecapConstants.ITEMBARCODE)){
+                            map.put(RecapConstants.ITEMBARCODE,(String)itemMap.get(RecapConstants.ITEMBARCODE));
+                        }
+                        if(itemMap.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
+                            String reason = (String)itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
+                            if(!StringUtils.isEmpty(reason)){
+                                if(StringUtils.isEmpty(reasonForFailureItem)){
+                                    reasonForFailureItem = ((String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
+                                }else{
+                                    reasonForFailureItem = ((String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))+","+reasonForFailureItem;
+                                }
+
+                            }
+                        }
+                        if(itemMap.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
+                            successItemCount = successItemCount + (int) itemMap.get(RecapConstants.SUCCESS_ITEM_COUNT);
+                        }
                         ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
                         ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
                         if (itemReportEntity != null) {
@@ -114,11 +144,20 @@ public class MarcToBibEntityConverter {
         if (processBib) {
             map.put("bibliographicEntity", bibliographicEntity);
         }
+        map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
+        map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
+        map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+
         return map;
     }
 
     private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName) {
+        int failedBibCount = 0;
+        int successBibCount = 0;
+        int exitsBibCount = 0;
+        String reasonForFailureBib = "";
         Map<String, Object> map = new HashMap<>();
+
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         StringBuffer errorMessage = new StringBuffer();
 
@@ -160,13 +199,24 @@ public class MarcToBibEntityConverter {
                 errorMessage.append("Leader Field value should be 24 characters");
             }
         }
+        if(owningInstitutionId != null && StringUtils.isNotBlank(owningInstitutionBibId)){
+            BibliographicEntity existBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(owningInstitutionId,owningInstitutionBibId);
+            if(null != existBibliographicEntity){
+                exitsBibCount = 1;
+            }
+        }
         List<ReportDataEntity> reportDataEntities = null;
+
         if (errorMessage.toString().length() > 1) {
+            failedBibCount = failedBibCount+1;
+            reasonForFailureBib = errorMessage.toString();
             reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity, bibRecord);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
+        }else{
+            successBibCount = successBibCount+1;
         }
         if (!CollectionUtils.isEmpty(reportDataEntities)) {
             ReportEntity reportEntity = new ReportEntity();
@@ -177,7 +227,11 @@ public class MarcToBibEntityConverter {
             reportEntity.addAll(reportDataEntities);
             map.put("bibReportEntity", reportEntity);
         }
+        map.put(RecapConstants.FAILED_BIB_COUNT , failedBibCount);
+        map.put(RecapConstants.REASON_FOR_BIB_FAILURE , reasonForFailureBib);
         map.put("bibliographicEntity", bibliographicEntity);
+        map.put(RecapConstants.SUCCESS_BIB_COUNT,successBibCount);
+        map.put(RecapConstants.EXIST_BIB_COUNT,exitsBibCount);
         return map;
     }
 
@@ -231,10 +285,16 @@ public class MarcToBibEntityConverter {
         StringBuffer errorMessage = new StringBuffer();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
-
+        int failedItemCount = 0;
+        int successItemCount = 0;
+        String reasonForFailureItem = "";
+        map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
+        map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
+        map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
         String itemBarcode = marcUtil.getDataFieldValue(itemRecord, "876", 'p');
         if (StringUtils.isNotBlank(itemBarcode)) {
             itemEntity.setBarcode(itemBarcode);
+            map.put("itemBarcode",itemBarcode);
         } else {
             errorMessage.append("Item Barcode cannot be null");
         }
@@ -285,11 +345,25 @@ public class MarcToBibEntityConverter {
 
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
+            if(map.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
+                failedItemCount = ((int) map.get(RecapConstants.FAILED_ITEM_COUNT)) + 1;
+                map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
+            }
+            if(map.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
+                reasonForFailureItem = errorMessage.toString();
+                map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+            }
+
             reportDataEntities = getDbReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity, institutionName, bibRecord);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
+        }else{
+            if(map.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
+                successItemCount = (int) map.get(RecapConstants.SUCCESS_ITEM_COUNT) + 1;
+                map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
+            }
         }
         if (!org.springframework.util.CollectionUtils.isEmpty(reportDataEntities)) {
             ReportEntity reportEntity = new ReportEntity();

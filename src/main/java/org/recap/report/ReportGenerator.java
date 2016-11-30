@@ -53,6 +53,12 @@ public class ReportGenerator {
     @Autowired
     FTPDeAccessionReportGenerator ftpDeAccessionReportGenerator;
 
+    @Autowired
+    FSAccessionReportGenerator fsAccessionReportGenerator;
+
+    @Autowired
+    FTPAccessionReportGenerator ftpAccessionReportGenerator;
+
     public String generateReport(String fileName, String institutionName, String reportType, String transmissionType, Date from, Date to) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -61,6 +67,10 @@ public class ReportGenerator {
             reportEntityList = reportDetailRepository.findByFileAndTypeAndDateRange(fileName, reportType, from, to);
         } else {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
+        }
+
+        if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
+            fileName = fileName+"-"+institutionName;
         }
 
         stopWatch.stop();
@@ -90,6 +100,8 @@ public class ReportGenerator {
             reportGenerators.add(ftpSolrExceptionReportGenerator);
             reportGenerators.add(fsDeAccessionReportGenerator);
             reportGenerators.add(ftpDeAccessionReportGenerator);
+            reportGenerators.add(fsAccessionReportGenerator);
+            reportGenerators.add(ftpAccessionReportGenerator);
         }
         return reportGenerators;
     }

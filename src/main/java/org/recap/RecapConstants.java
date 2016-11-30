@@ -51,6 +51,9 @@ public class RecapConstants {
     public static final String COLLECTION_GROUP_CODE = "CollectionGroupCode";
     public static final String STATUS = "Status";
     public static final String REASON_FOR_FAILURE = "ReasonForFailure";
+    public static final String REASON_FOR_FAILURE_BIB = "ReasonForFailureBib";
+    public static final String REASON_FOR_FAILURE_HOLDING = "ReasonForFailureHolding";
+    public static final String REASON_FOR_FAILURE_ITEM = "ReasonForFailureItem";
 
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
@@ -221,6 +224,7 @@ public class RecapConstants {
 
     public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
+    public static final String DATE_OF_ACCESSION = "DateOfAccession";
 
     public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
     public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpDeAccessionSummaryReportQ";
@@ -228,7 +232,31 @@ public class RecapConstants {
     public static final String FS_DE_ACCESSION_SUMMARY_REPORT_ID = "fsDeAccessionSummaryReportQ";
     public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_ID = "ftpDeAccessionSummaryReportQ";
 
+    public static final String FS_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsAccessionSummaryReportQ";
+    public static final String FTP_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpAccessionSummaryReportQ";
+
+    public static final String FS_ACCESSION_SUMMARY_REPORT_ID = "fsAccessionSummaryReportQ";
+    public static final String FTP_ACCESSION_SUMMARY_REPORT_ID = "ftpAccessionSummaryReportQ";
     public static final String DEACCESION_DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyyHHmmss";
+    public static final String ACCESSION_SUMMARY_REPORT = "Accession_Summary_Report";
     public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
     public static final String DEACCESSION_REPORT = "DeAccession_Report";
+    public static final String ACCESSION_REPORT = "Accession_Report";
+    public static final String SUCCESS_BIB_COUNT = "successBibCount";
+    public static final String FAILED_BIB_COUNT = "failedBibCount";
+    public static final String SUCCESS_ITEM_COUNT = "successItemCount";
+    public static final String FAILED_ITEM_COUNT = "failedItemCount";
+    public static final String EXIST_BIB_COUNT = "exitsBibCount";
+    public static final String REASON_FOR_BIB_FAILURE = "reasonForFailureBib";
+    public static final String REASON_FOR_ITEM_FAILURE = "reasonForFailureItem";
+    public static final String BIB_SUCCESS_COUNT = "SuccessBibCount";
+    public static final String ITEM_SUCCESS_COUNT = "SuccessItemCount";
+    public static final String BIB_FAILURE_COUNT = "FailedBibCount";
+    public static final String ITEM_FAILURE_COUNT = "FailedItemCount";
+    public static final String NUMBER_OF_BIB_MATCHES = "NoOfBibMatches";
+    public static final String FAILURE_BIB_REASON = "ReasonForFailureBib";
+    public static final String FAILURE_ITEM_REASON = "ReasonForFailureItem";
+    public static final String ITEMBARCODE = "itemBarcode";
+
+
 }
