@@ -12,8 +12,9 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.SaveMatchingBibsCallable;
-import org.recap.executors.SaveMatchingReportsCallable;
+import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -108,6 +109,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         stopWatch.stop();
         logger.info("Total Time taken : " + stopWatch.getTotalTimeSeconds());
 
+        Thread.sleep(10000);
         long savedCount = matchingMatchPointsDetailsRepository.count();
         assertEquals(count, savedCount);
     }
@@ -149,19 +151,21 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         long batchSize = 1000;
-        Integer count = 0;
+        long count = 0;
         long reportsCountBefore = reportDetailRepository.count();
         long multipleMatchUniqueBibCount = matchingBibDetailsRepository.getMultipleMatchUniqueBibCount();
         logger.info("Total Unique Bib Count : " + multipleMatchUniqueBibCount);
         int totalPagesCount = (int) Math.ceil(multipleMatchUniqueBibCount / batchSize);
-        ExecutorService executorService = getExecutorService(50);
-        List<Callable<Integer>> callables = new ArrayList<>();
         for (int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             long from = pageNum * batchSize;
-            Callable callable = new SaveMatchingReportsCallable(matchingBibDetailsRepository, matchingAlgorithmUtil, producer, from, batchSize);
-            callables.add(callable);
+            List<Integer> multipleMatchedBibIdsBasedOnLimit = matchingBibDetailsRepository.getMultipleMatchedBibIdsBasedOnLimit(from, batchSize);
+            List<MatchingBibEntity> multipleMatchPointBibEntityList = matchingBibDetailsRepository.getBibEntityBasedOnBibIds(multipleMatchedBibIdsBasedOnLimit);
+            if (CollectionUtils.isNotEmpty(multipleMatchPointBibEntityList)) {
+                List<ReportEntity> reportEntityList = matchingAlgorithmUtil.populateReportEntities(multipleMatchPointBibEntityList);
+                producer.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntityList);
+                count = count + reportEntityList.size();
+            }
         }
-        executeCallables(count, executorService, callables);
         logger.info("Total count : " + count);
         DestinationViewMBean saveMatchingReportsQ = jmxHelper.getBeanForQueueName("saveMatchingReportsQ");
         while (saveMatchingReportsQ.getQueueSize() != 0) {
@@ -170,9 +174,11 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         stopWatch.stop();
         logger.info("Total Time taken : " + stopWatch.getTotalTimeSeconds());
 
-        Integer savedReportsCount = 0;
+        Thread.sleep(10000);
+
+        long savedReportsCount = 0;
         long reportsCountAfter = reportDetailRepository.count();
-        savedReportsCount = Math.toIntExact(reportsCountAfter - reportsCountBefore);
+        savedReportsCount = reportsCountAfter - reportsCountBefore;
         assertEquals(savedReportsCount, count);
     }
 

@@ -39,6 +39,7 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
         matchingBibEntity.setLccn("039329");
         matchingBibEntity.setMaterialType("monograph");
         matchingBibEntity.setMatching(matchingCriteria);
+        matchingBibEntity.setRoot("31");
         return matchingBibDetailsRepository.save(matchingBibEntity);
     }
 
