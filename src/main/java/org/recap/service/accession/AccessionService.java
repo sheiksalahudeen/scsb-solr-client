@@ -9,6 +9,7 @@ import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.converter.MarcToBibEntityConverter;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by chenchulakshmig on 20/10/16.
@@ -47,6 +45,9 @@ public class AccessionService {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
     MarcUtil marcUtil;
@@ -92,10 +93,12 @@ public class AccessionService {
         if (StringUtils.isNotBlank(bibDataResponse)) {
             records = marcUtil.readMarcXml(bibDataResponse);
         }
+        List<Map<String,String>> responseMapList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(records)) {
             try {
                 for (Record record : records) {
                     Map responseMap = marcToBibEntityConverter.convert(record, owningInstitution);
+                    responseMapList.add(responseMap);
                     BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get("bibliographicEntity");
                     List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get("reportEntities");
                     if (CollectionUtils.isNotEmpty(reportEntityList)) {
@@ -110,12 +113,107 @@ public class AccessionService {
                         }
                     }
                 }
+                generateAccessionSummaryReport(responseMapList,owningInstitution);
             } catch (Exception e) {
                 response = e.getMessage();
                 log.error(e.getMessage());
             }
+
         }
+
         return response;
+    }
+
+    private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
+        int successBibCount = 0;
+        int successItemCount = 0;
+        int failedBibCount = 0;
+        int failedItemCount = 0;
+        int exitsBibCount = 0;
+        String reasonForFailureBib = "";
+        String reasonForFailureItem = "";
+        String itemBarcode = "";
+
+        for(Map responseMap : responseMapList){
+            successBibCount = successBibCount + (responseMap.get(RecapConstants.SUCCESS_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_BIB_COUNT) : 0);
+            successItemCount = successItemCount + (responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT) : 0);
+            failedBibCount = failedBibCount + (responseMap.get(RecapConstants.FAILED_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_BIB_COUNT) : 0);
+            failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
+            exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
+
+            if(!StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
+                itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
+            }
+            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE))){
+                if(!reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
+                    reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
+                }
+            }
+            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
+                if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
+                    reasonForFailureItem = (String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE)+ "," +reasonForFailureItem;
+                }
+            }
+        }
+
+        List<ReportEntity> reportEntityList = new ArrayList<>();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName(RecapConstants.ACCESSION_REPORT);
+        reportEntity.setType(RecapConstants.ACCESSION_SUMMARY_REPORT);
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setInstitutionName(owningInstitution);
+
+        ReportDataEntity successBibCountReportDataEntity = new ReportDataEntity();
+        successBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_SUCCESS_COUNT);
+        successBibCountReportDataEntity.setHeaderValue(String.valueOf(successBibCount));
+        reportDataEntities.add(successBibCountReportDataEntity);
+
+        ReportDataEntity successItemCountReportDataEntity = new ReportDataEntity();
+        successItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_SUCCESS_COUNT);
+        successItemCountReportDataEntity.setHeaderValue(String.valueOf(successItemCount));
+        reportDataEntities.add(successItemCountReportDataEntity);
+
+        ReportDataEntity existsBibCountReportDataEntity = new ReportDataEntity();
+        existsBibCountReportDataEntity.setHeaderName(RecapConstants.NUMBER_OF_BIB_MATCHES);
+        existsBibCountReportDataEntity.setHeaderValue(String.valueOf(exitsBibCount));
+        reportDataEntities.add(existsBibCountReportDataEntity);
+
+        ReportDataEntity failedBibCountReportDataEntity = new ReportDataEntity();
+        failedBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_FAILURE_COUNT);
+        failedBibCountReportDataEntity.setHeaderValue(String.valueOf(failedBibCount));
+        reportDataEntities.add(failedBibCountReportDataEntity);
+
+        ReportDataEntity failedItemCountReportDataEntity = new ReportDataEntity();
+        failedItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_FAILURE_COUNT);
+        failedItemCountReportDataEntity.setHeaderValue(String.valueOf(failedItemCount));
+        reportDataEntities.add(failedItemCountReportDataEntity);
+
+        ReportDataEntity reasonForBibFailureReportDataEntity = new ReportDataEntity();
+        reasonForBibFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_BIB_REASON);
+        if(reasonForFailureBib.startsWith("\n")){
+            reasonForFailureBib = reasonForFailureBib.substring(1,reasonForFailureBib.length()-1);
+        }
+        reasonForFailureBib = reasonForFailureBib.replaceAll(",$", "");
+        reasonForBibFailureReportDataEntity.setHeaderValue(reasonForFailureBib);
+        reportDataEntities.add(reasonForBibFailureReportDataEntity);
+
+        ReportDataEntity reasonForItemFailureReportDataEntity = new ReportDataEntity();
+        reasonForItemFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_ITEM_REASON);
+        if(reasonForFailureItem.startsWith("\n")){
+            reasonForFailureItem = reasonForFailureItem.substring(1,reasonForFailureItem.length()-1);
+        }
+        reasonForFailureItem = reasonForFailureItem.replaceAll(",$", "");
+        if(!StringUtils.isEmpty(itemBarcode) && successItemCount == 0){
+            reasonForItemFailureReportDataEntity.setHeaderValue(itemBarcode+"-"+reasonForFailureItem);
+        }else{
+            reasonForItemFailureReportDataEntity.setHeaderValue(reasonForFailureItem);
+        }
+        reportDataEntities.add(reasonForItemFailureReportDataEntity);
+
+        reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntityList.add(reportEntity);
+        reportDetailRepository.save(reportEntityList);
     }
 
     private String getILSBibDataURL(String owningInstitution) {

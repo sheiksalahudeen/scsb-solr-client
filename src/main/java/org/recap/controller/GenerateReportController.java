@@ -47,8 +47,14 @@ public class GenerateReportController {
         String generatedReportFileName = null;
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         String status = "";
-        String fileName = reportType.equalsIgnoreCase(RecapConstants.DEACCESSION_SUMMARY_REPORT) ? RecapConstants.DEACCESSION_REPORT : RecapConstants.SOLR_INDEX_FAILURE_REPORT;
-
+        String fileName = "";
+        if(reportType.equalsIgnoreCase(RecapConstants.DEACCESSION_SUMMARY_REPORT)){
+            fileName = RecapConstants.DEACCESSION_REPORT;
+        }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
+            fileName = RecapConstants.ACCESSION_REPORT;
+        }else{
+            fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
+        }
         generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(createdDate));
         if(StringUtils.isEmpty(generatedReportFileName)) {
             status = "Report wasn't generated! Please contact help desk!";
