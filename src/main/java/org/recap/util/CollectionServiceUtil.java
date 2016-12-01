@@ -8,6 +8,7 @@ import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.ItemChangeLogEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.BibliographicMarcForm;
 import org.recap.repository.jpa.*;
 import org.recap.repository.solr.main.ItemCrudRepository;
@@ -75,21 +76,25 @@ public class CollectionServiceUtil {
     }
 
     public void updateCGDForItemInSolr(BibliographicMarcForm bibliographicMarcForm) {
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicMarcForm.getBibId());
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-        if (CollectionUtils.isNotEmpty(bibSolrInputDocument.getChildDocuments())) {
-            for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
-                if (CollectionUtils.isNotEmpty(holdingsSolrInputDocument.getChildDocuments())) {
-                    for (SolrInputDocument itemSolrInputDocument : holdingsSolrInputDocument.getChildDocuments()) {
-                        if (bibliographicMarcForm.getItemId().equals(itemSolrInputDocument.get(RecapConstants.ITEM_ID).getValue())) {
-                            itemSolrInputDocument.setField(RecapConstants.COLLECTION_GROUP_DESIGNATION, bibliographicMarcForm.getNewCollectionGroupDesignation());
+        ItemEntity itemEntity = itemDetailsRepository.findByItemId(bibliographicMarcForm.getItemId());
+        if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
+            for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+                if (CollectionUtils.isNotEmpty(bibSolrInputDocument.getChildDocuments())) {
+                    for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
+                        if (CollectionUtils.isNotEmpty(holdingsSolrInputDocument.getChildDocuments())) {
+                            for (SolrInputDocument itemSolrInputDocument : holdingsSolrInputDocument.getChildDocuments()) {
+                                if (bibliographicMarcForm.getItemId().equals(itemSolrInputDocument.get(RecapConstants.ITEM_ID).getValue())) {
+                                    itemSolrInputDocument.setField(RecapConstants.COLLECTION_GROUP_DESIGNATION, bibliographicMarcForm.getNewCollectionGroupDesignation());
+                                }
+                            }
                         }
                     }
                 }
+                solrTemplate.saveDocument(bibSolrInputDocument);
             }
         }
-        solrTemplate.saveDocument(bibSolrInputDocument);
         solrTemplate.commit();
     }
 

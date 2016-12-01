@@ -81,7 +81,7 @@ public class SolrIndexController {
     @Value("${solr.parent.core}")
     String solrCore;
 
-    @RequestMapping("/")
+    @RequestMapping("/scsbadmin")
     public String solrIndexer(Model model){
         model.addAttribute("solrIndexRequest",new SolrIndexRequest());
         return "solrIndexer";

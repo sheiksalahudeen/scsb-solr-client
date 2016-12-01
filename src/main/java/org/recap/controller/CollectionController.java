@@ -2,11 +2,11 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
-import org.recap.model.search.CollectionForm;
-import org.recap.model.search.SearchItemResultRow;
-import org.recap.model.search.SearchRecordsRequest;
-import org.recap.model.search.SearchResultRow;
+import org.recap.model.search.*;
+import org.recap.util.CollectionServiceUtil;
+import org.recap.util.MarcRecordViewUtil;
 import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +35,12 @@ public class CollectionController {
     @Autowired
     SearchRecordsUtil searchRecordsUtil;
 
+    @Autowired
+    MarcRecordViewUtil marcRecordViewUtil;
+
+    @Autowired
+    CollectionServiceUtil collectionServiceUtil;
+
     @RequestMapping("/collection")
     public String collection(Model model) {
         CollectionForm collectionForm = new CollectionForm();
@@ -51,6 +57,30 @@ public class CollectionController {
         searchAndSetResults(collectionForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
         return new ModelAndView("searchRecords", "collectionForm", collectionForm);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/collection", method = RequestMethod.POST, params = "action=openMarcView")
+    public ModelAndView openMarcView(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
+                                       BindingResult result,
+                                       Model model) throws Exception {
+        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId());
+        populateCollectionForm(collectionForm, bibliographicMarcForm);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
+        return new ModelAndView("collection :: #collectionUpdateModal", "collectionForm", collectionForm);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/collection", method = RequestMethod.POST, params = "action=collectionUpdate")
+    public ModelAndView collectionUpdate(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
+                                         BindingResult result,
+                                         Model model) throws JSONException {
+        if (RecapConstants.UPDATE_CGD.equalsIgnoreCase(collectionForm.getCollectionAction())) {
+            collectionServiceUtil.updateCGDForItem(collectionForm);
+        } else if (RecapConstants.DEACCESSION.equalsIgnoreCase(collectionForm.getCollectionAction())) {
+            collectionServiceUtil.deAccessionItem(collectionForm);
+        }
+        return new ModelAndView("collection :: #itemDetailsSection", "collectionForm", collectionForm);
     }
 
     private void searchAndSetResults(CollectionForm collectionForm) throws Exception {
@@ -91,12 +121,12 @@ public class CollectionController {
             collectionForm.setSearchResultRows(Collections.EMPTY_LIST);
             if (CollectionUtils.isNotEmpty(searchResultRows)) {
                 collectionForm.setSearchResultRows(searchResultRows);
-                collectionForm.setShowResults(true);
                 collectionForm.setSelectAll(false);
             }
         } else {
             collectionForm.setErrorMessage(RecapConstants.NO_RESULTS_FOUND);
         }
+        collectionForm.setShowResults(true);
     }
 
     private void buildMissingBarcodes(CollectionForm collectionForm) {
@@ -129,5 +159,38 @@ public class CollectionController {
             return missingBarcodes;
         }
         return Collections.EMPTY_SET;
+    }
+
+    private void populateCollectionForm(CollectionForm collectionForm, BibliographicMarcForm bibliographicMarcForm) {
+        collectionForm.setTitle(bibliographicMarcForm.getTitle());
+        collectionForm.setAuthor(bibliographicMarcForm.getAuthor());
+        collectionForm.setPublisher(bibliographicMarcForm.getPublisher());
+        collectionForm.setPublishedDate(bibliographicMarcForm.getPublishedDate());
+        collectionForm.setOwningInstitution(bibliographicMarcForm.getOwningInstitution());
+        collectionForm.setCallNumber(bibliographicMarcForm.getCallNumber());
+        collectionForm.setTag000(bibliographicMarcForm.getTag000());
+        collectionForm.setControlNumber001(bibliographicMarcForm.getControlNumber001());
+        collectionForm.setControlNumber005(bibliographicMarcForm.getControlNumber005());
+        collectionForm.setControlNumber008(bibliographicMarcForm.getControlNumber008());
+        collectionForm.setBibDataFields(bibliographicMarcForm.getBibDataFields());
+        collectionForm.setAvailability(bibliographicMarcForm.getAvailability());
+        collectionForm.setBarcode(bibliographicMarcForm.getBarcode());
+        collectionForm.setLocationCode(bibliographicMarcForm.getLocationCode());
+        collectionForm.setUseRestriction(bibliographicMarcForm.getUseRestriction());
+        collectionForm.setCollectionGroupDesignation(bibliographicMarcForm.getCollectionGroupDesignation());
+        collectionForm.setNewCollectionGroupDesignation(bibliographicMarcForm.getNewCollectionGroupDesignation());
+        collectionForm.setCgdChangeNotes(bibliographicMarcForm.getCgdChangeNotes());
+        collectionForm.setCustomerCode(bibliographicMarcForm.getCustomerCode());
+        collectionForm.setDeaccessionType(bibliographicMarcForm.getDeaccessionType());
+        collectionForm.setDeaccessionNotes(bibliographicMarcForm.getDeaccessionNotes());
+        collectionForm.setDeliveryLocations(bibliographicMarcForm.getDeliveryLocations());
+        collectionForm.setDeliveryLocation(bibliographicMarcForm.getDeliveryLocation());
+        collectionForm.setShared(bibliographicMarcForm.isShared());
+        collectionForm.setSubmitted(bibliographicMarcForm.isSubmitted());
+        collectionForm.setMessage(bibliographicMarcForm.getMessage());
+        collectionForm.setErrorMessage(bibliographicMarcForm.getErrorMessage());
+        collectionForm.setCollectionAction(bibliographicMarcForm.getCollectionAction());
+        collectionForm.setShowModal(true);
+        collectionForm.setShowResults(true);
     }
 }

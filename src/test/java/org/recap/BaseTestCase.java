@@ -64,6 +64,12 @@ public class BaseTestCase {
     public CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
     @Autowired
+    public RequestItemDetailsRepository requestItemDetailsRepository;
+
+    @Autowired
+    public NotesDetailsRepository notesDetailsRepository;
+
+    @Autowired
     public ItemCrudRepository itemCrudRepository;
 
     @Autowired

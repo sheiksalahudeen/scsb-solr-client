@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by rajeshbabuk on 12/10/16.
  */
-public class CollectionForm {
+public class CollectionForm extends BibliographicMarcForm {
 
     private String itemBarcodes;
     private boolean showResults = false;
@@ -15,6 +15,7 @@ public class CollectionForm {
     private String barcodesNotFoundErrorMessage;
     private String ignoredBarcodesErrorMessage;
     private List<SearchResultRow> searchResultRows = new ArrayList<>();
+    private boolean showModal = false;
 
     public String getItemBarcodes() {
         return itemBarcodes;
@@ -73,5 +74,13 @@ public class CollectionForm {
 
     public void setSearchResultRows(List<SearchResultRow> searchResultRows) {
         this.searchResultRows = searchResultRows;
+    }
+
+    public boolean isShowModal() {
+        return showModal;
+    }
+
+    public void setShowModal(boolean showModal) {
+        this.showModal = showModal;
     }
 }

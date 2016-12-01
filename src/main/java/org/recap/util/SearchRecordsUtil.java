@@ -107,6 +107,7 @@ public final class SearchRecordsUtil {
                                 searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                                 searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
                                 searchItemResultRows.add(searchItemResultRow);
+                                searchResultRow.setAvailability(item.getAvailabilityDisplay());
                             }
                         }
                         searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
