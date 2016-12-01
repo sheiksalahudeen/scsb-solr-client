@@ -150,7 +150,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
                 Item item = getItem(solrDocument);
-                if (bibItems.contains(item.getRoot())) {
+                if (getRootIds(bibItems).contains(item.getRoot())) {
                     BibItem bibItem = findBibItem(bibItems, item.getRoot());
                     if (null != bibItem) {
                         bibItem.addItem(item);
