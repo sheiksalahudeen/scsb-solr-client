@@ -4,20 +4,20 @@
     <title>SCSB Solr Index</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" th:href="@{../css/bootstrap.min.css}"/>
-    <link rel="stylesheet" th:href="@{../css/datepicker.css}"/>
-    <link rel="stylesheet" th:href="@{../css/bootstrap-datetimepicker.css}"/>
-    <script th:src="@{../js/jquery.min.js}"></script>
-    <script th:src="@{../js/bootstrap.min.js}"></script>
-    <script th:src="@{../js/bootstrap-datepicker.js}"></script>
-    <script th:src="@{../js/bootstrap-datetimepicker.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{../css/styles.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{../lib/Bootstrap/css/bootstrap.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{../css/datepicker.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{../css/bootstrap-datetimepicker.css}"/>
+    <script type="text/javascript" th:src="@{../lib/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/Bootstrap/js/bootstrap.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/Buttons/js/buttons.colVis.js}"></script>
+    <script type="text/javascript" th:src="@{../js/bootstrap-datepicker.js}"></script>
+    <script type="text/javascript" th:src="@{../js/bootstrap-datetimepicker.js}"></script>
     <script type="text/javascript" th:src="@{../js/solrIndexer.js}"></script>
-    <div th:replace="recapHeader :: #recapPageHeaderId"></div>
 </head>
-
 <body>
-
-
+<div th:replace="recapHeader :: #recapPageHeaderId"></div>
+<section>
 <div class="container">
     <div class="jumbotron">
         <h1 align="center">SCSB Solr Admin</h1>
@@ -338,5 +338,7 @@
         </div>
     </div>
 </div>
+</section>
+<div th:replace="recapFooter :: #recapPageFooterId"></div>
 </body>
 </html>

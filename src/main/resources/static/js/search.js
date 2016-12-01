@@ -3,7 +3,7 @@
  */
 
 jQuery(document).ready(function ($) {
-    $("#searchResults").tablesorter();
+    $("#search-result-table").tablesorter();
 
     if ($("#fieldValue").val().length == 0) {
         $("#clearSearchText").hide();

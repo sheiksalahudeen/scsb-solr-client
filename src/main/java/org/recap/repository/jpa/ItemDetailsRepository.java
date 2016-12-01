@@ -34,6 +34,8 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     ItemEntity findByOwningInstitutionItemId(@Param("owningInstitutionItemId") String owningInstitutionItemId);
 
+    ItemEntity findByBarcode(String barcode);
+
     @Modifying
     @Transactional
     @Query("update ItemEntity item set item.collectionGroupId = :collectionGroupId, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate where item.itemId = :itemId")

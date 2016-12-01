@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Search Records</title>
+    <title>ReCAP</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" th:href="@{../css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{../css/font-awesome.min.css}"/>
-    <script th:src="@{../js/jquery.min.js}"></script>
-    <script th:src="@{../js/bootstrap.min.js}"></script>
-    <script type="text/javascript" th:src="@{../js/jquery.tablesorter.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{../lib/Bootstrap/css/bootstrap.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{../lib/DataTables/css/dataTables.bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{../css/styles.css}"/>
+    <!--<script type="text/javascript" th:src="@{../js/jquery.tablesorter.js}"></script>-->
+    <script type="text/javascript" th:src="@{../lib/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/Bootstrap/js/bootstrap.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/Bootstrap/js/bootstrapValidator.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/DataTables/js/jquery.dataTables.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/DataTables/js/dataTables.bootstrap.js}"></script>
+    <script type="text/javascript" th:src="@{../lib/Buttons/js/buttons.colVis.js}"></script>
+    <script type="text/javascript" th:src="@{../js/main.js}"></script>
+    <script type="text/javascript" th:src="@{../js/formvalidation.js}"></script>
 </head>
-<body>
+<body class="dashboard-page">
 <div th:replace="recapHeader :: #recapPageHeaderId"></div>
-<div class="container col-xs-12">
-    <ul class="nav nav-tabs nav-justified" id="searchTabs">
-        <li id="searchTabListId" name="searchTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}">
-            <a id="searchTabId" name="searchTabName" href="/search">Search</a>
-        </li>
-        <li id="collectionTabListId" name="collectionTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
-            <a id="collectionTabId" name="collectionTabName" href="/collection">Collection</a>
-        </li>
-        <li id="requestTabListId" name="requestTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
-            <a id="requestTabId" name="requestTabName" href="/request">Request</a>
-        </li>
-        <li id="reportsTabListId" name="reportsTabListName" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
-            <a id="reportsTabId" name="reportsTabName" href="/reports">Reports</a>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-        <div th:replace="${template} :: content"></div>
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="dashboard-content col-sm-12">
+                <ul id="search-content-tab" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="tab-search-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}">
+                        <a href="/search" aria-controls="search" class="tab-search"><span class="icons"></span><span>Search</span></a>
+                    </li>
+                    <li role="presentation" class="tab-collection-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
+                        <a href="/collection" aria-controls="collection" class="tab-collection"><span class="icons"></span><span>Collection</span></a>
+                    </li>
+                    <li role="presentation" class="tab-request-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
+                        <a href="/request" aria-controls="request" class="tab-request"><span class="icons"></span><span>Request</span></a>
+                    </li>
+                    <li role="presentation" class="tab-reports-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
+                        <a href="/reports" aria-controls="reports" class="tab-reports"><span class="icons"></span><span>Reports</span></a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div th:replace="${template} :: content"></div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+<div th:replace="recapFooter :: #recapPageFooterId"></div>
 </body>
 </html>

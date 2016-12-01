@@ -49,6 +49,13 @@ public class SearchResultRow {
     @ApiModelProperty(name= "itemId", value= "Item Id",position = 17)
     private Integer itemId;
 
+    private Integer requestPosition;
+    private Integer patronBarcode;
+    private String requestingInstitution;
+    private String deliveryLocation;
+    private String requestType;
+    private String requestNotes;
+
     public Integer getBibId() {
         return bibId;
     }
@@ -191,5 +198,53 @@ public class SearchResultRow {
 
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
+    }
+
+    public Integer getRequestPosition() {
+        return requestPosition;
+    }
+
+    public void setRequestPosition(Integer requestPosition) {
+        this.requestPosition = requestPosition;
+    }
+
+    public Integer getPatronBarcode() {
+        return patronBarcode;
+    }
+
+    public void setPatronBarcode(Integer patronBarcode) {
+        this.patronBarcode = patronBarcode;
+    }
+
+    public String getRequestingInstitution() {
+        return requestingInstitution;
+    }
+
+    public void setRequestingInstitution(String requestingInstitution) {
+        this.requestingInstitution = requestingInstitution;
+    }
+
+    public String getDeliveryLocation() {
+        return deliveryLocation;
+    }
+
+    public void setDeliveryLocation(String deliveryLocation) {
+        this.deliveryLocation = deliveryLocation;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
+    public String getRequestNotes() {
+        return requestNotes;
+    }
+
+    public void setRequestNotes(String requestNotes) {
+        this.requestNotes = requestNotes;
     }
 }

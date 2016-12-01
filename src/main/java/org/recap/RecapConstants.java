@@ -181,6 +181,7 @@ public class RecapConstants {
     public static final String DEACCESSION = "Deaccession";
     public static final String TEMPLATE = "template";
     public static final String COLLECTION = "collection";
+    public static final String REQUEST = "request";
     public static final String GUEST = "guest";
     public static final String ITEM_BARCODES = "itemBarcodes";
     public static final String API_KEY = "api_key";
@@ -202,6 +203,9 @@ public class RecapConstants {
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
     public static final int BARCODE_LIMIT = 10;
+
+    //Request
+    public static final String REQUEST_ID = "requestId";
 
     public static final String SEARCH_RESULT_ERROR_NO_RECORDS_FOUND="No search results found. Please refine search conditions.";
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
