@@ -170,13 +170,14 @@ public class RequestController {
                     ItemEntity itemEntity = itemDetailsRepository.findByBarcode(barcode);
                     if (null != itemEntity) {
                         if (CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
-                            BibliographicEntity bibliographicEntity = itemEntity.getBibliographicEntities().get(0);
-                            String bibContent = new String(bibliographicEntity.getContent());
-                            BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                            List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
-                            Record marcRecord = records.get(0);
-                            itemTitles.add(bibJSONUtil.getTitle(marcRecord));
-                            itemOwningInstitutions.add(itemEntity.getInstitutionEntity().getInstitutionCode());
+                            for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                                String bibContent = new String(bibliographicEntity.getContent());
+                                BibJSONUtil bibJSONUtil = new BibJSONUtil();
+                                List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+                                Record marcRecord = records.get(0);
+                                itemTitles.add(bibJSONUtil.getTitle(marcRecord));
+                                itemOwningInstitutions.add(itemEntity.getInstitutionEntity().getInstitutionCode());
+                            }
                         }
                     } else {
                         invalidBarcodes.add(barcode);

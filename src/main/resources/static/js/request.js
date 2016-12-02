@@ -129,9 +129,7 @@ function createRequest() {
         if (requestType == 'EDD') {
             var startPage = $('#StartPage').val();
             var endPage = $('#EndPage').val();
-            var volumeNumber = $('#VolumeNumber').val();
-            var issue = $('#Issue').val();
-            var articleAuthor = $('#ArticleAuthor').val();
+            var articleTitle = $('#ArticleChapterTitle').val();
 
             if (isBlankValue(startPage)) {
                 $('#startPageErrorMessage').show();
@@ -143,20 +141,10 @@ function createRequest() {
             } else {
                 $('#endPageErrorMessage').hide();
             }
-            if (isBlankValue(volumeNumber)) {
-                $('#volumeNumberErrorMessage').show();
+            if (isBlankValue(articleTitle)) {
+                $('#articleTitleErrorMessage').show();
             } else {
-                $('#volumeNumberErrorMessage').hide();
-            }
-            if (isBlankValue(issue)) {
-                $('#issueErrorMessage').show();
-            } else {
-                $('#issueErrorMessage').hide();
-            }
-            if (isBlankValue(articleAuthor)) {
-                $('#articleAuthorErrorMessage').show();
-            } else {
-                $('#articleAuthorErrorMessage').hide();
+                $('#articleTitleErrorMessage').hide();
             }
         }
         $('#requestTypeErrorMessage').hide();
@@ -190,7 +178,5 @@ function resetDefaults() {
     $('#requestingInstitutionErrorMessage').hide();
     $('#startPageErrorMessage').hide();
     $('#endPageErrorMessage').hide();
-    $('#volumeNumberErrorMessage').hide();
-    $('#issueErrorMessage').hide();
-    $('#articleAuthorErrorMessage').hide();
+    $('#articleTitleErrorMessage').hide();
 }
