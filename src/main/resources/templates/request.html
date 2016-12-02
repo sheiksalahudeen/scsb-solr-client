@@ -226,29 +226,11 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="col-md-4 col-sm-6">
-                                            <div class="form-group">
-                                                <div class="col-md-6 col-sm-6 text-right margin-top-15"><label for="requestingInstitutionId" class="fontcolor-dark">Requesting Institution <span class="error-color">*</span></label></div>
-                                                <div class="col-md-6 col-sm-6">
-                                                    <div class="select-holder">
-                                                        <select id="requestingInstitutionId"
-                                                                name="requestingInstitutionName"
-                                                                class="form-control themed-input themed-select"
-                                                                th:field="*{requestingInstitution}">
-                                                            <option value=""></option>
-                                                            <option th:each="requestingInstitution : *{requestingInstitutions}" th:value="${requestingInstitution}" th:text="${requestingInstitution}"></option>
-                                                        </select>
-                                                        <span id="requestingInstitutionErrorMessage" style="color: red;">Requesting institution is required.</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-8 col-sm-12">
+                                        <div class="col-sm-12">
                                             <div class="row">
-                                                <div class="col-md-6 col-sm-6">
+                                                <div class="col-md-4 col-sm-6">
                                                     <div class="form-group">
                                                         <div class="col-md-6 col-sm-4 text-right margin-top-15"><label for="patronBarcodeId" class="fontcolor-dark">Patron Barcode <span class="error-color">*</span></label></div>
                                                         <div class="col-md-6 col-sm-8">
@@ -262,7 +244,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 col-sm-6">
+                                                <div class="col-md-4 col-sm-6">
                                                     <div class="form-group">
                                                         <div class="col-md-4 col-sm-6 text-right margin-top-05"><label for="patronEmailId" class="fontcolor-dark">Patron <br/>Email Address</label></div>
                                                         <div class="col-md-8 col-sm-6">
@@ -272,6 +254,23 @@
                                                                    class="form-control themed-input"
                                                                    th:field="*{patronEmailAddress}">
                                                             </input>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-md-6 col-sm-6 text-right margin-top-15"><label for="requestingInstitutionId" class="fontcolor-dark">Requesting Institution <span class="error-color">*</span></label></div>
+                                                        <div class="col-md-6 col-sm-6">
+                                                            <div class="select-holder">
+                                                                <select id="requestingInstitutionId"
+                                                                        name="requestingInstitutionName"
+                                                                        class="form-control themed-input themed-select"
+                                                                        th:field="*{requestingInstitution}">
+                                                                    <option value=""></option>
+                                                                    <option th:each="requestingInstitution : *{requestingInstitutions}" th:value="${requestingInstitution}" th:text="${requestingInstitution}"></option>
+                                                                </select>
+                                                                <span id="requestingInstitutionErrorMessage" style="color: red;">Requesting institution is required.</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -349,10 +348,9 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <div class="col-md-6 col-sm-4 text-right margin-top-15"><label for="VolumeNumber" class="fontcolor-dark">Volume Number <span class="error-color">*</span></label></div>
+                                                        <div class="col-md-6 col-sm-4 text-right margin-top-15"><label for="VolumeNumber" class="fontcolor-dark">Volume Number</label></div>
                                                         <div class="col-md-6 col-sm-8">
                                                             <input type="text" class="form-control themed-input" id="VolumeNumber" name="VolumeNumber" th:field="*{volumeNumber}"/>
-                                                            <span id="volumeNumberErrorMessage" style="color: red;">Volume number is required.</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -360,19 +358,17 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <div class="col-md-6 col-sm-4 margin-top-15"><label for="Issue" class="fontcolor-dark">Issue <span class="error-color">*</span></label></div>
+                                                        <div class="col-md-6 col-sm-4 margin-top-15"><label for="Issue" class="fontcolor-dark">Issue</label></div>
                                                         <div class="col-md-6 col-sm-8">
                                                             <input type="text" class="form-control themed-input" id="Issue" name="Issue" th:field="*{issue}"/>
-                                                            <span id="issueErrorMessage" style="color: red;">Issue is required.</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="form-group">
-                                                        <div class="col-md-3 col-sm-4 text-right margin-top-15"><label for="ArticleAuthor" class="fontcolor-dark">Article Author <span class="error-color">*</span></label></div>
+                                                        <div class="col-md-3 col-sm-4 text-right margin-top-15"><label for="ArticleAuthor" class="fontcolor-dark">Article Author</label></div>
                                                         <div class="col-md-9 col-sm-8">
                                                             <input type="text" class="form-control themed-input" id="ArticleAuthor" name="ArticleAuthor" th:field="*{articleAuthor}"/>
-                                                            <span id="articleAuthorErrorMessage" style="color: red;">Article author is required.</span>
                                                         </div>
                                                     </div>
 
@@ -383,9 +379,10 @@
                                                 <div class="col-sm-12">
                                                     <div class="form-group">
                                                         <div class="col-md-2 col-sm-4 margin-top-15"><label for="ArticleChapterTitle" class="fontcolor-dark">Article /
-                                                            Chapter Title</label></div>
+                                                            Chapter Title <span class="error-color">*</span></label></div>
                                                         <div class="col-md-10 col-sm-8">
                                                             <input type="text" class="form-control themed-input" id="ArticleChapterTitle" th:field="*{articleTitle}"/>
+                                                            <span id="articleTitleErrorMessage" style="color: red;">Article / Chapter title is required.</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -415,7 +412,7 @@
                                             <div class="row">
                                                 <div class="col-md-3 col-sm-2 text-right margin-top-15"></div>
                                                 <div class="col-md-9 col-sm-10">
-                                                    Fields marked with asterik(<span class="error-color">*</span>) are mandatory.
+                                                    Fields marked with asterisk(<span class="error-color">*</span>) are mandatory.
                                                 </div>
                                             </div>
                                         </div>
