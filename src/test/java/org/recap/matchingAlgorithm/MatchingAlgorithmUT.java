@@ -1,8 +1,10 @@
 package org.recap.matchingAlgorithm;
 
+import com.google.common.collect.Lists;
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -12,6 +14,7 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.SaveMatchingBibsCallable;
+import org.recap.executors.SaveMatchingReportsCallable;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -28,9 +31,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
@@ -79,7 +80,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        List<MatchingMatchPointsEntity> matchingMatchPointsEntities = new ArrayList<>();
+        List<MatchingMatchPointsEntity> matchingMatchPointsEntities;
         long count = 0;
 
         matchingMatchPointsEntities = getMatchingMatchPointsEntity(RecapConstants.MATCH_POINT_FIELD_OCLC);
@@ -161,7 +162,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
             List<Integer> multipleMatchedBibIdsBasedOnLimit = matchingBibDetailsRepository.getMultipleMatchedBibIdsBasedOnLimit(from, batchSize);
             List<MatchingBibEntity> multipleMatchPointBibEntityList = matchingBibDetailsRepository.getBibEntityBasedOnBibIds(multipleMatchedBibIdsBasedOnLimit);
             if (CollectionUtils.isNotEmpty(multipleMatchPointBibEntityList)) {
-                List<ReportEntity> reportEntityList = matchingAlgorithmUtil.populateReportEntities(multipleMatchPointBibEntityList);
+                List<ReportEntity> reportEntityList = matchingAlgorithmUtil.populateReportEntities(multipleMatchPointBibEntityList, RecapConstants.MATCHING_TYPE);
                 producer.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntityList);
                 count = count + reportEntityList.size();
             }
@@ -182,6 +183,95 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         assertEquals(savedReportsCount, count);
     }
 
+    @Test
+    public void populateReportEntityForSingleMatchPoint() throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        long reportsCountBefore = reportDetailRepository.count();
+        long batchSize = 10000;
+        long count = 0;
+        count += verifyTitleAndPopulateReports(batchSize, RecapConstants.MATCH_POINT_FIELD_OCLC);
+        count += verifyTitleAndPopulateReports(batchSize, RecapConstants.MATCH_POINT_FIELD_ISBN);
+        count += verifyTitleAndPopulateReports(batchSize, RecapConstants.MATCH_POINT_FIELD_ISSN);
+        count += verifyTitleAndPopulateReports(batchSize, RecapConstants.MATCH_POINT_FIELD_LCCN);
+
+        logger.info("Total count : " + count);
+        DestinationViewMBean saveMatchingReportsQ = jmxHelper.getBeanForQueueName("saveMatchingReportsQ");
+        while (saveMatchingReportsQ.getQueueSize() != 0) {
+
+        }
+        stopWatch.stop();
+        logger.info("Total Time taken : " + stopWatch.getTotalTimeSeconds());
+
+        Thread.sleep(10000);
+
+        long reportsCountAfter = reportDetailRepository.count();
+        long savedReportsCount = reportsCountAfter - reportsCountBefore;
+        assertEquals(savedReportsCount, count);
+    }
+
+    private long saveReportEntity(List<ReportEntity> reportEntityList) throws IOException, SolrServerException {
+        if(CollectionUtils.isNotEmpty(reportEntityList)) {
+            producer.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntityList);
+        }
+        return reportEntityList.size();
+    }
+
+    public Integer verifyTitleAndPopulateReports(long batchSize, String matchingCriteria) throws IOException, SolrServerException {
+        Integer count = 0;
+        long singleMatchUniqueBibCount = matchingBibDetailsRepository.getSingleMatchBibCountBasedOnMatching(matchingCriteria);
+        logger.info("Total Unique Bib Count for "+ matchingCriteria + " : " + singleMatchUniqueBibCount);
+        int totalPagesCount = (int) Math.ceil(singleMatchUniqueBibCount / batchSize);
+        Map<String, List<MatchingBibEntity>> matchingMap = new HashMap<>();
+        for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
+            long from = pageNum * batchSize;
+            List<MatchingBibEntity> singleMatchBibEntities = matchingBibDetailsRepository.getSingleMatchBibEntities(matchingCriteria, from, batchSize);
+            if(CollectionUtils.isNotEmpty(singleMatchBibEntities)) {
+                for(MatchingBibEntity matchingBibEntity : singleMatchBibEntities) {
+                    if(matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
+                        matchingAlgorithmUtil.getMatchingEntitiesMap(matchingMap, matchingBibEntity, matchingBibEntity.getOclc());
+                    } else if(matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
+                        matchingAlgorithmUtil.getMatchingEntitiesMap(matchingMap, matchingBibEntity, matchingBibEntity.getIsbn());
+                    } else if(matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
+                        matchingAlgorithmUtil.getMatchingEntitiesMap(matchingMap, matchingBibEntity, matchingBibEntity.getIssn());
+                    } else {
+                        matchingAlgorithmUtil.getMatchingEntitiesMap(matchingMap, matchingBibEntity, matchingBibEntity.getLccn());
+                    }
+                }
+            }
+        }
+
+        List<MatchingBibEntity> unMatchedBibEntities = new ArrayList<>();
+        List<MatchingBibEntity> matchingBibEntities = new ArrayList<>();
+        for (Iterator<String> iterator = matchingMap.keySet().iterator(); iterator.hasNext(); ) {
+            String matchingValue = iterator.next();
+            List<MatchingBibEntity> matchingBibEntityList = matchingMap.get(matchingValue);
+            Set<MatchingBibEntity> unMatchingBibsAfterTitleVerification = matchingAlgorithmUtil.getUnMatchingBibsAfterTitleVerification(matchingBibEntityList);
+            matchingBibEntityList.removeAll(unMatchingBibsAfterTitleVerification);
+            if(CollectionUtils.isNotEmpty(matchingBibEntityList) && matchingBibEntityList.size() > 1) {
+                matchingBibEntities.addAll(matchingBibEntityList);
+            }
+            if(CollectionUtils.isNotEmpty(unMatchingBibsAfterTitleVerification)) {
+                unMatchedBibEntities.addAll(unMatchingBibsAfterTitleVerification);
+            }
+            if(matchingBibEntities.size() >= 200 || unMatchedBibEntities.size() >= 100) {
+                count += saveReportEntitiesForSingleMatch(unMatchedBibEntities, matchingBibEntities);
+                matchingBibEntities = new ArrayList<>();
+                unMatchedBibEntities = new ArrayList<>();
+            }
+        }
+        count += saveReportEntitiesForSingleMatch(unMatchedBibEntities, matchingBibEntities);
+        return count;
+    }
+
+    private Integer saveReportEntitiesForSingleMatch(List<MatchingBibEntity> unMatchedBibEntities, List<MatchingBibEntity> matchingBibEntities) throws IOException, SolrServerException {
+        List<ReportEntity> reportEntityList = new ArrayList<>();
+        reportEntityList.addAll(matchingAlgorithmUtil.populateReportEntities(matchingBibEntities, RecapConstants.MATCHING_TYPE));
+        reportEntityList.addAll(matchingAlgorithmUtil.populateReportEntities(unMatchedBibEntities, RecapConstants.EXCEPTION_TYPE));
+        saveReportEntity(reportEntityList);
+        return reportEntityList.size();
+    }
+
     public List<MatchingMatchPointsEntity> getMatchingMatchPointsEntity(String fieldName) throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities = new ArrayList<>();
         String query = RecapConstants.DOCTYPE + ":" + RecapConstants.BIB + and + RecapConstants.IS_DELETED_BIB + ":false" + and + coreParentFilterQuery + RecapConstants.COLLECTION_GROUP_DESIGNATION
@@ -196,18 +286,20 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         stopWatch.start();
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         stopWatch.stop();
-        logger.info("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
+        logger.info("Total Time Taken to get "+ fieldName +" duplicates from solr : " + stopWatch.getTotalTimeSeconds());
         List<FacetField> facetFields = queryResponse.getFacetFields();
         for (FacetField facetField : facetFields) {
             List<FacetField.Count> values = facetField.getValues();
             for (Iterator<FacetField.Count> iterator = values.iterator(); iterator.hasNext(); ) {
                 FacetField.Count next = iterator.next();
                 String name = next.getName();
-                MatchingMatchPointsEntity matchingMatchPointsEntity = new MatchingMatchPointsEntity();
-                matchingMatchPointsEntity.setMatchCriteria(fieldName);
-                matchingMatchPointsEntity.setCriteriaValue(name);
-                matchingMatchPointsEntity.setCriteriaValueCount((int) next.getCount());
-                matchingMatchPointsEntities.add(matchingMatchPointsEntity);
+                if(StringUtils.isNotBlank(name)) {
+                    MatchingMatchPointsEntity matchingMatchPointsEntity = new MatchingMatchPointsEntity();
+                    matchingMatchPointsEntity.setMatchCriteria(fieldName);
+                    matchingMatchPointsEntity.setCriteriaValue(name);
+                    matchingMatchPointsEntity.setCriteriaValueCount((int) next.getCount());
+                    matchingMatchPointsEntities.add(matchingMatchPointsEntity);
+                }
             }
         }
         return matchingMatchPointsEntities;
@@ -224,7 +316,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         List<Callable<Integer>> callables = new ArrayList<>();
         for (int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new SaveMatchingBibsCallable(matchingMatchPointsDetailsRepository, matchCriteria, solrTemplate,
-                    bibSolrDocumentRepository, producer, solrQueryBuilder, batchSize, pageNum, matchingAlgorithmUtil);
+                    producer, solrQueryBuilder, batchSize, pageNum, matchingAlgorithmUtil);
             callables.add(callable);
         }
 

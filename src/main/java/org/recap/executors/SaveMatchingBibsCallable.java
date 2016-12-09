@@ -8,14 +8,16 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
+import org.recap.model.search.resolver.BibValueResolver;
+import org.recap.model.search.resolver.impl.Bib.*;
 import org.recap.model.solr.BibItem;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
-import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.SolrQueryBuilder;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -28,24 +30,24 @@ public class SaveMatchingBibsCallable implements Callable {
     private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
     private String matchCriteria;
     private SolrTemplate solrTemplate;
-    private BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
     private ProducerTemplate producer;
     private SolrQueryBuilder solrQueryBuilder;
     private long batchSize;
     private int pageNum;
     private MatchingAlgorithmUtil matchingAlgorithmUtil;
+
+    List<BibValueResolver> bibValueResolvers;
     private static List<Integer> bibIdList;
 
     public SaveMatchingBibsCallable() {
     }
 
     public SaveMatchingBibsCallable(MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository, String matchCriteria,
-                                    SolrTemplate solrTemplate, BibSolrDocumentRepositoryImpl bibSolrDocumentRepository,
+                                    SolrTemplate solrTemplate,
                                     ProducerTemplate producer, SolrQueryBuilder solrQueryBuilder, long batchSize, int pageNum, MatchingAlgorithmUtil matchingAlgorithmUtil) {
         this.matchingMatchPointsDetailsRepository = matchingMatchPointsDetailsRepository;
         this.matchCriteria = matchCriteria;
         this.solrTemplate = solrTemplate;
-        this.bibSolrDocumentRepository = bibSolrDocumentRepository;
         this.producer = producer;
         this.solrQueryBuilder = solrQueryBuilder;
         this.batchSize = batchSize;
@@ -67,7 +69,7 @@ public class SaveMatchingBibsCallable implements Callable {
             for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
                 BibItem bibItem = new BibItem();
-                bibSolrDocumentRepository.populateBibItem(solrDocument, bibItem);
+                populateBibItem(solrDocument, bibItem);
                 Integer bibId = bibItem.getBibId();
                 if(!getBibIdList().contains(bibId)) {
                     MatchingBibEntity matchingBibEntity = new MatchingBibEntity();
@@ -94,6 +96,20 @@ public class SaveMatchingBibsCallable implements Callable {
         return size;
     }
 
+    public void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
+        Collection<String> fieldNames = solrDocument.getFieldNames();
+        for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
+            String fieldName = stringIterator.next();
+            Object fieldValue = solrDocument.getFieldValue(fieldName);
+            for (Iterator<BibValueResolver> valueResolverIterator = getBibValueResolvers().iterator(); valueResolverIterator.hasNext(); ) {
+                BibValueResolver valueResolver = valueResolverIterator.next();
+                if (valueResolver.isInterested(fieldName)) {
+                    valueResolver.setValue(bibItem, fieldValue);
+                }
+            }
+        }
+    }
+
     public static void addBibIdToList(Integer bibId) {
         getBibIdList().add(bibId);
     }
@@ -107,5 +123,24 @@ public class SaveMatchingBibsCallable implements Callable {
 
     public static void setBibIdList(List<Integer> bibIdList) {
         SaveMatchingBibsCallable.bibIdList = bibIdList;
+    }
+
+    public List<BibValueResolver> getBibValueResolvers() {
+        if (null == bibValueResolvers) {
+            bibValueResolvers = new ArrayList<>();
+            bibValueResolvers.add(new RootValueResolver());
+            bibValueResolvers.add(new BibIdValueResolver());
+            bibValueResolvers.add(new IdValueResolver());
+            bibValueResolvers.add(new ISBNValueResolver());
+            bibValueResolvers.add(new ISSNValueResolver());
+            bibValueResolvers.add(new LCCNValueResolver());
+            bibValueResolvers.add(new LeaderMaterialTypeValueResolver());
+            bibValueResolvers.add(new OCLCValueResolver());
+            bibValueResolvers.add(new OwningInstitutionBibIdValueResolver());
+            bibValueResolvers.add(new OwningInstitutionValueResolver());
+            bibValueResolvers.add(new TitleDisplayValueResolver());
+            bibValueResolvers.add(new IsDeletedBibValueResolver());
+        }
+        return bibValueResolvers;
     }
 }
