@@ -9,16 +9,14 @@ import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.HoldingsSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Main.class)
@@ -77,6 +75,13 @@ public class BaseTestCase {
 
     @Autowired
     public SolrTemplate solrTemplate;
+
+    @Autowired
+    public UserDetailsRepository userRepo;
+
+    @Autowired
+    public UserService userService;
+
 
     @Test
     public void loadContexts() {
