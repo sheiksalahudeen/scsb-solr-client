@@ -5,17 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
+import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -71,7 +70,7 @@ public class AccessionService {
         return owningInstitution;
     }
 
-    @Transactional
+    //@Transactional
     public String processRequest(String itemBarcode, String owningInstitution) {
         String response = null;
         RestTemplate restTemplate = new RestTemplate();
