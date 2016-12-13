@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
+import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
@@ -38,9 +39,12 @@ public class MatchingAlgorithmUtil {
     @Autowired
     BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
 
+    @Autowired
+    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
+
     String or = " OR ";
 
-    public List<ReportEntity> populateReportEntities(List<MatchingBibEntity> matchingBibEntities) throws IOException, SolrServerException {
+    public List<ReportEntity> populateReportEntities(List<MatchingBibEntity> matchingBibEntities, String type) throws IOException, SolrServerException {
 
         List<ReportEntity> reportEntityList = new ArrayList<>();
         Map<Integer, List<ReportEntity>> reportEntityMap = new HashMap<>();
@@ -60,7 +64,7 @@ public class MatchingAlgorithmUtil {
             populateItemHoldingsInfo(itemMap, holdingsMap, solrDocuments);
         }
 
-        getReportEntityMap(matchingBibEntities, reportEntityMap, itemMap, holdingsMap);
+        getReportEntityMap(matchingBibEntities, reportEntityMap, itemMap, holdingsMap, type);
 
         for (Iterator<Integer> iterator = reportEntityMap.keySet().iterator(); iterator.hasNext(); ) {
             Integer bibId = iterator.next();
@@ -69,7 +73,7 @@ public class MatchingAlgorithmUtil {
         return reportEntityList;
     }
 
-    private void getReportEntityMap(List<MatchingBibEntity> matchingBibEntities, Map<Integer, List<ReportEntity>> reportEntityMap, Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap) {
+    public void getReportEntityMap(List<MatchingBibEntity> matchingBibEntities, Map<Integer, List<ReportEntity>> reportEntityMap, Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap, String type) {
         for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
             List<Item> itemList = itemMap.get(matchingBibEntity.getRoot());
             List<Holdings> holdingsList = holdingsMap.get(matchingBibEntity.getRoot());
@@ -85,7 +89,7 @@ public class MatchingAlgorithmUtil {
                 if(CollectionUtils.isNotEmpty(itemList)) {
                     Holdings holdings = CollectionUtils.isNotEmpty(holdingsList) ? holdingsList.get(0) : new Holdings();
                     for(Item item : itemList) {
-                        reportEntities.add(populateReportEntity(matchingBibEntity, item, holdings));
+                        reportEntities.add(populateReportEntity(matchingBibEntity, item, holdings, type));
                     }
                     reportEntityMap.put(bibId, reportEntities);
                 }
@@ -93,7 +97,7 @@ public class MatchingAlgorithmUtil {
         }
     }
 
-    private String getRootIds(List<MatchingBibEntity> matchingBibEntities) {
+    public String getRootIds(List<MatchingBibEntity> matchingBibEntities) {
         StringBuilder rootIds = new StringBuilder();
         rootIds.append("(");
         for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
@@ -107,7 +111,7 @@ public class MatchingAlgorithmUtil {
         return rootIds.toString();
     }
 
-    public ReportEntity populateReportEntity(MatchingBibEntity matchingBibEntity, Item item, Holdings holdings) {
+    public ReportEntity populateReportEntity(MatchingBibEntity matchingBibEntity, Item item, Holdings holdings, String type) {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
@@ -140,12 +144,50 @@ public class MatchingAlgorithmUtil {
 
         ReportDataEntity matchingFieldReportDataEntity = getReportDataEntityForCriteria(matchingBibEntity);
         if (matchingFieldReportDataEntity != null) reportDataEntities.add(matchingFieldReportDataEntity);
-        reportEntity.setFileName(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME);
+        reportEntity.setFileName(type.equalsIgnoreCase(RecapConstants.MATCHING_TYPE) ? RecapConstants.MATCHING_ALGO_FULL_FILE_NAME : RecapConstants.EXCEPTION_REPORT_FILE_NAME);
         reportEntity.setInstitutionName(RecapConstants.ALL_INST);
-        reportEntity.setType(RecapConstants.MATCHING_TYPE);
+        reportEntity.setType(type);
         reportEntity.setCreatedDate(new Date());
         reportEntity.addAll(reportDataEntities);
         return reportEntity;
+    }
+
+    public void getMatchingEntitiesMap(Map<String, List<MatchingBibEntity>> matchingMap, MatchingBibEntity matchingBibEntity, String matchingValue) {
+        if(matchingMap.containsKey(matchingValue)) {
+            List<MatchingBibEntity> matchingBibEntityList = new ArrayList<>();
+            matchingBibEntityList.addAll(matchingMap.get(matchingValue));
+            matchingBibEntityList.add(matchingBibEntity);
+            matchingMap.put(matchingValue, matchingBibEntityList);
+        } else {
+            matchingMap.put(matchingValue, Arrays.asList(matchingBibEntity));
+        }
+    }
+
+    public Set<MatchingBibEntity> getUnMatchingBibsAfterTitleVerification(List<MatchingBibEntity> matchingBibEntities) {
+        Set<MatchingBibEntity> unMatchedBibEntitySet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(matchingBibEntities)) {
+            for (int i = 0; i < matchingBibEntities.size(); i++) {
+                for (int j = 0; j < matchingBibEntities.size(); j++) {
+                    if (i != j) {
+                        MatchingBibEntity tempMatchingBibEntity1 = matchingBibEntities.get(i);
+                        MatchingBibEntity tempMatchingBibEntity2 = matchingBibEntities.get(j);
+                        String tempTitle1 = tempMatchingBibEntity1.getTitle();
+                        String tempTitle2 = tempMatchingBibEntity2.getTitle();
+                        if (StringUtils.isNotBlank(tempTitle1) && StringUtils.isNotBlank(tempTitle2)) {
+                            tempTitle1 = tempTitle1.replaceAll("[^\\w\\s]", " ").trim();
+                            tempTitle2 = tempTitle2.replaceAll("[^\\w\\s]", " ").trim();
+                            String title1 = matchingAlgorithmHelperService.getTitleToMatch(tempTitle1.replaceAll("\\s{2,}", " "));
+                            String title2 = matchingAlgorithmHelperService.getTitleToMatch(tempTitle2.replaceAll("\\s{2,}", " "));
+                            if (!title1.equalsIgnoreCase(title2)) {
+                                unMatchedBibEntitySet.add(tempMatchingBibEntity2);
+                                unMatchedBibEntitySet.add(tempMatchingBibEntity1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return unMatchedBibEntitySet;
     }
 
     private ReportDataEntity getReportDataEntity(String headerName, String headerValue) {
@@ -212,7 +254,7 @@ public class MatchingAlgorithmUtil {
     }
 
     private String checkAndTruncateHeaderValue(String headerValue) {
-        if (headerValue.length() > 7999) {
+        if (StringUtils.isNotBlank(headerValue) && headerValue.length() > 7999) {
             String headerValueSubString = headerValue.substring(0, 7996);
             headerValueSubString = headerValueSubString.concat("...");
             return headerValueSubString;
