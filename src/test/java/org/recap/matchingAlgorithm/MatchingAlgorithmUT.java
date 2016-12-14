@@ -1,6 +1,5 @@
 package org.recap.matchingAlgorithm;
 
-import com.google.common.collect.Lists;
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,7 +13,6 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.SaveMatchingBibsCallable;
-import org.recap.executors.SaveMatchingReportsCallable;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.jpa.ReportEntity;

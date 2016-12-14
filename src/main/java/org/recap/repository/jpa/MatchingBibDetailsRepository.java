@@ -28,11 +28,15 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
     @Query(value = "select * from matching_bib_t where bib_id in (?1) order by bib_id", nativeQuery = true)
     List<MatchingBibEntity> getBibEntityBasedOnBibIds(List<Integer> bibIds);
 
-    @Query(value = "select MBE from MatchingBibEntity as MBE where \n" +
-            "MBE.bibId in (select MBE1.bibId from MatchingBibEntity as MBE1 group by MBE1.bibId having count(MBE1.bibId) > 1) and\n" +
-            "MBE.matching in (?1,?2) and\n" +
-            "MBE.oclc in (select MBE2.oclc from MatchingBibEntity as MBE2 where MBE2.matching=?1) and\n" +
-            "MBE.isbn in (select MBE3.isbn from MatchingBibEntity as MBE3 where MBE3.matching=?2)")
-    Page<MatchingBibEntity> getMultiMatchBibEntitiesForOCLCAndISBN(Pageable pageable, String matchCriteria1, String matchCriteria2);
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.oclc = MB3.oclc and MB2.isbn = MB3.isbn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForOclcAndIsbn(String matchingCriteria1, String matchingCriteria2);
+
+
+    @Query(value = "select MB1 from MatchingBibEntity MB1 where MB1.bibId in (?1) and MB1.matching in (?2, ?3) order by MB1.bibId")
+    List<MatchingBibEntity> getMultiMatchBibEntitiesBasedOnBibIds(List<Integer> bibIds, String matchingCriteria1, String matchingCriteria2);
+
 
 }
