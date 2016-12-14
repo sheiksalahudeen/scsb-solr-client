@@ -1,5 +1,6 @@
 package org.recap.matchingAlgorithm.report;
 
+import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,27 +37,21 @@ public class MatchingAlgoReportUT extends BaseTestCase {
     public void fetchMultiMatchBibsForOCLCAndISBN() throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Integer batchSize = 100000;
-        Page<MatchingBibEntity> multiMatchBibEntitiesForOCLCAndISBN = matchingBibDetailsRepository.getMultiMatchBibEntitiesForOCLCAndISBN(new PageRequest(0, batchSize), RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
+        Integer batchSize = 10000;
+        List<Integer> multiMatchBibIdsForOCLCAndISBN = matchingBibDetailsRepository.getMultiMatchBibIdsForOclcAndIsbn(RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
         stopWatch.stop();
         logger.info("Time Taken to fetch results from db : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
-        Integer totalPageCount = multiMatchBibEntitiesForOCLCAndISBN.getTotalPages();
-        logger.info("Total No of Pages : " + totalPageCount);
-        List<MatchingBibEntity> matchingBibEntities = multiMatchBibEntitiesForOCLCAndISBN.getContent();
+        List<List<Integer>> multipleMatchBibIds = Lists.partition(multiMatchBibIdsForOCLCAndISBN, batchSize);
         Map<String, List<Integer>> oclcAndIsbnMap = new HashMap<>();
         Map<Integer, String> bibIdAndCriteriaMap = new HashMap<>();
         Map<Integer, String> bibIdAndOwningInstitutionMap = new HashMap<>();
-        if(CollectionUtils.isNotEmpty(matchingBibEntities)) {
-            populateOclcAndIsbnMap(bibIdAndCriteriaMap, bibIdAndOwningInstitutionMap, matchingBibEntities);
-        }
-        for(int pageNum = 1; pageNum < totalPageCount; pageNum++) {
-            logger.info("Page Number : " + pageNum);
-            multiMatchBibEntitiesForOCLCAndISBN = matchingBibDetailsRepository.getMultiMatchBibEntitiesForOCLCAndISBN(new PageRequest(pageNum, batchSize), RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
-            matchingBibEntities = multiMatchBibEntitiesForOCLCAndISBN.getContent();
-            if(CollectionUtils.isNotEmpty(matchingBibEntities)) {
-                populateOclcAndIsbnMap(bibIdAndCriteriaMap, bibIdAndOwningInstitutionMap, matchingBibEntities);
+        logger.info("Total Bib Id partition List : " + multipleMatchBibIds.size());
+        for(List<Integer> bibIds : multipleMatchBibIds) {
+            List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
+            if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
+                populateOclcAndIsbnMap(bibIdAndCriteriaMap, bibIdAndOwningInstitutionMap, bibEntitiesBasedOnBibIds);
             }
         }
         for (Iterator<Integer> iterator = bibIdAndCriteriaMap.keySet().iterator(); iterator.hasNext(); ) {

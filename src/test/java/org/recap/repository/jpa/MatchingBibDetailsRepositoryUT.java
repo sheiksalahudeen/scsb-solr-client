@@ -84,9 +84,9 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
     public void getMultiMatchBibEntitiesForMatchCriterias() throws Exception {
         saveMatchingBibEntity(RecapConstants.OCLC_CRITERIA);
         saveMatchingBibEntity(RecapConstants.ISBN_CRITERIA);
-        Page<MatchingBibEntity> multiMatchBibEntitiesForMatchCriterias = matchingBibDetailsRepository.getMultiMatchBibEntitiesForOCLCAndISBN(new PageRequest(0, 10), RecapConstants.OCLC_CRITERIA, RecapConstants.ISBN_CRITERIA);
-        assertNotNull(multiMatchBibEntitiesForMatchCriterias);
-        assertTrue(multiMatchBibEntitiesForMatchCriterias.getTotalElements() > 0);
+        List<Integer> multiMatchBibIdsForOclcAndIsbn = matchingBibDetailsRepository.getMultiMatchBibIdsForOclcAndIsbn(RecapConstants.OCLC_CRITERIA, RecapConstants.ISBN_CRITERIA);
+        assertNotNull(multiMatchBibIdsForOclcAndIsbn);
+        assertTrue(multiMatchBibIdsForOclcAndIsbn.size() > 0);
     }
 
 }
