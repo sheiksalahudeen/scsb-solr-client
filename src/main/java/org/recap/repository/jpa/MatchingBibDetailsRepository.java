@@ -28,15 +28,42 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
     @Query(value = "select * from matching_bib_t where bib_id in (?1) order by bib_id", nativeQuery = true)
     List<MatchingBibEntity> getBibEntityBasedOnBibIds(List<Integer> bibIds);
 
+    @Query(value = "select MB1 from MatchingBibEntity MB1 where MB1.bibId in (?1) and MB1.matching in (?2, ?3) order by MB1.bibId")
+    List<MatchingBibEntity> getMultiMatchBibEntitiesBasedOnBibIds(List<Integer> bibIds, String matchingCriteria1, String matchingCriteria2);
+
     @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
             "where MB2.oclc = MB3.oclc and MB2.isbn = MB3.isbn and MB2.id = MB3.id \n" +
             "and MB2.matching in (?1, ?2)\n" +
             "group by MB2.bibId having count(MB2.bibId) > 1")
     List<Integer> getMultiMatchBibIdsForOclcAndIsbn(String matchingCriteria1, String matchingCriteria2);
 
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.oclc = MB3.oclc and MB2.issn = MB3.issn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForOclcAndIssn(String matchingCriteria1, String matchingCriteria2);
 
-    @Query(value = "select MB1 from MatchingBibEntity MB1 where MB1.bibId in (?1) and MB1.matching in (?2, ?3) order by MB1.bibId")
-    List<MatchingBibEntity> getMultiMatchBibEntitiesBasedOnBibIds(List<Integer> bibIds, String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.oclc = MB3.oclc and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForOclcAndLccn(String matchingCriteria1, String matchingCriteria2);
 
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.isbn = MB3.isbn and MB2.issn = MB3.issn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForIsbnAndIssn(String matchingCriteria1, String matchingCriteria2);
 
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.isbn = MB3.isbn and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForIsbnAndLccn(String matchingCriteria1, String matchingCriteria2);
+
+    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
+            "where MB2.issn = MB3.issn and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
+            "and MB2.matching in (?1, ?2)\n" +
+            "group by MB2.bibId having count(MB2.bibId) > 1")
+    List<Integer> getMultiMatchBibIdsForIssnAndLccn(String matchingCriteria1, String matchingCriteria2);
 }
