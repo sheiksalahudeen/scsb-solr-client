@@ -38,12 +38,8 @@ public class FTPAccessionReportGenerator implements ReportGeneratorInterface{
         String generatedFileName = null;
         List<AccessionSummaryRecord> accessionSummaryRecordList = new ArrayList<>();
         AccessionSummaryRecordGenerator accessionSummaryRecordGenerator = new AccessionSummaryRecordGenerator();
-        for(ReportEntity reportEntity : reportEntityList){
-            AccessionSummaryRecord accessionSummaryRecord = accessionSummaryRecordGenerator.prepareAccessionSummaryReportRecord(reportEntity);
-            accessionSummaryRecordList.add(accessionSummaryRecord);
-        }
+        accessionSummaryRecordList = accessionSummaryRecordGenerator.prepareAccessionSummaryReportRecord(reportEntityList);
         producerTemplate.sendBodyAndHeader(RecapConstants.FTP_ACCESSION_SUMMARY_REPORT_Q, accessionSummaryRecordList, "fileName", fileName);
-
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
         return generatedFileName;

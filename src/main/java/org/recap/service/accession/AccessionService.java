@@ -14,18 +14,23 @@ import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.*;
 
 /**
  * Created by chenchulakshmig on 20/10/16.
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AccessionService {
 
     Logger log = Logger.getLogger(AccessionService.class);
@@ -70,7 +75,7 @@ public class AccessionService {
         return owningInstitution;
     }
 
-    //@Transactional
+    @Transactional
     public String processRequest(String itemBarcode, String owningInstitution) {
         String response = null;
         RestTemplate restTemplate = new RestTemplate();
@@ -140,7 +145,7 @@ public class AccessionService {
             failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
 
-            if(!StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
+            if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
                 itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
             }
             if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE))){
@@ -193,6 +198,7 @@ public class AccessionService {
         if(reasonForFailureBib.startsWith("\n")){
             reasonForFailureBib = reasonForFailureBib.substring(1,reasonForFailureBib.length()-1);
         }
+        reasonForFailureBib = reasonForFailureBib.replaceAll("\n",",");
         reasonForFailureBib = reasonForFailureBib.replaceAll(",$", "");
         reasonForBibFailureReportDataEntity.setHeaderValue(reasonForFailureBib);
         reportDataEntities.add(reasonForBibFailureReportDataEntity);
@@ -202,12 +208,9 @@ public class AccessionService {
         if(reasonForFailureItem.startsWith("\n")){
             reasonForFailureItem = reasonForFailureItem.substring(1,reasonForFailureItem.length()-1);
         }
+        reasonForFailureItem = reasonForFailureItem.replaceAll("\n",",");
         reasonForFailureItem = reasonForFailureItem.replaceAll(",$", "");
-        if(!StringUtils.isEmpty(itemBarcode) && successItemCount == 0){
-            reasonForItemFailureReportDataEntity.setHeaderValue(itemBarcode+"-"+reasonForFailureItem);
-        }else{
-            reasonForItemFailureReportDataEntity.setHeaderValue(reasonForFailureItem);
-        }
+        reasonForItemFailureReportDataEntity.setHeaderValue(reasonForFailureItem);
         reportDataEntities.add(reasonForItemFailureReportDataEntity);
 
         reportEntity.setReportDataEntities(reportDataEntities);
