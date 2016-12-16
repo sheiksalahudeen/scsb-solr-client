@@ -31,6 +31,9 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
     @Query(value = "select MB1 from MatchingBibEntity MB1 where MB1.bibId in (?1) and MB1.matching in (?2, ?3) order by MB1.bibId")
     List<MatchingBibEntity> getMultiMatchBibEntitiesBasedOnBibIds(List<Integer> bibIds, String matchingCriteria1, String matchingCriteria2);
 
+    @Query(value = "select bib_id from matching_bib_t where bib_id in (select bib_Id from matching_bib_t group by BIB_ID having count(bib_id) = 1) and matching =?1", nativeQuery = true)
+    List<Integer> getSingleMatchBibIdsBasedOnMatching(String matching);
+
     @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
             "where MB2.oclc = MB3.oclc and MB2.isbn = MB3.isbn and MB2.id = MB3.id \n" +
             "and MB2.matching in (?1, ?2)\n" +

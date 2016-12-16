@@ -1,6 +1,7 @@
 package org.recap.matchingAlgorithm.report;
 
 import com.google.common.collect.Lists;
+import io.swagger.models.auth.In;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -203,6 +204,111 @@ public class MatchingAlgoReportUT extends BaseTestCase {
         stopWatch.stop();
         Thread.sleep(1000);
         logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void fetchSingleMatchBibs() throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Integer batchSize = 10000;
+        getSingleMatchBibsAndSaveReport(batchSize, RecapConstants.MATCH_POINT_FIELD_OCLC);
+        getSingleMatchBibsAndSaveReport(batchSize, RecapConstants.MATCH_POINT_FIELD_ISBN);
+        getSingleMatchBibsAndSaveReport(batchSize, RecapConstants.MATCH_POINT_FIELD_ISSN);
+        getSingleMatchBibsAndSaveReport(batchSize, RecapConstants.MATCH_POINT_FIELD_LCCN);
+        stopWatch.stop();
+        logger.info("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
+    }
+
+    private void getSingleMatchBibsAndSaveReport(Integer batchSize, String matching) {
+        Map<String, List<MatchingBibEntity>> matchingBibEntityMap = new HashMap<>();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        List<Integer> singleMatchBibIdsBasedOnMatching = matchingBibDetailsRepository.getSingleMatchBibIdsBasedOnMatching(matching);
+        stopWatch.stop();
+        logger.info("Time taken to fetch " + matching + " from db : " + stopWatch.getTotalTimeSeconds());
+        logger.info("Total oclc : " + singleMatchBibIdsBasedOnMatching.size());
+
+        if(CollectionUtils.isNotEmpty(singleMatchBibIdsBasedOnMatching)) {
+            List<List<Integer>> bibIdLists = Lists.partition(singleMatchBibIdsBasedOnMatching, batchSize);
+            logger.info("Total " + matching + " list : " + bibIdLists.size());
+            for (Iterator<List<Integer>> iterator = bibIdLists.iterator(); iterator.hasNext(); ) {
+                List<Integer> bibIds = iterator.next();
+                List<MatchingBibEntity> matchingBibEntities = matchingBibDetailsRepository.getBibEntityBasedOnBibIds(bibIds);
+                if(CollectionUtils.isNotEmpty(matchingBibEntities)) {
+                    for (Iterator<MatchingBibEntity> matchingBibEntityIterator = matchingBibEntities.iterator(); matchingBibEntityIterator.hasNext(); ) {
+                        MatchingBibEntity matchingBibEntity = matchingBibEntityIterator.next();
+                        String matchCriteriaValue = getMatchCriteriaValue(matching, matchingBibEntity);
+                        if(matchingBibEntityMap.containsKey(matchCriteriaValue)) {
+                            List<MatchingBibEntity> matchingBibEntityList = matchingBibEntityMap.get(matchCriteriaValue);
+                            List<MatchingBibEntity> tempMatchingBibEntities = new ArrayList<>();
+                            tempMatchingBibEntities.addAll(matchingBibEntityList);
+                            tempMatchingBibEntities.add(matchingBibEntity);
+                            matchingBibEntityMap.put(matchCriteriaValue, tempMatchingBibEntities);
+                        } else {
+                            matchingBibEntityMap.put(matchCriteriaValue, Arrays.asList(matchingBibEntity));
+                        }
+                    }
+                }
+            }
+            for(String criteriaValue : matchingBibEntityMap.keySet()) {
+                List<MatchingBibEntity> matchingBibEntityList = matchingBibEntityMap.get(criteriaValue);
+                saveReportForSingleMatch(criteriaValue, matchingBibEntityList, matching);
+            }
+        }
+    }
+
+    private void saveReportForSingleMatch(String criteriaValue, List<MatchingBibEntity> matchingBibEntityList, String criteria) {
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        StringBuilder bibIds = new StringBuilder();
+        StringBuilder owningInsts = new StringBuilder();
+        Set<String> owningInstSet = new HashSet<>();
+        for(int index=0; index < matchingBibEntityList.size(); index++) {
+            MatchingBibEntity matchingBibEntity = matchingBibEntityList.get(index);
+            owningInstSet.add(matchingBibEntity.getOwningInstitution());
+            if(index == 0) {
+                bibIds.append(matchingBibEntity.getBibId());
+                owningInsts.append(matchingBibEntity.getOwningInstitution());
+            } else {
+                bibIds.append(",").append(matchingBibEntity.getBibId());
+                owningInsts.append(",").append(matchingBibEntity.getOwningInstitution());
+            }
+            if(StringUtils.isNotBlank(matchingBibEntity.getTitle())) {
+                ReportDataEntity titleReportDataEntity = new ReportDataEntity();
+                int i = index + 1;
+                titleReportDataEntity.setHeaderName("Title" + i);
+                titleReportDataEntity.setHeaderValue(matchingBibEntity.getTitle());
+                reportDataEntities.add(titleReportDataEntity);
+            }
+        }
+        if(owningInstSet.size() > 1) {
+            ReportEntity reportEntity = new ReportEntity();
+            reportEntity.setFileName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
+            reportEntity.setType("SingleMatch");
+            reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+            reportEntity.setCreatedDate(new Date());
+
+            if(StringUtils.isNotBlank(bibIds.toString())) {
+                ReportDataEntity bibIdReportDataEntity = new ReportDataEntity();
+                bibIdReportDataEntity.setHeaderName("BibId");
+                bibIdReportDataEntity.setHeaderValue(bibIds.toString());
+                reportDataEntities.add(bibIdReportDataEntity);
+            }
+
+            if(StringUtils.isNotBlank(owningInsts.toString())) {
+                ReportDataEntity owningInstReportDataEntity = new ReportDataEntity();
+                owningInstReportDataEntity.setHeaderName("OwningInstitution");
+                owningInstReportDataEntity.setHeaderValue(owningInsts.toString());
+                reportDataEntities.add(owningInstReportDataEntity);
+            }
+
+            ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
+            criteriaReportDataEntity.setHeaderName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
+            criteriaReportDataEntity.setHeaderValue(criteriaValue);
+            reportDataEntities.add(criteriaReportDataEntity);
+
+            reportEntity.addAll(reportDataEntities);
+            producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
+        }
     }
 
     private void populateMatchingCriteriaMap(Map<String, List<Integer>> criteriaMap, Map<Integer, String> bibIdAndCriteriaMap) {
