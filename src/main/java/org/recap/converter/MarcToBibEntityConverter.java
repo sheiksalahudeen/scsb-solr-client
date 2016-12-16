@@ -215,7 +215,7 @@ public class MarcToBibEntityConverter {
             errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
             reportDataEntities.add(errorReportDataEntity);
-        }else{
+        }else if(exitsBibCount == 0){
             successBibCount = successBibCount+1;
         }
         if (!CollectionUtils.isEmpty(reportDataEntities)) {

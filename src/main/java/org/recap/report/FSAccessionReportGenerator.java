@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hemalathas on 21/11/16.
@@ -38,10 +36,7 @@ public class FSAccessionReportGenerator implements ReportGeneratorInterface{
         String generatedFileName = null;
         List<AccessionSummaryRecord> accessionSummaryRecordList = new ArrayList<>();
         AccessionSummaryRecordGenerator accessionSummaryRecordGenerator = new AccessionSummaryRecordGenerator();
-        for(ReportEntity reportEntity : reportEntityList){
-            AccessionSummaryRecord accessionSummaryRecord = accessionSummaryRecordGenerator.prepareAccessionSummaryReportRecord(reportEntity);
-            accessionSummaryRecordList.add(accessionSummaryRecord);
-        }
+        accessionSummaryRecordList = accessionSummaryRecordGenerator.prepareAccessionSummaryReportRecord(reportEntityList);
         producerTemplate.sendBodyAndHeader(RecapConstants.FS_ACCESSION_SUMMARY_REPORT_Q, accessionSummaryRecordList, "fileName", fileName);
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";

@@ -32,8 +32,6 @@ public class AccessionSummaryRecord implements Serializable{
     @DataField(pos = 7, columnName = "Item-Reason for Failure")
     private String reasonForFailureItem;
 
-    @DataField(pos = 8, columnName = "Owning Institution")
-    private String owningInstitution;
 
 
     public String getSuccessBibCount() {
@@ -74,14 +72,6 @@ public class AccessionSummaryRecord implements Serializable{
 
     public void setFailedItemCount(String failedItem) {
         this.failedItemCount = failedItem;
-    }
-
-    public String getOwningInstitution() {
-        return owningInstitution;
-    }
-
-    public void setOwningInstitution(String owningInstitution) {
-        this.owningInstitution = owningInstitution;
     }
 
     public String getReasonForFailureBib() {
