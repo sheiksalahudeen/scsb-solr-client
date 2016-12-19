@@ -72,11 +72,12 @@ public class SharedCollectionRestController {
     @ResponseBody
     public ResponseEntity accession(@RequestBody AccessionRequest accessionRequest) {
         String owningInstitution = accessionService.getOwningInstitution(accessionRequest.getCustomerCode());
+        String customerCode = accessionRequest.getCustomerCode();
         if (StringUtils.isBlank(owningInstitution)) {
             ResponseEntity responseEntity = new ResponseEntity(RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
             return responseEntity;
         } else {
-            String response = accessionService.processRequest(accessionRequest.getItemBarcode(), owningInstitution);
+            String response = accessionService.processRequest(accessionRequest.getItemBarcode(),customerCode, owningInstitution);
             ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
             return responseEntity;
         }
