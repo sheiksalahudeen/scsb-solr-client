@@ -66,28 +66,6 @@
                 <div id="searchResultsContainer" class="search-results-container" data-th-if="*{showResults}">
                     <div class="row">
                         <div class="col-xs-12">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="pull-left">
-                                        <h3 class="heading margin-right-35 margin-top-10 margin-btm-0">Search
-                                            Results</h3>
-                                    </div>
-                                    <div class="pull-left margin-top-15 parent">
-                                        <div class="recap-status">
-                                            <div class="inline-box margin-right-10">
-                                                <img class="status" src="images/inRecap.png" alt="In ReCAP"
-                                                     style="width:20px;height:25px;"/><span
-                                                    class="align-middle padding-5">In ReCAP</span>
-                                            </div>
-                                            <div class="inline-box">
-                                                <img class="status" src="images/out.png" alt="Out"
-                                                     style="width:20px;height:25px;"/><span
-                                                    class="align-middle padding-5">OUT</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="divider-horizontal margin-top-10 margin-btm-10"></div>
                             <div id="errorMessageId" class="row margin-btm-10" data-th-if="*{errorMessage ne null &amp;&amp; errorMessage ne ''}">
                                 <div class="col-sm-12">
@@ -105,7 +83,25 @@
                                 </div>
                             </div>
                             <div class="row" th:if="*{searchResultRows.size() &gt; 0 &amp;&amp; showResults}">
-                                <p class="col-xs-12 margin-btm-05">CGD - Collection Group Designation</p>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="pull-left col-sm-2">
+                                            <div class="recap-status">
+                                                <div class="inline-box margin-right-10">
+                                                    <img class="status" src="images/inRecap.png" alt="In ReCAP"
+                                                         style="width:20px;height:25px;"/><span
+                                                        class="align-middle padding-5">In ReCAP</span>
+                                                </div>
+                                                <div class="inline-box">
+                                                    <img class="status" src="images/out.png" alt="Out"
+                                                         style="width:20px;height:25px;"/><span
+                                                        class="align-middle padding-5">OUT</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="">CGD - Collection Group Designation</p>
+                                    </div>
+                                </div>
                                 <div class="col-xs-12">
                                     <table id="collection-result-table" class="table table-striped margin-btm-0">
                                         <thead class="tablesorter-headerRow">
@@ -114,7 +110,7 @@
                                                 <div>Barcode</div>
                                             </th>
                                             <th width="50%">
-                                                <div>TITLE</div>
+                                                <div>Title</div>
                                             </th>
                                             <th th:title="'Collection Group Designation'">
                                                 <div>CGD</div>
@@ -199,6 +195,10 @@
                                             <div class="row margin-btm-05">
                                                 <div class="col-sm-5">Owning Institution</div>
                                                 <div class="col-sm-7 fontcolor-light"><span th:text="${collectionForm.owningInstitution}"></span></div>
+                                            </div>
+                                            <div class="row margin-btm-05">
+                                                <div class="col-sm-5">Collection Group Designation (CGD)</div>
+                                                <div class="col-sm-7 fontcolor-light"><span th:text="${collectionForm.monographCollectionGroupDesignation}"></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -325,7 +325,11 @@
                                                             </div>
                                                             <div class="col-sm-8 padding-left-0">
                                                                 <div class="select-holder" id="newCGDDiv" th:if="${!collectionForm.submitted}">
-                                                                    <select class="form-control themed-input themed-select" name="newCGD" id="newCGD" th:field="${collectionForm.newCollectionGroupDesignation}">
+                                                                    <select class="form-control themed-input themed-select"
+                                                                            name="newCGD"
+                                                                            id="newCGD"
+                                                                            th:field="${collectionForm.newCollectionGroupDesignation}"
+                                                                            th:onchange="'javascript:toggleNewCgdValidation()'">
                                                                         <option value="">Select</option>
                                                                         <option value="Shared">Shared</option>
                                                                         <option value="Private">Private</option>
@@ -344,7 +348,7 @@
                                                                 <label for="CGDChangeNotes" class="fontcolor-dark">CGD Change Notes <span class="error-color" th:if="${!collectionForm.submitted &amp;&amp; collectionForm.collectionGroupDesignation eq 'Shared'}">*</span></label>
                                                             </div>
                                                             <div class="col-sm-8 padding-left-0">
-                                                                <textarea class="form-control themed-input" name="CGDChangeNotes" id="CGDChangeNotes" th:field="${collectionForm.cgdChangeNotes}" th:if="${!collectionForm.submitted}"></textarea>
+                                                                <textarea class="form-control themed-input" name="CGDChangeNotes" id="CGDChangeNotes" th:field="${collectionForm.cgdChangeNotes}" th:if="${!collectionForm.submitted}" th:onkeyup="'javascript:toggleCgdNotesValidation()'"></textarea>
                                                                 <span id="cgdNotesErrorMessage" style="color: red;">Please enter CGD Change Notes.</span>
                                                                 <div class="form-group padding-top-10">
                                                                     <span id="CGDNoteReadOnly" th:if="${collectionForm.submitted}" th:text="${collectionForm.cgdChangeNotes}"></span>
@@ -365,12 +369,18 @@
                                                         </div>
                                                         <div class="row form-group">
                                                             <div class="col-sm-4 text-right padding-right-30 margin-top-10">
-                                                                <label for="DeliveryLocation" class="fontcolor-dark">Delivery Location <span class="error-color" th:if="${!collectionForm.submitted &amp;&amp; collectionForm.deaccessionType eq 'Permanent Withdrawl Direct (PWD)'}">*</span></label>
+                                                                <label for="DeliveryLocation" class="fontcolor-dark">Delivery Location <span class="error-color" th:if="${!collectionForm.submitted &amp;&amp; collectionForm.deaccessionType eq 'Permanent Withdrawal Direct (PWD)'}">*</span></label>
                                                             </div>
                                                             <div class="col-sm-8 padding-left-0">
                                                                 <div class="select-holder" th:if="${!collectionForm.submitted}">
                                                                     <input type="hidden" th:field="${collectionForm.deliveryLocations}"/>
-                                                                    <select class="form-control themed-input themed-select" name="DeliveryLocation" id="DeliveryLocation" th:field="${collectionForm.deliveryLocation}" th:if="${!collectionForm.submitted}" th:disabled="${collectionForm.availability != 'Available'}">
+                                                                    <select class="form-control themed-input themed-select"
+                                                                            name="DeliveryLocation"
+                                                                            id="DeliveryLocation"
+                                                                            th:field="${collectionForm.deliveryLocation}"
+                                                                            th:if="${!collectionForm.submitted}"
+                                                                            th:disabled="${collectionForm.availability != 'Available'}"
+                                                                            th:onchange="'javascript:toggleDeliveryLocationValidation()'">
                                                                         <option value=""></option>
                                                                         <option th:each="location : ${collectionForm.deliveryLocations}" th:value="${location}" th:text="${location}"></option>
                                                                     </select>
@@ -384,7 +394,7 @@
                                                         <div class="row form-group">
                                                             <div class="col-sm-4 text-right padding-right-30 margin-top-10"><label for="DeaccessionNotes" class="fontcolor-dark">Deaccession Notes <span class="error-color" th:if="${!collectionForm.submitted}">*</span></label></div>
                                                             <div class="col-sm-8 padding-left-0 padding-top-10">
-                                                                <textarea class="form-control themed-input" name="DeaccessionNotes" id="DeaccessionNotes" th:field="${collectionForm.deaccessionNotes}" th:if="${!collectionForm.submitted}"></textarea>
+                                                                <textarea class="form-control themed-input" name="DeaccessionNotes" id="DeaccessionNotes" th:field="${collectionForm.deaccessionNotes}" th:if="${!collectionForm.submitted}" th:onkeyup="'javascript:toggleDeaccessionNotesValidation()'"></textarea>
                                                                 <span id="deaccessionNotesErrorMessage" style="color: red;">Please enter Deaccession Notes.</span>
                                                                 <span th:if="${collectionForm.submitted}" th:text="${collectionForm.deaccessionNotes}"></span>
                                                             </div>
@@ -404,7 +414,7 @@
                                                         </div>
                                                     </div>
                                                     <div id="mandateText" th:if="${!collectionForm.submitted}">
-                                                        Fields marked with asterik(<span class="error-color">*</span>) are mandatory.
+                                                        Fields marked with asterisk(<span class="error-color">*</span>) are mandatory.
                                                     </div>
                                                 </div>
 

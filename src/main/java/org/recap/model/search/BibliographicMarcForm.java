@@ -15,6 +15,7 @@ public class BibliographicMarcForm {
     private String publishedDate;
     private String owningInstitution;
     private String callNumber;
+    private String leaderMaterialType;
     private String tag000;
     private String controlNumber001;
     private String controlNumber005;
@@ -28,6 +29,7 @@ public class BibliographicMarcForm {
     private String barcode;
     private String locationCode;
     private String useRestriction;
+    private String monographCollectionGroupDesignation;
     private String collectionGroupDesignation;
     private String newCollectionGroupDesignation;
     private String cgdChangeNotes;
@@ -289,5 +291,21 @@ public class BibliographicMarcForm {
 
     public void setCollectionAction(String collectionAction) {
         this.collectionAction = collectionAction;
+    }
+
+    public String getMonographCollectionGroupDesignation() {
+        return monographCollectionGroupDesignation;
+    }
+
+    public void setMonographCollectionGroupDesignation(String monographCollectionGroupDesignation) {
+        this.monographCollectionGroupDesignation = monographCollectionGroupDesignation;
+    }
+
+    public String getLeaderMaterialType() {
+        return leaderMaterialType;
+    }
+
+    public void setLeaderMaterialType(String leaderMaterialType) {
+        this.leaderMaterialType = leaderMaterialType;
     }
 }

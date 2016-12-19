@@ -218,8 +218,8 @@ textarea{resize:none;}
 #search-filter h2{margin:50px 0 20px}
 .search-table-header-note{position:absolute;color:#7F807F;font-weight:700;font-size:12px;left:25px;top:35px;width:670px;}
 .search-bar .notes span{color:#000;}
-.create-request a,.backtext a{color:#699683;font-size:22px}
-#request .search-bar .buscador-principal [class*="themed-"] {height:auto}
+.search-request a,.backtext a{color:#699683;font-size:22px}
+/*#request .search-bar .buscador-principal [class*="themed-"] {height:auto}*/
 #request .search-bar .buscador-principal{padding:10px 15px 20px;background:#E8EDED}
 #request .search-bar .buscador-principal label{font-weight:normal}
 #request .search-bar .buscador-principal .themed-input {border:1px solid #888988}

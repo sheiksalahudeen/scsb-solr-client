@@ -11,11 +11,10 @@
                 <input id="totalPageCount" name="totalPageCount" type="text" th:field="*{totalPageCount}" hidden="hidden"/>
                 <input id="totalRecordsCount" name="totalRecordsCount" type="text" th:field="*{totalRecordsCount}" hidden="hidden"/>
                 <div role="tabpanel" class="tab-pane" id="request">
-                    <div class="request-main-section">
+                    <div id="searchRequestsSection" class="request-main-section" style="display:none;">
                         <div class="search-bar">
                             <div class="row margin-btm-10">
-                                <div class="col-sm-6 margin-top-05"><em>Provide one or multiple data to search</em></div>
-                                <div class="col-sm-6 text-right create-request"><a href="#"><span class="glyphicon glyphicon-plus-sign"></span> Create Request</a></div>
+                                <div class="col-sm-12 text-right backtext"><a href="#"><span class="glyphicon glyphicon-menu-left"></span> Go Back</a></div>
                             </div>
                             <div class="row margin-0">
                                 <div class="col-xs-12  padding-0">
@@ -34,7 +33,7 @@
                                                 <input id="deliveryLocation" name="deliveryLocation" type="text" th:field="*{deliveryLocation}" class="form-control themed-input"/>
                                             </div>
                                             <div class="input-group-btn search-panel padding-left-70 padding-right-10">
-                                                <button id="searchRequests" class="btn themed-button themed-button-search" type="submit" name="action" value="searchRequests">Search</button>
+                                                <button id="searchRequestsButton" class="btn themed-button themed-button-search" type="button" name="searchRequestsButton" onclick="searchRequests('searchRequests')">Search</button>
                                             </div>
                                             <div class="input-group-btn">
                                                 <button id="clearRequestForm" class="btn themed-button themed-button-cancel" type="submit" name="action" value="clear">Clear Search</button>
@@ -45,13 +44,6 @@
                             </div>
                         </div>
                         <div class="search-results-container" data-th-if="*{showResults}">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="pull-left">
-                                        <h3 class="heading margin-btm-0 margin-right-35">Search Results</h3>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="divider-horizontal margin-top-10 margin-btm-10"></div>
                             <div class="row margin-btm-10" data-th-if="*{message ne null &amp;&amp; message ne ''}">
                                 <div class="col-sm-12">
@@ -156,9 +148,36 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div id="paginationBottomDivId" name="paginationDivName" class="col-md-12" style="margin-top: -20px; margin-bottom: -20px;">
+                                    <div id="requestPaginationDivId" name="requestPaginationDivName" class="col-md-12" style="margin-bottom: -20px;">
                                         <div class="pull-right">
-                                            <div th:replace="pagination :: #paginationId"></div>
+                                            <div id="requestPaginationId" name="requestPaginationName" xmlns:th="http://www.w3.org/1999/xhtml">
+                                                <ul class="pagination">
+                                                    <li th:class="*{pageNumber == 0} ? 'disabled' : ''">
+                                                        <span th:if="*{pageNumber == 0}">First</span>
+                                                        <a th:if="*{pageNumber != 0}" href="#"
+                                                           title="Go to first page"
+                                                           onclick="requestsFirstPage()">First</a>
+                                                    </li>
+                                                    <li th:class="*{(pageNumber != 0) &amp;&amp; (totalPageCount &gt; 1)}? '' : 'disabled'">
+                                                        <span th:if="*{pageNumber == 0}">Previous</span>
+                                                        <a th:if="*{pageNumber != 0}" href="#"
+                                                           title="Go to previous page"
+                                                           onclick="requestsPreviousPage()">Previous</a>
+                                                    </li>
+                                                    <li th:class="*{(pageNumber+1 != totalPageCount) &amp;&amp; (totalPageCount &gt; 1)}? '' : 'disabled'">
+                                                        <span th:if="*{pageNumber+1 == totalPageCount}">Next</span>
+                                                        <a th:if="*{pageNumber+1 != totalPageCount}"
+                                                           href="#" title="Go to next page"
+                                                           onclick="requestsNextPage()">Next</a>
+                                                    </li>
+                                                    <li th:class="*{pageNumber+1 == totalPageCount}? 'disabled' : ''">
+                                                        <span th:if="*{pageNumber+1 == totalPageCount}">Last</span>
+                                                        <a th:if="*{pageNumber+1 != totalPageCount}"
+                                                           href="#"
+                                                           onclick="requestsLastPage()">Last</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                     <div id="requestButtonsId" name="requestButtonsName" class="form-group input-group-btn" align="center">
@@ -168,10 +187,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="create-request-section" style="display:none;">
+                    <div id="createRequestSection" class="create-request-section">
                         <div class="row margin-top-0">
                             <div class="col-sm-6 margin-top-0"><h3 class="margin-0">Create Request</h3></div>
-                            <div class="col-sm-6 text-right backtext"><a href="#"><span class="glyphicon glyphicon-menu-left"></span> Go Back</a></div>
+                            <div class="col-sm-6 text-right search-request"><a href="#"><span class="glyphicon glyphicon-plus-sign"></span> Search Requests</a></div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12 divider-horizontal margin-top-10 margin-btm-10"></div>
@@ -189,6 +208,7 @@
                                                            name="itemBarcodeName"
                                                            class="form-control themed-input"
                                                            th:field="*{itemBarcodeInRequest}"
+                                                           th:onkeyup="'javascript:toggleItemBarcodeValidation()'"
                                                            onblur="populateItemDetails()">
                                                     </input>
                                                     <span id="itemBarcodeErrorMessage" style="color: red;">Item barcode is required.</span>
@@ -238,7 +258,8 @@
                                                                    id="patronBarcodeId"
                                                                    name="patronBarcodeName"
                                                                    class="form-control themed-input"
-                                                                   th:field="*{patronBarcodeInRequest}">
+                                                                   th:field="*{patronBarcodeInRequest}"
+                                                                   th:onkeyup="'javascript:togglePatronBarcodeValidation()'">
                                                             </input>
                                                             <span id="patronBarcodeErrorMessage" style="color: red;">Patron barcode is required.</span>
                                                         </div>
@@ -252,8 +273,10 @@
                                                                    id="patronEmailId"
                                                                    name="patronEmailName"
                                                                    class="form-control themed-input"
-                                                                   th:field="*{patronEmailAddress}">
+                                                                   th:field="*{patronEmailAddress}"
+                                                                   onblur="validateEmailAddress()">
                                                             </input>
+                                                            <span id="patronEmailIdErrorMessage" style="color: red;">Email address is invalid.</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -265,7 +288,8 @@
                                                                 <select id="requestingInstitutionId"
                                                                         name="requestingInstitutionName"
                                                                         class="form-control themed-input themed-select"
-                                                                        th:field="*{requestingInstitution}">
+                                                                        th:field="*{requestingInstitution}"
+                                                                        th:onchange="'javascript:toggleRequestingInstitutionValidation()'">
                                                                     <option value=""></option>
                                                                     <option th:each="requestingInstitution : *{requestingInstitutions}" th:value="${requestingInstitution}" th:text="${requestingInstitution}"></option>
                                                                 </select>
@@ -308,7 +332,8 @@
                                                                 <select id="deliveryLocationId"
                                                                         name="deliveryLocationName"
                                                                         class="form-control themed-input themed-select"
-                                                                        th:field="*{deliveryLocationInRequest}">
+                                                                        th:field="*{deliveryLocationInRequest}"
+                                                                        th:onchange="'javascript:toggleDeliveryLocationValidation()'">
                                                                     <option value=""></option>
                                                                     <option th:each="location : *{deliveryLocations}" th:value="${location}" th:text="${location}"></option>
                                                                 </select>
@@ -331,7 +356,7 @@
                                                     <div class="form-group">
                                                         <div class="col-md-6 col-sm-4 margin-top-15"><label for="StartPage" class="fontcolor-dark">Start Page <span class="error-color">*</span></label></div>
                                                         <div class="col-md-6 col-sm-8">
-                                                            <input type="text" class="form-control themed-input" id="StartPage" name="StartPage" th:field="*{startPage}"/>
+                                                            <input type="text" class="form-control themed-input" id="StartPage" name="StartPage" th:field="*{startPage}" th:onkeyup="'javascript:toggleStartPageValidation()'"/>
                                                             <span id="startPageErrorMessage" style="color: red;">Start page is required.</span>
                                                         </div>
                                                     </div>
@@ -340,7 +365,7 @@
                                                     <div class="form-group">
                                                         <div class="col-md-6 col-sm-4 text-right margin-top-15"><label for="EndPage" class="fontcolor-dark">End Page <span class="error-color">*</span></label></div>
                                                         <div class="col-md-6 col-sm-8">
-                                                            <input type="text" class="form-control themed-input" id="EndPage" name="EndPage" th:field="*{endPage}"/>
+                                                            <input type="text" class="form-control themed-input" id="EndPage" name="EndPage" th:field="*{endPage}" th:onkeyup="'javascript:toggleEndPageValidation()'"/>
                                                             <span id="endPageErrorMessage" style="color: red;">End page is required.</span>
                                                         </div>
                                                     </div>
@@ -381,7 +406,7 @@
                                                         <div class="col-md-2 col-sm-4 margin-top-15"><label for="ArticleChapterTitle" class="fontcolor-dark">Article /
                                                             Chapter Title <span class="error-color">*</span></label></div>
                                                         <div class="col-md-10 col-sm-8">
-                                                            <input type="text" class="form-control themed-input" id="ArticleChapterTitle" th:field="*{articleTitle}"/>
+                                                            <input type="text" class="form-control themed-input" id="ArticleChapterTitle" th:field="*{articleTitle}" th:onkeyup="'javascript:toggleArticleTitleValidation()'"/>
                                                             <span id="articleTitleErrorMessage" style="color: red;">Article / Chapter title is required.</span>
                                                         </div>
                                                     </div>

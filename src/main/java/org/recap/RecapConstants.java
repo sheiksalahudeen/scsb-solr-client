@@ -188,8 +188,8 @@ public class RecapConstants {
     public static final String RECAP = "recap";
     public static final String AVAILABLE = "Available";
     public static final String NOT_AVAILABLE = "Not Available";
-    public static final String PERMANENT_WITHDRAWL_DIRECT = "Permanent Withdrawl Direct (PWD)";
-    public static final String PERMANENT_WITHDRAWL_INDIRECT = "Permanent Withdrawl Indirect (PWI)";
+    public static final String PERMANENT_WITHDRAWAL_DIRECT = "Permanent Withdrawal Direct (PWD)";
+    public static final String PERMANENT_WITHDRAWAL_INDIRECT = "Permanent Withdrawal Indirect (PWI)";
 
     public static final String DEACCESSION_URL = "sharedCollection/deAccession";
 
