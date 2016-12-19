@@ -208,7 +208,9 @@ public class MarcToBibEntityConverter {
         List<ReportDataEntity> reportDataEntities = null;
 
         if (errorMessage.toString().length() > 1) {
-            failedBibCount = failedBibCount+1;
+            if(exitsBibCount == 0){
+                failedBibCount = failedBibCount+1;
+            }
             reasonForFailureBib = errorMessage.toString();
             reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity, bibRecord);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
