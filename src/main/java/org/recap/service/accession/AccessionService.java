@@ -62,6 +62,43 @@ public class AccessionService {
     @PersistenceContext
     private EntityManager entityManager;
 
+
+    public MarcUtil getMarcUtil() {
+        return marcUtil;
+    }
+
+    public MarcToBibEntityConverter getMarcToBibEntityConverter() {
+        return marcToBibEntityConverter;
+    }
+
+    public ReportDetailRepository getReportDetailRepository() {
+        return reportDetailRepository;
+    }
+
+    public SolrIndexService getSolrIndexService() {
+        return solrIndexService;
+    }
+
+    public CustomerCodeDetailsRepository getCustomerCodeDetailsRepository() {
+        return customerCodeDetailsRepository;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
+        return institutionDetailsRepository;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public Logger getLog() {
+        return log;
+    }
+
     public String getOwningInstitution(String customerCode) {
         String owningInstitution = null;
         try {
@@ -78,7 +115,7 @@ public class AccessionService {
     @Transactional
     public String processRequest(String itemBarcode, String owningInstitution) {
         String response = null;
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = getRestTemplate();
 
         String ilsBibDataURL = getILSBibDataURL(owningInstitution);
         String bibDataResponse = null;
@@ -95,24 +132,24 @@ public class AccessionService {
         }
         List<Record> records = new ArrayList<>();
         if (StringUtils.isNotBlank(bibDataResponse)) {
-            records = marcUtil.readMarcXml(bibDataResponse);
+            records = getMarcUtil().readMarcXml(bibDataResponse);
         }
         List<Map<String,String>> responseMapList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(records)) {
             try {
                 for (Record record : records) {
-                    Map responseMap = marcToBibEntityConverter.convert(record, owningInstitution);
+                    Map responseMap = getMarcToBibEntityConverter().convert(record, owningInstitution);
                     responseMapList.add(responseMap);
                     BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get("bibliographicEntity");
                     List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get("reportEntities");
                     if (CollectionUtils.isNotEmpty(reportEntityList)) {
-                        reportDetailRepository.save(reportEntityList);
+                        getReportDetailRepository().save(reportEntityList);
                     }
                     if (bibliographicEntity != null) {
                         BibliographicEntity savedBibliographicEntity =updatebiBliographicEntity(bibliographicEntity);
 
                         if (null != savedBibliographicEntity) {
-                            solrIndexService.indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
+                            getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
                             response = RecapConstants.SUCCESS;
                         }
                     }
@@ -128,6 +165,10 @@ public class AccessionService {
         return response;
     }
 
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+
     private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
         int successBibCount = 0;
         int successItemCount = 0;
@@ -140,11 +181,12 @@ public class AccessionService {
 
         for(Map responseMap : responseMapList){
             successBibCount = successBibCount + (responseMap.get(RecapConstants.SUCCESS_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_BIB_COUNT) : 0);
-            successItemCount = successItemCount + (responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT) : 0);
             failedBibCount = failedBibCount + (responseMap.get(RecapConstants.FAILED_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_BIB_COUNT) : 0);
-            failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
+            if(failedBibCount == 0){
+                successItemCount = successItemCount + (responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT) : 0);
+                failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
+            }
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
-
             if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
                 itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
             }
@@ -153,7 +195,7 @@ public class AccessionService {
                     reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
                 }
             }
-            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
+            if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib)){
                 if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
                     reasonForFailureItem = (String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE)+ "," +reasonForFailureItem;
                 }
@@ -215,10 +257,10 @@ public class AccessionService {
 
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntityList.add(reportEntity);
-        reportDetailRepository.save(reportEntityList);
+        getReportDetailRepository().save(reportEntityList);
     }
 
-    private String getILSBibDataURL(String owningInstitution) {
+    public String getILSBibDataURL(String owningInstitution) {
         if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
             return ilsprincetonBibData;
         }
@@ -227,11 +269,11 @@ public class AccessionService {
 
     public BibliographicEntity updatebiBliographicEntity(BibliographicEntity bibliographicEntity) {
         BibliographicEntity savedBibliographicEntity=null;
-        BibliographicEntity fetchBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
+        BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
         if(fetchBibliographicEntity ==null) { // New Bib Record
 
-            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-            entityManager.refresh(savedBibliographicEntity);
+            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(bibliographicEntity);
+            getEntityManager().refresh(savedBibliographicEntity);
         }else{ // Existing bib Record
             // Bib
             fetchBibliographicEntity.setContent(bibliographicEntity.getContent());
@@ -284,8 +326,8 @@ public class AccessionService {
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
 
-            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(fetchBibliographicEntity);
-            entityManager.refresh(fetchBibliographicEntity);
+            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
+            getEntityManager().refresh(fetchBibliographicEntity);
         }
         return savedBibliographicEntity;
     }

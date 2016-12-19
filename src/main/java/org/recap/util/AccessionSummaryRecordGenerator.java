@@ -31,10 +31,10 @@ public class AccessionSummaryRecordGenerator {
                     itemSuccessCount = itemSuccessCount + Integer.parseInt(reportDataEntity.getHeaderValue());
                 }
                 if(reportDataEntity.getHeaderName().equalsIgnoreCase(RecapConstants.BIB_FAILURE_COUNT)){
-                    bibFailureCount = bibFailureCount + Integer.parseInt(reportDataEntity.getHeaderValue());
+                    bibFailureCount = Integer.parseInt(reportDataEntity.getHeaderValue());
                 }
                 if(reportDataEntity.getHeaderName().equalsIgnoreCase(RecapConstants.ITEM_FAILURE_COUNT)){
-                    itemFailureCount = itemFailureCount + Integer.parseInt(reportDataEntity.getHeaderValue());
+                    itemFailureCount = Integer.parseInt(reportDataEntity.getHeaderValue());
                 }
                 if(reportDataEntity.getHeaderName().equalsIgnoreCase(RecapConstants.NUMBER_OF_BIB_MATCHES)){
                     existingBibCount = existingBibCount + Integer.parseInt(reportDataEntity.getHeaderValue());
@@ -42,20 +42,17 @@ public class AccessionSummaryRecordGenerator {
                 if(reportDataEntity.getHeaderName().equalsIgnoreCase(RecapConstants.FAILURE_BIB_REASON) && !StringUtils.isEmpty(reportDataEntity.getHeaderValue())){
                     Integer bibCount = bibFailureReasonCountMap.get(reportDataEntity.getHeaderValue());
                     if(bibCount != null){
-                        bibCount++;
-                        bibFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),bibCount);
+                        bibFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),bibCount+bibFailureCount);
                     }else{
-                        bibFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),1);
+                        bibFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),bibFailureCount);
                     }
                 }
                 if(reportDataEntity.getHeaderName().equalsIgnoreCase(RecapConstants.FAILURE_ITEM_REASON) && !StringUtils.isEmpty(reportDataEntity.getHeaderValue())){
                     Integer itemCount = itemFailureReasonCountMap.get(reportDataEntity.getHeaderValue());
                     if(itemCount != null){
-                        itemCount++;
-                        itemFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),itemCount);
-
+                        itemFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),itemCount+itemFailureCount);
                     }else{
-                        itemFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),1);
+                        itemFailureReasonCountMap.put(reportDataEntity.getHeaderValue(),itemFailureCount);
                     }
                 }
             }
