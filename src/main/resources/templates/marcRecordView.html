@@ -29,12 +29,12 @@
                                   th:action="@{/openMarcRecord}"
                                   th:object="${bibliographicMarcForm}" method="post">
                                 <fieldset>
-                                    <div class="row margin-top-25 margin-btm-10">
+                                    <div class="row">
                                         <div class="col-sm-12">
                                             <h3 class="pull-left padding-left-20 fontcolor-dark margin-top-15"><span th:text="${bibliographicMarcForm.title}"></span></h3>
                                         </div>
                                     </div>
-                                    <div class="margin-top-25 margin-btm-20 padding-top-20 padding-left-20 padding-right-20 bg-white">
+                                    <div class="margin-top-10 margin-btm-20 padding-top-20 padding-left-20 padding-right-20 bg-white">
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <div class="row margin-btm-05">
@@ -59,6 +59,10 @@
                                                     <div class="col-sm-5">Owning Institution</div>
                                                     <div class="col-sm-7 fontcolor-light">: <span th:text="${bibliographicMarcForm.owningInstitution}"></span></div>
                                                 </div>
+                                                <div class="row margin-btm-05">
+                                                    <div class="col-sm-5">Collection Group Designation (CGD)</div>
+                                                    <div class="col-sm-7 fontcolor-light">: <span th:text="${bibliographicMarcForm.monographCollectionGroupDesignation}"></span></div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="divider-horizontal margin-top-10 margin-btm-20"></div>
@@ -67,7 +71,7 @@
                                                 <div class="contentdetail">
                                                     <h4 class="border-style-bottom padding-10 margin-top-05 margin-btm-0">MARC Content</h4>
                                                     <div class="padding-10">
-                                                        <div class="table-wrapper">
+                                                        <div>
                                                             <table class="table table-striped margin-btm-0">
                                                                 <tr>
                                                                     <td width="20%">tag000</td>

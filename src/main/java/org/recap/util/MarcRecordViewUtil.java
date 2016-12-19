@@ -50,6 +50,12 @@ public class MarcRecordViewUtil {
             }
             List<ItemEntity> nonDeletedItemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
             if (CollectionUtils.isNotEmpty(nonDeletedItemEntities)) {
+                if (nonDeletedItemEntities.size() == 1 && RecapConstants.MONOGRAPH.equals(bibliographicMarcForm.getLeaderMaterialType())) {
+                    CollectionGroupEntity collectionGroupEntity = nonDeletedItemEntities.get(0).getCollectionGroupEntity();
+                    if (null != collectionGroupEntity) {
+                        bibliographicMarcForm.setMonographCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
+                    }
+                }
                 bibliographicMarcForm.setCallNumber(nonDeletedItemEntities.get(0).getCallNumber());
                 if (null != itemId) {
                     for (ItemEntity itemEntity : nonDeletedItemEntities) {
@@ -73,9 +79,9 @@ public class MarcRecordViewUtil {
                             }
                             if (StringUtils.isNotBlank(bibliographicMarcForm.getAvailability())) {
                                 if (RecapConstants.AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
-                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWL_DIRECT);
+                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_DIRECT);
                                 } else if (RecapConstants.NOT_AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
-                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWL_INDIRECT);
+                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_INDIRECT);
                                 }
                             }
                             CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(bibliographicMarcForm.getCustomerCode());
@@ -105,6 +111,7 @@ public class MarcRecordViewUtil {
         bibliographicMarcForm.setAuthor(bibJSONUtil.getAuthorDisplayValue(marcRecord));
         bibliographicMarcForm.setPublisher(bibJSONUtil.getPublisherValue(marcRecord));
         bibliographicMarcForm.setPublishedDate(bibJSONUtil.getPublicationDateValue(marcRecord));
+        bibliographicMarcForm.setLeaderMaterialType(bibJSONUtil.getLeaderMaterialType(marcRecord.getLeader()));
         bibliographicMarcForm.setTag000(bibJSONUtil.getLeader(marcRecord));
         bibliographicMarcForm.setControlNumber001(bibJSONUtil.getControlFieldValue(marcRecord, "001"));
         bibliographicMarcForm.setControlNumber005(bibJSONUtil.getControlFieldValue(marcRecord, "005"));

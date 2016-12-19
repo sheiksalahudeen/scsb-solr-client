@@ -168,6 +168,7 @@ public class CollectionController {
         collectionForm.setPublishedDate(bibliographicMarcForm.getPublishedDate());
         collectionForm.setOwningInstitution(bibliographicMarcForm.getOwningInstitution());
         collectionForm.setCallNumber(bibliographicMarcForm.getCallNumber());
+        collectionForm.setMonographCollectionGroupDesignation(bibliographicMarcForm.getMonographCollectionGroupDesignation());
         collectionForm.setTag000(bibliographicMarcForm.getTag000());
         collectionForm.setControlNumber001(bibliographicMarcForm.getControlNumber001());
         collectionForm.setControlNumber005(bibliographicMarcForm.getControlNumber005());

@@ -3,32 +3,17 @@
  */
 
 jQuery(document).ready(function ($) {
-    $('#request-result-table').dataTable({
-        searching: false,
-        "scrollCollapse": true,
-        order: [[1,'asc']],
-        scrollY:'287px',
-        "pagingType": "simple_numbers",
-        "orderCellsTop": true,
-        "paging":   false,
-        "info":     false,
-        columnDefs: [
-            { targets: [1,2,4],orderable: true},
-            { targets: '_all',orderable: false}
-        ]
-    });
-
+    resetDefaults();
     /***Request Tab Create Request Form Show/Hide ***/
-    $("#request .create-request a").click(function (e) {
-        loadCreateRequest();
-    });
-    $("#request .backtext a").click(function () {
+    $("#request .search-request a").click(function (e) {
         $("#request .request-main-section").show();
         $("#request .create-request-section").hide();
-        
     });
-
-    resetDefaults();
+    $("#request .backtext a").click(function () {
+        $("#request .request-main-section").hide();
+        $("#request .create-request-section").show();
+        loadCreateRequest();
+    });
 });
 
 function loadCreateRequest() {
@@ -46,6 +31,41 @@ function loadCreateRequest() {
         }
     });
 }
+
+function searchRequests(action) {
+    var $form = $('#request-form');
+    var url = $form.attr('action') + "?action=" + action;
+    var request = $.ajax({
+        url: url,
+        type: 'post',
+        data: $form.serialize(),
+        success: function (response) {
+            console.log("completed");
+            $('#requestContentId').html(response);
+            $("#request .request-main-section").show();
+            $("#request .create-request-section").hide();
+        }
+    });
+}
+
+function requestsFirstPage() {
+    searchRequests('first');
+}
+
+function requestsLastPage() {
+    searchRequests('last');
+}
+
+function requestsPreviousPage() {
+    $('#pageNumber').val(parseInt($('#pageNumber').val()) - 1);
+    searchRequests('previous');
+}
+
+function requestsNextPage() {
+    $('#pageNumber').val(parseInt($('#pageNumber').val()) + 1);
+    searchRequests('next');
+}
+
 
 function selectAllRows() {
     var selectAllFlag = $('#requestSelectAll').is(":checked");
@@ -85,6 +105,7 @@ function populateItemDetails() {
                 $('#itemBarcodeErrorMessage').hide();
                 if (errorMessage != null && errorMessage != '') {
                     $('#itemBarcodeNotFoundErrorMessage').html(errorMessage);
+                    $('#itemBarcodeNotFoundErrorMessage').show();
                 } else {
                     $('#itemBarcodeNotFoundErrorMessage').html('');
                 }
@@ -98,7 +119,7 @@ $(function() {
     $('#requestTypeId').change(function(){
         $('.EDDdetails-section').hide();
         $('#' + $(this).val()).show();
-        if ($(this).find(':selected').val() === 'EDD' || $(this).find(':selected').val() === 'BORROW_DIRECT') {
+        if ($(this).find(':selected').val() === 'EDD' || $(this).find(':selected').val() === 'BORROW DIRECT') {
             $('#deliverylocation_request').hide();
         } else {
             $('#deliverylocation_request').show();
@@ -112,6 +133,8 @@ function createRequest() {
     var requestType = $('#requestTypeId').val();
     var deliveryLocation = $('#deliveryLocationId').val();
     var requestingInstitution = $('#requestingInstitutionId').val();
+
+    validateEmailAddress();
 
     if (isBlankValue(itemBarcode)) {
         $('#itemBarcodeErrorMessage').show();
@@ -150,7 +173,7 @@ function createRequest() {
         $('#requestTypeErrorMessage').hide();
     }
     if (isBlankValue(deliveryLocation)) {
-        if (!(requestType == 'EDD' || requestType == 'BORROW_DIRECT')) {
+        if (!(requestType == 'EDD' || requestType == 'BORROW DIRECT')) {
             $('#deliveryLocationErrorMessage').show();
         }
     } else {
@@ -179,4 +202,79 @@ function resetDefaults() {
     $('#startPageErrorMessage').hide();
     $('#endPageErrorMessage').hide();
     $('#articleTitleErrorMessage').hide();
+    $('#patronEmailIdErrorMessage').hide();
+}
+
+function toggleItemBarcodeValidation() {
+    var itemBarcode = $('#itemBarcodeId').val();
+    if (isBlankValue(itemBarcode)) {
+        $('#itemBarcodeErrorMessage').show();
+        $('#itemBarcodeNotFoundErrorMessage').hide();
+    } else {
+        $('#itemBarcodeErrorMessage').hide();
+    }
+}
+
+function toggleRequestingInstitutionValidation() {
+    var requestingInstitution = $('#requestingInstitutionId').val();
+    if (isBlankValue(requestingInstitution)) {
+        $('#requestingInstitutionErrorMessage').show();
+    } else {
+        $('#requestingInstitutionErrorMessage').hide();
+    }
+}
+
+function togglePatronBarcodeValidation() {
+    var patronBarcode = $('#patronBarcodeId').val();
+    if (isBlankValue(patronBarcode)) {
+        $('#patronBarcodeErrorMessage').show();
+    } else {
+        $('#patronBarcodeErrorMessage').hide();
+    }
+}
+
+function toggleDeliveryLocationValidation() {
+    var deliveryLocation = $('#deliveryLocationId').val();
+    if (isBlankValue(deliveryLocation)) {
+        $('#deliveryLocationErrorMessage').show();
+    } else {
+        $('#deliveryLocationErrorMessage').hide();
+    }
+}
+
+function toggleStartPageValidation() {
+    var startPage = $('#StartPage').val();
+    if (isBlankValue(startPage)) {
+        $('#startPageErrorMessage').show();
+    } else {
+        $('#startPageErrorMessage').hide();
+    }
+}
+
+function toggleEndPageValidation() {
+    var endPage = $('#EndPage').val();
+    if (isBlankValue(endPage)) {
+        $('#endPageErrorMessage').show();
+    } else {
+        $('#endPageErrorMessage').hide();
+    }
+}
+
+function toggleArticleTitleValidation() {
+    var articleTitle = $('#ArticleChapterTitle').val();
+    if (isBlankValue(articleTitle)) {
+        $('#articleTitleErrorMessage').show();
+    } else {
+        $('#articleTitleErrorMessage').hide();
+    }
+}
+
+function validateEmailAddress() {
+    var isValidEmailAddress = $('#patronEmailId').is(':valid');
+    if (!isValidEmailAddress) {
+        $('#patronEmailIdErrorMessage').show();
+    } else {
+        $('#patronEmailIdErrorMessage').hide();
+    }
+
 }

@@ -271,7 +271,7 @@ public class BibJSONUtil extends MarcUtil {
         producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
-    private String getLeaderMaterialType(Leader leader) {
+    public String getLeaderMaterialType(Leader leader) {
         String leaderMaterialType = null;
         String leaderFieldValue = leader != null ? leader.toString() : null;
         if (StringUtils.isNotBlank(leaderFieldValue) && leaderFieldValue.length() > 7) {

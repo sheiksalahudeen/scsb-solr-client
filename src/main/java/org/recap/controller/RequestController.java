@@ -57,7 +57,7 @@ public class RequestController {
 
     @RequestMapping("/request")
     public String collection(Model model) {
-        RequestForm requestForm = new RequestForm();
+        RequestForm requestForm = setDefaultsToCreateRequest();
         model.addAttribute("requestForm", requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
         return "searchRecords";
@@ -71,7 +71,7 @@ public class RequestController {
         requestForm.resetPageNumber();
         searchAndSetResults(requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return new ModelAndView("searchRecords", "requestForm", requestForm);
+        return new ModelAndView("request", "requestForm", requestForm);
     }
 
     @ResponseBody
@@ -82,7 +82,7 @@ public class RequestController {
         requestForm.resetPageNumber();
         searchAndSetResults(requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return new ModelAndView("searchRecords", "requestForm", requestForm);
+        return new ModelAndView("request", "requestForm", requestForm);
     }
 
     @ResponseBody
@@ -93,7 +93,7 @@ public class RequestController {
         requestForm.setPageNumber(requestForm.getTotalPageCount() - 1);
         searchAndSetResults(requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return new ModelAndView("searchRecords", "requestForm", requestForm);
+        return new ModelAndView("request", "requestForm", requestForm);
     }
 
     @ResponseBody
@@ -103,7 +103,7 @@ public class RequestController {
                                    Model model) {
         searchAndSetResults(requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return new ModelAndView("searchRecords", "requestForm", requestForm);
+        return new ModelAndView("request", "requestForm", requestForm);
     }
 
     @ResponseBody
@@ -113,13 +113,19 @@ public class RequestController {
                                        Model model) {
         searchAndSetResults(requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return new ModelAndView("searchRecords", "requestForm", requestForm);
+        return new ModelAndView("request", "requestForm", requestForm);
     }
 
     @ResponseBody
     @RequestMapping(value = "/request", method = RequestMethod.POST, params = "action=loadCreateRequest")
     public ModelAndView loadCreateRequest(Model model) {
+        RequestForm requestForm = setDefaultsToCreateRequest();
+        model.addAttribute("requestForm", requestForm);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
+        return new ModelAndView("request", "requestForm", requestForm);
+    }
 
+    private RequestForm setDefaultsToCreateRequest() {
         RequestForm requestForm = new RequestForm();
 
         List<String> requestingInstitutions = new ArrayList<>();
@@ -148,9 +154,7 @@ public class RequestController {
         requestForm.setRequestTypes(requestTypes);
         requestForm.setDeliveryLocations(deliveryLocations);
         requestForm.setRequestType("RETRIEVAL");
-
-        model.addAttribute("requestForm", requestForm);
-        return new ModelAndView("request", "requestForm", requestForm);
+        return requestForm;
     }
 
     @ResponseBody
