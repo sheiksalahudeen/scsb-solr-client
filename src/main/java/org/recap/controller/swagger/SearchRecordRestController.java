@@ -93,18 +93,16 @@ public class SearchRecordRestController {
         if (fieldName !=null) {
             searchRecordsRequest.setFieldName(fieldName);
         }
-        if(owningInstitutions !=null) {
+        if(owningInstitutions !=null && owningInstitutions.trim().length()>0) {
             searchRecordsRequest.setOwningInstitutions(Arrays.asList(owningInstitutions.split(",")));
-        }else{
-
         }
-        if(collectionGroupDesignations !=null) {
+        if(collectionGroupDesignations !=null && collectionGroupDesignations.trim().length()>0) {
             searchRecordsRequest.setCollectionGroupDesignations(Arrays.asList(collectionGroupDesignations.split(",")));
         }
-        if(availability !=null) {
+        if(availability !=null && availability.trim().length()>0) {
             searchRecordsRequest.setAvailability(Arrays.asList(availability.split(",")));
         }
-        if(materialTypes !=null) {
+        if(materialTypes !=null && materialTypes.trim().length()>0) {
             searchRecordsRequest.setMaterialTypes(Arrays.asList(materialTypes.split(",")));
         }
         if(pageSize !=null) {
@@ -115,6 +113,7 @@ public class SearchRecordRestController {
             searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
         } catch (Exception e) {
             searchResultRows = new ArrayList<>();
+            logger.error("Exception",e);
         }
         return searchResultRows;
     }
