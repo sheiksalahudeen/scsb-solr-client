@@ -269,9 +269,8 @@ public class AccessionSummaryReportUT extends BaseTestCase{
         String barcode = "32101058378587";
         Mockito.when(mockRestTemplate.getForObject(ilsprincetonBibData + barcode, String.class)).thenReturn(bibMarcRecord);
         Mockito.when(accessionService.getRestTemplate()).thenReturn(mockRestTemplate);
-        Mockito.when(accessionService.processRequest(barcode,owningInstitution)).thenCallRealMethod();
-        Mockito.when(accessionService.updatebiBliographicEntity(Mockito.any())).thenCallRealMethod();
-        Mockito.when(accessionService.getILSBibDataURL(owningInstitution)).thenReturn(ilsprincetonBibData);
+        Mockito.when(accessionService.processRequest(barcode,"PB",owningInstitution)).thenCallRealMethod();
+        Mockito.when(accessionService.updateBibliographicEntity(Mockito.any())).thenCallRealMethod();
         Mockito.when(accessionService.getMarcUtil()).thenReturn(new MarcUtil());
         Mockito.when(accessionService.getMarcToBibEntityConverter()).thenReturn(marcToBibEntityConverter);
         Mockito.when(accessionService.getReportDetailRepository()).thenReturn(reportDetailRepository);
@@ -280,7 +279,7 @@ public class AccessionSummaryReportUT extends BaseTestCase{
         Mockito.when(accessionService.getEntityManager()).thenReturn(entityManager);
         Mockito.when(accessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
         Mockito.when(accessionService.getInstitutionDetailsRepository()).thenReturn(institutionDetailsRepository);
-        String response = accessionService.processRequest(barcode,owningInstitution);
+        String response = accessionService.processRequest(barcode,"PB",owningInstitution);
         assertNotNull(response);
         assertEquals(response, RecapConstants.SUCCESS);
 

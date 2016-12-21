@@ -6,19 +6,23 @@ import org.apache.log4j.Logger;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
+import org.recap.converter.SCSBToBibEntityConverter;
+import org.recap.converter.XmlToBibEntityConverterInterface;
+import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.JAXBHandler;
+import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.service.partnerservice.NYPLService;
+import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
@@ -35,11 +39,11 @@ public class AccessionService {
 
     Logger log = Logger.getLogger(AccessionService.class);
 
-    @Value("${ils.princeton.bibdata}")
-    String ilsprincetonBibData;
-
     @Autowired
     MarcToBibEntityConverter marcToBibEntityConverter;
+
+    @Autowired
+    SCSBToBibEntityConverter scsbToBibEntityConverter;
 
     @Autowired
     CustomerCodeDetailsRepository customerCodeDetailsRepository;
@@ -52,6 +56,12 @@ public class AccessionService {
 
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Autowired
+    PrincetonService princetonService;
+
+    @Autowired
+    NYPLService nyplService;
 
     @Autowired
     MarcUtil marcUtil;
@@ -91,6 +101,22 @@ public class AccessionService {
         return institutionDetailsRepository;
     }
 
+    public PrincetonService getPrincetonService() {
+        return princetonService;
+    }
+
+    public void setPrincetonService(PrincetonService princetonService) {
+        this.princetonService = princetonService;
+    }
+
+    public NYPLService getNyplService() {
+        return nyplService;
+    }
+
+    public void setNyplService(NYPLService nyplService) {
+        this.nyplService = nyplService;
+    }
+
     public EntityManager getEntityManager() {
         return entityManager;
     }
@@ -113,51 +139,51 @@ public class AccessionService {
     }
 
     @Transactional
-    public String processRequest(String itemBarcode, String owningInstitution) {
+    public String processRequest(String itemBarcode, String customerCode, String owningInstitution) {
         String response = null;
-        RestTemplate restTemplate = getRestTemplate();
-
-        String ilsBibDataURL = getILSBibDataURL(owningInstitution);
         String bibDataResponse = null;
-        if (StringUtils.isNotBlank(ilsBibDataURL)) {
-            try {
-                bibDataResponse = restTemplate.getForObject(ilsBibDataURL + itemBarcode, String.class);
-            } catch (HttpClientErrorException ex) {
-                response = "Item Barcode not found";
-                return response;
-            } catch (Exception e) {
-                response = ilsBibDataURL + "Service is Unavailable.";
-                return response;
-            }
-        }
-        List<Record> records = new ArrayList<>();
-        if (StringUtils.isNotBlank(bibDataResponse)) {
-            records = getMarcUtil().readMarcXml(bibDataResponse);
-        }
         List<Map<String,String>> responseMapList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(records)) {
-            try {
-                for (Record record : records) {
-                    Map responseMap = getMarcToBibEntityConverter().convert(record, owningInstitution);
-                    responseMapList.add(responseMap);
-                    BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get("bibliographicEntity");
-                    List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get("reportEntities");
-                    if (CollectionUtils.isNotEmpty(reportEntityList)) {
-                        getReportDetailRepository().save(reportEntityList);
-                    }
-                    if (bibliographicEntity != null) {
-                        BibliographicEntity savedBibliographicEntity =updatebiBliographicEntity(bibliographicEntity);
-
-                        if (null != savedBibliographicEntity) {
-                            getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
-                            response = RecapConstants.SUCCESS;
-                        }
+        try {
+            if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                bibDataResponse = princetonService.getBibData(itemBarcode, customerCode);
+                List<Record> records = new ArrayList<>();
+                if (StringUtils.isNotBlank(bibDataResponse)) {
+                    records = getMarcUtil().readMarcXml(bibDataResponse);
+                }
+                if (CollectionUtils.isNotEmpty(records)) {
+                    for (Record record : records) {
+                        response = updateData(record, owningInstitution, responseMapList);
                     }
                 }
-                generateAccessionSummaryReport(responseMapList,owningInstitution);
-            } catch (Exception e) {
-                response = e.getMessage();
-                log.error(e.getMessage());
+            } else if (owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                bibDataResponse = nyplService.getBibData(itemBarcode, customerCode);
+                BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
+                for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+                    response = updateData(bibRecord, owningInstitution, responseMapList);
+                }
+            }
+        } catch (Exception ex) {
+            response = ex.getMessage();
+        }
+        generateAccessionSummaryReport(responseMapList,owningInstitution);
+
+        return response;
+    }
+
+    private String updateData(Object record, String owningInstitution, List<Map<String,String>> responseMapList){
+        String response = null;
+        Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution);
+        responseMapList.add(responseMap);
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get("bibliographicEntity");
+        List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get("reportEntities");
+        if (CollectionUtils.isNotEmpty(reportEntityList)) {
+            reportDetailRepository.save(reportEntityList);
+        }
+        if (bibliographicEntity != null) {
+            BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
+            if (null != savedBibliographicEntity) {
+                solrIndexService.indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
+                response = RecapConstants.SUCCESS;
             }
 
         }
@@ -187,6 +213,7 @@ public class AccessionService {
                 failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
             }
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
+
             if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
                 itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
             }
@@ -257,23 +284,16 @@ public class AccessionService {
 
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntityList.add(reportEntity);
-        getReportDetailRepository().save(reportEntityList);
+        reportDetailRepository.save(reportEntityList);
     }
 
-    public String getILSBibDataURL(String owningInstitution) {
-        if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-            return ilsprincetonBibData;
-        }
-        return null;
-    }
-
-    public BibliographicEntity updatebiBliographicEntity(BibliographicEntity bibliographicEntity) {
+    public BibliographicEntity updateBibliographicEntity(BibliographicEntity bibliographicEntity) {
         BibliographicEntity savedBibliographicEntity=null;
         BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
         if(fetchBibliographicEntity ==null) { // New Bib Record
 
-            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(bibliographicEntity);
-            getEntityManager().refresh(savedBibliographicEntity);
+            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+            entityManager.refresh(savedBibliographicEntity);
         }else{ // Existing bib Record
             // Bib
             fetchBibliographicEntity.setContent(bibliographicEntity.getContent());
@@ -285,7 +305,7 @@ public class AccessionService {
 
             // Holding
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
-            List<HoldingsEntity> holdingsEntities = new ArrayList<HoldingsEntity>(bibliographicEntity.getHoldingsEntities());
+            List<HoldingsEntity> holdingsEntities = new ArrayList<>(bibliographicEntity.getHoldingsEntities());
 
             log.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
             log.info("holdingsEntities = "+holdingsEntities.size());
@@ -295,7 +315,7 @@ public class AccessionService {
                 for (int j=0;j<fetchHoldingsEntities.size();j++) {
                     HoldingsEntity fetchHolding=fetchHoldingsEntities.get(j);
                     if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
-                        fetchHolding = copytoHoldingsEntity(fetchHolding,holdingsEntity);
+                        copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
                     }
                 }
@@ -305,7 +325,7 @@ public class AccessionService {
 
             // Item
             List<ItemEntity> fetchItemsEntities =fetchBibliographicEntity.getItemEntities();
-            List<ItemEntity> itemsEntities = new ArrayList<ItemEntity>(bibliographicEntity.getItemEntities());
+            List<ItemEntity> itemsEntities = new ArrayList<>(bibliographicEntity.getItemEntities());
 
             log.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
             log.info("holdingsEntities = "+itemsEntities.size());
@@ -315,7 +335,7 @@ public class AccessionService {
                 for (Iterator ifetchItems=fetchItemsEntities.iterator();ifetchItems.hasNext();) {
                     ItemEntity fetchItem=(ItemEntity) ifetchItems.next();
                     if(fetchItem.getOwningInstitutionItemId().equalsIgnoreCase(itemEntity.getOwningInstitutionItemId())  && fetchItem.getOwningInstitutionId().intValue() == itemEntity.getOwningInstitutionId().intValue()) {
-                        fetchItem = copytoHoldingsEntity(fetchItem,itemEntity);
+                        copyItemEntity(fetchItem,itemEntity);
                         iItems.remove();
                     }
                 }
@@ -326,29 +346,29 @@ public class AccessionService {
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
 
-            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
-            getEntityManager().refresh(fetchBibliographicEntity);
+            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(fetchBibliographicEntity);
+            entityManager.refresh(savedBibliographicEntity);
         }
         return savedBibliographicEntity;
     }
 
-    private HoldingsEntity copytoHoldingsEntity(HoldingsEntity fetchHoldingsEntity,HoldingsEntity holdingsEntity){
-        fetchHoldingsEntity.setContent(holdingsEntity.getContent()); ;
+    private HoldingsEntity copyHoldingsEntity(HoldingsEntity fetchHoldingsEntity, HoldingsEntity holdingsEntity){
+        fetchHoldingsEntity.setContent(holdingsEntity.getContent());
         fetchHoldingsEntity.setCreatedBy(holdingsEntity.getCreatedBy());
         fetchHoldingsEntity.setCreatedDate(holdingsEntity.getCreatedDate());
         fetchHoldingsEntity.setDeleted(holdingsEntity.isDeleted());
         fetchHoldingsEntity.setLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
-        fetchHoldingsEntity.setLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
+        fetchHoldingsEntity.setLastUpdatedDate(new Date());
         return fetchHoldingsEntity;
     }
 
-    private ItemEntity copytoHoldingsEntity(ItemEntity fetchItemEntity,ItemEntity itemEntity){
-        fetchItemEntity.setBarcode(itemEntity.getBarcode()); ;
+    private ItemEntity copyItemEntity(ItemEntity fetchItemEntity, ItemEntity itemEntity){
+        fetchItemEntity.setBarcode(itemEntity.getBarcode());
         fetchItemEntity.setCreatedBy(itemEntity.getCreatedBy());
         fetchItemEntity.setCreatedDate(itemEntity.getCreatedDate());
         fetchItemEntity.setDeleted(itemEntity.isDeleted());
         fetchItemEntity.setLastUpdatedBy(itemEntity.getLastUpdatedBy());
-        fetchItemEntity.setLastUpdatedDate(itemEntity.getLastUpdatedDate());
+        fetchItemEntity.setLastUpdatedDate(new Date());
         fetchItemEntity.setCallNumber(itemEntity.getCallNumber());
         fetchItemEntity.setCustomerCode(itemEntity.getCustomerCode());
         fetchItemEntity.setCallNumberType(itemEntity.getCallNumberType());
@@ -359,4 +379,14 @@ public class AccessionService {
         fetchItemEntity.setVolumePartYear(itemEntity.getVolumePartYear());
         return fetchItemEntity;
     }
+
+    private XmlToBibEntityConverterInterface getConverter(String institutionId){
+        if(institutionId.equalsIgnoreCase(RecapConstants.PRINCETON)){
+            return marcToBibEntityConverter;
+        } else if(institutionId.equalsIgnoreCase(RecapConstants.NYPL)){
+            return scsbToBibEntityConverter;
+        }
+        return null;
+    }
+
 }
