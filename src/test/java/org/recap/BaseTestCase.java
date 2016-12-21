@@ -82,6 +82,12 @@ public class BaseTestCase {
     @Autowired
     public UserService userService;
 
+    @Autowired
+    public RolesDetailsRepositorty roleRepository;
+
+    @Autowired
+    public PermissionsRepository permissionsRepository;
+
 
     @Test
     public void loadContexts() {

@@ -2,9 +2,12 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
 import org.recap.model.search.*;
+import org.recap.security.UserManagement;
 import org.recap.util.CollectionServiceUtil;
 import org.recap.util.MarcRecordViewUtil;
 import org.recap.util.SearchRecordsUtil;
@@ -43,10 +46,18 @@ public class CollectionController {
 
     @RequestMapping("/collection")
     public String collection(Model model) {
-        CollectionForm collectionForm = new CollectionForm();
-        model.addAttribute("collectionForm", collectionForm);
-        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
-        return "searchRecords";
+        Subject subject= SecurityUtils.getSubject();
+        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
+        if(subject.isPermitted(permissions.get(UserManagement.WRITE_GCD.getPermissionId())) ||
+                subject.isPermitted(permissions.get(UserManagement.DEACCESSION.getPermissionId()))) {
+            CollectionForm collectionForm = new CollectionForm();
+            model.addAttribute("collectionForm", collectionForm);
+            model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
+            return "searchRecords";
+        }else{
+            return UserManagement.unAuthorized(subject);
+        }
+
     }
 
     @ResponseBody

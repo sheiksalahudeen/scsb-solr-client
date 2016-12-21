@@ -2,6 +2,8 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
@@ -12,6 +14,7 @@ import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
+import org.recap.security.UserManagement;
 import org.recap.util.BibJSONUtil;
 import org.recap.util.RequestServiceUtil;
 import org.slf4j.Logger;
@@ -57,10 +60,16 @@ public class RequestController {
 
     @RequestMapping("/request")
     public String collection(Model model) {
-        RequestForm requestForm = setDefaultsToCreateRequest();
-        model.addAttribute("requestForm", requestForm);
-        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
-        return "searchRecords";
+        Subject subject= SecurityUtils.getSubject();
+        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
+        if(subject.isPermitted(permissions.get(UserManagement.REQUEST_PLACE.getPermissionId()))) {
+            RequestForm requestForm = setDefaultsToCreateRequest();
+            model.addAttribute("requestForm", requestForm);
+            model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
+            return "searchRecords";
+        }else{
+            return UserManagement.unAuthorized(subject);
+        }
     }
 
     @ResponseBody

@@ -6,16 +6,11 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.recap.model.jpa.RoleEntity;
-import org.recap.model.jpa.UsersEntity;
 import org.recap.model.userManagement.UserForm;
-import org.recap.repository.jpa.UserDetailsRepository;
-import org.recap.security.UserService;
+import org.recap.security.AuthenticationService;
+import org.recap.security.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by dharmendrag on 29/11/16.
@@ -23,27 +18,31 @@ import java.util.Set;
 @Component
 public class SimpleAuthorizationRealm extends AuthorizingRealm{
 
-    @Autowired
-    protected UserDetailsRepository userRepo;
+
 
     @Autowired
-    protected UserService userService;
+    private AuthenticationService authenticationService;
 
-    public UserService getUserService() {
-        return userService;
+    @Autowired
+    private AuthorizationService authorizationService;
+
+    public AuthenticationService getAuthenticationService() {
+        return authenticationService;
     }
 
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
-    public UserDetailsRepository getUserRepo() {
-        return userRepo;
+    public AuthorizationService getAuthorizationService() {
+        return authorizationService;
     }
 
-    public void setUserRepo(UserDetailsRepository userRepo) {
-        this.userRepo = userRepo;
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
+
+
 
     public SimpleAuthorizationRealm(){
         setName("simpleAuthRealm");
@@ -56,21 +55,8 @@ public class SimpleAuthorizationRealm extends AuthorizingRealm{
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         Integer loginId=(Integer)principals.fromRealm(getName()).iterator().next();
-        System.out.println("Login Id ---->"+loginId);
-        Set<String> permissionSet=new HashSet<String>();
-
-        UsersEntity usersEntity = userRepo.findByUserId(loginId);
-        if( usersEntity != null ) {
-            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-            for( RoleEntity role :usersEntity.getUserRole()) {
-                info.addRole(role.getRoleName());
-                info.addStringPermissions( role.getPermissions() );
-            }
-
-            return info;
-        } else {
-            return null;
-        }
+        SimpleAuthorizationInfo authorizationInfo=new SimpleAuthorizationInfo();
+        return authorizationService.doAuthorizationInfo(authorizationInfo,loginId);
 
     }
 
@@ -79,13 +65,13 @@ public class SimpleAuthorizationRealm extends AuthorizingRealm{
         UsernamePasswordToken token=(UsernamePasswordToken)authToken;
         UserForm userForm=null;
         try {
-            userForm = userService.toUserForm(userRepo.findByLoginId(token.getUsername()), userForm);
+            userForm=authenticationService.doAuthentication(token);
         }catch(Exception e)
         {
             e.printStackTrace();
         }
-        if(userForm!=null){
-            return new SimpleAuthenticationInfo(userForm.getUserId(),userForm.getPassword(),getName());
+        if(userForm!=null && userForm.isPasswordMatcher()){
+            return new SimpleAuthenticationInfo(userForm.getUserId(),token.getPassword(),getName());
         }
         return null;
     }

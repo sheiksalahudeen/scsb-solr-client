@@ -33,8 +33,8 @@
                                 </div>
                                 <div class="row margin-top-15 text-right">
                                     <div class="col-xs-12">
-                                        <div class="pull-right margin-left-30">
-                                            Welcome Guest <span class="glyphicon glyphicon-menu-down small"></span>
+                                        <div th:with="session=${subject.getSession(false)}" class="pull-right margin-left-30">
+                                            Welcome <span th:text="${session.getAttribute('userName')}"></span> <span class="glyphicon glyphicon-menu-down small"></span>
                                         </div>
                                         <div class="pull-right"><span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy hh:mm a')}"></span></div>
                                     </div>
