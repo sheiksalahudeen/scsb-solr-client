@@ -17,7 +17,7 @@ public class LoginValidator implements Validator {
     public void validate(Object target, Errors errors) {
         UserForm userForm=(UserForm) target;
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "error.username.empty", "Please specify a username.");
-        if(userForm.getInstitution()==null || userForm.getInstitution().equals("0"))
+        if(userForm.getInstitution()==0)
         {
             errors.rejectValue("institution","error.username.notselected","Please select your institution");
         }

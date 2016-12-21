@@ -3,11 +3,15 @@ package org.recap.controller;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.recap.model.userManagement.LoginValidator;
 import org.recap.model.userManagement.UserForm;
+import org.recap.security.UserManagement;
+import org.recap.security.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -29,8 +35,12 @@ public class LoginController {
 
     private LoginValidator loginValidator=new LoginValidator();
 
+    @Autowired
+    private UserService userService;
+
     @RequestMapping(value="/",method= RequestMethod.GET)
     public String loginScreen(HttpServletRequest request, Model model,@ModelAttribute UserForm userForm) {
+        logger.info("Login Screen called");
         return "login";
     }
 
@@ -38,34 +48,44 @@ public class LoginController {
     @RequestMapping(value="/",method=RequestMethod.POST)
     public String createSession(@Valid @ModelAttribute UserForm userForm, HttpServletRequest request, Model model, BindingResult error){
         loginValidator.validate(userForm,error);
+        final String loginScreen="login";
+        Map<Integer,String> permissionMap=null;
         if(userForm==null){
-            return "login";
+            return loginScreen;
         }
         try
         {
             if(error.hasErrors())
             {
+                logger.debug("Login Screen validation failed");
                 return loginScreen(request,model,userForm);
             }
-            UsernamePasswordToken token = new UsernamePasswordToken(userForm.getUsername(),userForm.getPassword(),true);
+            UsernamePasswordToken token = new UsernamePasswordToken(userForm.getUsername()+ UserManagement.TOKEN_SPLITER.getValue()+userForm.getInstitution(),userForm.getPassword(),false);
             Subject subject=SecurityUtils.getSubject();
             subject.login(token);
-            boolean auth=subject.isAuthenticated();
-            if(!auth)
+            if(!subject.isAuthenticated())
             {
-                return "login";
+                throw new AuthenticationException("Subject Authtentication Filed");
             }
+            permissionMap=userService.getPermissions();
+            Session session=subject.getSession(true);
+            session.setAttribute("userName",userForm.getUsername());
+            session.setAttribute("userInstitution",userForm.getInstitution());
+            session.setAttribute("userForm",userForm);
+            session.setAttribute(UserManagement.permissionsMap, Collections.unmodifiableMap(permissionMap));
 
         }
         catch(AuthenticationException e)
         {
+            logger.debug("Authentication exception");
+            logger.error("Exception in authentication : "+e.getMessage());
             error.rejectValue("wrongCredentials","error.invalid.credentials","Invalid Credentials");
-            return "login";
+            return loginScreen;
         }
         catch(Exception e)
         {
-            e.printStackTrace();
-            return "login";
+            logger.error("Exception occured in authentication : "+e.getLocalizedMessage());
+            return loginScreen;
         }
 
             return "redirect:/search";
@@ -74,8 +94,10 @@ public class LoginController {
 
     @RequestMapping("/logout")
     public String logoutUser(){
+        logger.info("Subject Logged out");
         SecurityUtils.getSubject().logout();
         return "redirect:/";
     }
+
 
 }

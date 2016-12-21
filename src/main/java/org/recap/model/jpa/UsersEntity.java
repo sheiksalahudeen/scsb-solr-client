@@ -9,7 +9,7 @@ import java.util.List;
  */
 
 @Entity
-@Table(name="users_t",schema="recap",catalog="")
+@Table(name="user_t",schema="recap",catalog="")
 public class UsersEntity implements Serializable{
     @Id
     @Column(name="user_id")
@@ -18,8 +18,6 @@ public class UsersEntity implements Serializable{
     @Column(name="login_id")
     private String loginId;
 
-    @Column(name="user_password")
-    private String passWord;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name="user_role_t", joinColumns = {
@@ -29,13 +27,10 @@ public class UsersEntity implements Serializable{
             })
     private List<RoleEntity> userRole;
 
-    /*@ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "institution", insertable = false, updatable = false)
-    private InstitutionEntity institutionEntity;*/
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_institution", insertable = false, updatable = false)
+    private InstitutionEntity institutionEntity;
 
-
-    @Column(name="user_institution")
-    private String institutionId;
 
     public Integer getUserId() {
         return userId;
@@ -53,14 +48,6 @@ public class UsersEntity implements Serializable{
         this.loginId = loginId;
     }
 
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
     public List<RoleEntity> getUserRole() {
         return userRole;
     }
@@ -69,18 +56,11 @@ public class UsersEntity implements Serializable{
         this.userRole = userRole;
     }
 
-    public String getInstitutionId() {
-        return institutionId;
+    public InstitutionEntity getInstitutionEntity() {
+        return institutionEntity;
     }
 
-    public void setInstitutionId(String institutionId) {
-        this.institutionId = institutionId;
+    public void setInstitutionEntity(InstitutionEntity institutionEntity) {
+        this.institutionEntity = institutionEntity;
     }
-
-
-
-
-
-
-
 }

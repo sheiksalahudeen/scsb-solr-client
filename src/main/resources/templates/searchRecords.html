@@ -25,16 +25,16 @@
         <div class="row">
             <div class="dashboard-content col-sm-12">
                 <ul id="search-content-tab" class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="tab-search-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}">
+                    <li th:if="${subject.isPermitted('SCSBSearchExport')}" role="presentation" class="tab-search-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/search' ? 'active':''}">
                         <a href="/search" aria-controls="search" class="tab-search"><span class="icons"></span><span>Search</span></a>
                     </li>
-                    <li role="presentation" class="tab-collection-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
+                    <li th:if="${subject.isPermitted('WriteCGD') || subject.isPermitted('DeAccession')}" role="presentation" class="tab-collection-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
                         <a href="/collection" aria-controls="collection" class="tab-collection"><span class="icons"></span><span>Collection</span></a>
                     </li>
-                    <li role="presentation" class="tab-request-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
+                    <li th:if="${subject.isPermitted('RequestPlace')}" role="presentation" class="tab-request-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
                         <a href="/request" aria-controls="request" class="tab-request"><span class="icons"></span><span>Request</span></a>
                     </li>
-                    <li role="presentation" class="tab-reports-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
+                    <li th:if="${subject.isPermitted('ViewPrintReports')}" role="presentation" class="tab-reports-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
                         <a href="/reports" aria-controls="reports" class="tab-reports"><span class="icons"></span><span>Reports</span></a>
                     </li>
                 </ul>

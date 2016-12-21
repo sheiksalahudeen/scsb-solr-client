@@ -1,12 +1,18 @@
 package org.recap.security;
 
 import org.apache.shiro.SecurityUtils;
-import org.recap.model.jpa.UsersEntity;
+import org.recap.model.jpa.PermissionEntity;
 import org.recap.model.userManagement.UserForm;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.jpa.PermissionsRepository;
 import org.recap.repository.jpa.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by dharmendrag on 29/11/16.
@@ -16,40 +22,43 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService{
 
     @Autowired
-    private UserDetailsRepository userDetails;
+    private UserDetailsRepository userDetailsRepository;
+
+    @Autowired
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Autowired
+    private PermissionsRepository permissionsRepository;
+
+    public PermissionsRepository getPermissionsRepository() {
+        return permissionsRepository;
+    }
+
+    public void setPermissionsRepository(PermissionsRepository permissionsRepository) {
+        this.permissionsRepository = permissionsRepository;
+    }
+
+    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
+        return institutionDetailsRepository;
+    }
+
+    public void setInstitutionDetailsRepository(InstitutionDetailsRepository institutionDetailsRepository) {
+        this.institutionDetailsRepository = institutionDetailsRepository;
+    }
 
     public UserDetailsRepository getUserDetails() {
-        return userDetails;
+        return userDetailsRepository;
     }
 
     public void setUserDetails(UserDetailsRepository userDetails) {
-        this.userDetails = userDetails;
+        this.userDetailsRepository = userDetails;
     }
 
     public UserForm findUser(String loginId,UserForm userForm)throws Exception
     {
-        return toUserForm(userDetails.findByLoginId(loginId),userForm);
+        return UserManagement.toUserForm(userDetailsRepository.findByLoginId(loginId),userForm);
     }
-    public UserForm toUserForm(UsersEntity userEntity, UserForm userForm)throws Exception
-    {
-        try
-        {
-            if(userForm==null)
-            {
-                userForm=new UserForm();
-            }
-            userForm.setUserId(userEntity.getUserId());
-            userForm.setUsername(userEntity.getLoginId());
-            userForm.setInstitution(userEntity.getInstitutionId());
-            userForm.setPassword(userEntity.getPassWord());
-            //userForm.setPermissions(userEntity.getUserRole().getPermissions());
 
-        }catch (Exception e)
-        {
-            throw new Exception(e);
-        }
-        return userForm;
-    }
 
     public UserForm getCurrentUser()
     {
@@ -66,8 +75,25 @@ public class UserServiceImpl implements UserService{
     }
 
     public UserForm findUserById(Integer userId) throws Exception {
-        return toUserForm(userDetails.findByUserId(userId),new UserForm());
+        return UserManagement.toUserForm(userDetailsRepository.findByUserId(userId),new UserForm());
     }
+
+    public Map<Integer,String> getPermissions()
+    {
+        Map<Integer,String> permissionsMap=new HashMap<Integer,String>();
+        List<PermissionEntity> permissions=permissionsRepository.findAll();
+
+        for(PermissionEntity permissionEntity:permissions)
+        {
+            permissionsMap.put(permissionEntity.getPermissionId(),permissionEntity.getPermissionName());
+        }
+
+        return permissionsMap;
+    }
+
+
+
+
 
 
 }

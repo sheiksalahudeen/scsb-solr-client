@@ -18,6 +18,16 @@ public class UserForm {
 
     private String wrongCredentials;
 
+    private boolean passwordMatcher;
+
+    public boolean isPasswordMatcher() {
+        return passwordMatcher;
+    }
+
+    public void setPasswordMatcher(boolean passwordMatcher) {
+        this.passwordMatcher = passwordMatcher;
+    }
+
     public String getWrongCredentials() {
         return wrongCredentials;
     }
@@ -36,15 +46,15 @@ public class UserForm {
         this.permissions = permissions;
     }
 
-    public String getInstitution() {
+    public int getInstitution() {
         return institution;
     }
 
-    public void setInstitution(String institution) {
+    public void setInstitution(int institution) {
         this.institution = institution;
     }
 
-    private String institution;
+    private int institution;
 
     public String getPassword() {
         return password;

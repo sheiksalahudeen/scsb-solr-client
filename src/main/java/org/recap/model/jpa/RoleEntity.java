@@ -1,7 +1,7 @@
 package org.recap.model.jpa;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by dharmendrag on 29/11/16.
@@ -19,13 +19,13 @@ public class RoleEntity {
     @Column(name="role_description")
     private String roleDescription;
 
-    @ManyToMany(targetEntity = PermissionEntity.class)
+    @ElementCollection(targetClass = PermissionEntity.class)
     @JoinTable(name="role_permission_t",joinColumns = {
             @JoinColumn(name="role_id",referencedColumnName = "role_id")},
             inverseJoinColumns = {
                     @JoinColumn(name="permission_id",referencedColumnName = "permission_id")
             })
-    private List<String> permissions;
+    private Set<PermissionEntity> permissions;
 
     public int getRoleId() {
         return roleId;
@@ -51,11 +51,11 @@ public class RoleEntity {
         this.roleDescription = roleDescription;
     }
 
-    public List<String> getPermissions() {
+    public Set<PermissionEntity> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<String> permissions) {
+    public void setPermissions(Set<PermissionEntity> permissions) {
         this.permissions = permissions;
     }
 }

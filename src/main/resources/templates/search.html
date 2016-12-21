@@ -332,7 +332,7 @@
                                                 <th data-sorter="false" style="text-align: left;" th:title="'Customer Code'">CC</th>
                                                 <th data-sorter="false" style="text-align: left;" th:title="'Collection Group Designation'">CGD</th>
                                                 <th data-sorter="false" style="text-align: left;" th:title="'Use Restriction'">Use Restriction</th>
-                                                <th data-sorter="false" style="text-align: left;" th:title="'Barcode'">Barcode</th>
+                                                <th th:if="${!subject.isPermitted('BarcodeRestriction')}" data-sorter="false" style="text-align: left;" th:title="'Barcode'">Barcode</th>
                                                 <th data-sorter="false" style="text-align: left;" th:title="'Summary Holdings'">SH</th>
                                             </tr>
                                         </thead>
@@ -392,7 +392,7 @@
                                                 <input type="hidden" th:field="*{searchResultRows[__${searchResultStat.index}__].useRestriction}"/>
                                                 <span data-th-id="'searchResultsDataURS-'+ ${searchResultStat.index}" th:text="${searchResult.useRestriction == 'No Restrictions'} ? '' : ${searchResult.useRestriction}"></span>
                                             </td>
-                                            <td data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
+                                            <td th:if="${!subject.isPermitted('BarcodeRestriction')}" data-th-id="'searchResultsDataBar-'+ ${searchResultStat.index}">
                                                 <input data-th-id="'showItemsInput-'+ ${searchResultStat.index}" name="showItemsInput" type="hidden" th:value="false"/>
                                                 <a class="btn" th:if="${searchResult.showItems}" data-toggle="collapse" th:attr="data-target='.row' + ${searchResultStat.index}" th:onclick="'javascript:showItems('+${searchResultStat.index}+')'">
                                                     <i data-th-id="'showItemsIcon-'+ ${searchResultStat.index}" name="showItemsIcon" class="fa fa-plus-circle" aria-hidden="true" style="font-size: 25px;"></i>
