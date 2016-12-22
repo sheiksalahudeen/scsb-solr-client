@@ -85,7 +85,7 @@ public class LoginControllerUT extends BaseControllerUT {
         UserForm user=new UserForm();
         user.setUsername("jhon");
         user.setPassword("admin1234");
-        user.setInstitution("PUL");
+        user.setInstitution(1);
         return user;
     }
 
