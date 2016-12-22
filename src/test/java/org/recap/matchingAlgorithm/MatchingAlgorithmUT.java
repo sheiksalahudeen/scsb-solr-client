@@ -308,7 +308,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         Integer size = 0;
         long countBasedOnCriteria = matchingMatchPointsDetailsRepository.countBasedOnCriteria(matchCriteria);
         SaveMatchingBibsCallable saveMatchingBibsCallable = new SaveMatchingBibsCallable();
-        saveMatchingBibsCallable.setBibIdList(new ArrayList<>());
+        saveMatchingBibsCallable.setBibIdList(new HashSet<>());
         int totalPagesCount = (int) Math.ceil(countBasedOnCriteria / batchSize);
         ExecutorService executorService = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();

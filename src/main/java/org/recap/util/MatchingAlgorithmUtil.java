@@ -261,47 +261,4 @@ public class MatchingAlgorithmUtil {
         }
         return headerValue;
     }
-
-    public String populateOCLC(List<String> oclcNumbers, BibItem bibItem, String matchingCriteria) {
-        if (CollectionUtils.isNotEmpty(bibItem.getOclcNumber())) {
-            if (matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-                for (String oclcNumber : bibItem.getOclcNumber()) {
-                    if (oclcNumbers.contains(oclcNumber)) {
-                        return oclcNumber;
-                    }
-                }
-            }
-            return bibItem.getOclcNumber().get(0);
-        }
-        return null;
-    }
-
-    public String populateISBN(List<String> isbnList, BibItem bibItem, String matchingCriteria) {
-        if (CollectionUtils.isNotEmpty(bibItem.getIsbn())) {
-            if (matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-                for (String isbn : bibItem.getIsbn()) {
-                    if (isbnList.contains(isbn)) {
-                        return isbn;
-                    }
-                }
-            }
-            return bibItem.getIsbn().get(0);
-        }
-        return null;
-    }
-
-    public String populateISSN(List<String> issnList, BibItem bibItem, String matchingCriteria) {
-        if (CollectionUtils.isNotEmpty(bibItem.getIssn())) {
-            if (matchingCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-                for (String issn : bibItem.getIssn()) {
-                    if (issnList.contains(issn)) {
-                        return issn;
-                    }
-                }
-            }
-            return bibItem.getIssn().get(0);
-        }
-        return null;
-    }
-
 }
