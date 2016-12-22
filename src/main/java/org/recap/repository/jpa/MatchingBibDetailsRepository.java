@@ -34,39 +34,48 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
     @Query(value = "select bib_id from matching_bib_t where bib_id in (select bib_Id from matching_bib_t group by BIB_ID having count(bib_id) = 1) and matching =?1", nativeQuery = true)
     List<Integer> getSingleMatchBibIdsBasedOnMatching(String matching);
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.oclc = MB3.oclc and MB2.isbn = MB3.isbn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForOclcAndIsbn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where bib_id in (select bib_id from matching_bib_t " +
+            "where MATCHING in ('OCLCNumber','ISBN') group by bib_id having count(bib_id) > 1) and " +
+            "MATCHING in ('OCLCNumber','ISBN')", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForOclcAndIsbn();
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.oclc = MB3.oclc and MB2.issn = MB3.issn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForOclcAndIssn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where " +
+            "bib_id in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in ((select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISBN') group by bib_id having count(bib_id) > 1)) and " +
+            "MATCHING in ('OCLCNumber','ISSN') order by bib_id", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForOclcAndIssn();
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.oclc = MB3.oclc and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForOclcAndLccn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where " +
+            "bib_id in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','LCCN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in ((select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISBN') group by bib_id having count(bib_id) > 1)) and " +
+            "MATCHING in ('OCLCNumber','LCCN') order by bib_id", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForOclcAndLccn();
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.isbn = MB3.isbn and MB2.issn = MB3.issn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForIsbnAndIssn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where " +
+            "bib_id in (select bib_id from matching_bib_t where MATCHING in ('ISBN','ISSN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','LCCN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by bib_id having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISBN') group by bib_id having count(bib_id) > 1) and " +
+            "MATCHING in ('ISBN','ISSN') order by bib_id", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForIsbnAndIssn();
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.isbn = MB3.isbn and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForIsbnAndLccn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where " +
+            "bib_id in (select bib_id from matching_bib_t where MATCHING in ('ISBN','LCCN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('ISBN','ISSN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','LCCN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISBN') group by BIB_ID having count(bib_id) > 1) and " +
+            "MATCHING in ('ISBN','ISSN') order by bib_id", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForIsbnAndLccn();
 
-    @Query(value = "select MB2.bibId from MatchingBibEntity MB2, MatchingBibEntity MB3\n" +
-            "where MB2.issn = MB3.issn and MB2.lccn = MB3.lccn and MB2.id = MB3.id \n" +
-            "and MB2.matching in (?1, ?2)\n" +
-            "group by MB2.bibId having count(MB2.bibId) > 1")
-    List<Integer> getMultiMatchBibIdsForIssnAndLccn(String matchingCriteria1, String matchingCriteria2);
+    @Query(value = "select distinct bib_id from matching_bib_t where " +
+            "bib_id in (select bib_id from matching_bib_t where MATCHING in ('ISSN','LCCN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISBN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('ISBN','LCCN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('ISBN','ISSN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','LCCN') group by BIB_ID having count(bib_id) > 1) and " +
+            "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by BIB_ID having count(bib_id) > 1) and " +
+            "MATCHING in ('ISBN','ISSN') order by bib_id", nativeQuery = true)
+    List<Integer> getMultiMatchBibIdsForIssnAndLccn();
 }

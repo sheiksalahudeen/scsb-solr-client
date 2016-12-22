@@ -6,6 +6,8 @@ import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import java.util.List;
  */
 @Component
 public class MatchingAlgorithmProcessor {
+
+    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmProcessor.class);
 
     @Autowired
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
@@ -31,7 +35,19 @@ public class MatchingAlgorithmProcessor {
     }
 
     public void saveMatchingBibEntity(List<MatchingBibEntity> matchingBibEntities){
-        matchingBibDetailsRepository.save(matchingBibEntities);
+        try {
+            matchingBibDetailsRepository.save(matchingBibEntities);
+        } catch (Exception ex) {
+            logger.info("Exception : " + ex.getMessage());
+            for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
+                try {
+                    matchingBibDetailsRepository.save(matchingBibEntity);
+                } catch (Exception e) {
+                    logger.info("Exception for single Entity : " + e.getMessage());
+                    logger.info("ISBN : " + matchingBibEntity.getIsbn());
+                }
+            }
+        }
     }
 
     public void saveMatchingReportEntity(List<ReportEntity> reportEntityList) {

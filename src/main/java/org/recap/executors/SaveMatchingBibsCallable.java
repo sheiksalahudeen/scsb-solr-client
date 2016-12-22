@@ -2,6 +2,7 @@ package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -14,18 +15,19 @@ import org.recap.model.solr.BibItem;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.SolrQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
  * Created by angelind on 4/11/16.
  */
 public class SaveMatchingBibsCallable implements Callable {
+
+    Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
 
     private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
     private String matchCriteria;
@@ -37,7 +39,7 @@ public class SaveMatchingBibsCallable implements Callable {
     private MatchingAlgorithmUtil matchingAlgorithmUtil;
 
     List<BibValueResolver> bibValueResolvers;
-    private static List<Integer> bibIdList;
+    private static Set<Integer> bibIdList;
 
     public SaveMatchingBibsCallable() {
     }
@@ -71,21 +73,22 @@ public class SaveMatchingBibsCallable implements Callable {
                 BibItem bibItem = new BibItem();
                 populateBibItem(solrDocument, bibItem);
                 Integer bibId = bibItem.getBibId();
-                if(!getBibIdList().contains(bibId)) {
+                if (!isBibIdDuplicate(bibId)) {
                     MatchingBibEntity matchingBibEntity = new MatchingBibEntity();
                     matchingBibEntity.setBibId(bibId);
                     matchingBibEntity.setRoot(bibItem.getRoot());
                     matchingBibEntity.setOwningInstitution(bibItem.getOwningInstitution());
                     matchingBibEntity.setOwningInstBibId(bibItem.getOwningInstitutionBibId());
                     matchingBibEntity.setTitle(bibItem.getTitleDisplay());
-                    matchingBibEntity.setOclc(matchingAlgorithmUtil.populateOCLC(matchingCriteriaValues, bibItem, matchCriteria));
-                    matchingBibEntity.setIsbn(matchingAlgorithmUtil.populateISBN(matchingCriteriaValues, bibItem, matchCriteria));
-                    matchingBibEntity.setIssn(matchingAlgorithmUtil.populateISSN(matchingCriteriaValues, bibItem, matchCriteria));
+                    matchingBibEntity.setOclc(CollectionUtils.isNotEmpty(bibItem.getOclcNumber()) ? StringUtils.join(bibItem.getOclcNumber(), ",") : null);
+                    matchingBibEntity.setIsbn(CollectionUtils.isNotEmpty(bibItem.getIsbn()) ? StringUtils.join(bibItem.getIsbn(), ",") : null);
+                    matchingBibEntity.setIssn(CollectionUtils.isNotEmpty(bibItem.getIssn()) ? StringUtils.join(bibItem.getIssn(), ",") : null);
                     matchingBibEntity.setLccn(bibItem.getLccn());
                     matchingBibEntity.setMaterialType(bibItem.getLeaderMaterialType());
                     matchingBibEntity.setMatching(matchCriteria);
-                    matchingBibEntityList.add(matchingBibEntity);
-                    addBibIdToList(bibId);
+                    if(addBibIdToList(bibId)) {
+                        matchingBibEntityList.add(matchingBibEntity);
+                    }
                 }
             }
             if (CollectionUtils.isNotEmpty(matchingBibEntityList)) {
@@ -110,18 +113,25 @@ public class SaveMatchingBibsCallable implements Callable {
         }
     }
 
-    public static void addBibIdToList(Integer bibId) {
-        getBibIdList().add(bibId);
+    public synchronized static boolean addBibIdToList(Integer bibId) {
+        return getBibIdList().add(bibId);
     }
 
-    public static List<Integer> getBibIdList() {
+    public synchronized static Set<Integer> getBibIdList() {
         if(bibIdList == null) {
-            bibIdList = new ArrayList<>();
+            bibIdList = new HashSet<>();
         }
         return bibIdList;
     }
 
-    public static void setBibIdList(List<Integer> bibIdList) {
+    public synchronized static boolean isBibIdDuplicate(Integer bibId) {
+        if(getBibIdList().contains(bibId)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void setBibIdList(Set<Integer> bibIdList) {
         SaveMatchingBibsCallable.bibIdList = bibIdList;
     }
 
