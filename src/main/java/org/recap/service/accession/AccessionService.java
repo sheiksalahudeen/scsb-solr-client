@@ -145,7 +145,7 @@ public class AccessionService {
         List<Map<String,String>> responseMapList = new ArrayList<>();
         try {
             if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-                bibDataResponse = princetonService.getBibData(itemBarcode, customerCode);
+                bibDataResponse = princetonService.getBibData(itemBarcode);
                 List<Record> records = new ArrayList<>();
                 if (StringUtils.isNotBlank(bibDataResponse)) {
                     records = getMarcUtil().readMarcXml(bibDataResponse);
