@@ -1,27 +1,26 @@
 package org.recap.util;
 
 import com.google.common.collect.Lists;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.jpa.MatchingBibEntity;
+import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
-import org.recap.model.solr.BibItem;
-import org.recap.model.solr.Holdings;
-import org.recap.model.solr.Item;
-import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
+import org.recap.repository.jpa.MatchingBibDetailsRepository;
+import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -30,235 +29,312 @@ import java.util.*;
 @Component
 public class MatchingAlgorithmUtil {
 
+    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
+
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    ProducerTemplate producerTemplate;
+
+    @Autowired
+    MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
+
+    @Autowired
+    MatchingBibDetailsRepository matchingBibDetailsRepository;
 
     @Autowired
     SolrTemplate solrTemplate;
 
-    @Autowired
-    BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
+    String and = " AND ";
+    String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
-    @Autowired
-    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
-    String or = " OR ";
+    public void getSingleMatchBibsAndSaveReport(Integer batchSize, String matching) {
+        Map<String, Set<Integer>> criteriaMap = new HashMap<>();
+        Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        List<Integer> singleMatchBibIdsBasedOnMatching = matchingBibDetailsRepository.getSingleMatchBibIdsBasedOnMatching(matching);
+        stopWatch.stop();
+        logger.info("Time taken to fetch " + matching + " from db : " + stopWatch.getTotalTimeSeconds());
+        logger.info("Total " + matching + " : " + singleMatchBibIdsBasedOnMatching.size());
 
-    public List<ReportEntity> populateReportEntities(List<MatchingBibEntity> matchingBibEntities, String type) throws IOException, SolrServerException {
-
-        List<ReportEntity> reportEntityList = new ArrayList<>();
-        Map<Integer, List<ReportEntity>> reportEntityMap = new HashMap<>();
-        Map<String, List<Item>> itemMap = new HashMap<>();
-        Map<String, List<Holdings>> holdingsMap = new HashMap<>();
-        List<List<MatchingBibEntity>> partitionedBibItems = Lists.partition(matchingBibEntities, 300);
-        for (Iterator<List<MatchingBibEntity>> iterator = partitionedBibItems.iterator(); iterator.hasNext(); ) {
-            List<MatchingBibEntity> matchingBibEntityList = iterator.next();
-            SolrQuery solrQuery = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + getRootIds(matchingBibEntityList));
-            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-            SolrDocumentList solrDocuments = queryResponse.getResults();
-            if (solrDocuments.getNumFound() > 10) {
-                solrQuery.setRows((int) solrDocuments.getNumFound());
-                queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-                solrDocuments = queryResponse.getResults();
-            }
-            populateItemHoldingsInfo(itemMap, holdingsMap, solrDocuments);
-        }
-
-        getReportEntityMap(matchingBibEntities, reportEntityMap, itemMap, holdingsMap, type);
-
-        for (Iterator<Integer> iterator = reportEntityMap.keySet().iterator(); iterator.hasNext(); ) {
-            Integer bibId = iterator.next();
-            reportEntityList.addAll(reportEntityMap.get(bibId));
-        }
-        return reportEntityList;
-    }
-
-    public void getReportEntityMap(List<MatchingBibEntity> matchingBibEntities, Map<Integer, List<ReportEntity>> reportEntityMap, Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap, String type) {
-        for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
-            List<Item> itemList = itemMap.get(matchingBibEntity.getRoot());
-            List<Holdings> holdingsList = holdingsMap.get(matchingBibEntity.getRoot());
-            Integer bibId = matchingBibEntity.getBibId();
-            if(reportEntityMap.containsKey(bibId)) {
-                List<ReportEntity> reportEntities = reportEntityMap.get(bibId);
-                for(ReportEntity reportEntity : reportEntities) {
-                    ReportDataEntity reportDataEntityForCriteria = getReportDataEntityForCriteria(matchingBibEntity);
-                    reportEntity.addAll(Arrays.asList(reportDataEntityForCriteria));
-                }
-            } else {
-                List<ReportEntity> reportEntities = new ArrayList<>();
-                if(CollectionUtils.isNotEmpty(itemList)) {
-                    Holdings holdings = CollectionUtils.isNotEmpty(holdingsList) ? holdingsList.get(0) : new Holdings();
-                    for(Item item : itemList) {
-                        reportEntities.add(populateReportEntity(matchingBibEntity, item, holdings, type));
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(singleMatchBibIdsBasedOnMatching)) {
+            List<List<Integer>> bibIdLists = Lists.partition(singleMatchBibIdsBasedOnMatching, batchSize);
+            logger.info("Total " + matching + " list : " + bibIdLists.size());
+            for (Iterator<List<Integer>> iterator = bibIdLists.iterator(); iterator.hasNext(); ) {
+                List<Integer> bibIds = iterator.next();
+                List<MatchingBibEntity> matchingBibEntities = matchingBibDetailsRepository.getBibEntityBasedOnBibIds(bibIds);
+                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(matchingBibEntities)) {
+                    for (Iterator<MatchingBibEntity> matchingBibEntityIterator = matchingBibEntities.iterator(); matchingBibEntityIterator.hasNext(); ) {
+                        MatchingBibEntity matchingBibEntity = matchingBibEntityIterator.next();
+                        Integer bibId = matchingBibEntity.getBibId();
+                        String matchCriteriaValue = getMatchCriteriaValue(matching, matchingBibEntity);
+                        if(!bibEntityMap.containsKey(bibId)) {
+                            bibEntityMap.put(bibId, matchingBibEntity);
+                        }
+                        populateCriteriaMap(criteriaMap, bibId, matchCriteriaValue);
                     }
-                    reportEntityMap.put(bibId, reportEntities);
+                }
+            }
+
+            Set<String> criteriaValueSet = new HashSet<>();
+            for (Iterator<String> iterator = criteriaMap.keySet().iterator(); iterator.hasNext(); ) {
+                String criteriaValue = iterator.next();
+                if (!criteriaValueSet.contains(criteriaValue) && criteriaMap.get(criteriaValue).size() > 1) {
+                    StringBuilder matchPointValue = new StringBuilder();
+                    criteriaValueSet.add(criteriaValue);
+                    Set<Integer> tempBibIds = new HashSet<>();
+                    List<Integer> tempBibIdList = new ArrayList<>();
+                    Set<Integer> bibIds = criteriaMap.get(criteriaValue);
+                    tempBibIds.addAll(bibIds);
+                    for (Integer bibId : bibIds) {
+                        MatchingBibEntity matchingBibEntity = bibEntityMap.get(bibId);
+                        matchPointValue.append(StringUtils.isNotBlank(matchPointValue.toString()) ? "," : "").append(getMatchCriteriaValue(matching, matchingBibEntity));
+                        String[] criteriaValueList = matchPointValue.toString().split(",");
+                        tempBibIds.addAll(getBibIdsForCriteriaValue(criteriaMap, criteriaValueSet, criteriaValue, matching, criteriaValueList, bibEntityMap, matchPointValue));
+                    }
+                    tempBibIdList.addAll(tempBibIds);
+                    saveReportForSingleMatch(matchPointValue.toString(), tempBibIdList, matching, bibEntityMap);
                 }
             }
         }
     }
 
-    public String getRootIds(List<MatchingBibEntity> matchingBibEntities) {
-        StringBuilder rootIds = new StringBuilder();
-        rootIds.append("(");
-        for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
-            MatchingBibEntity matchingBibEntity = iterator.next();
-            rootIds.append(matchingBibEntity.getRoot());
-            if(iterator.hasNext()){
-                rootIds.append(or);
-            }
-        }
-        rootIds.append(")");
-        return rootIds.toString();
-    }
-
-    public ReportEntity populateReportEntity(MatchingBibEntity matchingBibEntity, Item item, Holdings holdings, String type) {
-        ReportEntity reportEntity = new ReportEntity();
-        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-
-        ReportDataEntity localBibIdReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_LOCAL_BIB_ID, String.valueOf(matchingBibEntity.getBibId()));
-        if (localBibIdReportDataEntity != null) reportDataEntities.add(localBibIdReportDataEntity);
-
-        ReportDataEntity owningInstBibIdReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_BIB_ID, matchingBibEntity.getOwningInstBibId());
-        if (owningInstBibIdReportDataEntity != null) reportDataEntities.add(owningInstBibIdReportDataEntity);
-
-        ReportDataEntity titleReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_TITLE, checkAndTruncateHeaderValue(matchingBibEntity.getTitle()));
-        if (titleReportDataEntity != null) reportDataEntities.add(titleReportDataEntity);
-
-        ReportDataEntity barcodeReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_BARCODE, item.getBarcode());
-        if (barcodeReportDataEntity != null) reportDataEntities.add(barcodeReportDataEntity);
-
-        ReportDataEntity volumePartYearReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_VOLUME_PART_YEAR, item.getVolumePartYear());
-        if (volumePartYearReportDataEntity != null) reportDataEntities.add(volumePartYearReportDataEntity);
-
-        ReportDataEntity institutionReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_INSTITUTION_ID, matchingBibEntity.getOwningInstitution());
-        if (institutionReportDataEntity != null) reportDataEntities.add(institutionReportDataEntity);
-
-        ReportDataEntity useRestrictionsReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_USE_RESTRICTIONS, item.getUseRestriction());
-        if (useRestrictionsReportDataEntity != null) reportDataEntities.add(useRestrictionsReportDataEntity);
-
-        ReportDataEntity summaryHoldingsReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_SUMMARY_HOLDINGS, checkAndTruncateHeaderValue(holdings.getSummaryHoldings()));
-        if (summaryHoldingsReportDataEntity != null) reportDataEntities.add(summaryHoldingsReportDataEntity);
-
-        ReportDataEntity materialTypeReportDataEntity = getReportDataEntity(RecapConstants.MATCHING_MATERIAL_TYPE, matchingBibEntity.getMaterialType());
-        if (materialTypeReportDataEntity != null) reportDataEntities.add(materialTypeReportDataEntity);
-
-        ReportDataEntity matchingFieldReportDataEntity = getReportDataEntityForCriteria(matchingBibEntity);
-        if (matchingFieldReportDataEntity != null) reportDataEntities.add(matchingFieldReportDataEntity);
-        reportEntity.setFileName(type.equalsIgnoreCase(RecapConstants.MATCHING_TYPE) ? RecapConstants.MATCHING_ALGO_FULL_FILE_NAME : RecapConstants.EXCEPTION_REPORT_FILE_NAME);
-        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
-        reportEntity.setType(type);
-        reportEntity.setCreatedDate(new Date());
-        reportEntity.addAll(reportDataEntities);
-        return reportEntity;
-    }
-
-    public void getMatchingEntitiesMap(Map<String, List<MatchingBibEntity>> matchingMap, MatchingBibEntity matchingBibEntity, String matchingValue) {
-        if(matchingMap.containsKey(matchingValue)) {
-            List<MatchingBibEntity> matchingBibEntityList = new ArrayList<>();
-            matchingBibEntityList.addAll(matchingMap.get(matchingValue));
-            matchingBibEntityList.add(matchingBibEntity);
-            matchingMap.put(matchingValue, matchingBibEntityList);
-        } else {
-            matchingMap.put(matchingValue, Arrays.asList(matchingBibEntity));
-        }
-    }
-
-    public Set<MatchingBibEntity> getUnMatchingBibsAfterTitleVerification(List<MatchingBibEntity> matchingBibEntities) {
-        Set<MatchingBibEntity> unMatchedBibEntitySet = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(matchingBibEntities)) {
-            for (int i = 0; i < matchingBibEntities.size(); i++) {
-                for (int j = 0; j < matchingBibEntities.size(); j++) {
-                    if (i != j) {
-                        MatchingBibEntity tempMatchingBibEntity1 = matchingBibEntities.get(i);
-                        MatchingBibEntity tempMatchingBibEntity2 = matchingBibEntities.get(j);
-                        String tempTitle1 = tempMatchingBibEntity1.getTitle();
-                        String tempTitle2 = tempMatchingBibEntity2.getTitle();
-                        if (StringUtils.isNotBlank(tempTitle1) && StringUtils.isNotBlank(tempTitle2)) {
-                            tempTitle1 = tempTitle1.replaceAll("[^\\w\\s]", " ").trim();
-                            tempTitle2 = tempTitle2.replaceAll("[^\\w\\s]", " ").trim();
-                            String title1 = matchingAlgorithmHelperService.getTitleToMatch(tempTitle1.replaceAll("\\s{2,}", " "));
-                            String title2 = matchingAlgorithmHelperService.getTitleToMatch(tempTitle2.replaceAll("\\s{2,}", " "));
-                            if (!title1.equalsIgnoreCase(title2)) {
-                                unMatchedBibEntitySet.add(tempMatchingBibEntity2);
-                                unMatchedBibEntitySet.add(tempMatchingBibEntity1);
+    public Set<Integer> getBibIdsForCriteriaValue(Map<String, Set<Integer>> criteriaMap, Set<String> criteriaValueSet, String criteriaValue,
+                                                   String matching, String[] criteriaValueList, Map<Integer, MatchingBibEntity> bibEntityMap, StringBuilder matchPointValue) {
+        Set<Integer> tempBibIdSet = new HashSet<>();
+        for (String value : criteriaValueList) {
+            criteriaValueSet.add(value);
+            if (!value.equalsIgnoreCase(criteriaValue)) {
+                Set<Integer> bibIdSet = criteriaMap.get(value);
+                if (org.apache.commons.collections.CollectionUtils.isNotEmpty(bibIdSet)) {
+                    for(Integer bibId : bibIdSet) {
+                        MatchingBibEntity matchingBibEntity = bibEntityMap.get(bibId);
+                        String matchCriteriaValue = getMatchCriteriaValue(matching, matchingBibEntity);
+                        String[] matchCriteriaValueList = matchCriteriaValue.split(",");
+                        for(String matchingValue : matchCriteriaValueList) {
+                            if(!criteriaValueSet.contains(matchingValue)) {
+                                matchPointValue.append(StringUtils.isNotBlank(matchPointValue.toString()) ? "," : "").append(matchingValue);
+                                criteriaValueSet.add(matchingValue);
                             }
                         }
                     }
+                    tempBibIdSet.addAll(bibIdSet);
                 }
             }
         }
-        return unMatchedBibEntitySet;
+        return tempBibIdSet;
     }
 
-    private ReportDataEntity getReportDataEntity(String headerName, String headerValue) {
-        if (StringUtils.isNotBlank(headerName) && StringUtils.isNotBlank(headerValue)) {
-            ReportDataEntity reportDataEntity = new ReportDataEntity();
-            reportDataEntity.setHeaderName(headerName);
-            reportDataEntity.setHeaderValue(headerValue);
-            return reportDataEntity;
-        }
-        return null;
-    }
+    public void saveReportForSingleMatch(String criteriaValue, List<Integer> bibIdList, String criteria, Map<Integer, MatchingBibEntity> matchingBibEntityMap) {
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        Set<String> owningInstSet = new HashSet<>();
+        List<Integer> bibIds = new ArrayList<>();
+        List<String> materialTypes = new ArrayList<>();
 
-    private ReportDataEntity getReportDataEntityForCriteria(MatchingBibEntity matchingBibEntity) {
-        String criteria = matchingBibEntity.getMatching();
-        ReportDataEntity reportDataEntity = null;
-        if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_OCLC, matchingBibEntity.getOclc());
-        } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_ISBN, matchingBibEntity.getIsbn());
-        } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_ISSN, matchingBibEntity.getIssn());
-        } else if (criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
-            reportDataEntity = getReportDataEntity(RecapConstants.MATCHING_LCCN, matchingBibEntity.getLccn());
-        }
-        return reportDataEntity;
-    }
-
-    private void populateItemHoldingsInfo(Map<String, List<Item>> itemMap, Map<String, List<Holdings>> holdingsMap, SolrDocumentList solrDocuments) {
-        for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
-            SolrDocument solrDocument = iterator.next();
-            String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
-            if (docType.equalsIgnoreCase(RecapConstants.ITEM)) {
-                String fieldValue = (String) solrDocument.getFieldValue(RecapConstants.COLLECTION_GROUP_DESIGNATION);
-                if (fieldValue.equalsIgnoreCase(RecapConstants.SHARED_CGD)) {
-                    Item item = bibSolrDocumentRepository.getItem(solrDocument);
-                    String itemRoot = item.getRoot();
-                    if(itemMap.containsKey(itemRoot)) {
-                        List<Item> itemList = new ArrayList<>();
-                        itemList.addAll(itemMap.get(itemRoot));
-                        if(!itemList.contains(item.getItemId())) {
-                            itemList.add(item);
-                            itemMap.put(itemRoot, itemList);
-                        }
-                    } else {
-                        itemMap.put(itemRoot, Arrays.asList(item));
-                    }
+        for (Iterator<Integer> iterator = bibIdList.iterator(); iterator.hasNext(); ) {
+            Integer bibId = iterator.next();
+            MatchingBibEntity matchingBibEntity = matchingBibEntityMap.get(bibId);
+            int index=0;
+            if(!owningInstSet.contains(matchingBibEntity.getOwningInstitution())) {
+                owningInstSet.add(matchingBibEntity.getOwningInstitution());
+                bibIds.add(bibId);
+                materialTypes.add(matchingBibEntity.getMaterialType());
+                index = index + 1;
+                if(StringUtils.isNotBlank(matchingBibEntity.getTitle())) {
+                    ReportDataEntity titleReportDataEntity = new ReportDataEntity();
+                    titleReportDataEntity.setHeaderName("Title" + index);
+                    titleReportDataEntity.setHeaderValue(matchingBibEntity.getTitle());
+                    reportDataEntities.add(titleReportDataEntity);
                 }
             }
-            if (docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
-                Holdings holdings = bibSolrDocumentRepository.getHoldings(solrDocument);
-                String holdingsRoot = holdings.getRoot();
-                if(holdingsMap.containsKey(holdingsRoot)) {
-                    List<Holdings> holdingsList = new ArrayList<>();
-                    holdingsList.addAll(holdingsMap.get(holdingsRoot));
-                    if(!holdingsList.contains(holdings.getHoldingsId())) {
-                        holdingsList.add(holdings);
-                        holdingsMap.put(holdingsRoot, holdingsList);
-                    }
+        }
+        if(owningInstSet.size() > 1) {
+            ReportEntity reportEntity = new ReportEntity();
+            reportEntity.setFileName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
+            reportEntity.setType("SingleMatch");
+            reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+            reportEntity.setCreatedDate(new Date());
+
+            if(CollectionUtils.isNotEmpty(bibIds)) {
+                ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, "BibId");
+                reportDataEntities.add(bibIdReportDataEntity);
+            }
+
+            if(CollectionUtils.isNotEmpty(owningInstSet)) {
+                ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
+                reportDataEntities.add(owningInstReportDataEntity);
+            }
+
+            if(CollectionUtils.isNotEmpty(materialTypes)) {
+                ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
+                reportDataEntities.add(materialTypeReportDataEntity);
+            }
+
+            ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
+            criteriaReportDataEntity.setHeaderName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
+            criteriaReportDataEntity.setHeaderValue(criteriaValue);
+            reportDataEntities.add(criteriaReportDataEntity);
+
+            reportEntity.addAll(reportDataEntities);
+            producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
+        }
+    }
+
+    private ReportDataEntity getReportDataEntityForCollectionValues(Collection headerValues, String headerName) {
+        ReportDataEntity bibIdReportDataEntity = new ReportDataEntity();
+        bibIdReportDataEntity.setHeaderName(headerName);
+        bibIdReportDataEntity.setHeaderValue(StringUtils.join(headerValues, ","));
+        return bibIdReportDataEntity;
+    }
+
+    public void populateBibIdWithMatchingCriteriaValue(Map<String, Set<Integer>> criteria1Map, List<MatchingBibEntity> matchingBibEntities, String matchCriteria1, String matchCriteria2, Map<Integer, MatchingBibEntity> bibEntityMap) {
+        for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
+            MatchingBibEntity matchingBibEntity = iterator.next();
+            Integer bibId = matchingBibEntity.getBibId();
+            String matching = matchingBibEntity.getMatching();
+            if(!bibEntityMap.containsKey(bibId)) {
+                bibEntityMap.put(bibId, matchingBibEntity);
+            }
+            if(matching.equalsIgnoreCase(matchCriteria1)) {
+                String criteriaValue1 = getMatchCriteriaValue(matchCriteria1, matchingBibEntity);
+                populateCriteriaMap(criteria1Map, bibId, criteriaValue1);
+            }
+        }
+    }
+
+    public void populateCriteriaMap(Map<String, Set<Integer>> criteriaMap, Integer bibId, String value) {
+
+        String[] criteriaValues = value.split(",");
+        for(String criteriaValue : criteriaValues) {
+            if(StringUtils.isNotBlank(criteriaValue)) {
+                if(criteriaMap.containsKey(criteriaValue)) {
+                    Set<Integer> bibIdSet = new HashSet<>();
+                    Set<Integer> bibIds = criteriaMap.get(criteriaValue);
+                    bibIdSet.addAll(bibIds);
+                    bibIdSet.add(bibId);
+                    criteriaMap.put(criteriaValue, bibIdSet);
                 } else {
-                    holdingsMap.put(holdingsRoot, Arrays.asList(holdings));
+                    Set<Integer> bibIdSet = new HashSet<>();
+                    bibIdSet.add(bibId);
+                    criteriaMap.put(criteriaValue,bibIdSet);
                 }
             }
         }
     }
 
-    private String checkAndTruncateHeaderValue(String headerValue) {
-        if (StringUtils.isNotBlank(headerValue) && headerValue.length() > 7999) {
-            String headerValueSubString = headerValue.substring(0, 7996);
-            headerValueSubString = headerValueSubString.concat("...");
-            return headerValueSubString;
+    public String getMatchCriteriaValue(String matchCriteria, MatchingBibEntity matchingBibEntity) {
+        if(matchCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
+            return matchingBibEntity.getOclc();
+        } else if (matchCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
+            return matchingBibEntity.getIsbn();
+        } else if (matchCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
+            return matchingBibEntity.getIssn();
+        } else if (matchCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
+            return matchingBibEntity.getLccn();
         }
-        return headerValue;
+        return "";
     }
+
+    public void populateAndSaveReportEntity(Set<Integer> bibIds, Map<Integer, MatchingBibEntity> bibEntityMap, String header1, String header2, String oclcNumbers, String isbns) {
+        ReportEntity reportEntity = new ReportEntity();
+        Set<String> owningInstSet = new HashSet<>();
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
+        reportEntity.setFileName(header1 + "," + header2);
+        reportEntity.setType("MultiMatch");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+        List<Integer> bibIdList = new ArrayList<>();
+        List<String> materialTypes = new ArrayList<>();
+
+        for (Iterator<Integer> integerIterator = bibIds.iterator(); integerIterator.hasNext(); ) {
+            Integer bibId = integerIterator.next();
+            MatchingBibEntity matchingBibEntity = bibEntityMap.get(bibId);
+            if(!owningInstSet.contains(matchingBibEntity.getOwningInstitution())) {
+                owningInstSet.add(matchingBibEntity.getOwningInstitution());
+                bibIdList.add(matchingBibEntity.getBibId());
+                materialTypes.add(matchingBibEntity.getMaterialType());
+            }
+        }
+        if(owningInstSet.size() > 1) {
+            if(CollectionUtils.isNotEmpty(bibIdList)) {
+                ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIdList, "BibId");
+                reportDataEntities.add(bibIdReportDataEntity);
+            }
+
+            if(CollectionUtils.isNotEmpty(owningInstSet)) {
+                ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
+                reportDataEntities.add(owningInstReportDataEntity);
+            }
+
+            if(CollectionUtils.isNotEmpty(materialTypes)) {
+                ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
+                reportDataEntities.add(materialTypeReportDataEntity);
+            }
+
+            if(StringUtils.isNotBlank(oclcNumbers)) {
+                ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
+                criteriaReportDataEntity.setHeaderName(header1);
+                criteriaReportDataEntity.setHeaderValue(oclcNumbers);
+                reportDataEntities.add(criteriaReportDataEntity);
+            }
+
+            if(StringUtils.isNotBlank(isbns)) {
+                ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
+                criteriaReportDataEntity.setHeaderValue(isbns);
+                criteriaReportDataEntity.setHeaderName(header2);
+                reportDataEntities.add(criteriaReportDataEntity);
+            }
+            reportEntity.addAll(reportDataEntities);
+            producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
+        }
+    }
+
+    public List<MatchingMatchPointsEntity> getMatchingMatchPointsEntity(String fieldName) throws Exception {
+        List<MatchingMatchPointsEntity> matchingMatchPointsEntities = new ArrayList<>();
+        String query = RecapConstants.DOCTYPE + ":" + RecapConstants.BIB + and + RecapConstants.IS_DELETED_BIB + ":false" + and + coreParentFilterQuery + RecapConstants.COLLECTION_GROUP_DESIGNATION
+                + ":" + RecapConstants.SHARED_CGD + and + coreParentFilterQuery + RecapConstants.IS_DELETED_ITEM + ":false";
+        SolrQuery solrQuery = new SolrQuery(query);
+        solrQuery.setFacet(true);
+        solrQuery.addFacetField(fieldName);
+        solrQuery.setFacetLimit(-1);
+        solrQuery.setFacetMinCount(2);
+        solrQuery.setRows(0);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        stopWatch.stop();
+        logger.info("Total Time Taken to get "+ fieldName +" duplicates from solr : " + stopWatch.getTotalTimeSeconds());
+        List<FacetField> facetFields = queryResponse.getFacetFields();
+        for (FacetField facetField : facetFields) {
+            List<FacetField.Count> values = facetField.getValues();
+            for (Iterator<FacetField.Count> iterator = values.iterator(); iterator.hasNext(); ) {
+                FacetField.Count next = iterator.next();
+                String name = next.getName();
+                if(StringUtils.isNotBlank(name)) {
+                    MatchingMatchPointsEntity matchingMatchPointsEntity = new MatchingMatchPointsEntity();
+                    matchingMatchPointsEntity.setMatchCriteria(fieldName);
+                    matchingMatchPointsEntity.setCriteriaValue(name);
+                    matchingMatchPointsEntity.setCriteriaValueCount((int) next.getCount());
+                    matchingMatchPointsEntities.add(matchingMatchPointsEntity);
+                }
+            }
+        }
+        return matchingMatchPointsEntities;
+    }
+
+    public void saveMatchingMatchPointEntities(List<MatchingMatchPointsEntity> matchingMatchPointsEntities) {
+        int batchSize = 1000;
+        int size = 0;
+        if (CollectionUtils.isNotEmpty(matchingMatchPointsEntities)) {
+            for (int i = 0; i < matchingMatchPointsEntities.size(); i += batchSize) {
+                List<MatchingMatchPointsEntity> matchingMatchPointsEntityList = new ArrayList<>();
+                matchingMatchPointsEntityList.addAll(matchingMatchPointsEntities.subList(i, Math.min(i + batchSize, matchingMatchPointsEntities.size())));
+                producerTemplate.sendBody("scsbactivemq:queue:saveMatchingMatchPointsQ", matchingMatchPointsEntityList);
+                size = size + matchingMatchPointsEntityList.size();
+            }
+        }
+    }
+
+
+
 }

@@ -1,9 +1,9 @@
 package org.recap.controller;
 
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.MatchingAlgorithmSaveReport;
-import org.recap.report.ReportGenerator;
+import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.report.ReportGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class MatchingAlgorithmController {
     Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
 
     @Autowired
-    MatchingAlgorithmSaveReport matchingAlgorithmSaveReport;
+    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
     @Autowired
     ReportGenerator reportGenerator;
@@ -38,88 +38,64 @@ public class MatchingAlgorithmController {
     @RequestMapping(value = "/matchingAlgorithm/full", method = RequestMethod.POST)
     public String matchingAlgorithmFull() {
         StringBuilder stringBuilder = new StringBuilder();
+        Integer batchSize = 10000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmSaveReport.saveMatchingAlgorithmReports();
-            stopWatch.stop();
-            logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
-        } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-        }
-        return stringBuilder.toString();
-    }
 
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/oclc", method = RequestMethod.POST)
-    public String matchingAlgorithmBasedOnOCLC() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            matchingAlgorithmSaveReport.saveMatchingAlgorithmReportForOclc();
-            stopWatch.stop();
-            logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
-        } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-        }
-        return stringBuilder.toString();
-    }
+            StopWatch stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.findMatchingAndPopulateMatchPointsEntities();
+            stopWatch1.stop();
+            logger.info("Time taken to save Match point Entity : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateMatchingBibEntities();
+            stopWatch1.stop();
+            logger.info("Time taken to save Matching Bib Entity : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save OCLC&ISBN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save OCLC&ISSN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save OCLC&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save ISBN&ISSN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save ISBN&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save ISSN&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
+            stopWatch1 = new StopWatch();
+            stopWatch1.start();
+            matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize);
+            stopWatch1.stop();
+            logger.info("Time taken to save Single Matching Reports : " + stopWatch1.getTotalTimeSeconds());
 
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/isbn", method = RequestMethod.POST)
-    public String matchingAlgorithmBasedOnISBN() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            matchingAlgorithmSaveReport.saveMatchingAlgorithmReportForIsbn();
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
             stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
             logger.error("Exception : " + e.getMessage());
-        }
-        return stringBuilder.toString();
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/issn", method = RequestMethod.POST)
-    public String matchingAlgorithmBasedOnISSN() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            matchingAlgorithmSaveReport.saveMatchingAlgorithmReportForIssn();
-            stopWatch.stop();
-            logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
-        } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-        }
-        return stringBuilder.toString();
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/lccn", method = RequestMethod.POST)
-    public String matchingAlgorithmBasedOnLCCN() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            matchingAlgorithmSaveReport.saveMatchingAlgorithmReportForLccn();
-            stopWatch.stop();
-            logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
-        } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
+            stringBuilder.append("Status : Failed");
         }
         return stringBuilder.toString();
     }
