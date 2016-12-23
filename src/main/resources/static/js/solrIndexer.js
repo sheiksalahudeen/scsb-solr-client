@@ -73,14 +73,6 @@ function saveReport() {
     var url = '';
     if(criteria === 'ALL') {
         url = "/matchingAlgorithm/full";
-    } else if(criteria === 'OCLC') {
-        url = "/matchingAlgorithm/oclc";
-    } else if(criteria === 'ISBN') {
-        url = "/matchingAlgorithm/isbn";
-    } else if(criteria === 'ISSN') {
-        url = "/matchingAlgorithm/issn";
-    } else if(criteria === 'LCCN') {
-        url = "/matchingAlgorithm/lccn";
     }
     if(url !== '') {
         var request = $.ajax({

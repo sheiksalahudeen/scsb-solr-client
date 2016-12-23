@@ -10,6 +10,7 @@ import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.util.MatchingAlgorithmUtil;
 
 import java.util.*;
 
@@ -31,6 +32,9 @@ public class MatchingAlgorithmHelperServiceUT {
     @Mock
     public ItemCrudRepository itemCrudRepository;
 
+    @Mock
+    MatchingAlgorithmUtil matchingAlgorithmUtil;
+
     @Before
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
@@ -38,31 +42,6 @@ public class MatchingAlgorithmHelperServiceUT {
         when(itemCrudRepository.findByCollectionGroupDesignationAndItemIdIn(RecapConstants.SHARED_CGD, Arrays.asList(1))).thenReturn(Arrays.asList(getItem()));
         when(itemCrudRepository.findByItemId(1)).thenReturn(getItem());
     }
-
-    @Test
-    public void testGetBibs(){
-        List<Bib> bibs =  matchingAlgorithmHelperService.getBibs("OCLCNumber","00 1 614-793-8682");
-        assertNotNull(bibs);
-        assertEquals(2,bibs.size());
-        assertEquals("1",bibs.get(0).getId());
-        assertEquals("SampleTitle",bibs.get(0).getTitle());
-        assertEquals("PUL",bibs.get(0).getOwningInstitution());
-        assertEquals("BA342",bibs.get(0).getBarcode());
-        assertEquals("Imprint",bibs.get(0).getImprint());
-    }
-
-    @Test
-    public void testGetMatchingReports(){
-        Map<String, Set<Bib>> owningInstitutionMap = matchingAlgorithmHelperService.getMatchingBibsBasedOnTitle(getBibs(), new HashSet<>());
-        assertNotNull(owningInstitutionMap);
-        Set<Bib> bibSet = owningInstitutionMap.get("PUL");
-        Bib bib = bibSet.iterator().next();
-        assertNotNull("00 1 614-793-8682", bib.getOclcNumber());
-        assertNotNull("1", bib.getId());
-        assertNotNull("SampleTitle", bib.getTitle());
-        assertNotNull("BA352", bib.getBarcode());
-    }
-
 
     private List<Bib> getBibs(){
         List<Bib> bibs = new ArrayList<>();

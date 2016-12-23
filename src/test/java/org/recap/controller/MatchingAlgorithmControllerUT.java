@@ -6,9 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.MatchingAlgorithmSaveReport;
-import org.recap.report.ReportGenerator;
+import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.report.ReportGenerator;
+import org.recap.util.MatchingAlgorithmUtil;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -27,9 +28,6 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     MatchingAlgorithmController matchingAlgorithmController= new MatchingAlgorithmController();
 
     @Mock
-    MatchingAlgorithmSaveReport mockMatchingAlgorithmSaveReport;
-
-    @Mock
     ReportGenerator reportGenerator;
 
     @Mock
@@ -38,6 +36,11 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     @Mock
     Model model;
 
+    @Mock
+    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
+
+    private Integer batchSize = 10000;
+
     @Before
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
@@ -45,38 +48,16 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     @Test
     public void matchingAlgorithmFullTest() throws Exception{
-
-        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReports();
+        doNothing().when(matchingAlgorithmHelperService).findMatchingAndPopulateMatchPointsEntities();
+        doNothing().when(matchingAlgorithmHelperService).populateMatchingBibEntities();
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCandISBN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCAndISSN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCAndLCCN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForISBNAndISSN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForISBNAndLCCN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForISSNAndLCCN(batchSize);
+        doNothing().when(matchingAlgorithmHelperService).populateReportsForSingleMatch(batchSize);
         String response = matchingAlgorithmController.matchingAlgorithmFull();
-        assertTrue(response.contains("Status  : Done"));
-    }
-
-   @Test
-    public void testMatchingAlgorithmBasedOnOCLC() throws Exception{
-       doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForOclc();
-        String response = matchingAlgorithmController.matchingAlgorithmBasedOnOCLC();
-        assertTrue(response.contains("Status  : Done"));assertTrue(response.contains("Status  : Done"));
-    }
-
-
-    @Test
-    public void testMatchingAlgorithmBasedOnISSN() throws Exception{
-        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForIssn();
-        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISSN();
-        assertTrue(response.contains("Status  : Done"));;
-    }
-
-
-    @Test
-    public void testMatchingAlgorithmBasedOnLCCN() throws Exception{
-        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForLccn();
-        String response = matchingAlgorithmController.matchingAlgorithmBasedOnLCCN();
-        assertTrue(response.contains("Status  : Done"));
-    }
-    @Test
-    public void testMatchingAlgorithmBasedOnISBN() throws Exception{
-        doNothing().when(mockMatchingAlgorithmSaveReport).saveMatchingAlgorithmReportForIsbn();
-        String response = matchingAlgorithmController.matchingAlgorithmBasedOnISBN();
         assertTrue(response.contains("Status  : Done"));
     }
 
