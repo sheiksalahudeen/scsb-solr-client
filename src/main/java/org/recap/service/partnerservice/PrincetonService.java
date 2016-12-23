@@ -7,7 +7,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import sun.security.ssl.SSLSocketImpl;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +30,9 @@ public class PrincetonService {
         String bibDataResponse = null;
         String response = null;
         try {
+            System.setProperty("jsse.enableSNIExtension", "false");
             bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
+            System.setProperty("jsse.enableSNIExtension", "true");
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             response = "Item Barcode not found";
