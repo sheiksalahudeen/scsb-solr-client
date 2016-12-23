@@ -30,6 +30,7 @@ public class PrincetonService {
         String bibDataResponse = null;
         String response = null;
         try {
+            //This is needed to by pass host name verification; Otherwise we get a SSL handshake alert: unrecognized_name error
             System.setProperty("jsse.enableSNIExtension", "false");
             bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
             System.setProperty("jsse.enableSNIExtension", "true");
