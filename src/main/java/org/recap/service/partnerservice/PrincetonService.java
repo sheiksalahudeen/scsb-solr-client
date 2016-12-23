@@ -9,12 +9,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import sun.security.ssl.SSLSocketImpl;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by premkb on 18/12/16.
@@ -25,15 +27,16 @@ public class PrincetonService {
     @Value("${ils.princeton.bibdata}")
     String ilsprincetonBibData;
 
-    public String getBibData(String itemBarcode, String customerCode) {
+    public String getBibData(String itemBarcode) {
         RestTemplate restTemplate = new RestTemplate();
+        HostnameVerifier verifier = new NullHostnameVerifier();
+        SCSBSimpleClientHttpRequestFactory factory = new SCSBSimpleClientHttpRequestFactory(verifier);
+        restTemplate.setRequestFactory(factory);
+
         String bibDataResponse = null;
         String response = null;
         try {
-            //This is needed to by pass host name verification; Otherwise we get a SSL handshake alert: unrecognized_name error
-            System.setProperty("jsse.enableSNIExtension", "false");
             bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
-            System.setProperty("jsse.enableSNIExtension", "true");
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             response = "Item Barcode not found";
