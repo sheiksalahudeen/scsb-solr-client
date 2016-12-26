@@ -15,6 +15,7 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
+import org.recap.service.accession.SolrIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Sheik on 6/18/2016.
@@ -74,6 +73,9 @@ public class SolrIndexController {
 
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
+    SolrIndexService solrIndexService;
 
     @Autowired
     ProducerTemplate producerTemplate;
@@ -128,5 +130,29 @@ public class SolrIndexController {
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
     public String report(String status) {
         return StringUtils.isBlank(status) ? "Index process initiated!" : status;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/solrIndexer/indexByBibliographicId", method = RequestMethod.POST)
+    public String indexByBibliographicId(@RequestBody List<Integer> bibliographicIdList) {
+        String response = null;
+        try {
+            for (Integer bibliographicId : bibliographicIdList) {
+                getSolrIndexService().indexByBibliographicId(bibliographicId);
+            }
+            response = RecapConstants.SUCCESS;
+        } catch (Exception e) {
+            response = RecapConstants.FAILURE;
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public SolrIndexService getSolrIndexService() {
+        return solrIndexService;
+    }
+
+    public void setSolrIndexService(SolrIndexService solrIndexService) {
+        this.solrIndexService = solrIndexService;
     }
 }
