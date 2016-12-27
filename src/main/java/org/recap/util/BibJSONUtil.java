@@ -77,13 +77,19 @@ public class BibJSONUtil extends MarcUtil {
         List<String> oclcNumberList = getMultiDataFieldValues(record, "035", null, null, "a");
         for (String oclcNumber : oclcNumberList) {
             if (StringUtils.isNotBlank(oclcNumber) && oclcNumber.contains("OCoLC")) {
-                oclcNumbers.add(oclcNumber.replaceAll("[^0-9]", ""));
+                String modifiedOclc = oclcNumber.replaceAll("[^0-9]", "");
+                modifiedOclc = StringUtils.stripStart(modifiedOclc, "0");
+                oclcNumbers.add(modifiedOclc);
             }
         }
         if (CollectionUtils.isEmpty(oclcNumbers) && StringUtils.isNotBlank(institutionCode) && institutionCode.equalsIgnoreCase("NYPL")) {
             String oclcTag = getControlFieldValue(record, "003");
             if (StringUtils.isNotBlank(oclcTag) && oclcTag.equalsIgnoreCase("OCoLC")) {
-                oclcNumbers.add(getControlFieldValue(record, "001"));
+                oclcTag = getControlFieldValue(record, "001");
+            }
+            oclcTag = StringUtils.stripStart(oclcTag, "0");
+            if (StringUtils.isNotBlank(oclcTag)) {
+                oclcNumbers.add(oclcTag);
             }
         }
         return oclcNumbers;
@@ -310,7 +316,7 @@ public class BibJSONUtil extends MarcUtil {
 
     public String getTitleDisplay(Record marcRecord) {
         StringBuilder titleDisplay = new StringBuilder();
-        titleDisplay.append(getDataFieldValueStartsWith(marcRecord, "245", Arrays.asList('a', 'b','n','p')));
+        titleDisplay.append(getDataFieldValueStartsWith(marcRecord, "245", Arrays.asList('a', 'b', 'c', 'f', 'g', 'h', 'k', 'n', 'p', 's', '6', '8')));
         return titleDisplay.toString();
     }
 

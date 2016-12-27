@@ -1,6 +1,7 @@
 package org.recap.util;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.marc4j.marc.Record;
@@ -54,7 +55,7 @@ public class BibJSONUtilUT extends BaseTestCase{
             "              <subfield code=\"a\">NNSZ00100011</subfield>\n" +
             "            </datafield>\n" +
             "            <datafield ind1=\" \" ind2=\" \" tag=\"035\">\n" +
-            "              <subfield code=\"a\">(WaOLN)nyp0200023</subfield>\n" +
+            "              <subfield code=\"a\">(OCoLC)ocm004417290 </subfield>\n" +
             "            </datafield>\n" +
             "            <datafield ind1=\" \" ind2=\" \" tag=\"040\">\n" +
             "              <subfield code=\"c\">NN</subfield>\n" +
@@ -208,7 +209,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
         Record marcRecord = records.get(0);
         String titleDisplay = bibJSONUtil.getTitleDisplay(marcRecord);
-        assertEquals(titleDisplay, "al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /");
+        assertEquals(titleDisplay, "al-Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī / Muḥammad al-Rumayḥī.");
     }
 
     @Test
@@ -254,5 +255,12 @@ public class BibJSONUtilUT extends BaseTestCase{
         String titleSort = bibJSONUtil.getTitleSort(marcRecord, bibJSONUtil.getTitleDisplay(marcRecord));
         assertNotNull(titleSort);
         assertEquals(titleSort,"Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /");
+    }
+
+    @Test
+    public void testStripStart() throws Exception {
+        String number = "0023450";
+        number = StringUtils.stripStart(number, "0");
+        assertEquals("23450", number);
     }
 }
