@@ -65,6 +65,9 @@ public class RecapConstants {
     public static final String FTP_SUMMARY_ALGO_REPORT_Q = "scsbactivemq:queue:ftpSummaryAlgoReportQ";
     public static final String FTP_SOLR_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSolrExceptionReportQ";
     public static final String REPORT_Q= "scsbactivemq:queue:reportQ";
+    public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionRejectionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionRejectionReportQ";
+
 
     public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
     public static final String CSV_SUMMARY_ALGO_REPORT_ROUTE_ID = "csvSummaryAlgoReportRoute";
@@ -73,6 +76,8 @@ public class RecapConstants {
     public static final String FTP_SUMMARY_ALGO_REPORT_ROUTE_ID = "ftpSummaryAlgoReportRoute";
     public static final String FTP_SOLR_EXCEPTION_REPORT_ROUTE_ID = "ftpSolrExceptionReportRoute";
     public static final String REPORT_ROUTE_ID = "reportQRoute";
+    public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "fsSubmitCollectionRejectionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "ftpSubmitCollectionRejectionReportQ";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
     public static final String MATCHING_ALGO_OCLC_FILE_NAME = "Matching_Algo_OCLC";
@@ -262,5 +267,10 @@ public class RecapConstants {
     public static final String FAILURE_ITEM_REASON = "ReasonForFailureItem";
     public static final String ITEMBARCODE = "itemBarcode";
 
+    public static final String REJECTION_REPORT = "Rejection";
+    public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
+    public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
+    public static final String  SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
+    public static final String  SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
 
 }
