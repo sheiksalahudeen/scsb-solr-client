@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.model.search.BibliographicMarcForm;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.util.MarcRecordViewUtil;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -13,9 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -40,7 +39,11 @@ public class CollectionUpdateControllerUT extends BaseControllerUT {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(collectionUpdateController).build();
-        when(marcRecordViewUtil.buildBibliographicMarcForm(1,2)).thenReturn(new BibliographicMarcForm());
+        UserDetailsForm userDetailsForm= new UserDetailsForm();
+        userDetailsForm.setSuperAdmin(false);
+        userDetailsForm.setLoginInstitutionId(2);
+        userDetailsForm.setRecapUser(false);
+        when(marcRecordViewUtil.buildBibliographicMarcForm(1,2,userDetailsForm)).thenReturn(new BibliographicMarcForm());
     }
 
     @Test

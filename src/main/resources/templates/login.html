@@ -16,7 +16,6 @@
     <script type="text/javascript" th:src="@{../lib/Buttons/js/buttons.colVis.js}"></script>
     <script type="text/javascript" th:src="@{../js/main.js}"></script>
     <script type="text/javascript" th:src="@{../js/formvalidation.js}"></script>
-    <script type="text/javascript" th:src="@{../js/collection.js}"></script>
 </head>
 <body class="login-page">
 <div class="login-content content-top">
@@ -108,13 +107,14 @@
                 <div class="col-sm-5">
                     <!-- Login Section-->
                     <div class="login-wrapper">
-                        <form method="post" action="" th:object="${userForm}">
+                        <form method="post" action="" th:object="${userForm}" id="home_login">
                             <h2 class="heading">Login</h2>
                             <p th:if="${#fields.hasErrors('wrongCredentials')}" class="label label-danger" th:errors="*{wrongCredentials}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
                             <div class="form-group">
                                 <label for="networkloginid">Network Login id</label>
                                 <input type="text" class="form-control themed-input" id="networkloginid" th:field="*{username}"/>
                                 <p th:if="${#fields.hasErrors('username')}" class="label label-danger" th:errors="*{username}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <span id="networkloginidError" style="color: red; display : none;">Network Login id is required.</span>
                             </div>
                             <div class="form-group">
                                 <label for="institution">Institution</label>
@@ -127,11 +127,13 @@
                                     </select>
                                 </div>
                                 <p th:if="${#fields.hasErrors('institution')}" class="label label-danger" th:errors="*{institution}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <span id="institutionError" style="color: red; display : none ;">Institution is required.</span>
                             </div>
                             <div class="form-group">
                                 <label for="loginpassword">Password</label>
                                 <input type="password" class="form-control themed-input" id="loginpassword" th:field="*{password}"/>
                                 <p th:if="${#fields.hasErrors('password')}" class="label label-danger" th:errors="*{password}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <span id="loginpasswordError" style="color: red; display : none;">Password is required.</span>
                             </div>
                             <div class="login-form-button-wrapper  margin-btm-10">
                                 <button type="submit" id="submitBtn" class="btn btn-default themed-button">Submit</button>

@@ -9,6 +9,7 @@ import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.model.search.BibDataField;
 import org.recap.model.search.BibliographicMarcForm;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,78 +31,83 @@ public class MarcRecordViewUtil {
     @Autowired
     CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
-    public BibliographicMarcForm buildBibliographicMarcForm(Integer bibId, Integer itemId) {
+    public BibliographicMarcForm buildBibliographicMarcForm(Integer bibId, Integer itemId,UserDetailsForm userDetailsForm) {
         BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
         bibliographicMarcForm.setCollectionAction(RecapConstants.UPDATE_CGD);
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicIdAndIsDeletedFalse(bibId);
         if (null == bibliographicEntity) {
             bibliographicMarcForm.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
         } else {
-            bibliographicMarcForm.setBibId(bibliographicEntity.getBibliographicId());
-            String bibContent = new String(bibliographicEntity.getContent());
-            BibJSONUtil bibJSONUtil = new BibJSONUtil();
-            List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
-            Record marcRecord = records.get(0);
-            setBibliographicMarcFormWithBibValues(marcRecord, bibJSONUtil, bibliographicMarcForm);
-            bibliographicMarcForm.setContent(bibContent);
             InstitutionEntity institutionEntity = bibliographicEntity.getInstitutionEntity();
-            if (null != institutionEntity) {
-                bibliographicMarcForm.setOwningInstitution(institutionEntity.getInstitutionCode());
+            bibliographicMarcForm.setAllowEdit(true);
+            if(!userDetailsForm.isSuperAdmin() && !userDetailsForm.getLoginInstitutionId().equals(institutionEntity.getInstitutionId())) {
+                bibliographicMarcForm.setErrorMessage(RecapConstants.ACCESS_RESTRICTED);
+                bibliographicMarcForm.setAllowEdit(false);
             }
-            List<ItemEntity> nonDeletedItemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
-            if (CollectionUtils.isNotEmpty(nonDeletedItemEntities)) {
-                if (nonDeletedItemEntities.size() == 1 && RecapConstants.MONOGRAPH.equals(bibliographicMarcForm.getLeaderMaterialType())) {
-                    CollectionGroupEntity collectionGroupEntity = nonDeletedItemEntities.get(0).getCollectionGroupEntity();
-                    if (null != collectionGroupEntity) {
-                        bibliographicMarcForm.setMonographCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
-                    }
+                bibliographicMarcForm.setBibId(bibliographicEntity.getBibliographicId());
+                String bibContent = new String(bibliographicEntity.getContent());
+                BibJSONUtil bibJSONUtil = new BibJSONUtil();
+                List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+                Record marcRecord = records.get(0);
+                setBibliographicMarcFormWithBibValues(marcRecord, bibJSONUtil, bibliographicMarcForm);
+                bibliographicMarcForm.setContent(bibContent);
+                if (null != institutionEntity) {
+                    bibliographicMarcForm.setOwningInstitution(institutionEntity.getInstitutionCode());
                 }
-                bibliographicMarcForm.setCallNumber(nonDeletedItemEntities.get(0).getCallNumber());
-                if (null != itemId) {
-                    for (ItemEntity itemEntity : nonDeletedItemEntities) {
-                        if (itemEntity.getItemId().intValue() == itemId) {
-                            bibliographicMarcForm.setItemId(itemEntity.getItemId());
-                            bibliographicMarcForm.setBarcode(itemEntity.getBarcode());
-                            bibliographicMarcForm.setUseRestriction(itemEntity.getUseRestrictions());
-                            bibliographicMarcForm.setCallNumber(itemEntity.getCallNumber());
-                            bibliographicMarcForm.setCustomerCode(itemEntity.getCustomerCode());
-                            ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
-                            if (null != itemStatusEntity) {
-                                bibliographicMarcForm.setAvailability(itemStatusEntity.getStatusCode());
-                            }
-                            CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
-                            if (null != collectionGroupEntity) {
-                                bibliographicMarcForm.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
-                                bibliographicMarcForm.setNewCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
-                                if (RecapConstants.SHARED_CGD.equals(bibliographicMarcForm.getCollectionGroupDesignation())) {
-                                    bibliographicMarcForm.setShared(Boolean.TRUE);
-                                }
-                            }
-                            if (StringUtils.isNotBlank(bibliographicMarcForm.getAvailability())) {
-                                if (RecapConstants.AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
-                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_DIRECT);
-                                } else if (RecapConstants.NOT_AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
-                                    bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_INDIRECT);
-                                }
-                            }
-                            CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(bibliographicMarcForm.getCustomerCode());
-                            if (null != customerCodeEntity && StringUtils.isNotBlank(customerCodeEntity.getDeliveryRestrictions())) {
-                                List<String> deliveryLocations = new ArrayList<>();
-                                List<CustomerCodeEntity> customerCodeEntities = customerCodeDetailsRepository.findByCustomerCodeIn(Arrays.asList(customerCodeEntity.getDeliveryRestrictions().split(",")));
-                                if (CollectionUtils.isNotEmpty(customerCodeEntities)) {
-                                    for (CustomerCodeEntity custCodeEntity : customerCodeEntities) {
-                                        deliveryLocations.add(custCodeEntity.getDescription());
-                                    }
-                                }
-                                bibliographicMarcForm.setDeliveryLocations(deliveryLocations);
-                            }
+                List<ItemEntity> nonDeletedItemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+                if (CollectionUtils.isNotEmpty(nonDeletedItemEntities)) {
+                    if (nonDeletedItemEntities.size() == 1 && RecapConstants.MONOGRAPH.equals(bibliographicMarcForm.getLeaderMaterialType())) {
+                        CollectionGroupEntity collectionGroupEntity = nonDeletedItemEntities.get(0).getCollectionGroupEntity();
+                        if (null != collectionGroupEntity) {
+                            bibliographicMarcForm.setMonographCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
                         }
                     }
-                    if (null == bibliographicMarcForm.getItemId()) {
-                        bibliographicMarcForm.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
+                    bibliographicMarcForm.setCallNumber(nonDeletedItemEntities.get(0).getCallNumber());
+                    if (null != itemId) {
+                        for (ItemEntity itemEntity : nonDeletedItemEntities) {
+                            if (itemEntity.getItemId().intValue() == itemId) {
+                                bibliographicMarcForm.setItemId(itemEntity.getItemId());
+                                bibliographicMarcForm.setBarcode(itemEntity.getBarcode());
+                                bibliographicMarcForm.setUseRestriction(itemEntity.getUseRestrictions());
+                                bibliographicMarcForm.setCallNumber(itemEntity.getCallNumber());
+                                bibliographicMarcForm.setCustomerCode(itemEntity.getCustomerCode());
+                                ItemStatusEntity itemStatusEntity = itemEntity.getItemStatusEntity();
+                                if (null != itemStatusEntity) {
+                                    bibliographicMarcForm.setAvailability(itemStatusEntity.getStatusCode());
+                                }
+                                CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
+                                if (null != collectionGroupEntity) {
+                                    bibliographicMarcForm.setCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
+                                    bibliographicMarcForm.setNewCollectionGroupDesignation(collectionGroupEntity.getCollectionGroupCode());
+                                    if (RecapConstants.SHARED_CGD.equals(bibliographicMarcForm.getCollectionGroupDesignation())) {
+                                        bibliographicMarcForm.setShared(Boolean.TRUE);
+                                    }
+                                }
+                                if (StringUtils.isNotBlank(bibliographicMarcForm.getAvailability())) {
+                                    if (RecapConstants.AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
+                                        bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_DIRECT);
+                                    } else if (RecapConstants.NOT_AVAILABLE.equals(bibliographicMarcForm.getAvailability())) {
+                                        bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_INDIRECT);
+                                    }
+                                }
+                                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(bibliographicMarcForm.getCustomerCode());
+                                if (null != customerCodeEntity && StringUtils.isNotBlank(customerCodeEntity.getDeliveryRestrictions())) {
+                                    List<String> deliveryLocations = new ArrayList<>();
+                                    List<CustomerCodeEntity> customerCodeEntities = customerCodeDetailsRepository.findByCustomerCodeIn(Arrays.asList(customerCodeEntity.getDeliveryRestrictions().split(",")));
+                                    if (CollectionUtils.isNotEmpty(customerCodeEntities)) {
+                                        for (CustomerCodeEntity custCodeEntity : customerCodeEntities) {
+                                            deliveryLocations.add(custCodeEntity.getDescription());
+                                        }
+                                    }
+                                    bibliographicMarcForm.setDeliveryLocations(deliveryLocations);
+                                }
+                            }
+                        }
+                        if (null == bibliographicMarcForm.getItemId()) {
+                            bibliographicMarcForm.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
+                        }
                     }
                 }
-            }
         }
         return bibliographicMarcForm;
     }

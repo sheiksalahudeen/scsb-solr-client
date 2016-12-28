@@ -70,8 +70,9 @@ public class LoginController {
             permissionMap=userService.getPermissions();
             Session session=subject.getSession(true);
             session.setAttribute("userName",userForm.getUsername());
-            session.setAttribute("userInstitution",userForm.getInstitution());
+            session.setAttribute(UserManagement.USER_INSTITUTION,userForm.getInstitution());
             session.setAttribute("userForm",userForm);
+            session.setAttribute(UserManagement.USER_ID,subject.getPrincipal());
             session.setAttribute(UserManagement.permissionsMap, Collections.unmodifiableMap(permissionMap));
 
         }
