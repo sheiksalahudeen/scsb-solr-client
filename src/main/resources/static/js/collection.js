@@ -105,7 +105,13 @@ function collectionUpdate() {
             url: url,
             type: 'post',
             data: $form.serialize(),
+            beforeSend: function () {
+                $('#collectionModalContent').block({
+                    message: '<h1>Processing...</h1>'
+                });
+            },
             success: function (response) {
+                $('#collectionModalContent').unblock();
                 console.log("completed");
                 var editCgd = $('#editCgdclick').is(':checked');
                 var deaccession = $('#deaccesionclick').is(':checked');
