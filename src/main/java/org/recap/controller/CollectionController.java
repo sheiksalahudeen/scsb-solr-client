@@ -7,6 +7,7 @@ import org.apache.shiro.subject.Subject;
 import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
 import org.recap.model.search.*;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.security.UserManagement;
 import org.recap.util.CollectionServiceUtil;
 import org.recap.util.MarcRecordViewUtil;
@@ -60,6 +61,7 @@ public class CollectionController {
 
     }
 
+
     @ResponseBody
     @RequestMapping(value = "/collection", method = RequestMethod.POST, params = "action=displayRecords")
     public ModelAndView displayRecords(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
@@ -75,7 +77,9 @@ public class CollectionController {
     public ModelAndView openMarcView(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
                                        BindingResult result,
                                        Model model) throws Exception {
-        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId());
+        Subject subject= SecurityUtils.getSubject();
+        UserDetailsForm userDetailsForm=UserManagement.getRequestAccess(subject);
+        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId(),userDetailsForm);
         populateCollectionForm(collectionForm, bibliographicMarcForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
         return new ModelAndView("collection :: #collectionUpdateModal", "collectionForm", collectionForm);
@@ -204,5 +208,6 @@ public class CollectionController {
         collectionForm.setCollectionAction(bibliographicMarcForm.getCollectionAction());
         collectionForm.setShowModal(true);
         collectionForm.setShowResults(true);
+        collectionForm.setAllowEdit(bibliographicMarcForm.isAllowEdit());
     }
 }

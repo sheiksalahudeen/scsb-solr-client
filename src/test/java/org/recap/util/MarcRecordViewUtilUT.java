@@ -7,6 +7,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.BibliographicMarcForm;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -44,7 +45,12 @@ public class MarcRecordViewUtilUT extends BaseTestCase {
         Integer bibId = savedBibliographicEntity.getBibliographicId();
         Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
 
-        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(bibId, itemId);
+        UserDetailsForm userDetailsForm= new UserDetailsForm();
+        userDetailsForm.setSuperAdmin(false);
+        userDetailsForm.setLoginInstitutionId(2);
+        userDetailsForm.setRecapUser(false);
+
+        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(bibId, itemId,userDetailsForm);
         assertNotNull(bibliographicMarcForm);
         assertNotNull(bibliographicMarcForm.getBibId());
         assertNotNull(bibliographicMarcForm.getItemId());

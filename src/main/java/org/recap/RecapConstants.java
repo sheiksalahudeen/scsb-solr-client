@@ -166,6 +166,7 @@ public class RecapConstants {
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";
     public static final String SERVER_ERROR_MSG = "Server is down for Maintenance Please Try again Later.";
     public static final String EMPTY_FACET_ERROR_MSG = "At least one Bib Facet Box and one Item Facet Box needs to be checked to get results.";
+    public static final String ACCESS_RESTRICTED="User is not permitted to access this record";
 
     //Search Response Types
     public static final String SEARCH_SUCCESS_RESPONSE = "SuccessResponse";
@@ -266,6 +267,9 @@ public class RecapConstants {
     public static final String FAILURE_BIB_REASON = "ReasonForFailureBib";
     public static final String FAILURE_ITEM_REASON = "ReasonForFailureItem";
     public static final String ITEMBARCODE = "itemBarcode";
+
+    public static final String USER_ROLES="userRolesSearch";
+    public static final Integer CGD_PRIVATE=3;
 
     public static final String REJECTION_REPORT = "Rejection";
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";

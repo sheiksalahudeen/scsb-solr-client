@@ -42,6 +42,15 @@ public class BibliographicMarcForm {
     private boolean submitted = false;
     private String message;
     private String collectionAction;
+    private boolean allowEdit;
+
+    public boolean isAllowEdit() {
+        return allowEdit;
+    }
+
+    public void setAllowEdit(boolean allowEdit) {
+        this.allowEdit = allowEdit;
+    }
 
     public Integer getBibId() {
         return bibId;

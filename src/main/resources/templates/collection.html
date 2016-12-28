@@ -297,7 +297,7 @@
                                                             <td><span th:text="${collectionForm.collectionGroupDesignation}"></span></td>
                                                         </tr>
                                                     </table>
-
+                                                    <div th:if="${collectionForm.allowEdit}">
                                                     <div id="collectionOptionsDiv" class="row radio-btn-warpper" th:if="${!collectionForm.submitted}">
                                                         <div class="col-sm-12" align="center">
                                                             <div class="form-group margin-btm-10">
@@ -318,6 +318,7 @@
                                                         </div>
                                                     </div>
                                                     <!-- Edit CDG-->
+
                                                     <div id="editCDG-section" class="padding-top-20">
                                                         <div class="row form-group">
                                                             <div class="col-sm-4 text-right padding-right-30 margin-top-10">
@@ -413,11 +414,12 @@
                                                             </button>
                                                         </div>
                                                     </div>
+
                                                     <div id="mandateText" th:if="${!collectionForm.submitted}">
                                                         Fields marked with asterisk(<span class="error-color">*</span>) are mandatory.
                                                     </div>
                                                 </div>
-
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

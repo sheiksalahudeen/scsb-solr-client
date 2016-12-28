@@ -3,6 +3,7 @@ package org.recap.security;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.recap.model.jpa.UsersEntity;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.model.userManagement.UserForm;
 
 import java.util.Map;
@@ -12,10 +13,9 @@ import java.util.Map;
  */
 public enum UserManagement {
 
-
-
     TOKEN_SPLITER(":"),
     ReCAP("ReCAP"),
+    SUPER_ADMIN(1),
     CREATE_USER(1,"To create users,assign roles"),
     WRITE_GCD(2,"To write/edit CGD for own institutions"),
     DEACCESSION(3,"To deaccession records for own institution"),
@@ -30,8 +30,24 @@ public enum UserManagement {
 
     public static final String permissionsMap="permissionsMap";
 
+    public static final String USER_ID="userId";
+
+    public static final String USER_INSTITUTION="userInstitution";
+
+    public static final String ROLE_ID="roleId";
+
 
     private String value;
+
+    private int integerValues;
+
+    public int getIntegerValues() {
+        return integerValues;
+    }
+
+    public void setIntegerValues(int integerValues) {
+        this.integerValues = integerValues;
+    }
 
     private Integer permissionId;
 
@@ -48,6 +64,11 @@ public enum UserManagement {
     UserManagement(String value)
     {
         this.value=value;
+    }
+
+    UserManagement(int value)
+    {
+        this.integerValues=value;
     }
 
     UserManagement(Integer permissionId,String permissionDesc)
@@ -106,6 +127,15 @@ public enum UserManagement {
     public static Map<Integer,String> getPermissions(Subject subject){
         Session session=subject.getSession();
         return (Map<Integer,String>)session.getAttribute(permissionsMap);
+    }
+
+    public static UserDetailsForm getRequestAccess(Subject subject){
+        UserDetailsForm userDetailsForm=new UserDetailsForm();
+        Session session=subject.getSession();
+        Integer userId=(Integer)session.getAttribute(USER_ID);
+        userDetailsForm.setSuperAdmin(userId.equals(SUPER_ADMIN.getIntegerValues()));
+        userDetailsForm.setLoginInstitutionId((Integer) session.getAttribute(USER_INSTITUTION));
+        return userDetailsForm;
     }
 
 

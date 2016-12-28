@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.recap.model.search.BibliographicMarcForm;
 import org.recap.model.search.CollectionForm;
+import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.util.MarcRecordViewUtil;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -63,7 +64,11 @@ public class CollectionControllerUT extends BaseControllerUT {
     @Test
     public void openMarcRecord() throws Exception {
         CollectionForm collectionForm = new CollectionForm();
-        when(marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId())).thenReturn(new BibliographicMarcForm());
+        UserDetailsForm userDetailsForm= new UserDetailsForm();
+        userDetailsForm.setSuperAdmin(false);
+        userDetailsForm.setLoginInstitutionId(2);
+        userDetailsForm.setRecapUser(false);
+        when(marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId(),userDetailsForm)).thenReturn(new BibliographicMarcForm());
         ModelAndView modelAndView = collectionController.openMarcView(collectionForm, bindingResult, model);
         assertNotNull(modelAndView);
         assertEquals("collection :: #collectionUpdateModal", modelAndView.getViewName());
