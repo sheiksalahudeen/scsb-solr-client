@@ -93,7 +93,7 @@ function generateReport() {
     var criteria = $('#matchingCriteriaForReports').val();
     var processType = $('#processType').val();
     var url = '';
-    if(processType === 'SolrIndex' || processType === 'DeAccession_Summary_Report' || processType ==='Accession') {
+    if(processType === 'SolrIndex' || processType === 'DeAccession_Summary_Report' || processType ==='Accession'  || processType ==='SubmitCollection') {
         url = "/reportGeneration/generateReports";
     } else {
         if(criteria === 'ALL') {
