@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

@@ -376,4 +376,45 @@ public class SolrQueryBuilder {
         solrQuery.setRows(rows);
         return solrQuery;
     }
+
+    public SolrQuery buildSolrQueryForAccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
+        StringBuilder query = new StringBuilder();
+        query.append("DocType:Item").append(and);
+        query.append("ItemCreatedDate:").append("[").append(date).append("]").append(and);
+        query.append("IsDeletedItem:").append(isDeleted).append(and);
+        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
+        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        return new SolrQuery(query.toString());
+    }
+
+    public SolrQuery buildSolrQueryForDeaccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
+        StringBuilder query = new StringBuilder();
+        query.append("DocType:Item").append(and);
+        query.append("ItemLastUpdatedDate:").append("[").append(date).append("]").append(and);
+        query.append("IsDeletedItem:").append(isDeleted).append(and);
+        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
+        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        return new SolrQuery(query.toString());
+    }
+
+
+    public SolrQuery buildSolrQueryForCGDReports(String owningInstitution ,  String collectionGroupDesignation){
+        StringBuilder query = new StringBuilder();
+        query.append("DocType:Item").append(and);
+        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
+        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        return new SolrQuery(query.toString());
+    }
+
+
+    public SolrQuery buildSolrQueryForDeaccesionReportInformation(String date, String owningInstitution, boolean isDeleted) {
+        StringBuilder query = new StringBuilder();
+        query.append("DocType:Item").append(and);
+        query.append("ItemLastUpdatedDate:").append("[").append(date).append("]").append(and);
+        query.append("IsDeletedItem:").append(isDeleted).append(and);
+        query.append("ItemOwningInstitution:").append(owningInstitution);
+        return new SolrQuery(query.toString());
+    }
+
+
 }
