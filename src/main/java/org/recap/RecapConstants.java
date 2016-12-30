@@ -277,4 +277,16 @@ public class RecapConstants {
     public static final String  SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
     public static final String  SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
 
+
+    public static final String REPORTS = "reports";
+
+    //solr
+    public static final String DATE_FORMAT_YYYYMMDDHHMM = "yyyy-MM-dd HH:mm";
+    public static final String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String UTC = "UTC";
+    public static final String SOLR_DATE_RANGE_TO_NOW = " TO NOW";
+
+    public static final String Simple_Date_Format_REPORTS = "MM/dd/yyyy";
+
+
 }
