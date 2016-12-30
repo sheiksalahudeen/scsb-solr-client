@@ -32,14 +32,11 @@
                     <li th:if="${subject.isPermitted('WriteCGD') || subject.isPermitted('DeAccession')}" role="presentation" class="tab-collection-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/collection' ? 'active':''}">
                         <a href="/collection" aria-controls="collection" class="tab-collection"><span class="icons"></span><span>Collection</span></a>
                     </li>
-                    <li th:if="${subject.isPermitted('RequestPlace')}" role="presentation" class="tab-request-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
+                    <li th:if="${subject.isPermitted('RequestPlace') || subject.isPermitted('RequestPlaceAll') || subject.isPermitted('RequestItems')}" role="presentation" class="tab-request-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/request' ? 'active':''}">
                         <a href="/request" aria-controls="request" class="tab-request"><span class="icons"></span><span>Request</span></a>
                     </li>
                     <li th:if="${subject.isPermitted('ViewPrintReports')}" role="presentation" class="tab-reports-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
                         <a href="/reports" aria-controls="reports" class="tab-reports"><span class="icons"></span><span>Reports</span></a>
-                    </li>
-                    <li th:if="${subject.isPermitted('CreateUser')}" role="presentation" class="tab-users-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/userRoles' ? 'active':''}">
-                        <a href="/userRoles" aria-controls="users" class="tab-users"><span class="icons"></span><span>Users</span></a>
                     </li>
                 </ul>
                 <div class="tab-content">

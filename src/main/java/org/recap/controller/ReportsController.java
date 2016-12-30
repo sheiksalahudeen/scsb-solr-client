@@ -1,15 +1,17 @@
 package org.recap.controller;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.recap.RecapConstants;
 import org.recap.model.search.DeaccessionItemResultsRow;
 import org.recap.model.search.ReportsForm;
+import org.recap.security.UserManagement;
 import org.recap.util.ReportsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +22,7 @@ import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by rajeshbabuk on 13/10/16.
@@ -35,10 +38,17 @@ public class ReportsController {
 
     @RequestMapping("/reports")
     public String collection(Model model) {
-        ReportsForm reportsForm = new ReportsForm();
-        model.addAttribute("reportsForm", reportsForm);
-        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
-        return "searchRecords";
+        Subject subject= SecurityUtils.getSubject();
+        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
+        if(subject.isPermitted(permissions.get(UserManagement.VIEW_PRINT_REPORTS.getPermissionId()))) {
+            ReportsForm reportsForm = new ReportsForm();
+            model.addAttribute("reportsForm", reportsForm);
+            model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
+            return "searchRecords";
+        }else{
+            return UserManagement.unAuthorized(subject);
+        }
+
     }
 
     @ResponseBody

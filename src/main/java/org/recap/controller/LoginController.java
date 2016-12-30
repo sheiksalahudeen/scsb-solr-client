@@ -65,7 +65,7 @@ public class LoginController {
             subject.login(token);
             if(!subject.isAuthenticated())
             {
-                throw new AuthenticationException("Subject Authtentication Filed");
+                throw new AuthenticationException("Subject Authtentication Failed");
             }
             permissionMap=userService.getPermissions();
             Session session=subject.getSession(true);
