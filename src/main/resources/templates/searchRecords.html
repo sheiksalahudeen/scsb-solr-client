@@ -38,9 +38,6 @@
                     <li th:if="${subject.isPermitted('ViewPrintReports')}" role="presentation" class="tab-reports-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/reports' ? 'active':''}">
                         <a href="/reports" aria-controls="reports" class="tab-reports"><span class="icons"></span><span>Reports</span></a>
                     </li>
-                    <li th:if="${subject.isPermitted('CreateUser')}" role="presentation" class="tab-users-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/userRoles' ? 'active':''}">
-                        <a href="/userRoles" aria-controls="users" class="tab-users"><span class="icons"></span><span>Users</span></a>
-                    </li>
                 </ul>
                 <div class="tab-content">
                     <div th:replace="${template} :: content"></div>
