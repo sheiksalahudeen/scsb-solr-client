@@ -36,7 +36,6 @@ public enum UserManagement {
 
     public static final String ROLE_ID="roleId";
 
-
     private String value;
 
     private int integerValues;
@@ -101,7 +100,7 @@ public enum UserManagement {
     public static String unAuthorized(Subject subject)
     {
         subject.logout();
-        return "unAuthorized";
+        return "login";
     }
 
 

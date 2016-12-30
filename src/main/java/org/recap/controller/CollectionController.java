@@ -95,6 +95,7 @@ public class CollectionController {
         } else if (RecapConstants.DEACCESSION.equalsIgnoreCase(collectionForm.getCollectionAction())) {
             collectionServiceUtil.deAccessionItem(collectionForm);
         }
+        collectionForm.setAllowEdit(true);
         return new ModelAndView("collection :: #itemDetailsSection", "collectionForm", collectionForm);
     }
 

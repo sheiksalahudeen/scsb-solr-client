@@ -40,7 +40,7 @@ public class MarcRecordViewUtil {
         } else {
             InstitutionEntity institutionEntity = bibliographicEntity.getInstitutionEntity();
             bibliographicMarcForm.setAllowEdit(true);
-            if(!userDetailsForm.isSuperAdmin() && !userDetailsForm.getLoginInstitutionId().equals(institutionEntity.getInstitutionId())) {
+            if(userDetailsForm!=null &&  !userDetailsForm.isSuperAdmin() && !userDetailsForm.getLoginInstitutionId().equals(institutionEntity.getInstitutionId())) {
                 bibliographicMarcForm.setErrorMessage(RecapConstants.ACCESS_RESTRICTED);
                 bibliographicMarcForm.setAllowEdit(false);
             }
