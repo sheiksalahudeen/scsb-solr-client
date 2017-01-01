@@ -1,22 +1,11 @@
 package org.recap.service.partnerservice;
 
-import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import sun.security.ssl.SSLSocketImpl;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by premkb on 18/12/16.
