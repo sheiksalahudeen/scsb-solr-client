@@ -1,6 +1,7 @@
 package org.recap.service.accession;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.marc4j.marc.Record;
@@ -12,10 +13,7 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
@@ -28,6 +26,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -58,6 +58,12 @@ public class AccessionService {
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
+    ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Autowired
+    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+
+    @Autowired
     PrincetonService princetonService;
 
     @Autowired
@@ -72,6 +78,11 @@ public class AccessionService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private Map<String,Integer> institutionEntityMap;
+
+    private Map<String,Integer> itemStatusMap;
+
+    private Map<String,Integer> collectionGroupMap;
 
     public MarcUtil getMarcUtil() {
         return marcUtil;
@@ -165,8 +176,20 @@ public class AccessionService {
         } catch (Exception ex) {
             response = ex.getMessage();
         }
+        //Create dummy record
+        if(response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)){
+            response = createDummyRecord(itemBarcode, customerCode, owningInstitution);
+        }
         generateAccessionSummaryReport(responseMapList,owningInstitution);
+        return response;
+    }
 
+    private String createDummyRecord(String itemBarcode, String customerCode, String owningInstitution) {
+        String response;
+        Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(owningInstitution);
+        BibliographicEntity dummyBibliographicEntity = createDummyDataAsIncomplete(owningInstitutionId,itemBarcode,customerCode);
+        solrIndexService.indexByBibliographicId(dummyBibliographicEntity.getBibliographicId());
+        response = RecapConstants.SUCCESS;
         return response;
     }
 
@@ -174,8 +197,8 @@ public class AccessionService {
         String response = null;
         Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution);
         responseMapList.add(responseMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get("bibliographicEntity");
-        List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get("reportEntities");
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHIC_ID);
+        List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
         if (CollectionUtils.isNotEmpty(reportEntityList)) {
             reportDetailRepository.save(reportEntityList);
         }
@@ -185,10 +208,62 @@ public class AccessionService {
                 solrIndexService.indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
                 response = RecapConstants.SUCCESS;
             }
+        }
+        return response;
+    }
 
+    private BibliographicEntity createDummyDataAsIncomplete(Integer owningInstitutionId,String itemBarcode,String customerCode) {
+        Random random = new Random();
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        try {
+            bibliographicEntity.setContent(getXmlContent("dummybibcontent.xml").getBytes());
+            bibliographicEntity.setCreatedDate(new Date());
+            bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
+            bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
+            bibliographicEntity.setLastUpdatedDate(new Date());
+            bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+            bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
+            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+
+            HoldingsEntity holdingsEntity = new HoldingsEntity();
+            holdingsEntity.setContent(getXmlContent("dummyholdingcontent.xml").getBytes());
+            holdingsEntity.setCreatedDate(new Date());
+            holdingsEntity.setCreatedBy(RecapConstants.ACCESSION);
+            holdingsEntity.setLastUpdatedDate(new Date());
+            holdingsEntity.setOwningInstitutionId(owningInstitutionId);
+            holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
+
+            holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+            ItemEntity itemEntity = new ItemEntity();
+            itemEntity.setCallNumberType(RecapConstants.DUMMY_CALL_NUMBER);
+            itemEntity.setCallNumber(RecapConstants.DUMMYCALLNUMBER);
+            itemEntity.setCreatedDate(new Date());
+            itemEntity.setCreatedBy(RecapConstants.ACCESSION);
+            itemEntity.setLastUpdatedDate(new Date());
+            itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
+            itemEntity.setBarcode(itemBarcode);
+            itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+            itemEntity.setOwningInstitutionId(owningInstitutionId);
+            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.SHARED_CGD));
+            itemEntity.setCustomerCode(customerCode);
+            itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get(RecapConstants.NOT_AVAILABLE));
+            itemEntity.setDeleted(false);
+            itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+            itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+            List<ItemEntity> itemEntityList = new ArrayList<>();
+            itemEntityList.add(itemEntity);
+            holdingsEntity.setItemEntities(itemEntityList);
+
+            bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+            bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return response;
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        return savedBibliographicEntity;
     }
 
     public RestTemplate getRestTemplate() {
@@ -389,4 +464,58 @@ public class AccessionService {
         return null;
     }
 
+    public Map getInstitutionEntityMap() {
+        if (null == institutionEntityMap) {
+            institutionEntityMap = new HashMap();
+            try {
+                Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
+                for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
+                    InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
+                    institutionEntityMap.put( institutionEntity.getInstitutionCode(),institutionEntity.getInstitutionId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return institutionEntityMap;
+    }
+
+    public Map getItemStatusMap() {
+        if (null == itemStatusMap) {
+            itemStatusMap = new HashMap();
+            try {
+                Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
+                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
+                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
+                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return itemStatusMap;
+    }
+
+    public Map getCollectionGroupMap() {
+        if (null == collectionGroupMap) {
+            collectionGroupMap = new HashMap();
+            try {
+                Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
+                for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
+                    CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
+                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return collectionGroupMap;
+    }
+
+    private String getXmlContent(String filename) throws Exception {
+        URL resource = getClass().getResource(filename);
+        File file = new File(resource.toURI());
+        String marcXmlString = FileUtils.readFileToString(file, "UTF-8");
+        return marcXmlString;
+    }
 }

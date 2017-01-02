@@ -8,6 +8,7 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.service.authorization.NyplOauthTokenApiService;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -55,6 +56,14 @@ public class AccessionServiceUT extends BaseTestCase {
         TestCase.assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("K25 .xN5", field852.getSubfield('h').getData());
+    }
+
+    @Test
+    public void accessionUnavilableBarcode(){
+        accessionService.processRequest("3210106212830", "PA", "PUL");
+        ItemEntity itemEntity = itemDetailsRepository.findByBarcode("3210106212830");
+        assertNotNull(itemEntity);
+        assertEquals("dummycallnumber",itemEntity.getCallNumber());
     }
 
     @Test

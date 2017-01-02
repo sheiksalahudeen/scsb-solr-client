@@ -274,9 +274,16 @@ public class RecapConstants {
     public static final String REJECTION_REPORT = "Rejection";
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
     public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
-    public static final String  SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
-    public static final String  SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
-
+    public static final String SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
+    public static final String SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
+    public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";
+    public static final String ACCESSION = "accession";
+    public static final String DUMMYCALLNUMBER = "dummycallnumber";
+    public static final String COMPLETE_STATUS = "Complete";
+    public static final String INCOMPLETE_STATUS = "Incomplete";
+    public static final String BIBLIOGRAPHIC_ID= "bibliographicId";
+    public static final String REPORTENTITIES = "reportEntities";
+    public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
 
     public static final String REPORTS = "reports";
 
@@ -287,6 +294,5 @@ public class RecapConstants {
     public static final String SOLR_DATE_RANGE_TO_NOW = " TO NOW";
 
     public static final String Simple_Date_Format_REPORTS = "MM/dd/yyyy";
-
 
 }

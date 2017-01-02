@@ -1,0 +1,74 @@
+<collection>
+    <record>
+        <leader>01893cam a2200361 a 4500</leader>
+        <controlfield tag="001">Dummy</controlfield>
+        <controlfield tag="005">dummydummydumm.y</controlfield>
+        <controlfield tag="008">dummydummydummydummydummydummydummydummy</controlfield>
+        <datafield ind1=" " ind2=" " tag="010">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(OCoLC)Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="040">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="042">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="043">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="0" tag="050">
+            <subfield code="a">Dummy</subfield>
+            <subfield code="b">Dummy</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="0" tag="245">
+            <subfield code="a">Dummy Title</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="260">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="300">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="500">
+            <subfield code="a">"Dummy"</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="500">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="504">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1="2" ind2="0" tag="610">
+            <subfield code="a">Dummy</subfield>
+            <subfield code="x">Dummy</subfield>
+        </datafield>
+        <datafield ind1="2" ind2="0" tag="610">
+            <subfield code="a">Dummy</subfield>
+            <subfield code="x">Dummy</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="650">
+            <subfield code="a">Dummy</subfield>
+            <subfield code="z">Dummy</subfield>
+            <subfield code="x">Dummy</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="700">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+        <datafield ind1="2" ind2=" " tag="710">
+            <subfield code="a">Dummy</subfield>
+            <subfield code="0">(uri)http://id.loc.gov/authorities/names/no</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="999">
+            <subfield code="a">Dummy</subfield>
+        </datafield>
+    </record>
+</collection>
