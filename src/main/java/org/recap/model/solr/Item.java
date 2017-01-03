@@ -82,6 +82,9 @@ public class Item {
     @Field("Title_sort")
     private String titleSort;
 
+    @Field("ItemCatalogingStatus")
+    private String itemCatalogingStatus;
+
     @Ignore
     private String root;
 
@@ -275,5 +278,13 @@ public class Item {
 
     public void setTitleSort(String titleSort) {
         this.titleSort = titleSort;
+    }
+
+    public String getItemCatalogingStatus() {
+        return itemCatalogingStatus;
+    }
+
+    public void setItemCatalogingStatus(String itemCatalogingStatus) {
+        this.itemCatalogingStatus = itemCatalogingStatus;
     }
 }

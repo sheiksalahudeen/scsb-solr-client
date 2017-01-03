@@ -281,7 +281,7 @@ public class RecapConstants {
     public static final String DUMMYCALLNUMBER = "dummycallnumber";
     public static final String COMPLETE_STATUS = "Complete";
     public static final String INCOMPLETE_STATUS = "Incomplete";
-    public static final String BIBLIOGRAPHIC_ID= "bibliographicId";
+    public static final String BIBLIOGRAPHICENTITY = "bibliographicEntity";
     public static final String REPORTENTITIES = "reportEntities";
     public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
 
