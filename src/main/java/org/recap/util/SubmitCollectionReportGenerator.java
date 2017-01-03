@@ -1,7 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.recap.model.csv.SubmitCollectionRejectionRecord;
+import org.recap.model.csv.SubmitCollectionReportRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class SubmitCollectionReportGenerator {
 
-    public SubmitCollectionRejectionRecord prepareSubmitCollectionRejectionRecord(ReportEntity reportEntity) {
+    public SubmitCollectionReportRecord prepareSubmitCollectionRejectionRecord(ReportEntity reportEntity) {
 
-        SubmitCollectionRejectionRecord submitCollectionRejectionRecord = new SubmitCollectionRejectionRecord();
+        SubmitCollectionReportRecord submitCollectionReportRecord = new SubmitCollectionReportRecord();
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();
@@ -28,7 +28,7 @@ public class SubmitCollectionReportGenerator {
             Method setterMethod = getSetterMethod(headerName);
             if(null != setterMethod){
                 try {
-                    setterMethod.invoke(submitCollectionRejectionRecord, headerValue);
+                    setterMethod.invoke(submitCollectionReportRecord, headerValue);
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
@@ -36,13 +36,13 @@ public class SubmitCollectionReportGenerator {
                 }
             }
         }
-        return submitCollectionRejectionRecord;
+        return submitCollectionReportRecord;
     }
 
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, SubmitCollectionRejectionRecord.class));
+            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
             return writeMethod;
         } catch (IntrospectionException e) {
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class SubmitCollectionReportGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionRejectionRecord.class));
+            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
             return writeMethod;
         } catch (IntrospectionException e) {
             e.printStackTrace();

@@ -54,6 +54,8 @@ public class GenerateReportController {
             fileName = RecapConstants.ACCESSION_REPORT;
         }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
             fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
+        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+            fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
         }else{
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
         }

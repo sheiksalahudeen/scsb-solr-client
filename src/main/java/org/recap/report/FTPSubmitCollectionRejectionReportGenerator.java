@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.model.csv.SubmitCollectionRejectionRecord;
+import org.recap.model.csv.SubmitCollectionReportRecord;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.util.SubmitCollectionReportGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +36,13 @@ public class FTPSubmitCollectionRejectionReportGenerator implements ReportGenera
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
         String generatedFileName = null;
-        List<SubmitCollectionRejectionRecord> submitCollectionRejectionRecordList = new ArrayList<>();
+        List<SubmitCollectionReportRecord> submitCollectionReportRecordList = new ArrayList<>();
         SubmitCollectionReportGenerator submitCollectionReportGenerator = new SubmitCollectionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            SubmitCollectionRejectionRecord submitCollectionRejectionRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
-            submitCollectionRejectionRecordList.add(submitCollectionRejectionRecord);
+            SubmitCollectionReportRecord submitCollectionReportRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
+            submitCollectionReportRecordList.add(submitCollectionReportRecord);
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q,submitCollectionRejectionRecordList , "fileName", fileName);
+        producerTemplate.sendBodyAndHeader(RecapConstants.FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
 
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";

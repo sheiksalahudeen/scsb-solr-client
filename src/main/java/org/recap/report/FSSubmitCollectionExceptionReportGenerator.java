@@ -2,7 +2,7 @@ package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.model.csv.SubmitCollectionRejectionRecord;
+import org.recap.model.csv.SubmitCollectionReportRecord;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.util.SubmitCollectionReportGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class FSSubmitCollectionExceptionReportGenerator implements ReportGenerat
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT) ? true : false;
     }
 
     @Override
@@ -36,13 +36,13 @@ public class FSSubmitCollectionExceptionReportGenerator implements ReportGenerat
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
         String generatedFileName = null;
-        List<SubmitCollectionRejectionRecord> submitCollectionRejectionRecordList = new ArrayList<>();
+        List<SubmitCollectionReportRecord> submitCollectionReportRecordList = new ArrayList<>();
         SubmitCollectionReportGenerator submitCollectionReportGenerator = new SubmitCollectionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            SubmitCollectionRejectionRecord submitCollectionRejectionRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
-            submitCollectionRejectionRecordList.add(submitCollectionRejectionRecord);
+            SubmitCollectionReportRecord submitCollectionReportRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
+            submitCollectionReportRecordList.add(submitCollectionReportRecord);
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_REJECTION_REPORT_Q,submitCollectionRejectionRecordList , "fileName", fileName);
+        producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q, submitCollectionReportRecordList, "fileName", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT);
 
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
