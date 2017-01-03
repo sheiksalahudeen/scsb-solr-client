@@ -96,8 +96,7 @@
                                                                         name="ReportRequestType"
                                                                         multiple="multiple"
                                                                         th:field="*{reportRequestType}">
-                                                                    <option value="Retrivel">Retrieval</option>
-                                                                    <option value="Hold">Hold</option>
+                                                                    <option value="Retrieval">Retrieval</option>
                                                                     <option value="Recall">Recall</option>
                                                                 </select>
                                                             </div>
@@ -175,12 +174,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="" id="note-ILBD">
-                                                    <strong>Note:</strong> The request count report by IL/LBD shows
+                                                    <strong>Note:</strong> The request count report by IL/BD shows
                                                     the count of requests for partner institutions items.
                                                 </div>
                                                 <div class="" id="note-partners">
                                                     <strong>Note:</strong>The data differentiates EDD and physical records and
-                                                    further differentiates private and shared andopen
+                                                    further differentiates private and shared and open
                                                     records in each.
                                                 </div>
                                                 <div class="" id="note-requesttype">
@@ -375,20 +374,6 @@
                                                             </td>
                                                         </tr>
                                                         <tr class="border-style-top-white"
-                                                            data-th-if="${reportsForm.showHoldTable}">
-                                                            <td class="gray-dark fontcolor-white large-font" style="font-family:sans-serif;">Hold</td>
-                                                            <td><span
-                                                                    th:text="${#numbers.formatInteger(reportsForm.holdRequestPulCount,0,'COMMA')}"></span>
-                                                            </td>
-                                                            <td><span
-                                                                    th:text="${#numbers.formatInteger(reportsForm.holdRequestCulCount,0,'COMMA')}"></span>
-                                                            </td>
-                                                            <td><span
-                                                                    th:text="${#numbers.formatInteger(reportsForm.holdRequestNyplCount,0,'COMMA')}"></span>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="border-style-top-white"
                                                             data-th-if="${reportsForm.showRecallTable}">
                                                             <td class="gray-dark fontcolor-white large-font" style="font-family:sans-serif;">Recall</td>
                                                             <td><span
@@ -536,11 +521,11 @@
                                                         </tr>
                                                         <tr>
                                                             <td>SHARED</td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedOpenPulCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedPulCount,0,'COMMA')}"></span>
                                                             </td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedOpenCulCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedCulCount,0,'COMMA')}"></span>
                                                             </td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedOpenNyplCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionSharedNyplCount,0,'COMMA')}"></span>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -555,11 +540,11 @@
                                                         </tr>
                                                         <tr class="border-style-bottom">
                                                             <td class="fontcolor-dark large-font">SUBTOTAL</td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivatePulCount + reportsForm.accessionSharedOpenPulCount + reportsForm.accessionPrivatePulCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivatePulCount + reportsForm.accessionSharedPulCount + reportsForm.accessionPrivatePulCount,0,'COMMA')}"></span>
                                                             </td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivateCulCount + reportsForm.accessionSharedOpenCulCount + reportsForm.accessionPrivateCulCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivateCulCount + reportsForm.accessionSharedCulCount + reportsForm.accessionPrivateCulCount,0,'COMMA')}"></span>
                                                             </td>
-                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivateNyplCount + reportsForm.accessionSharedOpenNyplCount + reportsForm.accessionPrivateNyplCount,0,'COMMA')}"></span>
+                                                            <td><span th:text="${#numbers.formatInteger(reportsForm.accessionPrivateNyplCount + reportsForm.accessionSharedNyplCount + reportsForm.accessionPrivateNyplCount,0,'COMMA')}"></span>
                                                             </td>
                                                         </tr>
                                                         <tr>

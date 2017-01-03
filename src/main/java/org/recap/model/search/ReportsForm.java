@@ -26,9 +26,6 @@ public class ReportsForm {
     private long retrievalRequestCulCount;
     private long retrievalRequestNyplCount;
 
-    private long holdRequestPulCount;
-    private long holdRequestCulCount;
-    private long holdRequestNyplCount;
 
     private long recallRequestPulCount;
     private long recallRequestCulCount;
@@ -53,9 +50,9 @@ public class ReportsForm {
     private long accessionPrivatePulCount;
     private long accessionPrivateCulCount;
     private long accessionPrivateNyplCount;
-    private long accessionSharedOpenPulCount;
-    private long accessionSharedOpenCulCount;
-    private long accessionSharedOpenNyplCount;
+    private long accessionSharedPulCount;
+    private long accessionSharedCulCount;
+    private long accessionSharedNyplCount;
     private long accessionOpenPulCount;
     private long accessionOpenCulCount;
     private long accessionOpenNyplCount;
@@ -90,7 +87,6 @@ public class ReportsForm {
     private boolean showNoteRequestType=false;
 
     private boolean showRetrievalTable=false;
-    private boolean showHoldTable=false;
     private boolean showRecallTable=false;
     private boolean showRequestTypeShow=false;
 
@@ -230,30 +226,6 @@ public class ReportsForm {
 
     public void setRetrievalRequestNyplCount(long  retrievalRequestNyplCount) {
         this.retrievalRequestNyplCount = retrievalRequestNyplCount;
-    }
-
-    public long getHoldRequestPulCount() {
-        return holdRequestPulCount;
-    }
-
-    public void setHoldRequestPulCount(long holdRequestPulCount) {
-        this.holdRequestPulCount = holdRequestPulCount;
-    }
-
-    public long getHoldRequestCulCount() {
-        return holdRequestCulCount;
-    }
-
-    public void setHoldRequestCulCount(long holdRequestCulCount) {
-        this.holdRequestCulCount = holdRequestCulCount;
-    }
-
-    public long getHoldRequestNyplCount() {
-        return holdRequestNyplCount;
-    }
-
-    public void setHoldRequestNyplCount(long holdRequestNyplCount) {
-        this.holdRequestNyplCount = holdRequestNyplCount;
     }
 
     public long getRecallRequestPulCount() {
@@ -432,28 +404,28 @@ public class ReportsForm {
         this.accessionPrivateNyplCount = accessionPrivateNyplCount;
     }
 
-    public long getAccessionSharedOpenPulCount() {
-        return accessionSharedOpenPulCount;
+    public long getAccessionSharedPulCount() {
+        return accessionSharedPulCount;
     }
 
-    public void setAccessionSharedOpenPulCount(long accessionSharedOpenPulCount) {
-        this.accessionSharedOpenPulCount = accessionSharedOpenPulCount;
+    public void setAccessionSharedPulCount(long accessionSharedPulCount) {
+        this.accessionSharedPulCount = accessionSharedPulCount;
     }
 
-    public long getAccessionSharedOpenCulCount() {
-        return accessionSharedOpenCulCount;
+    public long getAccessionSharedCulCount() {
+        return accessionSharedCulCount;
     }
 
-    public void setAccessionSharedOpenCulCount(long accessionSharedOpenCulCount) {
-        this.accessionSharedOpenCulCount = accessionSharedOpenCulCount;
+    public void setAccessionSharedCulCount(long accessionSharedCulCount) {
+        this.accessionSharedCulCount = accessionSharedCulCount;
     }
 
-    public long getAccessionSharedOpenNyplCount() {
-        return accessionSharedOpenNyplCount;
+    public long getAccessionSharedNyplCount() {
+        return accessionSharedNyplCount;
     }
 
-    public void setAccessionSharedOpenNyplCount(long accessionSharedOpenNyplCount) {
-        this.accessionSharedOpenNyplCount = accessionSharedOpenNyplCount;
+    public void setAccessionSharedNyplCount(long accessionSharedNyplCount) {
+        this.accessionSharedNyplCount = accessionSharedNyplCount;
     }
 
     public long getAccessionOpenPulCount() {
@@ -670,14 +642,6 @@ public class ReportsForm {
 
     public void setShowRetrievalTable(boolean showRetrievalTable) {
         this.showRetrievalTable = showRetrievalTable;
-    }
-
-    public boolean isShowHoldTable() {
-        return showHoldTable;
-    }
-
-    public void setShowHoldTable(boolean showHoldTable) {
-        this.showHoldTable = showHoldTable;
     }
 
     public boolean isShowRecallTable() {

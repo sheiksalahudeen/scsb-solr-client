@@ -398,11 +398,12 @@ public class SolrQueryBuilder {
     }
 
 
-    public SolrQuery buildSolrQueryForCGDReports(String owningInstitution ,  String collectionGroupDesignation){
+    public SolrQuery buildSolrQueryForCGDReports(String owningInstitution , String collectionGroupDesignation){
         StringBuilder query = new StringBuilder();
         query.append("DocType:Item").append(and);
         query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
-        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation).append(and);
+        query.append("IsDeletedItem:false");
         return new SolrQuery(query.toString());
     }
 
