@@ -177,7 +177,7 @@ public class AccessionService {
             response = ex.getMessage();
         }
         //Create dummy record
-        if(response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)){
+        if(response !=null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)){
             response = createDummyRecord(itemBarcode, customerCode, owningInstitution);
         }
         generateAccessionSummaryReport(responseMapList,owningInstitution);
@@ -197,7 +197,7 @@ public class AccessionService {
         String response = null;
         Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution);
         responseMapList.add(responseMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHIC_ID);
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
         List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
         if (CollectionUtils.isNotEmpty(reportEntityList)) {
             reportDetailRepository.save(reportEntityList);
@@ -392,6 +392,18 @@ public class AccessionService {
                     if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
                         copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
+                    }else{
+                        List<ItemEntity> fetchedItemEntityList = fetchHolding.getItemEntities();
+                        List<ItemEntity> itemEntityList = holdingsEntity.getItemEntities();
+                        for(ItemEntity fetchedItemEntity : fetchedItemEntityList){
+                            for(ItemEntity itemEntity : itemEntityList){
+                                if(fetchedItemEntity.getOwningInstitutionItemId().equals(itemEntity.getOwningInstitutionItemId())){
+                                    copyHoldingsEntity(fetchHolding,holdingsEntity);
+                                    iholdings.remove();
+                                }
+                            }
+                        }
+
                     }
                 }
             }

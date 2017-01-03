@@ -65,13 +65,19 @@ public class ReportGenerator {
     @Autowired
     FTPSubmitCollectionRejectionReportGenerator ftpSubmitCollectionRejectionReportGenerator;
 
+    @Autowired
+    FSSubmitCollectionExceptionReportGenerator fsSubmitCollectionExceptionReportGenerator;
+
+    @Autowired
+    FTPSubmitCollectionExceptionReportGenerator ftpSubmitCollectionExceptionReportGenerator;
+
     public String generateReport(String fileName, String institutionName, String reportType, String transmissionType, Date from, Date to) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         List<ReportEntity> reportEntityList;
         if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST)) {
             reportEntityList = reportDetailRepository.findByFileAndTypeAndDateRange(fileName, reportType, from, to);
-         } else {
+        } else {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         }
 
@@ -112,6 +118,8 @@ public class ReportGenerator {
             reportGenerators.add(ftpAccessionReportGenerator);
             reportGenerators.add(fsSubmitCollectionRejectionReportGenerator);
             reportGenerators.add(ftpSubmitCollectionRejectionReportGenerator);
+            reportGenerators.add(fsSubmitCollectionExceptionReportGenerator);
+            reportGenerators.add(ftpSubmitCollectionExceptionReportGenerator);
         }
         return reportGenerators;
     }

@@ -67,6 +67,8 @@ public class RecapConstants {
     public static final String REPORT_Q= "scsbactivemq:queue:reportQ";
     public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionRejectionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionRejectionReportQ";
+    public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionExceptionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionExceptionReportQ";
 
 
     public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
@@ -76,8 +78,10 @@ public class RecapConstants {
     public static final String FTP_SUMMARY_ALGO_REPORT_ROUTE_ID = "ftpSummaryAlgoReportRoute";
     public static final String FTP_SOLR_EXCEPTION_REPORT_ROUTE_ID = "ftpSolrExceptionReportRoute";
     public static final String REPORT_ROUTE_ID = "reportQRoute";
-    public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "fsSubmitCollectionRejectionReportQ";
-    public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "ftpSubmitCollectionRejectionReportQ";
+    public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "fsSubmitCollectionRejectionReport";
+    public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "ftpSubmitCollectionRejectionReport";
+    public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "fsSubmitCollectionExceptionReport";
+    public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "ftpSubmitCollectionExceptionReport";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
     public static final String MATCHING_ALGO_OCLC_FILE_NAME = "Matching_Algo_OCLC";
@@ -274,6 +278,7 @@ public class RecapConstants {
     public static final String REJECTION_REPORT = "Rejection";
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
     public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
+    public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
     public static final String SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
     public static final String SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
     public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";
@@ -281,7 +286,7 @@ public class RecapConstants {
     public static final String DUMMYCALLNUMBER = "dummycallnumber";
     public static final String COMPLETE_STATUS = "Complete";
     public static final String INCOMPLETE_STATUS = "Incomplete";
-    public static final String BIBLIOGRAPHIC_ID= "bibliographicId";
+    public static final String BIBLIOGRAPHICENTITY = "bibliographicEntity";
     public static final String REPORTENTITIES = "reportEntities";
     public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
 

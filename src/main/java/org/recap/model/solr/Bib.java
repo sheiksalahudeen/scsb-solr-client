@@ -112,6 +112,9 @@ public class Bib {
     @Field("IsDeletedBib")
     private boolean isDeletedBib = false;
 
+    @Field("BibCatalogingStatus")
+    private String bibCatalogingStatus;
+
     public String getId() {
         return id;
     }
@@ -376,6 +379,14 @@ public class Bib {
         isDeletedBib = deletedBib;
     }
 
+    public String getBibCatalogingStatus() {
+        return bibCatalogingStatus;
+    }
+
+    public void setBibCatalogingStatus(String bibCatalogingStatus) {
+        this.bibCatalogingStatus = bibCatalogingStatus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -426,6 +437,8 @@ public class Bib {
             return false;
         if (getLeaderMaterialType() != null ? !getLeaderMaterialType().equals(bib.getLeaderMaterialType()) : bib.getLeaderMaterialType() != null)
             return false;
+        if (getBibCatalogingStatus() != null ? !getBibCatalogingStatus().equals(bib.getBibCatalogingStatus()) : bib.getBibCatalogingStatus() != null)
+            return false;
         return getTitleSort() != null ? getTitleSort().equals(bib.getTitleSort()) : bib.getTitleSort() == null;
 
     }
@@ -459,6 +472,7 @@ public class Bib {
         result = 31 * result + (getBibItemIdList() != null ? getBibItemIdList().hashCode() : 0);
         result = 31 * result + (getOwningInstitutionBibId() != null ? getOwningInstitutionBibId().hashCode() : 0);
         result = 31 * result + (getLeaderMaterialType() != null ? getLeaderMaterialType().hashCode() : 0);
+        result = 31 * result + (getBibCatalogingStatus() != null ? getBibCatalogingStatus().hashCode() : 0);
         result = 31 * result + (getTitleSort() != null ? getTitleSort().hashCode() : 0);
         return result;
     }

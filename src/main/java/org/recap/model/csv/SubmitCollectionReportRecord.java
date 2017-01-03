@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by hemalathas on 20/12/16.
  */
 @CsvRecord(generateHeaderColumns = true, separator = ",", quoting = true, crlf = "UNIX")
-public class SubmitCollectionRejectionRecord implements Serializable {
+public class SubmitCollectionReportRecord implements Serializable {
 
     @DataField(pos = 1, columnName = "Item Barcode")
     private String itemBarcode;
