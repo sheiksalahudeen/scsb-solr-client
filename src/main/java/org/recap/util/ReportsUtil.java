@@ -5,13 +5,14 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.ItemChangeLogEntity;
 import org.recap.model.search.DeaccessionItemResultsRow;
 import org.recap.model.search.ReportsForm;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
-import org.recap.repository.jpa.NotesDetailsRepository;
+import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.slf4j.Logger;
@@ -46,35 +47,35 @@ public class ReportsUtil {
     BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
-    NotesDetailsRepository notesDetailsRepository;
+    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     List<ItemValueResolver> itemValueResolvers;
 
     public void populateILBDCountsForRequest(ReportsForm reportsForm, Date requestFromDate, Date requestToDate) {
-        reportsForm.setIlRequestPulCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, 1, Arrays.asList(2, 3)));
-        reportsForm.setIlRequestCulCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, 2, Arrays.asList(1, 3)));
-        reportsForm.setIlRequestNyplCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, 3, Arrays.asList(1, 2)));
-        reportsForm.setBdRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 5));
-        reportsForm.setBdRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 2, 5));
-        reportsForm.setBdRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 3, 5));
+        reportsForm.setIlRequestPulCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, Arrays.asList(RecapConstants.CUL_INST_ID, RecapConstants.NYPL_INST_ID)));
+        reportsForm.setIlRequestCulCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, Arrays.asList(RecapConstants.PUL_INST_ID, RecapConstants.NYPL_INST_ID)));
+        reportsForm.setIlRequestNyplCount(requestItemDetailsRepository.getIlRequestCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, Arrays.asList(RecapConstants.PUL_INST_ID, RecapConstants.CUL_INST_ID)));
+        reportsForm.setBdRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate,RecapConstants.PUL_INST_ID, RecapConstants.BORROW_DIRECT));
+        reportsForm.setBdRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, RecapConstants.BORROW_DIRECT));
+        reportsForm.setBdRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, RecapConstants.BORROW_DIRECT));
         reportsForm.setShowILBDResults(true);
         reportsForm.setShowReportResultsText(true);
         reportsForm.setShowNoteILBD(true);
     }
 
     public void populatePartnersCountForRequest(ReportsForm reportsForm, Date requestFromDate, Date requestToDate) {
-        reportsForm.setPhysicalPrivatePulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 1, Arrays.asList(3), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setPhysicalPrivateCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 2, Arrays.asList(3), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setPhysicalPrivateNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 3, Arrays.asList(3), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setPhysicalSharedPulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 1, Arrays.asList(1, 2), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setPhysicalSharedCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 2, Arrays.asList(1, 2), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setPhysicalSharedNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 3, Arrays.asList(1, 2), Arrays.asList(1, 2, 3, 5)));
-        reportsForm.setEddPrivatePulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 1, Arrays.asList(3), Arrays.asList(4)));
-        reportsForm.setEddPrivateCulCount( requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 2, Arrays.asList(3), Arrays.asList(4)));
-        reportsForm.setEddPrivateNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 3, Arrays.asList(3), Arrays.asList(4)));
-        reportsForm.setEddSharedOpenPulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 1, Arrays.asList(1, 2), Arrays.asList(4)));
-        reportsForm.setEddSharedOpenCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 2, Arrays.asList(1, 2), Arrays.asList(4)));
-        reportsForm.setEddSharedOpenNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, 3, Arrays.asList(1, 2), Arrays.asList(4)));
+        reportsForm.setPhysicalPrivatePulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setPhysicalPrivateCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setPhysicalPrivateNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setPhysicalSharedPulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setPhysicalSharedCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setPhysicalSharedNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.HOLD, RecapConstants.RETRIEVAL, RecapConstants.RECALL, RecapConstants.BORROW_DIRECT)));
+        reportsForm.setEddPrivatePulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.EDD)));
+        reportsForm.setEddPrivateCulCount( requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.EDD)));
+        reportsForm.setEddPrivateNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, Arrays.asList(RecapConstants.CGD_PRIVATE), Arrays.asList(RecapConstants.EDD)));
+        reportsForm.setEddSharedOpenPulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.EDD)));
+        reportsForm.setEddSharedOpenCulCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.EDD)));
+        reportsForm.setEddSharedOpenNyplCount(requestItemDetailsRepository.getPhysicalAndEDDCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, Arrays.asList(RecapConstants.CGD_SHARED, RecapConstants.CGD_OPEN), Arrays.asList(RecapConstants.EDD)));
         reportsForm.setShowPartners(true);
         reportsForm.setShowReportResultsText(true);
         reportsForm.setShowNotePartners(true);
@@ -83,22 +84,17 @@ public class ReportsUtil {
 
     public void populateRequestTypeInformation(ReportsForm reportsForm, Date requestFromDate, Date requestToDate) {
         for (String requestType : reportsForm.getReportRequestType()) {
-            if (requestType.equalsIgnoreCase("Retrivel")) {
-                reportsForm.setRetrievalRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 2));
-                reportsForm.setRetrievalRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 2, 2));
-                reportsForm.setRetrievalRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 3, 2));
+            if (requestType.equalsIgnoreCase(RecapConstants.REPORTS_RETRIEVAL)) {
+                reportsForm.setRetrievalRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, RecapConstants.RETRIEVAL));
+                reportsForm.setRetrievalRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, RecapConstants.RETRIEVAL));
+                reportsForm.setRetrievalRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, RecapConstants.RETRIEVAL));
                 reportsForm.setShowRetrievalTable(true);
             }
-            if (requestType.equalsIgnoreCase("Hold")) {
-                reportsForm.setHoldRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 1));
-                reportsForm.setHoldRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 2, 1));
-                reportsForm.setHoldRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 3, 1));
-                reportsForm.setShowHoldTable(true);
-            }
-            if (requestType.equalsIgnoreCase("Recall")) {
-                reportsForm.setRecallRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 3));
-                reportsForm.setRecallRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 3));
-                reportsForm.setRecallRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, 1, 3));
+
+            if (requestType.equalsIgnoreCase(RecapConstants.REPORTS_RECALL)) {
+                reportsForm.setRecallRequestPulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.PUL_INST_ID, RecapConstants.RECALL));
+                reportsForm.setRecallRequestCulCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.CUL_INST_ID, RecapConstants.RECALL));
+                reportsForm.setRecallRequestNyplCount(requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(requestFromDate, requestToDate, RecapConstants.NYPL_INST_ID, RecapConstants.RECALL));
                 reportsForm.setShowRecallTable(true);
             }
         }
@@ -106,7 +102,6 @@ public class ReportsUtil {
         reportsForm.setShowRequestTypeTable(true);
         reportsForm.setShowNoteRequestType(true);
     }
-
     public void populateAccessionDeaccessionItemCounts(ReportsForm reportsForm, String requestedFromDate, String requestedToDate) throws Exception {
         String date = getSolrFormattedDates(requestedFromDate, requestedToDate);
         for (String owningInstitution : reportsForm.getOwningInstitutions()) {
@@ -116,28 +111,28 @@ public class ReportsUtil {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);
                 SolrDocumentList results = queryResponse.getResults();
                 long numFound = results.getNumFound();
-                if (owningInstitution.equalsIgnoreCase("PUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setAccessionOpenPulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
-                        reportsForm.setAccessionSharedOpenPulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
+                        reportsForm.setAccessionSharedPulCount(numFound);
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setAccessionPrivatePulCount(numFound);
                     }
-                } else if (owningInstitution.equalsIgnoreCase("CUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setAccessionOpenCulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
-                        reportsForm.setAccessionSharedOpenCulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
+                        reportsForm.setAccessionSharedCulCount(numFound);
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setAccessionPrivateCulCount(numFound);
                     }
-                } else if (owningInstitution.equalsIgnoreCase("NYPL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setAccessionOpenNyplCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
-                        reportsForm.setAccessionSharedOpenNyplCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
+                        reportsForm.setAccessionSharedNyplCount(numFound);
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setAccessionPrivateNyplCount(numFound);
                     }
                 }
@@ -150,28 +145,28 @@ public class ReportsUtil {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);
                 SolrDocumentList results = queryResponse.getResults();
                 long numFound = results.getNumFound();
-                if (ownInstitution.equalsIgnoreCase("PUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                if (ownInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setDeaccessionOpenPulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setDeaccessionSharedPulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setDeaccessionPrivatePulCount(numFound);
                     }
-                } else if (ownInstitution.equalsIgnoreCase("CUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (ownInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setDeaccessionOpenCulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setDeaccessionSharedCulCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setDeaccessionPrivateCulCount(numFound);
                     }
-                } else if (ownInstitution.equalsIgnoreCase("NYPL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (ownInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setDeaccessionOpenNyplCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setDeaccessionSharedNyplCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setDeaccessionPrivateNyplCount(numFound);
                     }
                 }
@@ -190,28 +185,28 @@ public class ReportsUtil {
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);
                 SolrDocumentList results = queryResponse.getResults();
                 long numFound = results.getNumFound();
-                if (owningInstitution.equalsIgnoreCase("PUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setOpenPulCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setSharedPulCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setPrivatePulCgdCount(numFound);
                     }
-                } else if (owningInstitution.equalsIgnoreCase("CUL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setOpenCulCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setSharedCulCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setPrivateCulCgdCount(numFound);
                     }
-                } else if (owningInstitution.equalsIgnoreCase("NYPL")) {
-                    if (collectionGroupDesignation.equalsIgnoreCase("Open")) {
+                } else if (owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                    if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_OPEN)) {
                         reportsForm.setOpenNyplCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Shared")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_SHARED)) {
                         reportsForm.setSharedNyplCgdCount(numFound);
-                    } else if (collectionGroupDesignation.equalsIgnoreCase("Private")) {
+                    } else if (collectionGroupDesignation.equalsIgnoreCase(RecapConstants.REPORTS_PRIVATE)) {
                         reportsForm.setPrivateNyplCgdCount(numFound);
                     }
                 }
@@ -222,13 +217,17 @@ public class ReportsUtil {
     public List<DeaccessionItemResultsRow> deaccessionReportFieldsInformation(String requestedFromDate, String requestedToDate, String ownInst) throws Exception {
         String date = getSolrFormattedDates(requestedFromDate,requestedToDate);
         SolrQuery query = solrQueryBuilder.buildSolrQueryForDeaccesionReportInformation(date, ownInst, true);
-        QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);
-        SolrDocumentList results = queryResponse.getResults();
-        long numfound = results.getNumFound();
-        query.setRows((int) numfound);
+        QueryResponse queryResponse = null;
+            queryResponse = solrTemplate.getSolrClient().query(query);
+            SolrDocumentList solrDocuments = queryResponse.getResults();
+            if(solrDocuments.getNumFound() > 10 ) {
+                query.setRows((int) solrDocuments.getNumFound());
+                queryResponse = solrTemplate.getSolrClient().query(query);
+                solrDocuments = queryResponse.getResults();
+            }
         List<Item> itemList = new ArrayList<>();
         List<Integer> itemIdList = new ArrayList<>();
-        for (Iterator<SolrDocument> solrDocumentIterator = results.iterator(); solrDocumentIterator.hasNext(); ) {
+        for (Iterator<SolrDocument> solrDocumentIterator = solrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
             SolrDocument solrDocument = solrDocumentIterator.next();
             boolean isDeletedItem = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_ITEM);
             if(isDeletedItem) {
@@ -248,8 +247,10 @@ public class ReportsUtil {
             deaccessionItemResultsRow.setDeaccessionDate(deaccessionDate);
             deaccessionItemResultsRow.setDeaccessionOwnInst(item.getOwningInstitution());
             deaccessionItemResultsRow.setItemBarcode(item.getBarcode());
-           /* NotesEntity notesEntity = notesDetailsRepository.findByItemId(item.getItemId());
-            deaccessionItemResultsRow.setDeaccessionNotes(notesEntity.getNotes());*/
+            ItemChangeLogEntity itemChangeLogEntity = itemChangeLogDetailsRepository.findByRecordId(item.getItemId());
+            if(null != itemChangeLogEntity && itemChangeLogEntity.getOperationType().equalsIgnoreCase(RecapConstants.REPORTS_DEACCESSION)) {
+                deaccessionItemResultsRow.setDeaccessionNotes(itemChangeLogEntity.getNotes());
+            }
             deaccessionItemResultsRow.setCgd(item.getCollectionGroupDesignation());
             deaccessionItemResultsRowList.add(deaccessionItemResultsRow);
         }
@@ -316,9 +317,9 @@ public class ReportsUtil {
     public Date getToDate(Date createdDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.HOUR_OF_DAY,23);
+        cal.set(Calendar.MINUTE,59);
+        cal.set(Calendar.SECOND,59);
         return cal.getTime();
     }
 
@@ -334,7 +335,7 @@ public class ReportsUtil {
     }
 
     private SimpleDateFormat getSimpleDateFormatForReports() {
-        return new SimpleDateFormat(RecapConstants.Simple_Date_Format_REPORTS);
+        return new SimpleDateFormat(RecapConstants.SIMPLE_DATE_FORMAT_REPORTS);
     }
 
 }
