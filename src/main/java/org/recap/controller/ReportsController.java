@@ -55,18 +55,18 @@ public class ReportsController {
     @RequestMapping(value = "/reports", method = RequestMethod.POST, params = "action=submit")
     public ModelAndView reportCounts(@Valid @ModelAttribute("reportsForm") ReportsForm reportsForm,
                                      Model model) throws Exception {
-        if (reportsForm.getRequestType().equalsIgnoreCase("Request")) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.Simple_Date_Format_REPORTS);
+        if (reportsForm.getRequestType().equalsIgnoreCase(RecapConstants.REPORTS_REQUEST)) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.SIMPLE_DATE_FORMAT_REPORTS);
             Date requestFromDate = simpleDateFormat.parse(reportsForm.getRequestFromDate());
             Date requestToDate = simpleDateFormat.parse(reportsForm.getRequestToDate());
-            if (reportsForm.getShowBy().equalsIgnoreCase("IL_BD")) {
+            if (reportsForm.getShowBy().equalsIgnoreCase(RecapConstants.REPORTS_IL_BD)) {
                 reportsUtil.populateILBDCountsForRequest(reportsForm, requestFromDate, requestToDate);
-            } else if (reportsForm.getShowBy().equalsIgnoreCase("Partners")) {
+            } else if (reportsForm.getShowBy().equalsIgnoreCase(RecapConstants.REPORTS_PARTNERS)) {
                 reportsUtil.populatePartnersCountForRequest(reportsForm, requestFromDate, requestToDate);
-            } else if (reportsForm.getShowBy().equalsIgnoreCase("RequestType")) {
+            } else if (reportsForm.getShowBy().equalsIgnoreCase(RecapConstants.REPORTS_REQUEST_TYPE)) {
                 reportsUtil.populateRequestTypeInformation(reportsForm, requestFromDate, requestToDate);
             }
-        } else if (reportsForm.getRequestType().equalsIgnoreCase("Accession/Deaccesion")) {
+        } else if (reportsForm.getRequestType().equalsIgnoreCase(RecapConstants.REPORTS_ACCESSION_DEACCESSION)) {
             reportsUtil.populateAccessionDeaccessionItemCounts(reportsForm, reportsForm.getAccessionDeaccessionFromDate(), reportsForm.getAccessionDeaccessionToDate());
 
         } else if (reportsForm.getRequestType().equalsIgnoreCase("CollectionGroupDesignation")) {

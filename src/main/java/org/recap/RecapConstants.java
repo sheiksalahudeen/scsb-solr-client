@@ -285,14 +285,35 @@ public class RecapConstants {
     public static final String REPORTENTITIES = "reportEntities";
     public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
 
-    public static final String REPORTS = "reports";
-
     //solr
     public static final String DATE_FORMAT_YYYYMMDDHHMM = "yyyy-MM-dd HH:mm";
     public static final String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String UTC = "UTC";
     public static final String SOLR_DATE_RANGE_TO_NOW = " TO NOW";
 
-    public static final String Simple_Date_Format_REPORTS = "MM/dd/yyyy";
+    //Reports
+    public static final String SIMPLE_DATE_FORMAT_REPORTS = "MM/dd/yyyy";
+    public static final String REPORTS = "reports";
+    public static final String REPORTS_REQUEST = "request";
+    public static final String REPORTS_IL_BD = "IL_BD";
+    public static final String REPORTS_PARTNERS = "Partners";
+    public static final String REPORTS_REQUEST_TYPE = "RequestType";
+    public static final String REPORTS_ACCESSION_DEACCESSION = "Accession/Deaccesion";
+    public static final String REPORTS_DEACCESSION = "Deaccession";
+    public static final String REPORTS_RETRIEVAL = "Retrieval";
+    public static final String REPORTS_RECALL = "Recall";
+    public static final String REPORTS_OPEN = "Open";
+    public static final String REPORTS_SHARED = "Shared";
+    public static final String REPORTS_PRIVATE = "Private";
+    public static final Integer PUL_INST_ID = 1;
+    public static final Integer CUL_INST_ID = 2;
+    public static final Integer NYPL_INST_ID = 3;
+    public static final Integer CGD_SHARED = 1;
+    public static final Integer CGD_OPEN = 2;
+    public static final Integer  HOLD= 1;
+    public static final Integer RETRIEVAL = 2;
+    public static final Integer RECALL = 3;
+    public static final Integer EDD = 4;
+    public static final Integer BORROW_DIRECT = 5;
 
 }

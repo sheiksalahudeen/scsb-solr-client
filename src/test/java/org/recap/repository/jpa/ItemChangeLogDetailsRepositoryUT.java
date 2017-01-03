@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import java.util.Date;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by rajeshbabuk on 18/10/16.
@@ -31,4 +32,29 @@ public class ItemChangeLogDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedItemChangeLogEntity);
         assertNotNull(savedItemChangeLogEntity.getChangeLogId());
     }
+
+    @Test
+    public void checkfindByRecordId() throws Exception{
+        ItemChangeLogEntity itemChangeLogEntity = saveDeaccessionNotes();
+        ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordId(itemChangeLogEntity.getRecordId());
+        assertNotNull(byRecordId);
+        if (itemChangeLogEntity.getOperationType().equalsIgnoreCase("Deaccession")){
+            assertEquals("testing",byRecordId.getNotes());
+        }
+
+    }
+
+    private ItemChangeLogEntity saveDeaccessionNotes() throws Exception{
+        ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
+        itemChangeLogEntity.setUpdatedBy("guest");
+        itemChangeLogEntity.setUpdatedDate(new Date());
+        itemChangeLogEntity.setOperationType("Deaccession");
+        itemChangeLogEntity.setNotes("testing");
+        ItemChangeLogEntity savedItemChangeLogEntity = itemChangeLogDetailsRepository.save(itemChangeLogEntity);
+        entityManager.refresh(savedItemChangeLogEntity);
+        return itemChangeLogEntity;
+
+    }
+
+
 }
