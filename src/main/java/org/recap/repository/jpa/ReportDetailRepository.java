@@ -37,4 +37,16 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
 
     @Query(value = "select * from report_t where INSTITUTION_NAME=?1 and TYPE=?2 and CREATED_DATE >= ?3 and CREATED_DATE <= ?4", nativeQuery = true)
     List<ReportEntity> findByInstitutionAndTypeAndDateRange(String institutionName, String type, Date from, Date to);
+
+    @Query(value = "delete from report_data_t where record_num in (select record_num from report_t where type in (?1))", nativeQuery = true)
+    void deleteReportDataEntitiesByTypeAndFileName(List<String> types);
+
+    @Query(value = "delete from report_t where type in (?1)", nativeQuery = true)
+    void deleteReportEntitiesByTypeAndFileName(List<String> types);
+
+    @Query(value = "select count(*) from report_t where FILE_NAME=?1 and TYPE=?2", nativeQuery = true)
+    long findCountByFileNameAndType(String fileName, String type);
+
+    @Query(value = "select * from report_t where FILE_NAME=?1 and TYPE=?2 limit ?3,?4", nativeQuery = true)
+    List<ReportEntity> findByFileNameAndTypeAndRange(String fileName, String type, long from, long to);
 }

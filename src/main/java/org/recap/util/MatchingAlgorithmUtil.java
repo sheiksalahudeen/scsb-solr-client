@@ -21,6 +21,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import java.text.Normalizer;
 import java.util.*;
 
 /**
@@ -125,58 +126,148 @@ public class MatchingAlgorithmUtil {
         return tempBibIdSet;
     }
 
+    public String normalizeDiacriticsInTitle(String title) {
+        String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD);
+        normalizedTitle = normalizedTitle.replaceAll("[^\\p{ASCII}]", "");
+        normalizedTitle = normalizedTitle.replaceAll("\\p{M}", "");
+        return normalizedTitle;
+    }
+
     public void saveReportForSingleMatch(String criteriaValue, List<Integer> bibIdList, String criteria, Map<Integer, MatchingBibEntity> matchingBibEntityMap) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         Set<String> owningInstSet = new HashSet<>();
         List<Integer> bibIds = new ArrayList<>();
         List<String> materialTypes = new ArrayList<>();
+        Map<String,String> titleMap = new HashMap<>();
+        Set<String> unMatchingTitleHeaderSet = new HashSet<>();
+        List<ReportEntity> reportEntitiesToSave = new ArrayList<>();
 
+        int index=0;
         for (Iterator<Integer> iterator = bibIdList.iterator(); iterator.hasNext(); ) {
             Integer bibId = iterator.next();
             MatchingBibEntity matchingBibEntity = matchingBibEntityMap.get(bibId);
-            int index=0;
             if(!owningInstSet.contains(matchingBibEntity.getOwningInstitution())) {
                 owningInstSet.add(matchingBibEntity.getOwningInstitution());
                 bibIds.add(bibId);
                 materialTypes.add(matchingBibEntity.getMaterialType());
                 index = index + 1;
                 if(StringUtils.isNotBlank(matchingBibEntity.getTitle())) {
-                    ReportDataEntity titleReportDataEntity = new ReportDataEntity();
-                    titleReportDataEntity.setHeaderName("Title" + index);
-                    titleReportDataEntity.setHeaderValue(matchingBibEntity.getTitle());
-                    reportDataEntities.add(titleReportDataEntity);
+                    String titleHeader = "Title" + index;
+                    getReportDataEntity(titleHeader, matchingBibEntity.getTitle(), reportDataEntities);
+                    titleMap.put(titleHeader, matchingBibEntity.getTitle());
                 }
             }
         }
+
         if(owningInstSet.size() > 1) {
             ReportEntity reportEntity = new ReportEntity();
-            reportEntity.setFileName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
-            reportEntity.setType("SingleMatch");
+            String fileName = criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria;
+            reportEntity.setFileName(fileName);
             reportEntity.setInstitutionName(RecapConstants.ALL_INST);
             reportEntity.setCreatedDate(new Date());
+            Set<String> matchingTitleHeaderSet = getMatchingAndUnMatchingBibsOnTitleVerification(titleMap, unMatchingTitleHeaderSet);
+            if(CollectionUtils.isNotEmpty(matchingTitleHeaderSet) && CollectionUtils.isNotEmpty(unMatchingTitleHeaderSet) && matchingTitleHeaderSet.size() != titleMap.size()) {
+                reportEntity.setType("TitleException");
 
-            if(CollectionUtils.isNotEmpty(bibIds)) {
-                ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, "BibId");
-                reportDataEntities.add(bibIdReportDataEntity);
+                ReportEntity matchingReportEntity = processReportsForMatchingTitles(fileName, titleMap, StringUtils.join(bibIds).split(","),
+                        StringUtils.join(materialTypes).split(","), StringUtils.join(owningInstSet).split(","), criteriaValue, matchingTitleHeaderSet);
+                reportEntitiesToSave.add(matchingReportEntity);
+
+            } else if(CollectionUtils.isEmpty(matchingTitleHeaderSet) && CollectionUtils.isNotEmpty(unMatchingTitleHeaderSet)) {
+                reportEntity.setType("TitleException");
+            } else {
+                reportEntity.setType("SingleMatch");
             }
 
-            if(CollectionUtils.isNotEmpty(owningInstSet)) {
-                ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
-                reportDataEntities.add(owningInstReportDataEntity);
-            }
+            getReportDataEntityList(reportDataEntities, owningInstSet, bibIds, materialTypes);
 
-            if(CollectionUtils.isNotEmpty(materialTypes)) {
-                ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
-                reportDataEntities.add(materialTypeReportDataEntity);
-            }
-
-            ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
-            criteriaReportDataEntity.setHeaderName(criteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC) ? RecapConstants.OCLC_CRITERIA : criteria);
-            criteriaReportDataEntity.setHeaderValue(criteriaValue);
-            reportDataEntities.add(criteriaReportDataEntity);
+            getReportDataEntity(fileName, criteriaValue, reportDataEntities);
 
             reportEntity.addAll(reportDataEntities);
-            producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
+            reportEntitiesToSave.add(reportEntity);
+        }
+        if(CollectionUtils.isNotEmpty(reportEntitiesToSave)) {
+            producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntitiesToSave);
+        }
+    }
+
+    public Set<String> getMatchingAndUnMatchingBibsOnTitleVerification(Map<String, String> titleMap, Set<String> unMatchingTitleHeaderSet) {
+
+        Set<String> matchingTitleHeaderSet = new HashSet<>();
+        if (titleMap != null) {
+            List<String> titleHeaders = new ArrayList(titleMap.keySet());
+            for(int i=0; i < titleMap.size(); i++) {
+                for(int j=i+1; j < titleMap.size(); j++) {
+                    String titleHeader1 = titleHeaders.get(i);
+                    String titleHeader2 = titleHeaders.get(j);
+                    String title1 = titleMap.get(titleHeader1);
+                    String title2 = titleMap.get(titleHeader2);
+                    title1 = getTitleToMatch(title1);
+                    title2 = getTitleToMatch(title2);
+                    logger.info("Title 1 : " + title1);
+                    logger.info("Title 2 : " + title2);
+                    if(title1.equalsIgnoreCase(title2)) {
+                        matchingTitleHeaderSet.add(titleHeader1);
+                        matchingTitleHeaderSet.add(titleHeader2);
+                    } else {
+                        unMatchingTitleHeaderSet.add(titleHeader1);
+                        unMatchingTitleHeaderSet.add(titleHeader2);
+                    }
+                }
+            }
+        }
+        return matchingTitleHeaderSet;
+    }
+
+    public String getTitleToMatch(String title) {
+        title = normalizeDiacriticsInTitle(title.trim());
+        title = title.replaceAll("[^\\w\\s]", "").trim();
+        title = title.replaceAll("\\s{2,}", " ");
+        String titleToMatch = "";
+        if(StringUtils.isNotBlank(title)) {
+            String[] titleArray = title.split(" ");
+            int count = 0;
+            for (int j = 0; j < titleArray.length; j++) {
+                String tempTitle = titleArray[j];
+                if (!(tempTitle.equalsIgnoreCase("a") || tempTitle.equalsIgnoreCase("an") || tempTitle.equalsIgnoreCase("the"))) {
+                    if(count == 0) {
+                        titleToMatch = tempTitle;
+                    } else {
+                        titleToMatch = titleToMatch + " " + tempTitle;
+                    }
+                    count = count + 1;
+                } else {
+                    if(j != 0) {
+                        if(count == 0) {
+                            titleToMatch = tempTitle;
+                        } else {
+                            titleToMatch = titleToMatch + " " + tempTitle;
+                        }
+                        count = count + 1;
+                    }
+                }
+                if (count == 4) {
+                    break;
+                }
+            }
+        }
+        return titleToMatch.replaceAll("\\s", "");
+    }
+
+    public void getReportDataEntityList(List<ReportDataEntity> reportDataEntities, Collection owningInstSet, Collection bibIds, Collection materialTypes) {
+        if(CollectionUtils.isNotEmpty(bibIds)) {
+            ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, "BibId");
+            reportDataEntities.add(bibIdReportDataEntity);
+        }
+
+        if(CollectionUtils.isNotEmpty(owningInstSet)) {
+            ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
+            reportDataEntities.add(owningInstReportDataEntity);
+        }
+
+        if(CollectionUtils.isNotEmpty(materialTypes)) {
+            ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
+            reportDataEntities.add(materialTypeReportDataEntity);
         }
     }
 
@@ -187,7 +278,7 @@ public class MatchingAlgorithmUtil {
         return bibIdReportDataEntity;
     }
 
-    public void populateBibIdWithMatchingCriteriaValue(Map<String, Set<Integer>> criteria1Map, List<MatchingBibEntity> matchingBibEntities, String matchCriteria1, String matchCriteria2, Map<Integer, MatchingBibEntity> bibEntityMap) {
+    public void populateBibIdWithMatchingCriteriaValue(Map<String, Set<Integer>> criteria1Map, List<MatchingBibEntity> matchingBibEntities, String matchCriteria1, Map<Integer, MatchingBibEntity> bibEntityMap) {
         for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
             MatchingBibEntity matchingBibEntity = iterator.next();
             Integer bibId = matchingBibEntity.getBibId();
@@ -256,37 +347,66 @@ public class MatchingAlgorithmUtil {
             }
         }
         if(owningInstSet.size() > 1) {
-            if(CollectionUtils.isNotEmpty(bibIdList)) {
-                ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIdList, "BibId");
-                reportDataEntities.add(bibIdReportDataEntity);
-            }
-
-            if(CollectionUtils.isNotEmpty(owningInstSet)) {
-                ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
-                reportDataEntities.add(owningInstReportDataEntity);
-            }
-
-            if(CollectionUtils.isNotEmpty(materialTypes)) {
-                ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
-                reportDataEntities.add(materialTypeReportDataEntity);
-            }
+            getReportDataEntityList(reportDataEntities, owningInstSet, bibIdList, materialTypes);
 
             if(StringUtils.isNotBlank(oclcNumbers)) {
-                ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
-                criteriaReportDataEntity.setHeaderName(header1);
-                criteriaReportDataEntity.setHeaderValue(oclcNumbers);
-                reportDataEntities.add(criteriaReportDataEntity);
+                getReportDataEntity(header1, oclcNumbers, reportDataEntities);
             }
 
             if(StringUtils.isNotBlank(isbns)) {
-                ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
-                criteriaReportDataEntity.setHeaderValue(isbns);
-                criteriaReportDataEntity.setHeaderName(header2);
-                reportDataEntities.add(criteriaReportDataEntity);
+                getReportDataEntity(header2, isbns, reportDataEntities);
             }
             reportEntity.addAll(reportDataEntities);
             producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
         }
+    }
+
+    public void getReportDataEntity(String header1, String headerValues, List<ReportDataEntity> reportDataEntities) {
+        ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
+        criteriaReportDataEntity.setHeaderName(header1);
+        criteriaReportDataEntity.setHeaderValue(headerValues);
+        reportDataEntities.add(criteriaReportDataEntity);
+    }
+
+    public ReportEntity processReportsForMatchingTitles(String fileName, Map<String, String> titleMap, String[] bibIds, String[] materialTypes, String[] owningInstitutions, String matchPointValue, Set<String> matchingTitleHeaderSet) {
+        ReportEntity matchingReportEntity = new ReportEntity();
+        matchingReportEntity.setType("SingleMatch");
+        matchingReportEntity.setCreatedDate(new Date());
+        matchingReportEntity.setInstitutionName(RecapConstants.ALL_INST);
+        matchingReportEntity.setFileName(fileName);
+        List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
+        List<String> bibIdList = new ArrayList<>();
+        List<String> materialTypeList = new ArrayList<>();
+        List<String> owningInstitutionList = new ArrayList<>();
+
+        for (Iterator<String> stringIterator = matchingTitleHeaderSet.iterator(); stringIterator.hasNext(); ) {
+            String titleHeader = stringIterator.next();
+            for(int i=1; i < matchingTitleHeaderSet.size(); i++) {
+                if(titleHeader.equalsIgnoreCase("Title"+String.valueOf(i))) {
+                    if(bibIds != null) {
+                        bibIdList.add(bibIds[i-1]);
+                    }
+                    if(materialTypes != null) {
+                        materialTypeList.add(materialTypes[i-1]);
+                    }
+                    if(owningInstitutions != null) {
+                        owningInstitutionList.add(owningInstitutions[i-1]);
+                    }
+                    ReportDataEntity titleReportDataEntity = new ReportDataEntity();
+                    titleReportDataEntity.setHeaderName(titleHeader);
+                    titleReportDataEntity.setHeaderValue(titleMap.get(titleHeader));
+                    reportDataEntityList.add(titleReportDataEntity);
+                    break;
+                }
+            }
+        }
+        getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList);
+
+        if(StringUtils.isNotBlank(matchPointValue)) {
+            getReportDataEntity(fileName, matchPointValue, reportDataEntityList);
+        }
+        matchingReportEntity.addAll(reportDataEntityList);
+        return matchingReportEntity;
     }
 
     public List<MatchingMatchPointsEntity> getMatchingMatchPointsEntity(String fieldName) throws Exception {

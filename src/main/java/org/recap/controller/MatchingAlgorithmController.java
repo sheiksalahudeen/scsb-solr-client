@@ -53,41 +53,7 @@ public class MatchingAlgorithmController {
             matchingAlgorithmHelperService.populateMatchingBibEntities();
             stopWatch1.stop();
             logger.info("Time taken to save Matching Bib Entity : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save OCLC&ISBN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save OCLC&ISSN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save OCLC&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save ISBN&ISSN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save ISBN&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save ISSN&LCCN Combination Reports : " + stopWatch1.getTotalTimeSeconds());
-            stopWatch1 = new StopWatch();
-            stopWatch1.start();
-            matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize);
-            stopWatch1.stop();
-            logger.info("Time taken to save Single Matching Reports : " + stopWatch1.getTotalTimeSeconds());
+            runReportsForMatchingAlgorithm(batchSize);
 
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
@@ -98,6 +64,64 @@ public class MatchingAlgorithmController {
             stringBuilder.append("Status : Failed");
         }
         return stringBuilder.toString();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/matchingAlgorithm/reports", method = RequestMethod.POST)
+    public String matchingAlgorithmOnlyReports() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Integer batchSize = 10000;
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            runReportsForMatchingAlgorithm(batchSize);
+            stopWatch.stop();
+            logger.info("Total Time taken to process Matching Algorithm Reports : " + stopWatch.getTotalTimeSeconds());
+            stringBuilder.append("Status  : Done" ).append("\n");
+            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+        } catch (Exception e) {
+            logger.error("Exception : " + e.getMessage());
+            stringBuilder.append("Status : Failed");
+        }
+        return stringBuilder.toString();
+    }
+
+    private void runReportsForMatchingAlgorithm(Integer batchSize) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save OCLC&ISBN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save OCLC&ISSN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save OCLC&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save ISBN&ISSN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save ISBN&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save ISSN&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize);
+        stopWatch.stop();
+        logger.info("Time taken to save Single Matching Reports : " + stopWatch.getTotalTimeSeconds());
     }
 
     @ResponseBody

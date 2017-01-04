@@ -73,6 +73,8 @@ function saveReport() {
     var url = '';
     if(criteria === 'ALL') {
         url = "/matchingAlgorithm/full";
+    } else if (criteria === 'Reports') {
+        url = "/matchingAlgorithm/reports";
     }
     if(url !== '') {
         var request = $.ajax({
