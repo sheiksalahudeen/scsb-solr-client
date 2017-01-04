@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.File;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -524,10 +524,23 @@ public class AccessionService {
         return collectionGroupMap;
     }
 
-    private String getXmlContent(String filename) throws Exception {
-        URL resource = getClass().getResource(filename);
-        File file = new File(resource.toURI());
-        String marcXmlString = FileUtils.readFileToString(file, "UTF-8");
-        return marcXmlString;
+    private String getXmlContent(String filename) {
+        InputStream inputStream = getClass().getResourceAsStream(filename);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder out = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty()) {
+                    out.append("\n");
+                } else {
+                    out.append(line);
+                    out.append("\n");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return out.toString();
     }
 }
