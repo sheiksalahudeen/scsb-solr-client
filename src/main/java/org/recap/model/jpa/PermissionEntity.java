@@ -4,6 +4,7 @@ package org.recap.model.jpa;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by dharmendrag on 29/11/16.
@@ -18,6 +19,12 @@ public class PermissionEntity implements Serializable{
 
     @Column(name="permission_name")
     private String permissionName;
+
+    @Column(name="permission_description")
+    private String permissionDesc;
+
+    @ManyToMany(mappedBy ="permissions")
+    private List<RoleEntity> roleEntityList;
 
     public int getPermissionId() {
         return permissionId;
@@ -43,9 +50,15 @@ public class PermissionEntity implements Serializable{
         this.permissionDesc = permissionDesc;
     }
 
-    @Column(name="permission_description")
+    public List<RoleEntity> getRoleEntityList() {
+        return roleEntityList;
+    }
 
-    private String permissionDesc;
+    public void setRoleEntityList(List<RoleEntity> roleEntityList) {
+        this.roleEntityList = roleEntityList;
+    }
+
+
 
 
 

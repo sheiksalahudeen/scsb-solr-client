@@ -321,4 +321,11 @@ public class RecapConstants {
     public static final Integer EDD = 4;
     public static final Integer BORROW_DIRECT = 5;
 
+    public static final String ROLES = "roles";
+    public static final String INVALID_ROLE_NAME = "Please give one valid role name";
+    public static final String WRONG_PERMISSION = "This permission is not given to this role";
+    public static final String INVALID_PERMISSION = "Please give one valid permission name";
+    public static final String SPECIAL_CHARACTERS_NOT_ALLOWED = "Special characters and spaces are not allowed";
+
+
 }

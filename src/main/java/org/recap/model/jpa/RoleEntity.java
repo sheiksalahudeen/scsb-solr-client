@@ -10,8 +10,9 @@ import java.util.Set;
 @Table(name="roles_t",schema="recap",catalog="")
 public class RoleEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="role_id")
-    private int roleId;
+    private Integer roleId;
 
     @Column(name="role_name")
     private String roleName;
@@ -27,11 +28,11 @@ public class RoleEntity {
             })
     private Set<PermissionEntity> permissions;
 
-    public int getRoleId() {
+    public Integer getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(int roleId) {
+    public void setRoleId(Integer roleId) {
         this.roleId = roleId;
     }
 
