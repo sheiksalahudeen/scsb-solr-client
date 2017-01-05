@@ -251,6 +251,10 @@ li.active a.tab-users span{color:#D38C0D;}
 .Deaccessionbacklink a span{border-radius:50%;padding:5px; color:#fff;background:#699683;font-size:11px;top:-3px}
 .create-request-section .buscador-principal .form-control{border:1px solid #888988}
 .create-request-section .buscador-principal .select-holder:after{padding:14px 6px}
+.create-role-section .buscador-principal .form-control{border:0.5px solid #888988}
+.edit-role-section .buscador-principal .form-control{border:0.5px solid #888988}
+.delete-role-section .buscador-principal .form-control{border:0.5px solid #888988}
+
 #recapreports .table tr.bgcolored{background:#F7DADA;}
 #recapreports .table tr th{padding:10px 8px}
 #recapreports .table thead tr{background:#7f807f !important;font-weight:normal}
@@ -313,6 +317,7 @@ textarea{resize:none;}
 #recaprequest .search-bar .buscador-principal .themed-button,
 #recapreports .search-bar .buscador-principal .themed-button,
 #recaprole .search-bar .buscador-principal .themed-button,
+#recaprole .create-role-section .buscador-principal .themed-button,
 #recapusers .search-bar .buscador-principal .themed-button{margin-top:30px;padding:5px 0;text-align:center}
 #recaprequest .search-bar .buscador-principal .themed-button-search,
 #recaprequest .search-bar .buscador-principal .themed-button-search:focus
@@ -326,6 +331,7 @@ textarea{resize:none;}
 #recaprole .search-bar .buscador-principal .themed-button-search:focus
 #recaprole .search-bar .buscador-principal .themed-button-search:visited{background-color:#29B7D3;}
 #recaprole .search-bar .buscador-principal .themed-button-search:hover{background-color:#24a1b9;}
+#recaprole .form-group.has-error .help-block{left:0}
 #recapusers .search-bar .buscador-principal .themed-button-search,
 #recapusers .search-bar .buscador-principal .themed-button-search:focus,
 #recapusers .search-bar .buscador-principal .themed-button-search:visited{background-color:#D38C0D;}
