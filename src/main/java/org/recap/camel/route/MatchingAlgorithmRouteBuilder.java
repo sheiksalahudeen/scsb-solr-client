@@ -42,7 +42,7 @@ public class MatchingAlgorithmRouteBuilder {
                 @Override
                 public void configure() throws Exception {
                     from("scsbactivemq:queue:saveMatchingReportsQ?concurrentConsumers=10")
-                            .routeId("saveMatchingReportsQ")
+                            .routeId("saveMatchingReportsQ").threads(10)
                             .bean(MatchingAlgorithmProcessor.class,"saveMatchingReportEntity");
                 }
             });

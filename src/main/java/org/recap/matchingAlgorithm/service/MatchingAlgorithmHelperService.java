@@ -13,6 +13,7 @@ import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
+import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.SolrQueryBuilder;
 import org.slf4j.Logger;
@@ -54,7 +55,21 @@ public class MatchingAlgorithmHelperService {
     @Autowired
     ProducerTemplate producerTemplate;
 
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
+
     private ExecutorService executorService;
+
+    public void clearExistingMatchingData() throws Exception {
+        matchingMatchPointsDetailsRepository.deleteAll();
+        matchingBibDetailsRepository.deleteAll();
+        clearMatchingReports();
+    }
+
+    public void clearMatchingReports() {
+        reportDetailRepository.deleteReportDataEntitiesByTypeAndFileName(Arrays.asList("SingleMatch", "MultiMatch"));
+        reportDetailRepository.deleteReportEntitiesByTypeAndFileName(Arrays.asList("SingleMatch", "MultiMatch"));
+    }
 
     public long findMatchingAndPopulateMatchPointsEntities() throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities;
@@ -109,7 +124,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
             if(org.apache.commons.collections.CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, bibEntityMap);
             }
         }
 
@@ -145,7 +160,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISSN);
             if(org.apache.commons.collections.CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISSN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, bibEntityMap);
             }
         }
 
@@ -181,7 +196,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_LCCN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(oclcAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, bibEntityMap);
             }
         }
 
@@ -217,7 +232,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_ISSN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(isbnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_ISSN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(isbnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, bibEntityMap);
             }
         }
 
@@ -253,7 +268,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(isbnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_LCCN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(isbnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, bibEntityMap);
             }
         }
 
@@ -289,7 +304,7 @@ public class MatchingAlgorithmHelperService {
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
-                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(issnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.MATCH_POINT_FIELD_LCCN, bibEntityMap);
+                matchingAlgorithmUtil.populateBibIdWithMatchingCriteriaValue(issnAndBibIdMap, bibEntitiesBasedOnBibIds, RecapConstants.MATCH_POINT_FIELD_ISSN, bibEntityMap);
             }
         }
 

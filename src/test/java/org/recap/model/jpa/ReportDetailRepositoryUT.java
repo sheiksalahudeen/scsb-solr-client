@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -43,6 +44,23 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         ReportEntity reportEntity1 = reportEntities.get(0);
         assertNotNull(reportEntity1);
         assertNotNull(reportEntity1.getReportDataEntities());
+    }
+
+    @Test
+    public void findAndUpdateReportEntity() {
+        ReportEntity savedReportEntity = saveReportEntity();
+        assertNotNull(savedReportEntity.getRecordNumber());
+        ReportEntity entity = reportDetailRepository.findOne(savedReportEntity.getRecordNumber());
+        assertNotNull(entity);
+        ReportDataEntity reportDataEntity = entity.getReportDataEntities().get(0);
+        assertNotNull(reportDataEntity);
+        entity.setType("Test");
+        ReportEntity savedEntity = reportDetailRepository.save(entity);
+        assertNotNull(savedEntity);
+        assertEquals(savedEntity.getRecordNumber(), entity.getRecordNumber());
+        ReportDataEntity dataEntity = savedEntity.getReportDataEntities().get(0);
+        assertNotNull(dataEntity);
+        assertEquals(reportDataEntity.getReportDataId(), dataEntity.getReportDataId());
     }
 
     private ReportEntity saveReportEntity() {

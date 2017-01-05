@@ -372,6 +372,7 @@ public class SolrQueryBuilder {
         if (CollectionUtils.isNotEmpty(matchCriteriaValues)) {
             query.append(buildQueryForMatchChildReturnParent(matchingCriteria, matchCriteriaValues));
         }
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false").append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD);
         SolrQuery solrQuery = new SolrQuery(query.toString());
         solrQuery.setRows(rows);
         return solrQuery;
