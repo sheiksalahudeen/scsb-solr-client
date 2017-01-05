@@ -364,7 +364,7 @@ public class ReportsUtilUT extends BaseTestCase {
                 assertEquals("Shared",deaccessionItemResultsRow.getCgd());
                 assertEquals("b3",deaccessionItemResultsRow.getItemBarcode());
                 assertEquals("PUL",deaccessionItemResultsRow.getDeaccessionOwnInst());
-                ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordId(deaccessionItemResultsRow.getItemId());
+                ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(deaccessionItemResultsRow.getItemId(),"Deaccession");
                 if(byRecordId.getOperationType().equalsIgnoreCase("Deaccession")){
                     assertEquals("test notes",deaccessionItemResultsRow.getDeaccessionNotes());
                 }
