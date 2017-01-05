@@ -36,7 +36,7 @@ public class ItemChangeLogDetailsRepositoryUT extends BaseTestCase {
     @Test
     public void checkfindByRecordId() throws Exception{
         ItemChangeLogEntity itemChangeLogEntity = saveDeaccessionNotes();
-        ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordId(itemChangeLogEntity.getRecordId());
+        ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(itemChangeLogEntity.getRecordId(),"Deaccession");
         assertNotNull(byRecordId);
         if (itemChangeLogEntity.getOperationType().equalsIgnoreCase("Deaccession")){
             assertEquals("testing",byRecordId.getNotes());
