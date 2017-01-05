@@ -1,10 +1,10 @@
 package org.recap.controller.swagger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.recap.controller.SearchRecordsController;
 import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
+import org.recap.model.search.SearchRecordsResponse;
 import org.recap.model.search.SearchResultRow;
 import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -24,35 +23,29 @@ import java.util.*;
 public class SearchRecordRestController {
 
     private Logger logger = LoggerFactory.getLogger(SearchRecordsController.class);
+
     @Autowired
     SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
 
-    @RequestMapping(value="/search", method = RequestMethod.GET)
-    @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search", position = 0, consumes="application/json")
+    @RequestMapping(value="/search", method = RequestMethod.POST)
+    @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search", position = 0)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
-    public List<SearchResultRow> searchRecordsServiceGetParam(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestParam String requestJson) {
-
-//        logger.info("Get " +requestJson);
-
-        ObjectMapper mapper = new ObjectMapper();
-        SearchRecordsRequest searchRecordsRequest = null;
+    @ResponseBody
+    public SearchRecordsResponse searchRecordsServiceGetParam(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestBody SearchRecordsRequest searchRecordsRequest) {
+        SearchRecordsResponse searchRecordsResponse = new SearchRecordsResponse();
         try {
-            searchRecordsRequest = mapper.readValue(requestJson, SearchRecordsRequest.class);
-        } catch (IOException e) {
-            logger.info("search : "+e.getMessage());
-        }
-        if (searchRecordsRequest ==null){
-            searchRecordsRequest = new SearchRecordsRequest();
-        }
-        List<SearchResultRow> searchResultRows = null;
-        try {
-            searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+            List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+            searchRecordsResponse.setSearchResultRows(searchResultRows);
+            searchRecordsResponse.setTotalBibRecordsCount(searchRecordsRequest.getTotalBibRecordsCount());
+            searchRecordsResponse.setTotalItemRecordsCount(searchRecordsRequest.getTotalItemRecordsCount());
+            searchRecordsResponse.setTotalRecordsCount(searchRecordsRequest.getTotalRecordsCount());
+            searchRecordsResponse.setTotalPageCount(searchRecordsRequest.getTotalPageCount());
         } catch (Exception e) {
-            searchResultRows = new ArrayList<>();
+            logger.error(e.getMessage());
+            searchRecordsResponse.setErrorMessage(e.getMessage());
         }
-        return searchResultRows;
+        return searchRecordsResponse;
     }
-
 
     @RequestMapping(value="/searchRecords", method = RequestMethod.POST)
     @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", position = 0, consumes="application/json")

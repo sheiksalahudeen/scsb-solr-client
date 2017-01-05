@@ -441,13 +441,13 @@ table .checkbox .cr{margin-right:0}
 .show-newsearchtable span{font-size:28px;color:#3C7FC1;}
 #search-result-table_info{display:none;}
 .dataTables_scroll{margin-bottom:20px}
-.tab-content .tab-pane .pagination a{border:0;padding:10px 15px;margin:0 10px}
+/*.tab-content .tab-pane .pagination a{border:0;padding:10px 15px;margin:0 10px}
 .tab-content .tab-pane .pagination > .active > a,
 .tab-content .tab-pane .pagination > .active > span,
 .tab-content .tab-pane .pagination > .active > a:hover,
 .tab-content .tab-pane .pagination > .active > span:hover,
 .tab-content .tab-pane .pagination > .active > a:focus,
-.tab-content .tab-pane .pagination > .active > span:focus{border:1px solid #828282;background:#f3f3f3;color:#696A69;}
+.tab-content .tab-pane .pagination > .active > span:focus{border:1px solid #828282;background:#f3f3f3;color:#696A69;}*/
 #info-tablecontent .hide{display:none}
 td.details-control {background:url('../images/show-icon.png') no-repeat center center;cursor:pointer;}
 tr.shown td.details-control {background:url('../images/hide-icon.png') no-repeat center center;}

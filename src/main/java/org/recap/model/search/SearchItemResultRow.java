@@ -104,6 +104,9 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
 
     @Override
     public int compareTo(SearchItemResultRow searchItemResultRow) {
-        return this.getChronologyAndEnum().compareTo(searchItemResultRow.getChronologyAndEnum());
+        if (null != this.getChronologyAndEnum()) {
+            return this.getChronologyAndEnum().compareTo(searchItemResultRow.getChronologyAndEnum());
+        }
+        return 0;
     }
 }
