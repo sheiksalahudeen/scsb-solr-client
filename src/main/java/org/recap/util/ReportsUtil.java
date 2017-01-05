@@ -247,8 +247,8 @@ public class ReportsUtil {
             deaccessionItemResultsRow.setDeaccessionDate(deaccessionDate);
             deaccessionItemResultsRow.setDeaccessionOwnInst(item.getOwningInstitution());
             deaccessionItemResultsRow.setItemBarcode(item.getBarcode());
-            ItemChangeLogEntity itemChangeLogEntity = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(item.getItemId(),"Deaccession");
-            if(null != itemChangeLogEntity && itemChangeLogEntity.getOperationType().equalsIgnoreCase(RecapConstants.REPORTS_DEACCESSION)) {
+            ItemChangeLogEntity itemChangeLogEntity = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(item.getItemId(),RecapConstants.REPORTS_DEACCESSION);
+            if(null != itemChangeLogEntity) {
                 deaccessionItemResultsRow.setDeaccessionNotes(itemChangeLogEntity.getNotes());
             }
             deaccessionItemResultsRow.setCgd(item.getCollectionGroupDesignation());
