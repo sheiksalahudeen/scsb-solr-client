@@ -15,7 +15,9 @@
     <script type="text/javascript" th:src="@{../lib/DataTables/js/dataTables.bootstrap.js}"></script>
     <script type="text/javascript" th:src="@{../lib/Buttons/js/buttons.colVis.js}"></script>
     <script type="text/javascript" th:src="@{../js/main.js}"></script>
+    <script type="text/javascript" th:src="@{../js/login.js}"></script>
     <script type="text/javascript" th:src="@{../js/formvalidation.js}"></script>
+    <script type="text/javascript" th:async="true" th:src="@{../js/twitter-widgets.js}" charset="utf-8"></script>
 </head>
 <body class="login-page">
 <div class="login-content content-top">
@@ -31,74 +33,7 @@
                     </div>
                     <div class="twitter-block row">
                         <div class="col-sm-12">
-                            <h3>Twitter Widget</h3>
-                            <div class="twitterfeed-wrapper">
-                                <div class="twitterfeed-title clearfix padding-10 padding-btm-5 padding-top-5">
-                                    <h5 class="pull-left">Tweets</h5>
-                                    <img src="images/twittet-title.png" class="pull-right"/>
-                                </div>
-                                <!-- twitterfeed-container -->
-                                <div class="twitterfeed-container">
-                                    <div class="twitterfeed  padding-10 padding-btm-5 padding-top-5 border-style-top">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <img src="images/twittet-iocn1.png"/>
-                                            </div>
-                                            <div class="col-sm-9 twittetinfo">
-                                                <div class="row">
-                                                    <div class="col-xs-12 padding-left-0">
-                                                        <div class="pull-left">
-                                                            <strong class="blocked">Test tweet</strong>
-                                                            <span>@brownie</span>
-                                                        </div>
-                                                        <div class="twittettime pull-right">2 hrs</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="twittetdescription margin-top-05 margin-btm-0">Embed twitter feed to ReCap.com Site recap.com</p>
-                                    </div>
-                                    <div class="twitterfeed  padding-10 padding-btm-5 padding-top-5 border-style-top">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <img src="images/twittet-iocn2.png"/>
-                                            </div>
-                                            <div class="col-sm-9 twittetinfo">
-                                                <div class="row">
-                                                    <div class="col-xs-12 padding-left-0">
-                                                        <div class="pull-left">
-                                                            <strong class="blocked">Test tweet</strong>
-                                                            <span>@brownie</span>
-                                                        </div>
-                                                        <div class="twittettime pull-right">2 hrs</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="twittetdescription margin-top-05 margin-btm-0">Embed twitter feed to ReCap.com Site recap.com</p>
-                                    </div>
-                                    <div class="twitterfeed  padding-10 padding-btm-5 padding-top-5 border-style-top">
-                                        <div class="row">
-                                            <div class="col-sm-3">
-                                                <img src="images/twittet-iocn3.png"/>
-                                            </div>
-                                            <div class="col-sm-9 twittetinfo">
-                                                <div class="row">
-                                                    <div class="col-xs-12 padding-left-0">
-                                                        <div class="pull-left">
-                                                            <strong class="blocked">Test tweet</strong>
-                                                            <span>@brownie</span>
-                                                        </div>
-                                                        <div class="twittettime pull-right">2 hrs</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="twittetdescription margin-top-05 margin-btm-0">Embed twitter feed to ReCap.com Site recap.com</p>
-                                    </div>
-                                </div>
-                                <!-- twitterfeed-container -->
-                            </div>
+                            <a class="twitter-timeline" data-height="350" href="https://twitter.com/recaplib">Tweets by recaplib</a>
                         </div>
                     </div>
                 </div>
@@ -109,30 +44,30 @@
                     <div class="login-wrapper">
                         <form method="post" action="" th:object="${userForm}" id="home_login">
                             <h2 class="heading">Login</h2>
-                            <p th:if="${#fields.hasErrors('wrongCredentials')}" class="label label-danger" th:errors="*{wrongCredentials}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                            <p id="wrongCredentialsError" th:if="${#fields.hasErrors('wrongCredentials')}" class="label label-danger" th:errors="*{wrongCredentials}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
                             <div class="form-group">
                                 <label for="networkloginid">Network Login id</label>
-                                <input type="text" class="form-control themed-input" id="networkloginid" th:field="*{username}"/>
-                                <p th:if="${#fields.hasErrors('username')}" class="label label-danger" th:errors="*{username}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <input type="text" class="form-control themed-input" id="networkloginid" th:field="*{username}" th:onkeyup="'javascript:toggleUsernameValidation()'"/>
+                                <p id="userNameError" th:if="${#fields.hasErrors('username')}" class="label label-danger" th:errors="*{username}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
                                 <span id="networkloginidError" style="color: red; display : none;">Network Login id is required.</span>
                             </div>
                             <div class="form-group">
                                 <label for="institution">Institution</label>
                                 <div class="select-holder">
-                                    <select class="form-control themed-input themed-select" id="institution" th:field="*{institution}">
+                                    <select class="form-control themed-input themed-select" id="institution" th:field="*{institution}" th:onchange="'javascript:toggleInstitutionValidation()'">
                                         <option value="0">Select One</option>
                                         <option value="1">PUL</option>
                                         <option value="2">CUL</option>
                                         <option value="3">NYPL</option>
                                     </select>
                                 </div>
-                                <p th:if="${#fields.hasErrors('institution')}" class="label label-danger" th:errors="*{institution}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
-                                <span id="institutionError" style="color: red; display : none ;">Institution is required.</span>
+                                <p id="institutionError" th:if="${#fields.hasErrors('institution')}" class="label label-danger" th:errors="*{institution}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <span id="institutionErrorId" style="color: red; display : none ;">Institution is required.</span>
                             </div>
                             <div class="form-group">
                                 <label for="loginpassword">Password</label>
-                                <input type="password" class="form-control themed-input" id="loginpassword" th:field="*{password}"/>
-                                <p th:if="${#fields.hasErrors('password')}" class="label label-danger" th:errors="*{password}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
+                                <input type="password" class="form-control themed-input" id="loginpassword" th:field="*{password}" th:onkeyup="'javascript:togglePasswordValidation()'"/>
+                                <p id="passwordError" th:if="${#fields.hasErrors('password')}" class="label label-danger" th:errors="*{password}"><span id="errorMessageSpanId" th:text="${e.message}"></span></p>
                                 <span id="loginpasswordError" style="color: red; display : none;">Password is required.</span>
                             </div>
                             <div class="login-form-button-wrapper  margin-btm-10">
