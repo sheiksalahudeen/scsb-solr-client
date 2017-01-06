@@ -287,6 +287,21 @@ jQuery(document).ready(function ($) {
     });
 
 
+    $('#numOfRecordsId').change(function (){
+        var $form = $('#reports-form');
+        var url = "/reports/deaccessionInformation";
+        $.ajax({
+            url: url,
+            type: 'get',
+            data :$form.serialize(),
+            success: function (response) {
+                $('#deaccessionInformation').html(response);
+            }
+        });
+
+    });
+
+
 });
 
 function cgd() {
@@ -302,33 +317,35 @@ function cgd() {
 }
 
 function deaccessionPul() {
-    var fromDate = $('#AccessionDeaccessionDateRangefrom').val();
-    var toDate = $('#AccessionDeaccessionDateRangeto').val();
-    var url = "/reports/deaccessionInformation";
-        $.ajax({
-            url: url,
-            type: 'get',
-            data :{fromDate: fromDate,
-                    toDate: toDate,
-                owningInstitution: 'PUL'},
-            success: function (response) {
-                $('#deaccessionInformation').html(response);
-            }
-        });
-
-}
-
-function deaccessionCul() {
-    var fromDate = $('#AccessionDeaccessionDateRangefrom').val();
-    var toDate = $('#AccessionDeaccessionDateRangeto').val();
-
+    $('#reportsPageNumber').val(0);
+    $('#reportstotalPageCount').val(0);
+    $('#numOfRecordsId').val('10');
+    var $form = $('#reports-form');
+    $('#ownInst').val('PUL');
     var url = "/reports/deaccessionInformation";
     $.ajax({
         url: url,
         type: 'get',
-        data :{fromDate: fromDate,
-            toDate: toDate,
-            owningInstitution: 'CUL'},
+        data :$form.serialize(),
+        success: function (response) {
+            $('#deaccessionInformation').html(response);
+        }
+    });
+
+}
+
+
+function deaccessionCul() {
+    $('#reportsPageNumber').val(0);
+    $('#reportstotalPageCount').val(0);
+    $('#numOfRecordsId').val('10');
+    var $form = $('#reports-form');
+    $('#ownInst').val('CUL');
+    var url = "/reports/deaccessionInformation";
+    $.ajax({
+        url: url,
+        type: 'get',
+        data :$form.serialize(),
         success: function (response) {
             $('#deaccessionInformation').html(response);
         }
@@ -337,16 +354,16 @@ function deaccessionCul() {
 }
 
 function deaccessionNypl() {
-    var fromDate = $('#AccessionDeaccessionDateRangefrom').val();
-    var toDate = $('#AccessionDeaccessionDateRangeto').val();
-
+    $('#reportsPageNumber').val(0);
+    $('#reportstotalPageCount').val(0);
+    $('#numOfRecordsId').val('10');
+    var $form = $('#reports-form');
+    $('#ownInst').val('NYPL');
     var url = "/reports/deaccessionInformation";
     $.ajax({
         url: url,
         type: 'get',
-        data :{fromDate: fromDate,
-            toDate: toDate,
-            owningInstitution: 'NYPL'},
+        data :$form.serialize(),
         success: function (response) {
             $('#deaccessionInformation').html(response);
         }
@@ -354,3 +371,55 @@ function deaccessionNypl() {
 
 }
 
+
+function first() {
+    var $form = $('#reports-form');
+    var url = "/reports/first";
+    $.ajax({
+        url: url,
+        type: 'get',
+        data: $form.serialize(),
+        success: function (response) {
+            $('#deaccessionInformation').html(response);
+        }
+    });
+}
+
+function previous() {
+    var $form = $('#reports-form');
+    var url = "/reports/previous";
+    $.ajax({
+        url: url,
+        type: 'get',
+        data: $form.serialize(),
+        success: function (response) {
+            $('#deaccessionInformation').html(response);
+        }
+    });
+}
+
+function next() {
+    var $form = $('#reports-form');
+    var url = "/reports/next";
+    $.ajax({
+        url: url,
+        type: 'get',
+        data: $form.serialize(),
+        success: function (response) {
+            $('#deaccessionInformation').html(response);
+        }
+    });
+}
+
+function last() {
+    var $form = $('#reports-form');
+    var url = "/reports/last";
+    $.ajax({
+        url: url,
+        type: 'get',
+        data: $form.serialize(),
+        success: function (response) {
+            $('#deaccessionInformation').html(response);
+        }
+    });
+}

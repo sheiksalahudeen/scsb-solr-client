@@ -93,10 +93,16 @@ public class ReportsForm {
     private List<String> reportRequestType=new ArrayList<>();
     private List<String> owningInstitutions = new ArrayList<>();
     private List<String> collectionGroupDesignations = new ArrayList<>();
-
     private List<DeaccessionItemResultsRow> deaccessionItemResultsRows = new ArrayList<>();
 
     private boolean showDeaccessionInformationTable = false;
+
+    private String totalRecordsCount = "0";
+    private Integer pageNumber = 0;
+    private Integer pageSize = 10;
+    private Integer totalPageCount = 0;
+    private String deaccessionOwnInst;
+
 
     public ReportsForm() {
         this.getOwningInstitutions().add("NYPL");
@@ -698,4 +704,43 @@ public class ReportsForm {
         this.showDeaccessionInformationTable = showDeaccessionInformationTable;
     }
 
+    public String getTotalRecordsCount() {
+        return totalRecordsCount;
+    }
+
+    public void setTotalRecordsCount(String totalRecordsCount) {
+        this.totalRecordsCount = totalRecordsCount;
+    }
+
+    public Integer getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getTotalPageCount() {
+        return totalPageCount;
+    }
+
+    public void setTotalPageCount(Integer totalPageCount) {
+        this.totalPageCount = totalPageCount;
+    }
+
+    public String getDeaccessionOwnInst() {
+        return deaccessionOwnInst;
+    }
+
+    public void setDeaccessionOwnInst(String deaccessionOwnInst) {
+        this.deaccessionOwnInst = deaccessionOwnInst;
+    }
 }

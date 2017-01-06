@@ -354,12 +354,11 @@ public class ReportsUtilUT extends BaseTestCase {
     public void deaccessionReportFieldsInformation() throws Exception{
         ReportsForm reportsForm = new ReportsForm();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        String requestedFromDate=simpleDateFormat.format(new Date());
-        String requestedToDate= simpleDateFormat.format(new Date());
-
+        reportsForm.setAccessionDeaccessionFromDate(simpleDateFormat.format(new Date()));
+        reportsForm.setAccessionDeaccessionToDate(simpleDateFormat.format(new Date()));
         BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, true);
         indexBibHoldingItem(bibliographicEntity);
-            List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(requestedFromDate,requestedToDate,"PUL");
+            List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
             for (DeaccessionItemResultsRow deaccessionItemResultsRow : deaccessionItemResultsRowList) {
                 assertEquals("Shared",deaccessionItemResultsRow.getCgd());
                 assertEquals("b3",deaccessionItemResultsRow.getItemBarcode());
