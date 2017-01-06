@@ -301,28 +301,28 @@ textarea{resize:none;}
 #search-filter h2{margin:50px 0 20px}
 .search-table-header-note{position:absolute;color:#7F807F;font-weight:700;font-size:12px;left:25px;top:35px;width:670px;}
 .search-bar .notes span{color:#000;}
-.create-request a,.backtext a,.Deaccessionbacklink a,.rolebacklink a,.usersbacklink a,.userscreaterequestlink a{color:#699683;font-size:22px}
-#recaprequest .search-bar .buscador-principal [class*="themed-"],
-#recapreports .search-bar .buscador-principal [class*="themed-"],
-#recaprole .search-bar .buscador-principal [class*="themed-"],
+.search-request a,.backtext a,.Deaccessionbacklink a,.rolebacklink a,.roleCreateNewlink a,.usersbacklink a,.userscreaterequestlink a{color:#699683;font-size:22px}
+/*#request .search-bar .buscador-principal [class*="themed-"],*/
+/*#recapreports .search-bar .buscador-principal [class*="themed-"],
+#recaprole .search-bar .buscador-principal [class*="themed-"],*/
 #recapusers .search-bar .buscador-principal [class*="themed-"]{height:auto}
-#recaprequest .search-bar .buscador-principal,
+#request .search-bar .buscador-principal,
 #recapreports .search-bar .buscador-principal,
 #recaprole .search-bar .buscador-principal,
 #recapusers .search-bar .buscador-principal{padding:10px 15px 15px;background:#F0F1F1}
-#recaprequest .search-bar .buscador-principal .themed-input,
+#request .search-bar .buscador-principal .themed-input,
 #recapreports .search-bar .buscador-principal .themed-input,
 #recaprole .search-bar .buscador-principal .themed-input,
 #recapusers .search-bar .buscador-principal .themed-input {border:1px solid #888988}
-#recaprequest .search-bar .buscador-principal .themed-button,
+#request .search-bar .buscador-principal .themed-button,
 #recapreports .search-bar .buscador-principal .themed-button,
 #recaprole .search-bar .buscador-principal .themed-button,
 #recaprole .create-role-section .buscador-principal .themed-button,
 #recapusers .search-bar .buscador-principal .themed-button{margin-top:30px;padding:5px 0;text-align:center}
-#recaprequest .search-bar .buscador-principal .themed-button-search,
-#recaprequest .search-bar .buscador-principal .themed-button-search:focus
-#recaprequest .search-bar .buscador-principal .themed-button-search:visited{background-color:#41CAC0;}
-#recaprequest .search-bar .buscador-principal .themed-button-search:hover{background-color:#329e96;}
+#request .search-bar .buscador-principal .themed-button-search,
+#request .search-bar .buscador-principal .themed-button-search:focus
+#request .search-bar .buscador-principal .themed-button-search:visited{background-color:#41CAC0;}
+#request .search-bar .buscador-principal .themed-button-search:hover{background-color:#329e96;}
 #recapreports .search-bar .buscador-principal .themed-button-search,
 #recapreports .search-bar .buscador-principal .themed-button-search:focus,
 #recapreports .search-bar .buscador-principal .themed-button-search:visited{background-color:#FF6D60;}
@@ -481,10 +481,10 @@ tr.shown td.details-control {background:url('../images/hide-icon.png') no-repeat
     #rolesearch .role-buttons{display:inline}
 }
 @media only screen and (max-width:1199px) {
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-right-20{padding-right:10px}
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-right-50.padding-left-50{padding:0 5px}
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-left-20{padding-left:10px}
-    #recaprequest .search-bar .buscador-principal .input-group-btn.padding-left-70{padding-left:10px}
+    #request .search-bar .buscador-principal .col-sm-4.padding-right-20{padding-right:10px}
+    #request .search-bar .buscador-principal .col-sm-4.padding-right-50.padding-left-50{padding:0 5px}
+    #request .search-bar .buscador-principal .col-sm-4.padding-left-20{padding-left:10px}
+    #request .search-bar .buscador-principal .input-group-btn.padding-left-70{padding-left:10px}
     .multiselect-native-select .btn-group .btn.btn-default{padding:0 12px}
 }
 @media only screen and (max-width:991px) {
@@ -564,25 +564,25 @@ tr.shown td.details-control {background:url('../images/hide-icon.png') no-repeat
     #recapcollection .search-bar .buscador-principal .input-group-btn.search-panel,
     #recapcollection .search-bar .buscador-principal .input-group-btn{margin-right:-3px}
     #recapcollection .search-bar .col-sm-11.padding-left-0{padding-left:15px;}
-    #recaprequest .search-bar .buscador-principal [class*="col-"],
+    #request .search-bar .buscador-principal [class*="col-"],
     #recaprole .search-bar .buscador-principal [class*="col-"],
     #recapusers .search-bar .buscador-principal [class*="col-"],
-    #recaprequest  .search-bar .input-group.buscador-principal [class*="col-"]{margin-bottom:10px;display:inline-block;width:100%;padding:0}
+    #request  .search-bar .input-group.buscador-principal [class*="col-"]{margin-bottom:10px;display:inline-block;width:100%;padding:0}
     #recapusers .search-bar .buscador-principal [class*="col-"]{margin-bottom:10px;display:inline-block;width:100%;}
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-right-20{padding-right:0}
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-right-50.padding-left-50{padding:0}
-    #recaprequest .search-bar .buscador-principal .col-sm-4.padding-left-20{padding-left:0}
-    #recaprequest .search-bar .buscador-principal .input-group-btn.padding-left-70{padding-left:0}
-    #recaprequest .search-bar .buscador-principal .input-group-btn.search-panel,
-    #recaprequest .search-bar .buscador-principal .input-group-btn,
+    #request .search-bar .buscador-principal .col-sm-4.padding-right-20{padding-right:0}
+    #request .search-bar .buscador-principal .col-sm-4.padding-right-50.padding-left-50{padding:0}
+    #request .search-bar .buscador-principal .col-sm-4.padding-left-20{padding-left:0}
+    #request .search-bar .buscador-principal .input-group-btn.padding-left-70{padding-left:0}
+    #request .search-bar .buscador-principal .input-group-btn.search-panel,
+    #request .search-bar .buscador-principal .input-group-btn,
     #recaprole .search-bar .buscador-principal .input-group-btn.search-panel,
     #recaprole .search-bar .buscador-principal .input-group-btn,
     #recapusers .search-bar .buscador-principal .input-group-btn.search-panel,
     #recapusers .search-bar .buscador-principal .input-group-btn,
     #recapusers .search-bar .buscador-principal  #userssearch button {width:50%;display:inline-block;margin:0 -.2%}
-    #recaprequest .search-bar .buscador-principal .input-group-btn.search-panel button,
+    #request .search-bar .buscador-principal .input-group-btn.search-panel button,
     .buscador-principal .margin-left-less-30  button{width:100%}
-    #recaprequest .search-bar .buscador-principal .input-group-btn button{margin-top:10px}
+    #request .search-bar .buscador-principal .input-group-btn button{margin-top:10px}
     .create-request-section .form-horizontal .text-right,
     #recapusers #users-createview .form-horizontal .text-right{text-align:left}
     #recapusers #users-createview .form-horizontal p.margin-btm-30{margin-bottom:10px}
@@ -593,9 +593,9 @@ tr.shown td.details-control {background:url('../images/hide-icon.png') no-repeat
     #cgd_deaccessionform .form-group.has-error .help-block{left:15px;}
     .table-wrapper .table{max-width:767px;width:767px !important}
     #rolesearch .row.margin-btm-20{margin-bottom:10px}
-    #recaprequest .search-bar .buscador-principal .themed-button,
+    #request .search-bar .buscador-principal .themed-button,
     #recapusers .search-bar .buscador-principal .themed-button{margin:10px 0 0}
-    #recaprequest .search-bar .buscador-principal .themed-button,
+    #request .search-bar .buscador-principal .themed-button,
     #recapreports .search-bar .buscador-principal .themed-button,
     #recaprole .search-bar .buscador-principal .themed-button,
     #recapusers .search-bar .buscador-principal .themed-button{margin:10px 0 0}
@@ -617,8 +617,8 @@ tr.shown td.details-control {background:url('../images/hide-icon.png') no-repeat
     .dashboard_recap{max-width:150px;margin:0 auto}
     .dashboard_recaptext{top:15px;}
     .export-buttons .btn{margin-bottom:10px;}
-    #recaprequest .search-bar .buscador-principal .input-group-btn.search-panel,
-    #recaprequest .search-bar .buscador-principal .input-group-btn,
+    #request .search-bar .buscador-principal .input-group-btn.search-panel,
+    #request .search-bar .buscador-principal .input-group-btn,
     #recaprole .search-bar .buscador-principal .input-group-btn.search-panel,
     #recaprole .search-bar .buscador-principal .input-group-btn{width:100%;margin:0}
     .create-request-section .form-horizontal button,.create-request-details .modal-content .modal-footer button{margin:0 0 10px}
