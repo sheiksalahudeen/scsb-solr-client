@@ -13,6 +13,9 @@ import org.springframework.data.repository.query.Param;
  */
 public interface RolesDetailsRepositorty extends JpaRepository<RoleEntity, Integer> {
 
+    Page<RoleEntity> findByRoleName(String roleName, Pageable pageable);
+
+
     RoleEntity findByRoleName(String roleName);
 
     @Query(value = "select roles from RoleEntity roles where roles.roleName = :roleName")
