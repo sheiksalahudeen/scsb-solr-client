@@ -676,6 +676,10 @@
                     <!-- Reports Form Section Ends-->
                     <!-- Deaccession tableview -->
                     <div class="reports-detail-table" id="Deaccession-tableview" style="display:none">
+                        <input type="hidden" id="ownInst" th:field="${reportsForm.deaccessionOwnInst}"/>
+                        <button id="pageSizeChangeButtonId" type="submit"
+                                name="action" value="pageSizeChange"
+                                hidden="hidden"></button>
                         <div class="row">
                             <h4 class="col-sm-9 margin-top-05 margin-btm-0">Report Results</h4>
                             <div class="col-sm-3 text-right Deaccessionbacklink">
@@ -684,27 +688,81 @@
                             </div>
                         </div>
                         <div class="divider-horizontal margin-top-10 margin-btm-10"></div>
-                        <p class="fontcolor-dark">OI - Owning Institution, CGD - Collection Group Designation</p>
-                        <table class="table table-striped text-center margin-btm-0" id="deaccessionInformation">
-                            <thead class="tablesorter-headerRow">
-                            <tr>
-                                <th width="15%" style="font-family:sans-serif;">DATE</th>
-                                <th width="20%" style="font-family:sans-serif;">TITLE</th>
-                                <th width="10%" style="font-family:sans-serif;">OI</th>
-                                <th width="10%" style="font-family:sans-serif;">ITEM BARCODE</th>
-                                <th width="10%" style="font-family:sans-serif;">CGD</th>
-                                <th width="40%" style="font-family:sans-serif;">DEACCESSION NOTES</th>
-                            </tr>
-                            </thead>
-                            <tr th:each="deaccessionRow:${deaccessionItemResultsRows}">
-                                <td><span th:text="${deaccessionRow.deaccessionDate}"></span></td>
-                                <td class="text-left"><span th:text="${deaccessionRow.title}"></span></td>
-                                <td><span th:text="${deaccessionRow.deaccessionOwnInst}"></span></td>
-                                <td class="text-left"><span th:text="${deaccessionRow.itemBarcode}"></span></td>
-                                <td><span th:text="${deaccessionRow.cgd}"></span></td>
-                                <td class="text-left"><span th:text="${deaccessionRow.deaccessionNotes}"></span></td>
-                            </tr>
-                        </table>
+                        <div id="showEntriesAndNumFoundDiv" name="showEntriesAndNumFoundDiv" class="row">
+                            <div class="col-sm-2 margin-top-05 show-entries-section">
+                                <div class="">
+                                    <span class="show-title">Show Entries</span>
+                                    <select id="numOfRecordsId" name="numOfRecordsName"
+                                            class="themed-input"
+                                            th:field="${reportsForm.pageSize}">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 margin-top-10">
+                                <div class="row">OI - Owning Institution, CGD - Collection Group Designation</div>
+                            </div>
+                        </div>
+
+                        <div id="deaccessionInformation">
+                            <label class="pull-right h4" style="margin-top: -10px;">Deaccessioned Item Results Found:<span th:text="${#numbers.formatInteger(reportsForm.totalRecordsCount,0,'COMMA')}"></span></label>
+                            <table class="table table-striped text-center margin-btm-0">
+                                <thead class="tablesorter-headerRow">
+                                <tr>
+                                    <th width="15%" style="font-family:sans-serif;">DATE</th>
+                                    <th width="20%" style="font-family:sans-serif;">TITLE</th>
+                                    <th width="10%" style="font-family:sans-serif;">OI</th>
+                                    <th width="10%" style="font-family:sans-serif;">ITEM BARCODE</th>
+                                    <th width="10%" style="font-family:sans-serif;">CGD</th>
+                                    <th width="40%" style="font-family:sans-serif;">DEACCESSION NOTES</th>
+                                </tr>
+                                </thead>
+                                <tr th:each="deaccessionRow:${reportsForm.deaccessionItemResultsRows}">
+                                    <td><span th:text="${deaccessionRow.deaccessionDate}"></span></td>
+                                    <td class="text-left"><span th:text="${deaccessionRow.title}"></span></td>
+                                    <td><span id="ownInstDeacc"  th:text="${deaccessionRow.deaccessionOwnInst}"></span></td>
+                                    <td class="text-left"><span th:text="${deaccessionRow.itemBarcode}"></span></td>
+                                    <td><span th:text="${deaccessionRow.cgd}"></span></td>
+                                    <td class="text-left"><span th:text="${deaccessionRow.deaccessionNotes}"></span></td>
+                                </tr>
+                            </table>
+                            <input id="reportsPageNumber" name="reportsPageNumber" type="text" th:field="${reportsForm.pageNumber}"
+                                   hidden="hidden"/>
+                            <input id="reportstotalPageCount" name="reportstotalPageCount" type="text"
+                                   th:field="${reportsForm.totalPageCount}" hidden="hidden"/>
+                            <div id="reportPaginationId" name="reportPaginationName" class="pull-right" style="margin-top: -10px;">
+                                <ul class="pagination" id="reportPaginationUl">
+                                    <li th:class="${reportsForm.pageNumber == 0} ? 'disabled' : ''">
+                                        <span th:if="${reportsForm.pageNumber == 0}">First</span>
+                                        <a th:if="${reportsForm.pageNumber != 0}" href="#"
+                                           title="Go to first page"
+                                           onclick="document.getElementById('ownInst').value ; first();">First</a>
+                                    </li>
+                                    <li th:class="${(reportsForm.pageNumber != 0) &amp;&amp; (reportsForm.totalPageCount &gt; 1)}? '' : 'disabled'">
+                                        <span th:if="${reportsForm.pageNumber == 0}">Previous</span>
+                                        <a th:if="${reportsForm.pageNumber != 0}" href="#"
+                                           title="Go to previous page"
+                                           onclick="document.getElementById('ownInst').value;document.getElementById('reportsPageNumber').value = parseInt(document.getElementById('reportsPageNumber').value) - 1; previous();">Previous</a>
+                                    </li>
+                                    <li th:class="${(reportsForm.pageNumber+1 != reportsForm.totalPageCount) &amp;&amp; (reportsForm.totalPageCount &gt; 1)}? '' : 'disabled'">
+                                        <span th:if="${reportsForm.pageNumber+1 == reportsForm.totalPageCount}">Next</span>
+                                        <a th:if="${reportsForm.pageNumber+1 != reportsForm.totalPageCount}"
+                                           href="#" title="Go to next page"
+                                           onclick="document.getElementById('ownInst').value;document.getElementById('reportsPageNumber').value = parseInt(document.getElementById('reportsPageNumber').value) + 1; next();">Next</a>
+                                    </li>
+                                    <li th:class="${reportsForm.pageNumber+1 == reportsForm.totalPageCount}? 'disabled' : ''">
+                                        <span th:if="${reportsForm.pageNumber+1 == reportsForm.totalPageCount}">Last</span>
+                                        <a th:if="${reportsForm.pageNumber+1 != reportsForm.totalPageCount}"
+                                           href="#"
+                                           onclick="document.getElementById('ownInst').value;last();">Last</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </fieldset>

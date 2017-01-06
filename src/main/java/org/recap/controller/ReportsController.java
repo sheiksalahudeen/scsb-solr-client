@@ -89,14 +89,57 @@ public class ReportsController {
 
     @ResponseBody
     @RequestMapping(value = "/reports/deaccessionInformation", method = RequestMethod.GET)
-    public ModelAndView deaccessionInformation(@Valid @ModelAttribute("fromDate") String fromDate,
-                                               @Valid @ModelAttribute("toDate") String toDate,
-                                               @Valid @ModelAttribute("owningInstitution") String owningInstitution,
+    public ModelAndView deaccessionInformation(ReportsForm reportsForm,
                                                Model model) throws Exception {
-        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList= reportsUtil.deaccessionReportFieldsInformation(fromDate, toDate, owningInstitution);
+        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
+        reportsForm.setDeaccessionItemResultsRows(deaccessionItemResultsRowList);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
-        return new ModelAndView("reports :: #deaccessionInformation","deaccessionItemResultsRows",deaccessionItemResultsRowList);
+        return new ModelAndView("reports :: #deaccessionInformation", "reportsForm", reportsForm);
 
     }
 
+
+    @ResponseBody
+    @RequestMapping(value = "/reports/first", method = RequestMethod.GET)
+    public ModelAndView searchFirst(@Valid ReportsForm reportsForm,
+                                    Model model) throws Exception {
+        reportsForm.setPageNumber(0);
+        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
+        reportsForm.setDeaccessionItemResultsRows(deaccessionItemResultsRowList);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
+        return new ModelAndView("reports :: #deaccessionInformation", "reportsForm", reportsForm);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reports/previous", method = RequestMethod.GET)
+    public ModelAndView searchPrevious(@Valid ReportsForm reportsForm,
+                                       Model model) throws Exception {
+        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
+        reportsForm.setDeaccessionItemResultsRows(deaccessionItemResultsRowList);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
+        return new ModelAndView("reports :: #deaccessionInformation", "reportsForm", reportsForm);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/reports/next", method = RequestMethod.GET)
+    public ModelAndView searchNext(@Valid ReportsForm reportsForm,
+                                   Model model) throws Exception {
+        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
+        reportsForm.setDeaccessionItemResultsRows(deaccessionItemResultsRowList);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
+        return new ModelAndView("reports :: #deaccessionInformation", "reportsForm", reportsForm);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/reports/last", method = RequestMethod.GET)
+    public ModelAndView searchLast(@Valid ReportsForm reportsForm,
+                                   Model model) throws Exception {
+        reportsForm.setPageNumber(reportsForm.getTotalPageCount() - 1);
+        List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = reportsUtil.deaccessionReportFieldsInformation(reportsForm);
+        reportsForm.setDeaccessionItemResultsRows(deaccessionItemResultsRowList);
+        model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REPORTS);
+        return new ModelAndView("reports :: #deaccessionInformation", "reportsForm", reportsForm);
+    }
 }
