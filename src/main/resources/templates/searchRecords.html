@@ -41,6 +41,9 @@
                     <li role="presentation" class="tab-roles-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/roles' ? 'active':''}">
                         <a href="/roles" aria-controls="roles" class="tab-reports"><span class="icons"></span><span>Roles</span></a>
                     </li>
+                    <li th:if="${subject.isPermitted('CreateUser')}" role="presentation" class="tab-users-holder" th:classappend="${#httpServletRequest.getRequestURI() == '/userRoles' ? 'active':''}">
+                        <a href="/userRoles" aria-controls="users" class="tab-users"><span class="icons"></span><span>Users</span></a>
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div th:replace="${template} :: content"></div>

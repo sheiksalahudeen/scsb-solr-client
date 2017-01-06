@@ -10,9 +10,8 @@ import java.util.Set;
 @Table(name="roles_t",schema="recap",catalog="")
 public class RoleEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="role_id")
-    private Integer roleId;
+    private int roleId;
 
     @Column(name="role_name")
     private String roleName;
@@ -28,11 +27,26 @@ public class RoleEntity {
             })
     private Set<PermissionEntity> permissions;
 
-    public Integer getRoleId() {
+
+    @ElementCollection(targetClass = UsersEntity.class)
+    @JoinTable(name="user_role_t",joinColumns = {
+           @JoinColumn(name="role_id",referencedColumnName = "role_id")},
+    inverseJoinColumns = {@JoinColumn(name="user_id",referencedColumnName = "user_id")})
+    private Set<UsersEntity> users;
+
+    public Set<UsersEntity> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UsersEntity> users) {
+        this.users = users;
+    }
+
+    public int getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Integer roleId) {
+    public void setRoleId(int roleId) {
         this.roleId = roleId;
     }
 
