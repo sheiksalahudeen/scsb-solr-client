@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Sheik on 6/18/2016.
@@ -140,6 +141,25 @@ public class SolrIndexController {
             for (Integer bibliographicId : bibliographicIdList) {
                 getSolrIndexService().indexByBibliographicId(bibliographicId);
             }
+            response = RecapConstants.SUCCESS;
+        } catch (Exception e) {
+            response = RecapConstants.FAILURE;
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/solrIndexer/deleteByBibHoldingItemId", method = RequestMethod.POST)
+    public String deleteByBibHoldingItemId(@RequestBody Map<String,String> idMapToRemoveIndex) {
+        String response = null;
+        String bibliographicId = idMapToRemoveIndex.get("BibId");
+        String holdingId = idMapToRemoveIndex.get("HoldingId");
+        String itemId = idMapToRemoveIndex.get("ItemId");
+        try {
+            getSolrIndexService().deleteByDocId(RecapConstants.BIB_ID,bibliographicId);
+            getSolrIndexService().deleteByDocId(RecapConstants.HOLDING_ID,holdingId);
+            getSolrIndexService().deleteByDocId(RecapConstants.ITEM_ID,itemId);
             response = RecapConstants.SUCCESS;
         } catch (Exception e) {
             response = RecapConstants.FAILURE;
