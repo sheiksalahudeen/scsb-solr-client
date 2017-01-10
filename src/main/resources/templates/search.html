@@ -2,6 +2,7 @@
 <div id="searchContentId" name="searchContentName" th:fragment="content" xmlns:th="http://www.thymeleaf.org"
      role="tabpanel" class="tab-pane active">
     <script type="text/javascript" th:src="@{../js/jquery.tablesorter.js}"></script>
+    <script type="text/javascript" th:src="@{../js/bootstrap-add-clear.min.js}"></script>
     <link rel="stylesheet" th:href="@{../css/search.css}"/>
     <script type="text/javascript" th:src="@{../js/search.js}"></script>
     <div id="searchFormDivId" name="searchFormDivName" th:fragment="search-form" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
@@ -25,22 +26,23 @@
                                     <button id="pageSizeChangeButtonId" type="submit"
                                             name="action" value="pageSizeChange"
                                             hidden="hidden"></button>
-                                    <div>
-                                        <div class="has-feedback">
-                                            <input id="fieldValue" name="fieldValue" type="text" placeholder="Type Text Here....." th:field="*{fieldValue}" class="form-control">
+                                    <div style="margin-top: 17px;width:900px;margin-left:15px;">
+                                        <input id="fieldValue" name="fieldValue" type="search" placeholder="Type Text Here....." th:field="*{fieldValue}" class="form-control"/>
+                                        <!--<div class="has-feedback">
+                                            <input id="fieldValue" name="fieldValue" type="search" placeholder="Type Text Here....." th:field="*{fieldValue}" class="form-control">
                                                 <i id="clearSearchText" class="fa fa-times form-control-feedback"
                                                    aria-hidden="true"
                                                    onclick="clearSearchText()"
-                                                   style="cursor: pointer; pointer-events: all; font-size: 20px; margin-top: 5px; margin-right: -10px;"
+                                                   style="cursor: pointer; pointer-events: all; font-size: 20px; margin-top: 5px; margin-right: -40px;"
                                                    th:title="clear">
                                                 </i>
                                             </input>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <div class="input-group-btn search-panel">
                                         <select id="fieldName"
                                                 class="form-control btn themed-button themed-button-allfields dropdown-toggle"
-                                                th:field="*{fieldName}" style="width: 170px; border-left-width: 0px;">
+                                                th:field="*{fieldName}" style="width: 170px; border-left-width: 0px;margin-left: 15px;">
                                             <option value="">ALL Fields</option>
                                             <option value="Author_search">Author</option>
                                             <option value="Title_search">Title</option>
