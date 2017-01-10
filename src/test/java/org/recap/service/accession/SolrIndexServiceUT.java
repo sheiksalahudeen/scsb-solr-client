@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by rajeshbabuk on 10/11/16.
@@ -47,6 +48,21 @@ public class SolrIndexServiceUT extends BaseTestCase {
 
         Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
         assertNotNull(bib);
+    }
+
+    @Test
+    public void deleteByDocId() throws Exception {
+        BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        Integer bibliographicId = savedBibliographicEntity.getBibliographicId();
+        solrIndexService.indexByBibliographicId(bibliographicId);
+        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
+        assertNotNull(bib);
+        solrIndexService.deleteByDocId("BibId",String.valueOf(bibliographicId));
+        Bib bib1 = bibSolrCrudRepository.findByBibId(bibliographicId);
+        assertNull(bib1);
     }
 
     private BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
