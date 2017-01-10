@@ -282,6 +282,7 @@ public class RecapConstants {
     public static final String SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
     public static final String SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
     public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";
+    public static final String ITEM_BARCODE_ALREADY_ACCESSIONED_MSG = "Unavailable barcode from partner is already accessioned";
     public static final String ACCESSION = "accession";
     public static final String DUMMYCALLNUMBER = "dummycallnumber";
     public static final String COMPLETE_STATUS = "Complete";
@@ -315,7 +316,7 @@ public class RecapConstants {
     public static final Integer NYPL_INST_ID = 3;
     public static final Integer CGD_SHARED = 1;
     public static final Integer CGD_OPEN = 2;
-    public static final Integer  HOLD= 1;
+    public static final Integer HOLD= 1;
     public static final Integer RETRIEVAL = 2;
     public static final Integer RECALL = 3;
     public static final Integer EDD = 4;

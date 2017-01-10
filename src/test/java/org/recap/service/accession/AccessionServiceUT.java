@@ -67,6 +67,21 @@ public class AccessionServiceUT extends BaseTestCase {
     }
 
     @Test
+    public void accessionUnavilableBarcodeAvoidDuplicate(){
+        accessionService.processRequest("3210106212830", "PA", "PUL");
+        ItemEntity itemEntity = itemDetailsRepository.findByBarcode("3210106212830");
+        assertEquals(1,itemEntity.getBibliographicEntities().size());
+        assertNotNull(itemEntity);
+        assertEquals("dummycallnumber",itemEntity.getCallNumber());
+
+        String respose = accessionService.processRequest("3210106212830", "PA", "PUL");
+        assertEquals(RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG,respose);
+        ItemEntity itemEntity1 = itemDetailsRepository.findByBarcode("3210106212830");
+        assertEquals(1,itemEntity1.getBibliographicEntities().size());
+
+    }
+
+    @Test
     public void processForNYPL(){
         accessionService.processRequest("33433002031718", "NA","NYPL");
         List<BibliographicEntity> fetchedBibliographicEntityList = bibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186");

@@ -58,6 +58,9 @@ public class AccessionService {
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
+    @Autowired
     ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
@@ -178,7 +181,12 @@ public class AccessionService {
         }
         //Create dummy record
         if(response !=null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)){
-            response = createDummyRecord(itemBarcode, customerCode, owningInstitution);
+            BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(itemBarcode);
+            if(fetchBibliographicEntity == null) {
+                response = createDummyRecord(itemBarcode, customerCode, owningInstitution);
+            }else {
+                response = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
+            }
         }
         generateAccessionSummaryReport(responseMapList,owningInstitution);
         return response;
@@ -437,6 +445,17 @@ public class AccessionService {
             entityManager.refresh(savedBibliographicEntity);
         }
         return savedBibliographicEntity;
+    }
+
+    private BibliographicEntity getBibEntityUsingBarcodeForIncompleteRecord(String itemBarcode){
+        List<String> itemBarcodeList = new ArrayList<>();
+        itemBarcodeList.add(itemBarcode);
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodeList);
+        BibliographicEntity fetchedBibliographicEntity = null;
+        if(itemEntityList != null && itemEntityList.size() > 0 && itemEntityList.get(0).getBibliographicEntities() != null){
+            fetchedBibliographicEntity = itemEntityList.get(0).getBibliographicEntities().get(0);
+        }
+        return fetchedBibliographicEntity;
     }
 
     private HoldingsEntity copyHoldingsEntity(HoldingsEntity fetchHoldingsEntity, HoldingsEntity holdingsEntity){
