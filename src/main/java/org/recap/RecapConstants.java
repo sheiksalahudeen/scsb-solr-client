@@ -316,11 +316,10 @@ public class RecapConstants {
     public static final Integer NYPL_INST_ID = 3;
     public static final Integer CGD_SHARED = 1;
     public static final Integer CGD_OPEN = 2;
-    public static final Integer HOLD= 1;
-    public static final Integer RETRIEVAL = 2;
-    public static final Integer RECALL = 3;
-    public static final Integer EDD = 4;
-    public static final Integer BORROW_DIRECT = 5;
+    public static final String RETRIEVAL = "RETRIEVAL";
+    public static final String RECALL = "RECALL";
+    public static final String EDD = "EDD";
+    public static final String BORROW_DIRECT = "BORROW DIRECT";
 
     public static final String ROLES = "roles";
     public static final String INVALID_ROLE_NAME = "Please give one valid role name";
