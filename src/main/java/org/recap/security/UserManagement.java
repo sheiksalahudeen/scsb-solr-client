@@ -1,12 +1,7 @@
 package org.recap.security;
 
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.recap.model.jpa.UsersEntity;
-import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.model.userManagement.UserForm;
-
-import java.util.Map;
 
 /**
  * Created by dharmendrag on 15/12/16.
@@ -97,13 +92,6 @@ public enum UserManagement {
         return values;
     }
 
-    public static String unAuthorized(Subject subject)
-    {
-        subject.logout();
-        return "login";
-    }
-
-
     public static UserForm toUserForm(UsersEntity userEntity, UserForm userForm)throws Exception
     {
         try
@@ -123,19 +111,6 @@ public enum UserManagement {
         return userForm;
     }
 
-    public static Map<Integer,String> getPermissions(Subject subject){
-        Session session=subject.getSession();
-        return (Map<Integer,String>)session.getAttribute(permissionsMap);
-    }
-
-    public static UserDetailsForm getRequestAccess(Subject subject){
-        UserDetailsForm userDetailsForm=new UserDetailsForm();
-        Session session=subject.getSession();
-        Integer userId=(Integer)session.getAttribute(USER_ID);
-        userDetailsForm.setSuperAdmin(userId.equals(SUPER_ADMIN.getIntegerValues()));
-        userDetailsForm.setLoginInstitutionId((Integer) session.getAttribute(USER_INSTITUTION));
-        return userDetailsForm;
-    }
 
 
 

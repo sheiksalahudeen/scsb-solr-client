@@ -1,14 +1,10 @@
 package org.recap.controller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.RoleEntity;
 import org.recap.model.jpa.UsersEntity;
-import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.model.userManagement.UserRoleForm;
 import org.recap.security.UserManagement;
 import org.recap.service.userManagement.UserRoleService;
@@ -29,7 +25,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by dharmendrag on 23/12/16.
@@ -47,22 +42,14 @@ public class UserRoleController {
     {
         logger.info("Users Tab Clicked");
         UserRoleForm userRoleForm=new UserRoleForm();
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
-        UserDetailsForm userDetailsForm=UserManagement.getRequestAccess(subject);
-        if(subject.isPermitted(permissions.get(UserManagement.CREATE_USER.getPermissionId()))) {
             List<Object> roles=userRoleService.getRoles(UserManagement.SUPER_ADMIN.getIntegerValues());
-            List<Object> institutions=userRoleService.getInstitutions(userDetailsForm.isSuperAdmin(),userDetailsForm.getLoginInstitutionId());
+            List<Object> institutions=userRoleService.getInstitutions(false,1);
             userRoleForm.setRoles(roles);
             userRoleForm.setInstitutions(institutions);
             userRoleForm.setAllowCreateEdit(true);
             model.addAttribute("userRoleForm",userRoleForm);
             model.addAttribute(RecapConstants.TEMPLATE,RecapConstants.USER_ROLES);
             return "searchRecords";
-        }else{
-            logger.debug("user is not permitted to view users tab :"+subject.getPrincipal());
-            return UserManagement.unAuthorized(subject);
-        }
     }
 
     @ResponseBody
@@ -118,17 +105,12 @@ public class UserRoleController {
     }
 
     private void priorSearch(UserRoleForm userRoleForm){
-        Subject subject= SecurityUtils.getSubject();
-        Session session=subject.getSession();
-        Integer loginInstitutionId=(Integer)session.getAttribute(UserManagement.USER_INSTITUTION);
-        Integer userId=(Integer)session.getAttribute(UserManagement.USER_ID);
-        boolean superAdminUser=userId.equals(UserManagement.SUPER_ADMIN.getIntegerValues());
         List<Object> roles=userRoleService.getRoles(UserManagement.SUPER_ADMIN.getIntegerValues());
-        List<Object> institutions=userRoleService.getInstitutions(superAdminUser,loginInstitutionId);
+        List<Object> institutions=userRoleService.getInstitutions(false,1);
         userRoleForm.setRoles(roles);
         userRoleForm.setInstitutions(institutions);
         userRoleForm.setAllowCreateEdit(true);
-        searchAndSetResult(userRoleForm,superAdminUser,userId);
+        searchAndSetResult(userRoleForm,false,1);
     }
 
 
@@ -216,10 +198,8 @@ public class UserRoleController {
     public ModelAndView createUserRequest(@ModelAttribute("userRoleForm") UserRoleForm userRoleForm,Model model)
     {
         logger.info("User - Create Request clicked");
-        Subject subject= SecurityUtils.getSubject();
-        UserDetailsForm userDetailsForm=UserManagement.getRequestAccess(subject);
-        List<Object> roles=userRoleService.getRoles(UserManagement.SUPER_ADMIN.getIntegerValues());
-        List<Object> institutions=userRoleService.getInstitutions(userDetailsForm.isSuperAdmin(),userDetailsForm.getLoginInstitutionId());
+        List<Object> roles=userRoleService.getRoles(1);
+        List<Object> institutions=userRoleService.getInstitutions(false,1);
         userRoleForm.setRoles(roles);
         userRoleForm.setInstitutions(institutions);
         userRoleForm.setAllowCreateEdit(true);

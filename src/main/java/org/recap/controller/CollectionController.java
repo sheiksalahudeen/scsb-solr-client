@@ -2,13 +2,9 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
 import org.recap.model.search.*;
-import org.recap.model.userManagement.UserDetailsForm;
-import org.recap.security.UserManagement;
 import org.recap.util.CollectionServiceUtil;
 import org.recap.util.MarcRecordViewUtil;
 import org.recap.util.SearchRecordsUtil;
@@ -47,18 +43,10 @@ public class CollectionController {
 
     @RequestMapping("/collection")
     public String collection(Model model) {
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
-        if(subject.isPermitted(permissions.get(UserManagement.WRITE_GCD.getPermissionId())) ||
-                subject.isPermitted(permissions.get(UserManagement.DEACCESSION.getPermissionId()))) {
             CollectionForm collectionForm = new CollectionForm();
             model.addAttribute("collectionForm", collectionForm);
             model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
             return "searchRecords";
-        }else{
-            return UserManagement.unAuthorized(subject);
-        }
-
     }
 
 
@@ -77,9 +65,7 @@ public class CollectionController {
     public ModelAndView openMarcView(@Valid @ModelAttribute("collectionForm") CollectionForm collectionForm,
                                        BindingResult result,
                                        Model model) throws Exception {
-        Subject subject= SecurityUtils.getSubject();
-        UserDetailsForm userDetailsForm=UserManagement.getRequestAccess(subject);
-        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId(),userDetailsForm);
+        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(collectionForm.getBibId(), collectionForm.getItemId(),null);
         populateCollectionForm(collectionForm, bibliographicMarcForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.COLLECTION);
         return new ModelAndView("collection :: #collectionUpdateModal", "collectionForm", collectionForm);
