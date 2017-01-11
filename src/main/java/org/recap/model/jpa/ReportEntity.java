@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "REPORT_T", schema = "RECAP", catalog = "")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class ReportEntity implements Serializable{
 
     @Id

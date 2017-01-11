@@ -2,8 +2,10 @@ package org.recap.matchingAlgorithm;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.camel.activemq.JmxHelper;
 import org.recap.controller.MatchingAlgorithmController;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.util.MatchingAlgorithmUtil;
@@ -37,6 +39,14 @@ public class MatchingAlgorithmUT extends BaseTestCase {
 
     @Autowired
     MatchingAlgorithmController matchingAlgorithmController;
+
+    @Autowired
+    JmxHelper jmxHelper;
+
+    @Autowired
+    MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
+
+    private Integer batchSize = 1000;
 
     @Test
     public void populateTempMatchingPointsEntity() throws Exception {
@@ -91,6 +101,18 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         String status = matchingAlgorithmController.matchingAlgorithmFull();
         assertNotNull(status);
         assertTrue(status.contains("Done"));
+    }
+
+    @Test
+    public void updateCGDForMatchingAlgorithm() throws Exception {
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(batchSize);
+
+        stopWatch.stop();
+        logger.info("Total Time taken to update CGD is : " + stopWatch.getTotalTimeSeconds());
     }
 
 }

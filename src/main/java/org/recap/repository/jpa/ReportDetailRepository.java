@@ -15,6 +15,8 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "report", path = "report")
 public interface ReportDetailRepository extends JpaRepository<ReportEntity, Integer> {
 
+    List<ReportEntity> findByRecordNumberIn(List<Integer> recordNumbers);
+
     List<ReportEntity> findByFileName(String fileName);
 
     List<ReportEntity> findByFileNameAndType(String fileName, String type);

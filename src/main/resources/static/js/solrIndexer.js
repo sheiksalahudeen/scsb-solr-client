@@ -75,6 +75,8 @@ function saveReport() {
         url = "/matchingAlgorithm/full";
     } else if (criteria === 'Reports') {
         url = "/matchingAlgorithm/reports";
+    } else if (criteria === 'UpdateCGD') {
+        url = "/matchingAlgorithm/updateCGD";
     }
     if(url !== '') {
         var request = $.ajax({
