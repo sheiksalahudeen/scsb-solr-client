@@ -2,13 +2,10 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
-import org.recap.security.UserManagement;
 import org.recap.util.CsvUtil;
 import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
@@ -29,7 +26,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Created by rajeshbabuk on 6/7/16.
@@ -54,16 +50,10 @@ public class SearchRecordsController {
 
     @RequestMapping("/search")
     public String searchRecords(Model model) {
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions=UserManagement.getPermissions(subject);
-        if(subject.isPermitted(permissions.get(UserManagement.SCSB_SEARCH_EXPORT.getPermissionId()))) {
             SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
             model.addAttribute("searchRecordsRequest", searchRecordsRequest);
             model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.SEARCH);
             return "searchRecords";
-        }else{
-            return UserManagement.unAuthorized(subject);
-        }
     }
 
     @ResponseBody

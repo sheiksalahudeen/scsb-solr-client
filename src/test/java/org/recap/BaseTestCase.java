@@ -9,7 +9,6 @@ import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.repository.solr.main.BibSolrDocumentRepository;
 import org.recap.repository.solr.main.HoldingsSolrCrudRepository;
 import org.recap.repository.solr.main.ItemCrudRepository;
-import org.recap.security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -81,9 +80,6 @@ public class BaseTestCase {
 
     @Autowired
     public UserDetailsRepository userRepo;
-
-    @Autowired
-    public UserService userService;
 
     @Autowired
     public RolesDetailsRepositorty roleRepository;

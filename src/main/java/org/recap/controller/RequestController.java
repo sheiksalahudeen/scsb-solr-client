@@ -2,21 +2,16 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.codehaus.jettison.json.JSONObject;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.model.search.RequestForm;
 import org.recap.model.search.SearchResultRow;
-import org.recap.model.userManagement.UserDetailsForm;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
-import org.recap.security.UserManagement;
 import org.recap.util.BibJSONUtil;
 import org.recap.util.RequestServiceUtil;
 import org.slf4j.Logger;
@@ -62,28 +57,10 @@ public class RequestController {
 
     @RequestMapping("/request")
     public String collection(Model model) {
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
-        UserDetailsForm userDetailsForm=getPermissions(subject,permissions);
-        if(subject.isPermitted(permissions.get(UserManagement.REQUEST_PLACE.getPermissionId())) || subject.isPermitted(permissions.get(UserManagement.REQUEST_PLACE_ALL.getPermissionId())) ||
-                userDetailsForm.isRecapUser()) {
-            RequestForm requestForm = setDefaultsToCreateRequest(userDetailsForm);
+            RequestForm requestForm = setDefaultsToCreateRequest();
             model.addAttribute("requestForm", requestForm);
             model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
             return "searchRecords";
-        }else{
-            return UserManagement.unAuthorized(subject);
-        }
-    }
-
-    private UserDetailsForm getPermissions(Subject subject,Map<Integer,String> permissions){
-        UserDetailsForm userDetailsForm=new UserDetailsForm();
-        userDetailsForm.setRecapUser(subject.isPermitted(permissions.get(UserManagement.REQUEST_ITEMS.getPermissionId())));
-        Session session=subject.getSession();
-        Integer userId=(Integer)session.getAttribute(UserManagement.USER_ID);
-        userDetailsForm.setSuperAdmin(userId.equals(UserManagement.SUPER_ADMIN.getIntegerValues()));
-        userDetailsForm.setLoginInstitutionId((Integer) session.getAttribute(UserManagement.USER_INSTITUTION));
-        return userDetailsForm;
     }
 
     @ResponseBody
@@ -142,16 +119,13 @@ public class RequestController {
     @ResponseBody
     @RequestMapping(value = "/request", method = RequestMethod.POST, params = "action=loadCreateRequest")
     public ModelAndView loadCreateRequest(Model model) {
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
-        UserDetailsForm userDetailsForm=getPermissions(subject,permissions);
-        RequestForm requestForm = setDefaultsToCreateRequest(userDetailsForm);
+        RequestForm requestForm = setDefaultsToCreateRequest();
         model.addAttribute("requestForm", requestForm);
         model.addAttribute(RecapConstants.TEMPLATE, RecapConstants.REQUEST);
         return new ModelAndView("request", "requestForm", requestForm);
     }
 
-    private RequestForm setDefaultsToCreateRequest(UserDetailsForm userDetailsForm) {
+    private RequestForm setDefaultsToCreateRequest() {
         RequestForm requestForm = new RequestForm();
 
         List<String> requestingInstitutions = new ArrayList<>();
@@ -161,9 +135,6 @@ public class RequestController {
         Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
         for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
             InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-            if(userDetailsForm.getLoginInstitutionId()==institutionEntity.getInstitutionId() || userDetailsForm.isRecapUser() || userDetailsForm.isSuperAdmin()) {
-                requestingInstitutions.add(institutionEntity.getInstitutionCode());
-            }
         }
 
         Iterable<RequestTypeEntity> requestTypeEntities = requestTypeDetailsRepository.findAll();
@@ -191,9 +162,6 @@ public class RequestController {
                                BindingResult result,
                                Model model) throws Exception {
         JSONObject jsonObject = new JSONObject();
-        Subject subject= SecurityUtils.getSubject();
-        Map<Integer,String> permissions= UserManagement.getPermissions(subject);
-        UserDetailsForm userDetailsForm=getPermissions(subject,permissions);
         if (StringUtils.isNotBlank(requestForm.getItemBarcodeInRequest())) {
             List<String> itemBarcodes = Arrays.asList(requestForm.getItemBarcodeInRequest().split(","));
             List<String> invalidBarcodes = new ArrayList<>();
@@ -205,18 +173,13 @@ public class RequestController {
                     ItemEntity itemEntity = itemDetailsRepository.findByBarcode(barcode);
                     if (null != itemEntity) {
                         if (CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
-                            if( itemEntity.getCollectionGroupId()==RecapConstants.CGD_PRIVATE && !userDetailsForm.isSuperAdmin() && !userDetailsForm.isRecapUser() && !userDetailsForm.getLoginInstitutionId().equals(itemEntity.getOwningInstitutionId()) )
-                            {
-                                jsonObject.put("errorMessage", "User is not permitted to request these item(s)");
-                            }else {
-                                for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
-                                    String bibContent = new String(bibliographicEntity.getContent());
-                                    BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                                    List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
-                                    Record marcRecord = records.get(0);
-                                    itemTitles.add(bibJSONUtil.getTitle(marcRecord));
-                                    itemOwningInstitutions.add(itemEntity.getInstitutionEntity().getInstitutionCode());
-                                }
+                            for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                                String bibContent = new String(bibliographicEntity.getContent());
+                                BibJSONUtil bibJSONUtil = new BibJSONUtil();
+                                List<Record> records = bibJSONUtil.convertMarcXmlToRecord(bibContent);
+                                Record marcRecord = records.get(0);
+                                itemTitles.add(bibJSONUtil.getTitle(marcRecord));
+                                itemOwningInstitutions.add(itemEntity.getInstitutionEntity().getInstitutionCode());
                             }
                         }
                     } else {

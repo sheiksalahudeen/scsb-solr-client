@@ -91,9 +91,6 @@ dependencies {
 	compile('io.springfox:springfox-swagger-ui:2.5.0')
 	compile('io.springfox:springfox-swagger2:2.5.0')
 	compile('org.codehaus.jackson:jackson-mapper-asl:1.9.13')
-	compile('org.apache.shiro:shiro-core:1.4.0-RC2')
-	compile('org.apache.shiro:shiro-spring:1.4.0-RC2')
-	compile('org.apache.shiro:shiro-spring-boot-web-starter:1.4.0-RC2')
 	runtime('mysql:mysql-connector-java')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
