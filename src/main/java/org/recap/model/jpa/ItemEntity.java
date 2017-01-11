@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "item_t", schema = "recap", catalog = "")
 @IdClass(ItemPK.class)
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class ItemEntity implements Serializable {
     @Column(name = "ITEM_ID", insertable = false, updatable = false)
     private Integer itemId;

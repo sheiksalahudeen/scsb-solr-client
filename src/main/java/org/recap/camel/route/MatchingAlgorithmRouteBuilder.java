@@ -47,6 +47,15 @@ public class MatchingAlgorithmRouteBuilder {
                 }
             });
 
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from("scsbactivemq:queue:updateItemsQ")
+                            .routeId("updateItemsQ")
+                            .bean(MatchingAlgorithmProcessor.class, "updateItemEntity");
+                }
+            });
+
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

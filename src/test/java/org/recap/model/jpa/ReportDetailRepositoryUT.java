@@ -11,6 +11,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by SheikS on 8/8/2016.
@@ -101,6 +102,11 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         reportDataEntity6.setHeaderName("SummaryHoldings");
         reportDataEntity6.setHeaderValue("no.1 18292938");
         reportDataEntities.add(reportDataEntity6);
+
+        ReportDataEntity reportDataEntity7 = new ReportDataEntity();
+        reportDataEntity7.setHeaderName("MaterialType");
+        reportDataEntity7.setHeaderValue("Monograph,Monograph");
+        reportDataEntities.add(reportDataEntity7);
 
         reportEntity.setReportDataEntities(reportDataEntities);
 
@@ -244,6 +250,13 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         List<ReportEntity> reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
         assertNotNull(reportEntities.get(0));
+    }
+
+    @Test
+    public void testFindByRecordNumberIn() throws Exception {
+        List<ReportEntity> byRecordNumberIn = reportDetailRepository.findByRecordNumberIn(Arrays.asList(1, 2, 3, 4));
+        assertNotNull(byRecordNumberIn);
+        assertTrue(byRecordNumberIn.size() > 1);
     }
 
 }

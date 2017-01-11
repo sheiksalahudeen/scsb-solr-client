@@ -1,8 +1,10 @@
 package org.recap.camel.processor;
 
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -30,6 +32,9 @@ public class MatchingAlgorithmProcessor {
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
     public void saveMatchingMatchPointEntity(List<MatchingMatchPointsEntity> matchingMatchPointsEntities){
         matchingMatchPointsDetailsRepository.save(matchingMatchPointsEntities);
     }
@@ -52,5 +57,9 @@ public class MatchingAlgorithmProcessor {
 
     public void saveMatchingReportEntity(List<ReportEntity> reportEntityList) {
         reportDetailRepository.save(reportEntityList);
+    }
+
+    public void updateItemEntity(List<ItemEntity> itemEntities) {
+        itemDetailsRepository.save(itemEntities);
     }
 }
