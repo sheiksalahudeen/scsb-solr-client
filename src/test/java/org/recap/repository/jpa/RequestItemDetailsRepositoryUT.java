@@ -2,6 +2,7 @@ package org.recap.repository.jpa;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 
 import javax.persistence.EntityManager;
@@ -11,7 +12,6 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by rajeshbabuk on 28/10/16.
@@ -83,7 +83,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1,5);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.BORROW_DIRECT);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -97,7 +97,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2,5);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2,RecapConstants.BORROW_DIRECT);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -111,7 +111,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3,5);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3,RecapConstants.BORROW_DIRECT);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -126,8 +126,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -144,8 +144,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -162,8 +162,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,2,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -181,8 +181,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,2,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -199,8 +199,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,3,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -217,8 +217,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {1,2,3,5};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,3,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -236,8 +236,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -254,8 +254,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -272,8 +272,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,2,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -290,8 +290,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,2,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -308,8 +308,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {3};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,3,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -326,8 +326,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
         Integer[] cgdId = {1,2};
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
-        Integer[] requestTypeId = {4};
-        List<Integer> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
+        String[] requestTypeId = {"EDD"};
+        List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,3,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
@@ -344,7 +344,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1,3);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.RECALL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -358,7 +358,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2,3);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2, RecapConstants.RECALL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -372,7 +372,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3,3);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3, RecapConstants.RECALL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -387,7 +387,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1,2);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.RETRIEVAL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -401,7 +401,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2,2);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2, RecapConstants.RETRIEVAL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -415,7 +415,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3,2);
+        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,3, RecapConstants.RETRIEVAL);
         assertNotNull(count);
         assertEquals(1,count);
     }
