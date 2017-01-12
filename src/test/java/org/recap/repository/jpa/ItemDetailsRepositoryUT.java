@@ -6,8 +6,6 @@ import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,14 +15,9 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by chenchulakshmig on 13/7/16.
@@ -261,5 +254,17 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedBibliographicEntity);
         return savedBibliographicEntity;
+    }
+
+    @Test
+    public void findByLastUpdatedDateTest() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Page<ItemEntity> byLastUpdatedDate = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, 10), cal.getTime(), new Date());
+        assertNotNull(byLastUpdatedDate.getContent());
+        assertTrue(byLastUpdatedDate.getContent().size() > 0);
     }
 }

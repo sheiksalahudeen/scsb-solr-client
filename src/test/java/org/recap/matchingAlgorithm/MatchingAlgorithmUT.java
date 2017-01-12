@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
 import java.text.Normalizer;
+import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -113,6 +114,17 @@ public class MatchingAlgorithmUT extends BaseTestCase {
 
         stopWatch.stop();
         logger.info("Total Time taken to update CGD is : " + stopWatch.getTotalTimeSeconds());
+    }
+
+    @Test
+    public void updateCGDForItemsInSolr() throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(new Date(), batchSize);
+
+        stopWatch.stop();
+        logger.info("Total Time taken to update CGD in Solr is : " + stopWatch.getTotalTimeSeconds());
     }
 
 }
