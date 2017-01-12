@@ -50,4 +50,7 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     @Query(value = "select itemStatus.statusCode from ItemEntity item, ItemStatusEntity itemStatus where item.itemAvailabilityStatusId = itemStatus.itemStatusId and item.barcode = :barcode and item.isDeleted = 0")
     String getItemStatusByBarcodeAndIsDeletedFalse(@Param("barcode") String barcode);
+
+    @Query(value = "select item from ItemEntity item where item.lastUpdatedDate between ?1 and ?2")
+    Page<ItemEntity> findByLastUpdatedDate(Pageable pageable, Date lastUpdatedDate, Date lastUpdateDateTime);
 }
