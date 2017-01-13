@@ -49,7 +49,6 @@ public class SearchResultRow {
     @ApiModelProperty(name= "itemId", value= "Item Id",position = 17)
     private Integer itemId;
 
-    private Integer requestPosition;
     private Integer patronBarcode;
     private String requestingInstitution;
     private String deliveryLocation;
@@ -198,14 +197,6 @@ public class SearchResultRow {
 
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
-    }
-
-    public Integer getRequestPosition() {
-        return requestPosition;
-    }
-
-    public void setRequestPosition(Integer requestPosition) {
-        this.requestPosition = requestPosition;
     }
 
     public Integer getPatronBarcode() {

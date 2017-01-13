@@ -219,7 +219,6 @@ public class RequestController {
             List<SearchResultRow> searchResultRows = new ArrayList<>();
             for (RequestItemEntity requestItemEntity : requestItemEntities) {
                 SearchResultRow searchResultRow = new SearchResultRow();
-                searchResultRow.setRequestPosition(requestItemEntity.getRequestPosition());
                 searchResultRow.setPatronBarcode(Integer.parseInt(requestItemEntity.getPatronEntity().getInstitutionIdentifier()));
                 searchResultRow.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
                 searchResultRow.setBarcode(requestItemEntity.getItemEntity().getBarcode());
