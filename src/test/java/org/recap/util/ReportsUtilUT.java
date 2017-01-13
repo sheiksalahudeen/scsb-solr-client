@@ -453,7 +453,6 @@ public class ReportsUtilUT extends BaseTestCase {
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setPatronId(patronID);
-        requestItemEntity.setRequestPosition(new Random().nextInt());
         requestItemEntity.setStopCode("s1");
         requestItemDetailsRepository.save(requestItemEntity);
     }

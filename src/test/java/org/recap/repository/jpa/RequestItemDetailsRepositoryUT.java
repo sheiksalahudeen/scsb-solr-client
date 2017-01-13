@@ -482,7 +482,6 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setPatronId(patronID);
-        requestItemEntity.setRequestPosition(1);
         requestItemEntity.setStopCode("s1");
         requestItemDetailsRepository.save(requestItemEntity);
     }

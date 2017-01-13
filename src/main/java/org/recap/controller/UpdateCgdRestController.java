@@ -20,12 +20,6 @@ public class UpdateCgdRestController {
 
     private Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
 
-    @Value("${server.protocol}")
-    String serverProtocol;
-
-    @Value("${scsb.solr.client.url}")
-    String scsbSolrClientUrl;
-
     @Autowired
     UpdateCgdUtil updateCgdUtil;
 
