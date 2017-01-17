@@ -101,13 +101,15 @@ public class MatchingAlgorithmCGDProcessor {
                     //NYPL
                     boolean isMultipleCopy = false;
                     for(ItemEntity itemEntity : itemEntities) {
-                        if(itemEntity.getCopyNumber() > 1) {
-                            isMultipleCopy = true;
-                            itemEntityMap.put(itemEntity.getItemId(), itemEntity);
-                            Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
-                            Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
-                            populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
-                            materialTypeSet.add(RecapConstants.MONOGRAPH);
+                        if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                            if(itemEntity.getCopyNumber() > 1) {
+                                isMultipleCopy = true;
+                                itemEntityMap.put(itemEntity.getItemId(), itemEntity);
+                                Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
+                                Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
+                                populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
+                                materialTypeSet.add(RecapConstants.MONOGRAPH);
+                            }
                         }
                     }
                     if(!isMultipleCopy) {
@@ -118,11 +120,13 @@ public class MatchingAlgorithmCGDProcessor {
                     //CUL & PUL
                     if(bibliographicEntity.getHoldingsEntities().size() > 1) {
                         for(ItemEntity itemEntity : itemEntities) {
-                            itemEntityMap.put(itemEntity.getItemId(), itemEntity);
-                            Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
-                            Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
-                            populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
-                            materialTypeSet.add(RecapConstants.MONOGRAPH);
+                            if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                                itemEntityMap.put(itemEntity.getItemId(), itemEntity);
+                                Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
+                                Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
+                                populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
+                                materialTypeSet.add(RecapConstants.MONOGRAPH);
+                            }
                         }
                     } else {
                         isMonograph = false;
