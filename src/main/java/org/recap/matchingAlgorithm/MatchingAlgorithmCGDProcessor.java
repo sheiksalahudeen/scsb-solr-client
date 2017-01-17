@@ -91,23 +91,22 @@ public class MatchingAlgorithmCGDProcessor {
             //Check for Monograph - (Single Bib & Single Item)
             if(itemEntities != null && itemEntities.size() == 1) {
                 ItemEntity itemEntity = itemEntities.get(0);
-                itemEntityMap.put(itemEntity.getItemId(), itemEntity);
-                Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
-                Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
-                populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
-                materialTypeSet.add(RecapConstants.MONOGRAPH);
+                if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                    populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
+                } else {
+                    isMonograph = false;
+                    materialTypeSet.add(RecapConstants.MONOGRAPH);
+                }
             } else {
                 if(bibliographicEntity.getOwningInstitutionId().equals(institutionMap.get("NYPL"))) {
                     //NYPL
                     boolean isMultipleCopy = false;
                     for(ItemEntity itemEntity : itemEntities) {
-                        if(itemEntity.getCopyNumber() > 1) {
-                            isMultipleCopy = true;
-                            itemEntityMap.put(itemEntity.getItemId(), itemEntity);
-                            Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
-                            Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
-                            populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
-                            materialTypeSet.add(RecapConstants.MONOGRAPH);
+                        if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                            if(itemEntity.getCopyNumber() > 1) {
+                                isMultipleCopy = true;
+                                populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
+                            }
                         }
                     }
                     if(!isMultipleCopy) {
@@ -118,11 +117,9 @@ public class MatchingAlgorithmCGDProcessor {
                     //CUL & PUL
                     if(bibliographicEntity.getHoldingsEntities().size() > 1) {
                         for(ItemEntity itemEntity : itemEntities) {
-                            itemEntityMap.put(itemEntity.getItemId(), itemEntity);
-                            Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
-                            Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
-                            populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
-                            materialTypeSet.add(RecapConstants.MONOGRAPH);
+                            if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                                populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
+                            }
                         }
                     } else {
                         isMonograph = false;
@@ -132,6 +129,14 @@ public class MatchingAlgorithmCGDProcessor {
             }
         }
         return isMonograph;
+    }
+
+    private void populateValues(Set<String> materialTypeSet, Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, Map<Integer, ItemEntity> itemEntityMap, ItemEntity itemEntity) {
+        itemEntityMap.put(itemEntity.getItemId(), itemEntity);
+        Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
+        Integer useRestriction = getUseRestrictionInNumbers(itemEntity.getUseRestrictions());
+        populateUseRestrictionMap(useRestrictionMap, itemEntity, owningInstitutionId, useRestriction);
+        materialTypeSet.add(RecapConstants.MONOGRAPH);
     }
 
     public void populateUseRestrictionMap(Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, ItemEntity itemEntity, Integer owningInstitutionId, Integer useRestriction) {

@@ -1,5 +1,7 @@
 package org.recap.model.jpa;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -8,7 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "REPORT_DATA_T", schema = "RECAP", catalog = "")
-@org.hibernate.annotations.Entity(dynamicUpdate = true)
+@DynamicUpdate
 public class ReportDataEntity implements Serializable {
 
     @Id
