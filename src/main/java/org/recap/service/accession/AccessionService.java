@@ -292,8 +292,11 @@ public class AccessionService {
             successBibCount = successBibCount + (responseMap.get(RecapConstants.SUCCESS_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_BIB_COUNT) : 0);
             failedBibCount = failedBibCount + (responseMap.get(RecapConstants.FAILED_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_BIB_COUNT) : 0);
             if(failedBibCount == 0){
-                successItemCount = successItemCount + (responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_ITEM_COUNT) : 0);
-                failedItemCount = failedItemCount + (responseMap.get(RecapConstants.FAILED_ITEM_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_ITEM_COUNT) : 0);
+                if(StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
+                    successItemCount = 1;
+                }else{
+                    failedItemCount = 1;
+                }
             }
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
 
