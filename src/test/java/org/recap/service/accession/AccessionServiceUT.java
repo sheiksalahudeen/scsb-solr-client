@@ -61,23 +61,30 @@ public class AccessionServiceUT extends BaseTestCase {
     @Test
     public void accessionUnavilableBarcode(){
         accessionService.processRequest("3210106212830", "PA", "PUL");
-        ItemEntity itemEntity = itemDetailsRepository.findByBarcode("3210106212830");
-        assertNotNull(itemEntity);
-        assertEquals("dummycallnumber",itemEntity.getCallNumber());
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
+        assertNotNull(itemEntities);
+        assertTrue(itemEntities.size() > 0);
+        assertNotNull(itemEntities.get(0));
+        assertEquals("dummycallnumber",itemEntities.get(0).getCallNumber());
     }
 
     @Test
     public void accessionUnavilableBarcodeAvoidDuplicate(){
         accessionService.processRequest("3210106212830", "PA", "PUL");
-        ItemEntity itemEntity = itemDetailsRepository.findByBarcode("3210106212830");
-        assertEquals(1,itemEntity.getBibliographicEntities().size());
-        assertNotNull(itemEntity);
-        assertEquals("dummycallnumber",itemEntity.getCallNumber());
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
+        assertNotNull(itemEntities);
+        assertTrue(itemEntities.size() > 0);
+        assertNotNull(itemEntities.get(0));
+        assertEquals(1,itemEntities.get(0).getBibliographicEntities().size());
+        assertEquals("dummycallnumber",itemEntities.get(0).getCallNumber());
 
         String respose = accessionService.processRequest("3210106212830", "PA", "PUL");
         assertEquals(RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG,respose);
-        ItemEntity itemEntity1 = itemDetailsRepository.findByBarcode("3210106212830");
-        assertEquals(1,itemEntity1.getBibliographicEntities().size());
+        List<ItemEntity> itemEntities1 = itemDetailsRepository.findByBarcode("3210106212830");
+        assertNotNull(itemEntities1);
+        assertTrue(itemEntities1.size() > 0);
+        assertNotNull(itemEntities1.get(0));
+        assertEquals(1,itemEntities1.get(0).getBibliographicEntities().size());
 
     }
 

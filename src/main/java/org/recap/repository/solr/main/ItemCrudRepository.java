@@ -13,7 +13,7 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "itemSolr", path = "itemSolr")
 public interface ItemCrudRepository extends SolrCrudRepository<Item, String> {
 
-    Item findByBarcode(String barcode);
+    List<Item> findByBarcode(String barcode);
 
     Item findByItemId(Integer itemId);
 

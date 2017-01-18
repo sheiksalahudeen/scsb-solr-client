@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by rajeshbabuk on 5/1/17.
@@ -46,13 +48,14 @@ public class UpdateCgdUtil {
     @Autowired
     SolrTemplate solrTemplate;
 
-    public String updateCGDForItem(Integer itemId, String newCollectionGroupDesignation, String cgdChangeNotes) {
-        String userName = RecapConstants.GUEST;
+    public String updateCGDForItem(String itemBarcode, String newCollectionGroupDesignation, String cgdChangeNotes) {
+        String username = RecapConstants.GUEST;
+        List<ItemEntity> itemEntities = new ArrayList<>();
         Date lastUpdatedDate = new Date();
         try {
-            updateCGDForItemInDB(itemId, newCollectionGroupDesignation, userName, lastUpdatedDate);
-            updateCGDForItemInSolr(itemId, newCollectionGroupDesignation);
-            saveItemChangeLogEntity(itemId, userName, lastUpdatedDate, RecapConstants.UPDATE_CGD, cgdChangeNotes);
+            updateCGDForItemInDB(itemBarcode, newCollectionGroupDesignation, username, lastUpdatedDate);
+            updateCGDForItemInSolr(itemBarcode, itemEntities);
+            saveItemChangeLogEntity(itemEntities, username, lastUpdatedDate, RecapConstants.UPDATE_CGD, cgdChangeNotes);
             return RecapConstants.SUCCESS;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -60,41 +63,38 @@ public class UpdateCgdUtil {
         }
     }
 
-    public void updateCGDForItemInDB(Integer itemId, String newCollectionGroupDesignation, String userName, Date lastUpdatedDate) {
+    public void updateCGDForItemInDB(String itemBarcode, String newCollectionGroupDesignation, String username, Date lastUpdatedDate) {
         CollectionGroupEntity collectionGroupEntity = collectionGroupDetailsRepository.findByCollectionGroupCode(newCollectionGroupDesignation);
-        itemDetailsRepository.updateCollectionGroupIdByItemId(collectionGroupEntity.getCollectionGroupId(), itemId, userName, lastUpdatedDate);
+        itemDetailsRepository.updateCollectionGroupIdByItemBarcode(collectionGroupEntity.getCollectionGroupId(), itemBarcode, username, lastUpdatedDate);
     }
 
-    public void updateCGDForItemInSolr(Integer itemId, String newCollectionGroupDesignation) {
+    public void updateCGDForItemInSolr(String itemBarcode, List<ItemEntity> itemEntities) {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        ItemEntity itemEntity = itemDetailsRepository.findByItemId(itemId);
-        if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
-            for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
-                SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-                if (CollectionUtils.isNotEmpty(bibSolrInputDocument.getChildDocuments())) {
-                    for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
-                        if (CollectionUtils.isNotEmpty(holdingsSolrInputDocument.getChildDocuments())) {
-                            for (SolrInputDocument itemSolrInputDocument : holdingsSolrInputDocument.getChildDocuments()) {
-                                if (itemId.equals(itemSolrInputDocument.get(RecapConstants.ITEM_ID).getValue())) {
-                                    itemSolrInputDocument.setField(RecapConstants.COLLECTION_GROUP_DESIGNATION, newCollectionGroupDesignation);
-                                }
-                            }
-                        }
+        itemEntities.addAll(itemDetailsRepository.findByBarcode(itemBarcode));
+        if (CollectionUtils.isNotEmpty(itemEntities)) {
+            for (ItemEntity itemEntity : itemEntities) {
+                if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
+                    for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                        SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+                        solrTemplate.saveDocument(bibSolrInputDocument);
+                        solrTemplate.commit();
                     }
                 }
-                solrTemplate.saveDocument(bibSolrInputDocument);
             }
         }
-        solrTemplate.commit();
     }
 
-    private void saveItemChangeLogEntity(Integer recordId, String userName, Date lastUpdatedDate, String operationType, String notes) {
-        ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
-        itemChangeLogEntity.setUpdatedBy(userName);
-        itemChangeLogEntity.setUpdatedDate(lastUpdatedDate);
-        itemChangeLogEntity.setOperationType(operationType);
-        itemChangeLogEntity.setRecordId(recordId);
-        itemChangeLogEntity.setNotes(notes);
-        itemChangeLogDetailsRepository.save(itemChangeLogEntity);
+    private void saveItemChangeLogEntity(List<ItemEntity> itemEntities, String username, Date lastUpdatedDate, String operationType, String notes) {
+        if (CollectionUtils.isNotEmpty(itemEntities)) {
+            for (ItemEntity itemEntity : itemEntities) {
+                ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
+                itemChangeLogEntity.setUpdatedBy(username);
+                itemChangeLogEntity.setUpdatedDate(lastUpdatedDate);
+                itemChangeLogEntity.setOperationType(operationType);
+                itemChangeLogEntity.setRecordId(itemEntity.getItemId());
+                itemChangeLogEntity.setNotes(notes);
+                itemChangeLogDetailsRepository.save(itemChangeLogEntity);
+            }
+        }
     }
 }

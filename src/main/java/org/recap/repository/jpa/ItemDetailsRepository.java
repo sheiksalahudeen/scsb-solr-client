@@ -34,12 +34,12 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     ItemEntity findByOwningInstitutionItemId(@Param("owningInstitutionItemId") String owningInstitutionItemId);
 
-    ItemEntity findByBarcode(String barcode);
+    List<ItemEntity> findByBarcode(String barcode);
 
     @Modifying
     @Transactional
-    @Query("update ItemEntity item set item.collectionGroupId = :collectionGroupId, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate where item.itemId = :itemId")
-    int updateCollectionGroupIdByItemId(@Param("collectionGroupId") Integer collectionGroupId, @Param("itemId") Integer itemId, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
+    @Query("update ItemEntity item set item.collectionGroupId = :collectionGroupId, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate where item.barcode = :itemBarcode")
+    int updateCollectionGroupIdByItemBarcode(@Param("collectionGroupId") Integer collectionGroupId, @Param("itemBarcode") String itemBarcode, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
     List<ItemEntity> findByBarcodeIn(@Param("barcodes") List<String> barcodes);
 
