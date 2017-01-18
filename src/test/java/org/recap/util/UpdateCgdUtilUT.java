@@ -16,12 +16,11 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by rajeshbabuk on 5/1/17.
@@ -47,15 +46,18 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getItemEntities());
         assertEquals("Shared", savedBibliographicEntity.getItemEntities().get(0).getCollectionGroupEntity().getCollectionGroupCode());
 
-        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
-        updateCgdUtil.updateCGDForItemInDB(itemId, "Private", "guest", new Date());
+        String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
+        updateCgdUtil.updateCGDForItemInDB(itemBarcode, "Private", "guest", new Date());
 
-        ItemEntity fetchedItemEntity = itemDetailsRepository.findByItemId(itemId);
-        entityManager.refresh(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity.getItemId());
-        assertEquals(itemId, fetchedItemEntity.getItemId());
-        assertEquals("Private", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+        List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemEntities);
+        assertTrue(fetchedItemEntities.size() > 0);
+        for (ItemEntity fetchedItemEntity : fetchedItemEntities) {
+            entityManager.refresh(fetchedItemEntity);
+            assertNotNull(fetchedItemEntity.getItemId());
+            assertEquals(itemBarcode, fetchedItemEntity.getBarcode());
+            assertEquals("Private", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+        }
     }
 
     @Test
@@ -76,20 +78,28 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         solrTemplate.saveDocument(solrInputDocument);
         solrTemplate.commit();
 
-        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
-        Item fetchedItemSolr = itemCrudRepository.findByItemId(itemId);
-        assertNotNull(fetchedItemSolr);
-        assertNotNull(fetchedItemSolr.getItemId());
-        assertEquals(itemId, fetchedItemSolr.getItemId());
-        assertEquals("Shared", fetchedItemSolr.getCollectionGroupDesignation());
+        String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
+        List<Item> fetchedItemsSolr = itemCrudRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemsSolr);
+        assertTrue(fetchedItemsSolr.size() > 0);
+        for (Item fetchedItemSolr : fetchedItemsSolr) {
+            assertNotNull(fetchedItemSolr.getItemId());
+            assertEquals(itemBarcode, fetchedItemSolr.getBarcode());
+            assertEquals("Shared", fetchedItemSolr.getCollectionGroupDesignation());
+        }
 
-        updateCgdUtil.updateCGDForItemInSolr(itemId, "Open");
+        updateCgdUtil.updateCGDForItemInDB(itemBarcode, "Open", "guest", new Date());
+        updateCgdUtil.updateCGDForItemInSolr(itemBarcode, new ArrayList<>());
+        solrTemplate.commit();
 
-        Item fetchedItemSolrAfterUpdate = itemCrudRepository.findByItemId(itemId);
-        assertNotNull(fetchedItemSolrAfterUpdate);
-        assertNotNull(fetchedItemSolrAfterUpdate.getItemId());
-        assertEquals(itemId, fetchedItemSolrAfterUpdate.getItemId());
-        assertEquals("Open", fetchedItemSolrAfterUpdate.getCollectionGroupDesignation());
+        List<Item> fetchedItemsSolrAfterUpdate = itemCrudRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemsSolrAfterUpdate);
+        assertTrue(fetchedItemsSolrAfterUpdate.size() > 0);
+        for (Item fetchedItemSolrAfterUpdate : fetchedItemsSolrAfterUpdate) {
+            assertNotNull(fetchedItemSolrAfterUpdate.getItemId());
+            assertEquals(itemBarcode, fetchedItemSolrAfterUpdate.getBarcode());
+            assertEquals("Shared", fetchedItemSolrAfterUpdate.getCollectionGroupDesignation());
+        }
     }
 
     @Test
@@ -112,27 +122,27 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         solrTemplate.saveDocument(solrInputDocument);
         solrTemplate.commit();
 
-        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
-        Item fetchedItemSolr = itemCrudRepository.findByItemId(itemId);
-        assertNotNull(fetchedItemSolr);
-        assertNotNull(fetchedItemSolr.getItemId());
-        assertEquals(itemId, fetchedItemSolr.getItemId());
-        assertEquals("Shared", fetchedItemSolr.getCollectionGroupDesignation());
+        String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
+        List<Item> fetchedItemsSolr = itemCrudRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemsSolr);
+        assertTrue(fetchedItemsSolr.size() > 0);
+        for (Item fetchedItemSolr : fetchedItemsSolr) {
+            assertNotNull(fetchedItemSolr.getItemId());
+            assertEquals(itemBarcode, fetchedItemSolr.getBarcode());
+            assertEquals("Shared", fetchedItemSolr.getCollectionGroupDesignation());
+        }
 
-        updateCgdUtil.updateCGDForItem(itemId, "Private", "Notes for updating CGD");
+        updateCgdUtil.updateCGDForItem(itemBarcode, "Private", "Notes for updating CGD");
 
-        ItemEntity fetchedItemEntity = itemDetailsRepository.findByItemId(itemId);
-        entityManager.refresh(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity.getItemId());
-        assertEquals(itemId, fetchedItemEntity.getItemId());
-        assertEquals("Private", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
-
-        Item fetchedItemSolrAfterUpdate = itemCrudRepository.findByItemId(itemId);
-        assertNotNull(fetchedItemSolrAfterUpdate);
-        assertNotNull(fetchedItemSolrAfterUpdate.getItemId());
-        assertEquals(itemId, fetchedItemSolrAfterUpdate.getItemId());
-        assertEquals("Private", fetchedItemSolrAfterUpdate.getCollectionGroupDesignation());
+        List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemEntities);
+        assertTrue(fetchedItemEntities.size() > 0);
+        for (ItemEntity fetchedItemEntity : fetchedItemEntities) {
+            entityManager.refresh(fetchedItemEntity);
+            assertNotNull(fetchedItemEntity.getItemId());
+            assertEquals(itemBarcode, fetchedItemEntity.getBarcode());
+            assertEquals("Private", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+        }
 
         long afterCountForChangeLog = itemChangeLogDetailsRepository.count();
 

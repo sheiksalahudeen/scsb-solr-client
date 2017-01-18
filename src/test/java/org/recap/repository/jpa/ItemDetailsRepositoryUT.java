@@ -131,16 +131,17 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getItemEntities());
         assertEquals("Shared", savedBibliographicEntity.getItemEntities().get(0).getCollectionGroupEntity().getCollectionGroupCode());
 
-        Integer itemId = savedBibliographicEntity.getItemEntities().get(0).getItemId();
-        int updatedItem = itemDetailsRepository.updateCollectionGroupIdByItemId(2, itemId, "guest", new Date());
+        String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
+        int updatedItem = itemDetailsRepository.updateCollectionGroupIdByItemBarcode(2, itemBarcode, "guest", new Date());
         assertEquals(1, updatedItem);
 
-        ItemEntity fetchedItemEntity = itemDetailsRepository.findByItemId(itemId);
-        entityManager.refresh(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity);
-        assertNotNull(fetchedItemEntity.getItemId());
-        assertEquals(itemId, fetchedItemEntity.getItemId());
-        assertEquals("Open", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+        List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+        entityManager.refresh(fetchedItemEntities);
+        assertNotNull(fetchedItemEntities);
+        assertTrue(fetchedItemEntities.size() > 0);
+        assertNotNull(fetchedItemEntities.get(0).getBarcode());
+        assertEquals(itemBarcode, fetchedItemEntities.get(0).getItemId());
+        assertEquals("Open", fetchedItemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode());
     }
 
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
