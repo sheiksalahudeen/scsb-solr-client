@@ -1,7 +1,6 @@
 package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
-import org.recap.controller.SearchRecordsController;
 import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchRecordsResponse;
@@ -22,7 +21,7 @@ import java.util.*;
 @Api(value="search", description="Search Records", position = 1)
 public class SearchRecordRestController {
 
-    private Logger logger = LoggerFactory.getLogger(SearchRecordsController.class);
+    private Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
 
     @Autowired
     SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
