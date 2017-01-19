@@ -109,6 +109,12 @@ public class Bib {
     @Field("BibLastUpdatedDate")
     private Date bibLastUpdatedDate;
 
+    @Field("BibHoldingLastUpdatedDate")
+    private Date bibHoldingLastUpdatedDate;
+
+    @Field("BibItemLastUpdatedDate")
+    private Date bibItemLastUpdatedDate;
+
     @Field("IsDeletedBib")
     private boolean isDeletedBib = false;
 
@@ -369,6 +375,22 @@ public class Bib {
 
     public void setBibLastUpdatedDate(Date bibLastUpdatedDate) {
         this.bibLastUpdatedDate = bibLastUpdatedDate;
+    }
+
+    public Date getBibHoldingLastUpdatedDate() {
+        return bibHoldingLastUpdatedDate;
+    }
+
+    public void setBibHoldingLastUpdatedDate(Date bibHoldingLastUpdatedDate) {
+        this.bibHoldingLastUpdatedDate = bibHoldingLastUpdatedDate;
+    }
+
+    public Date getBibItemLastUpdatedDate() {
+        return bibItemLastUpdatedDate;
+    }
+
+    public void setBibItemLastUpdatedDate(Date bibItemLastUpdatedDate) {
+        this.bibItemLastUpdatedDate = bibItemLastUpdatedDate;
     }
 
     public boolean isDeletedBib() {

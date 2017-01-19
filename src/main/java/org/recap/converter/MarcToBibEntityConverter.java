@@ -24,7 +24,7 @@ import java.util.*;
  * Created by chenchulakshmig on 17/10/16.
  */
 @Service
-public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterface{
+public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterface {
 
     @Autowired
     private MarcUtil marcUtil;
@@ -65,7 +65,8 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         BibMarcRecord bibMarcRecord = marcUtil.buildBibMarcRecord(record);
         Record bibRecord = bibMarcRecord.getBibRecord();
         Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(institutionName);
-        Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecord, owningInstitutionId, institutionName);
+        Date currentDate = new Date();
+        Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecord, owningInstitutionId, institutionName,currentDate);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
         ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
         if (bibReportEntity != null) {
@@ -83,7 +84,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             for (HoldingsMarcRecord holdingsMarcRecord : holdingsMarcRecords) {
                 boolean processHoldings = false;
                 Record holdingsRecord = holdingsMarcRecord.getHoldingsRecord();
-                Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, institutionName, holdingsRecord, bibRecord);
+                Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, institutionName, holdingsRecord, bibRecord, currentDate);
                 HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
                 ReportEntity holdingsReportEntity = (ReportEntity) holdingsMap.get("holdingsReportEntity");
                 if (holdingsReportEntity != null) {
@@ -99,7 +100,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 if (CollectionUtils.isNotEmpty(itemMarcRecordList)) {
                     for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
                         Record itemRecord = itemMarcRecord.getItemRecord();
-                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord);
+                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord, currentDate);
                         if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
                             failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
                         }
@@ -152,7 +153,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
-    private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName) {
+    private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName,Date currentDate) {
         int failedBibCount = 0;
         int successBibCount = 0;
         int exitsBibCount = 0;
@@ -174,10 +175,12 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append("\n");
             errorMessage.append("Owning Institution Id cannot be null");
         }
-        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setCreatedDate(currentDate);
         bibliographicEntity.setCreatedBy("accession");
-        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy("accession");
+        bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
+        bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
         bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String bibContent = marcUtil.writeMarcXml(bibRecord);
@@ -239,7 +242,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
-    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, Record holdingsRecord, Record bibRecord) {
+    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, Record holdingsRecord, Record bibRecord, Date currentDate) {
         StringBuffer errorMessage = new StringBuffer();
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -250,9 +253,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         } else {
             errorMessage.append("Holdings Content cannot be empty");
         }
-        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setCreatedDate(currentDate);
         holdingsEntity.setCreatedBy("accession");
-        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(currentDate);
         holdingsEntity.setLastUpdatedBy("accession");
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
@@ -285,7 +288,8 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
-    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, Record bibRecord) {
+    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, Record bibRecord,
+                                                             Date currentDate) {
         StringBuffer errorMessage = new StringBuffer();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
@@ -328,9 +332,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         } else {
             itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get("Open"));
         }
-        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedDate(currentDate);
         itemEntity.setCreatedBy("accession");
-        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setLastUpdatedDate(currentDate);
         itemEntity.setLastUpdatedBy("accession");
         itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 

@@ -54,6 +54,7 @@ public class UpdateCgdUtil {
         Date lastUpdatedDate = new Date();
         try {
             updateCGDForItemInDB(itemBarcode, newCollectionGroupDesignation, username, lastUpdatedDate);
+            updateBibliographicWithLastUpdatedDate(itemBarcode,username,lastUpdatedDate);
             updateCGDForItemInSolr(itemBarcode, itemEntities);
             saveItemChangeLogEntity(itemEntities, username, lastUpdatedDate, RecapConstants.UPDATE_CGD, cgdChangeNotes);
             return RecapConstants.SUCCESS;
@@ -66,6 +67,18 @@ public class UpdateCgdUtil {
     public void updateCGDForItemInDB(String itemBarcode, String newCollectionGroupDesignation, String username, Date lastUpdatedDate) {
         CollectionGroupEntity collectionGroupEntity = collectionGroupDetailsRepository.findByCollectionGroupCode(newCollectionGroupDesignation);
         itemDetailsRepository.updateCollectionGroupIdByItemBarcode(collectionGroupEntity.getCollectionGroupId(), itemBarcode, username, lastUpdatedDate);
+    }
+
+    public void updateBibliographicWithLastUpdatedDate(String itemBarcode,String userName,Date lastUpdatedDate){
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcode(itemBarcode);
+        for(ItemEntity itemEntity:itemEntityList){
+            List<BibliographicEntity> bibliographicEntityList = itemEntity.getBibliographicEntities();
+            List<Integer> bibliographicIdList = new ArrayList<>();
+            for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
+                bibliographicIdList.add(bibliographicEntity.getBibliographicId());
+            }
+            bibliographicDetailsRepository.updateBibItemLastUpdatedDate(bibliographicIdList,userName,lastUpdatedDate);
+        }
     }
 
     public void updateCGDForItemInSolr(String itemBarcode, List<ItemEntity> itemEntities) {

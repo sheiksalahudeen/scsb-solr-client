@@ -18,9 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by rajeshbabuk on 5/1/17.
@@ -149,6 +147,32 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         assertEquals(afterCountForChangeLog, beforeCountForChangeLog + 1);
     }
 
+    @Test
+    public void updateCGDForItemAndBibInDB() throws Exception {
+        BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity);
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
+        assertNotNull(savedBibliographicEntity.getItemEntities());
+        assertEquals("Shared", savedBibliographicEntity.getItemEntities().get(0).getCollectionGroupEntity().getCollectionGroupCode());
+
+        String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
+        Date currentDate = new Date();
+        updateCgdUtil.updateBibliographicWithLastUpdatedDate(itemBarcode, "guest", currentDate);
+
+        List<ItemEntity> fetchedItemEntityList = itemDetailsRepository.findByBarcode(itemBarcode);
+        assertNotNull(fetchedItemEntityList);
+        for (ItemEntity fetchedItemEntity : fetchedItemEntityList) {
+            entityManager.refresh(fetchedItemEntity);
+            assertNotNull(fetchedItemEntity.getItemId());
+            assertEquals(itemBarcode, fetchedItemEntity.getBarcode());
+            List<BibliographicEntity> bibliographicEntityList = fetchedItemEntity.getBibliographicEntities();
+            assertNotNull(bibliographicEntityList.get(0).getBibItemlastUpdatedDate());
+            assertNotEquals(bibliographicEntity.getBibItemlastUpdatedDate(),bibliographicEntityList.get(0).getBibItemlastUpdatedDate());
+        }
+    }
+
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
         Random random = new Random();
         File bibContentFile = getBibContentFile();
@@ -162,6 +186,8 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setBibItemlastUpdatedDate(new Date());
+        bibliographicEntity.setBibHoldinglastUpdatedDate(new Date());
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         bibliographicEntity.setDeleted(false);
