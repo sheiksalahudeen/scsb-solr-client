@@ -1,22 +1,14 @@
 package org.recap.service.deAccession;
 
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.recap.RecapConstants;
 import org.recap.model.deAccession.DeAccessionDBResponseEntity;
 import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -76,7 +68,7 @@ public class DeAccessionService {
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         DeAccessionDBResponseEntity deAccessionDBResponseEntity;
         List<String> responseItemBarcodeList = new ArrayList<>();
-
+        Date currentDate = new Date();
         List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodeList);
 
         try {
@@ -94,8 +86,8 @@ public class DeAccessionService {
                         Integer itemId = itemEntity.getItemId();
                         List<Integer> holdingsIds = processHoldings(holdingsEntities);
                         List<Integer> bibliographicIds = processBibs(bibliographicEntities);
-                        itemDetailsRepository.markItemAsDeleted(itemId, RecapConstants.GUEST, new Date());
-
+                        itemDetailsRepository.markItemAsDeleted(itemId, RecapConstants.GUEST, currentDate);
+                        updateBibliographicWithLastUpdatedDate(itemId, RecapConstants.GUEST,currentDate);
                         deAccessionDBResponseEntity = prepareSuccessResponse(barcode, itemEntity, holdingsIds, bibliographicIds);
                         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
                     }
@@ -304,5 +296,15 @@ public class DeAccessionService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void updateBibliographicWithLastUpdatedDate(Integer itemId,String userName,Date lastUpdatedDate){
+        ItemEntity itemEntity = itemDetailsRepository.findByItemId(itemId);
+        List<BibliographicEntity> bibliographicEntityList = itemEntity.getBibliographicEntities();
+        List<Integer> bibliographicIdList = new ArrayList<>();
+        for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
+            bibliographicIdList.add(bibliographicEntity.getBibliographicId());
+        }
+        bibliographicDetailsRepository.updateBibItemLastUpdatedDate(bibliographicIdList,userName,lastUpdatedDate);
     }
 }

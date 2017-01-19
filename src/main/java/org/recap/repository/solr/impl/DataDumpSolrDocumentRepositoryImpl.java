@@ -36,7 +36,7 @@ import java.util.*;
 @Repository
 public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
-    Logger log = Logger.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
+    private static final Logger log = Logger.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
 
     String and = " AND ";
     String or = " OR ";
@@ -135,8 +135,14 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
     public void populateItemInfo(List<BibItem> bibItems, SearchRecordsRequest searchRecordsRequest) {
 
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + getRootIds(bibItems) + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
-                + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted());
+        String querForItemString = "_root_:" + getRootIds(bibItems) + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
+                + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted();
+        if(searchRecordsRequest.getFieldName().contains(RecapConstants.BIBITEM_LASTUPDATED_DATE)){
+            querForItemString = querForItemString + and + RecapConstants.ITEM_LASTUPDATED_DATE + ":["+searchRecordsRequest.getFieldValue()+"]";
+        }
+
+        SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem(querForItemString) ;
+        log.info("solr query for data dump --->"+querForItemString);
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);

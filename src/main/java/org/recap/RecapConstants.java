@@ -327,5 +327,8 @@ public class RecapConstants {
     public static final String INVALID_PERMISSION = "Please give one valid permission name";
     public static final String SPECIAL_CHARACTERS_NOT_ALLOWED = "Special characters and spaces are not allowed";
 
+    public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
+    public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
+    public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
 
 }

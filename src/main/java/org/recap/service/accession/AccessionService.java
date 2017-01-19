@@ -1,7 +1,6 @@
 package org.recap.service.accession;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.marc4j.marc.Record;
@@ -26,8 +25,10 @@ import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.*;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -223,21 +224,24 @@ public class AccessionService {
     private BibliographicEntity createDummyDataAsIncomplete(Integer owningInstitutionId,String itemBarcode,String customerCode) {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        Date currentDate = new Date();
         try {
             bibliographicEntity.setContent(getXmlContent("dummybibcontent.xml").getBytes());
-            bibliographicEntity.setCreatedDate(new Date());
+            bibliographicEntity.setCreatedDate(currentDate);
             bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
             bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-            bibliographicEntity.setLastUpdatedDate(new Date());
+            bibliographicEntity.setLastUpdatedDate(currentDate);
+            bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
+            bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
             bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
             bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
             bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
 
             HoldingsEntity holdingsEntity = new HoldingsEntity();
             holdingsEntity.setContent(getXmlContent("dummyholdingcontent.xml").getBytes());
-            holdingsEntity.setCreatedDate(new Date());
+            holdingsEntity.setCreatedDate(currentDate);
             holdingsEntity.setCreatedBy(RecapConstants.ACCESSION);
-            holdingsEntity.setLastUpdatedDate(new Date());
+            holdingsEntity.setLastUpdatedDate(currentDate);
             holdingsEntity.setOwningInstitutionId(owningInstitutionId);
             holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
 
@@ -246,9 +250,9 @@ public class AccessionService {
             ItemEntity itemEntity = new ItemEntity();
             itemEntity.setCallNumberType(RecapConstants.DUMMY_CALL_NUMBER);
             itemEntity.setCallNumber(RecapConstants.DUMMYCALLNUMBER);
-            itemEntity.setCreatedDate(new Date());
+            itemEntity.setCreatedDate(currentDate);
             itemEntity.setCreatedBy(RecapConstants.ACCESSION);
-            itemEntity.setLastUpdatedDate(new Date());
+            itemEntity.setLastUpdatedDate(currentDate);
             itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
             itemEntity.setBarcode(itemBarcode);
             itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
@@ -388,6 +392,8 @@ public class AccessionService {
             fetchBibliographicEntity.setDeleted(bibliographicEntity.isDeleted());
             fetchBibliographicEntity.setLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
             fetchBibliographicEntity.setLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
+            fetchBibliographicEntity.setBibHoldinglastUpdatedDate(bibliographicEntity.getBibHoldinglastUpdatedDate());
+            fetchBibliographicEntity.setBibItemlastUpdatedDate(bibliographicEntity.getBibItemlastUpdatedDate());
 
             // Holding
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
@@ -467,7 +473,7 @@ public class AccessionService {
         fetchHoldingsEntity.setCreatedDate(holdingsEntity.getCreatedDate());
         fetchHoldingsEntity.setDeleted(holdingsEntity.isDeleted());
         fetchHoldingsEntity.setLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
-        fetchHoldingsEntity.setLastUpdatedDate(new Date());
+        fetchHoldingsEntity.setLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
         return fetchHoldingsEntity;
     }
 
@@ -477,7 +483,7 @@ public class AccessionService {
         fetchItemEntity.setCreatedDate(itemEntity.getCreatedDate());
         fetchItemEntity.setDeleted(itemEntity.isDeleted());
         fetchItemEntity.setLastUpdatedBy(itemEntity.getLastUpdatedBy());
-        fetchItemEntity.setLastUpdatedDate(new Date());
+        fetchItemEntity.setLastUpdatedDate(itemEntity.getLastUpdatedDate());
         fetchItemEntity.setCallNumber(itemEntity.getCallNumber());
         fetchItemEntity.setCustomerCode(itemEntity.getCustomerCode());
         fetchItemEntity.setCallNumberType(itemEntity.getCallNumberType());
