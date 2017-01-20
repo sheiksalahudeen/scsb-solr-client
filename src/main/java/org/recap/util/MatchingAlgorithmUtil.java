@@ -170,6 +170,7 @@ public class MatchingAlgorithmUtil {
         Map<String,String> titleMap = new HashMap<>();
         Set<String> unMatchingTitleHeaderSet = new HashSet<>();
         List<ReportEntity> reportEntitiesToSave = new ArrayList<>();
+        List<String> owningInstBibIds = new ArrayList<>();
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
         Integer nyplMatchingCount = 0;
@@ -181,6 +182,7 @@ public class MatchingAlgorithmUtil {
             if(!owningInstSet.contains(matchingBibEntity.getOwningInstitution())) {
                 owningInstSet.add(matchingBibEntity.getOwningInstitution());
                 owningInstList.add(matchingBibEntity.getOwningInstitution());
+                owningInstBibIds.add(matchingBibEntity.getOwningInstBibId());
                 bibIds.add(bibId);
                 materialTypeList.add(matchingBibEntity.getMaterialType());
                 materialTypeSet.add(matchingBibEntity.getMaterialType());
@@ -205,7 +207,8 @@ public class MatchingAlgorithmUtil {
                     reportEntity.setType("TitleException");
 
                     Map<String, Integer> countsMap = processReportsForMatchingTitles(fileName, titleMap, StringUtils.join(bibIds).split(","),
-                            StringUtils.join(materialTypeList).split(","), StringUtils.join(owningInstSet).split(","), criteriaValue, matchingTitleHeaderSet, reportEntitiesToSave);
+                            StringUtils.join(materialTypeList).split(","), StringUtils.join(owningInstSet).split(","), StringUtils.join(owningInstBibIds).split(","),
+                            criteriaValue, matchingTitleHeaderSet, reportEntitiesToSave);
                     pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
                     culMatchingCount = culMatchingCount + countsMap.get("culMatchingCount");
                     nyplMatchingCount = nyplMatchingCount + countsMap.get("nyplMatchingCount");
@@ -228,7 +231,7 @@ public class MatchingAlgorithmUtil {
                 reportEntity.setType("MaterialTypeException");
             }
 
-            getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList);
+            getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList, owningInstBibIds);
 
             getReportDataEntity(fileName, criteriaValue, reportDataEntities);
 
@@ -306,7 +309,7 @@ public class MatchingAlgorithmUtil {
         return titleToMatch.replaceAll("\\s", "");
     }
 
-    public void getReportDataEntityList(List<ReportDataEntity> reportDataEntities, Collection owningInstSet, Collection bibIds, Collection materialTypes) {
+    public void getReportDataEntityList(List<ReportDataEntity> reportDataEntities, Collection owningInstSet, Collection bibIds, Collection materialTypes, List<String> owningInstBibIds) {
         if(CollectionUtils.isNotEmpty(bibIds)) {
             ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, "BibId");
             reportDataEntities.add(bibIdReportDataEntity);
@@ -320,6 +323,11 @@ public class MatchingAlgorithmUtil {
         if(CollectionUtils.isNotEmpty(materialTypes)) {
             ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
             reportDataEntities.add(materialTypeReportDataEntity);
+        }
+
+        if(CollectionUtils.isNotEmpty(owningInstBibIds)) {
+            ReportDataEntity owningInstBibIdReportDataEntity = getReportDataEntityForCollectionValues(owningInstBibIds, "OwningInstitutionBibId");
+            reportDataEntities.add(owningInstBibIdReportDataEntity);
         }
     }
 
@@ -389,6 +397,7 @@ public class MatchingAlgorithmUtil {
         List<Integer> bibIdList = new ArrayList<>();
         List<String> materialTypeList = new ArrayList<>();
         Set<String> materialTypes = new HashSet<>();
+        List<String> owningInstBibIds = new ArrayList<>();
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
         Integer nyplMatchingCount = 0;
@@ -401,6 +410,7 @@ public class MatchingAlgorithmUtil {
             bibIdList.add(matchingBibEntity.getBibId());
             materialTypes.add(matchingBibEntity.getMaterialType());
             materialTypeList.add(matchingBibEntity.getMaterialType());
+            owningInstBibIds.add(matchingBibEntity.getOwningInstBibId());
         }
         if(materialTypes.size() == 1) {
             reportEntity.setType("MultiMatch");
@@ -408,7 +418,7 @@ public class MatchingAlgorithmUtil {
             reportEntity.setType("MaterialTypeException");
         }
         if(owningInstSet.size() > 1) {
-            getReportDataEntityList(reportDataEntities, owningInstList, bibIdList, materialTypeList);
+            getReportDataEntityList(reportDataEntities, owningInstList, bibIdList, materialTypeList, owningInstBibIds);
 
             for(String owningInst : owningInstList) {
                 if(owningInst.equalsIgnoreCase(RecapConstants.PRINCETON)) {
@@ -445,7 +455,8 @@ public class MatchingAlgorithmUtil {
         reportDataEntities.add(criteriaReportDataEntity);
     }
 
-    public Map<String, Integer> processReportsForMatchingTitles(String fileName, Map<String, String> titleMap, String[] bibIds, String[] materialTypes, String[] owningInstitutions, String matchPointValue, Set<String> matchingTitleHeaderSet, List<ReportEntity> reportEntitiesToSave) {
+    public Map<String, Integer> processReportsForMatchingTitles(String fileName, Map<String, String> titleMap, String[] bibIds, String[] materialTypes, String[] owningInstitutions,
+                                                                String[] owningInstBibIds, String matchPointValue, Set<String> matchingTitleHeaderSet, List<ReportEntity> reportEntitiesToSave) {
         ReportEntity matchingReportEntity = new ReportEntity();
         matchingReportEntity.setType("SingleMatch");
         matchingReportEntity.setCreatedDate(new Date());
@@ -455,6 +466,7 @@ public class MatchingAlgorithmUtil {
         List<String> bibIdList = new ArrayList<>();
         List<String> materialTypeList = new ArrayList<>();
         List<String> owningInstitutionList = new ArrayList<>();
+        List<String> owningInstBibIdList = new ArrayList<>();
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
         Integer nyplMatchingCount = 0;
@@ -471,6 +483,9 @@ public class MatchingAlgorithmUtil {
                     }
                     if(owningInstitutions != null) {
                         owningInstitutionList.add(owningInstitutions[i-1]);
+                    }
+                    if(owningInstBibIds != null) {
+                        owningInstBibIdList.add(owningInstBibIds[i-1]);
                     }
                     ReportDataEntity titleReportDataEntity = new ReportDataEntity();
                     titleReportDataEntity.setHeaderName(titleHeader);
@@ -491,7 +506,7 @@ public class MatchingAlgorithmUtil {
             }
         }
 
-        getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList);
+        getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList, owningInstBibIdList);
 
         if(StringUtils.isNotBlank(matchPointValue)) {
             getReportDataEntity(fileName, matchPointValue, reportDataEntityList);

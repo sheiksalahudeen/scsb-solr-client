@@ -4,11 +4,12 @@ import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.MatchingAlgorithmCGDCallable;
-import org.recap.executors.MatchingUpdateCGDInSolrCallable;
 import org.recap.matchingAlgorithm.MatchingCounter;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -19,6 +20,7 @@ import org.recap.util.UpdateCgdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -121,13 +123,10 @@ public class MatchingAlgorithmUpdateCGDService {
             //Waiting for the updateItemQ messages finish processing
         }
 
-        updateCGDForItemsInSolr(new Date(), batchSize);
-
         executorService.shutdown();
     }
 
     public void updateCGDForItemsInSolr(Date lastUpdatedDate, Integer batchSize) {
-        BibJSONUtil bibJSONUtil = new BibJSONUtil();
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastUpdatedDate);
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -139,20 +138,42 @@ public class MatchingAlgorithmUpdateCGDService {
         logger.info("Total Elements : " + itemEntityPage.getTotalElements());
         logger.info("Total Pages : " + totalPages);
         List<ItemEntity> itemEntities = itemEntityPage.getContent();
-        ExecutorService executorService = getExecutorService(50);
-        List<Callable<Integer>> callables = new ArrayList<>();
-        Callable matchingUpdateCGDInSolrCallable = new MatchingUpdateCGDInSolrCallable(itemEntities, bibJSONUtil, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-        callables.add(matchingUpdateCGDInSolrCallable);
+        List<SolrInputDocument> bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
+        saveSolrInputDocuments(bibSolrInputDocuments);
         for(int i=1; i < totalPages; i++) {
             itemEntityPage = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(i, batchSize), lastUpdatedFromDate, lastUpdatedDate);
             itemEntities = itemEntityPage.getContent();
-            Callable callable = new MatchingUpdateCGDInSolrCallable(itemEntities, bibJSONUtil, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-            callables.add(callable);
+            bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
+            saveSolrInputDocuments(bibSolrInputDocuments);
         }
-        getFutures(executorService, callables);
-        if(totalPages > 0) {
+    }
+
+    private void saveSolrInputDocuments(List<SolrInputDocument> bibSolrInputDocuments) {
+        if (!org.springframework.util.CollectionUtils.isEmpty(bibSolrInputDocuments)) {
+            solrTemplate.saveDocuments(bibSolrInputDocuments);
             solrTemplate.commit();
         }
+    }
+
+    private List<SolrInputDocument> prepareSolrInputDocument(List<ItemEntity> itemEntities) {
+        List<SolrInputDocument> bibSolrInputDocuments = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(itemEntities)) {
+            for(ItemEntity itemEntity : itemEntities) {
+                if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
+                    for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                        try {
+                            BibJSONUtil bibJSONUtil = new BibJSONUtil();
+                            SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate,
+                                    bibliographicDetailsRepository, holdingsDetailsRepository);
+                            bibSolrInputDocuments.add(bibSolrInputDocument);
+                        } catch (Exception ex) {
+                            logger.error("Exception in Callable : " + ex.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+        return bibSolrInputDocuments;
     }
 
     private Map<String, List<Integer>> executeCallables(ExecutorService executorService, List<Callable<Integer>> callables) {
