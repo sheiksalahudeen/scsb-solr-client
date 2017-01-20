@@ -331,4 +331,13 @@ public class RecapConstants {
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
 
+    public static final String EMAIL_Q = "scsbactivemq:queue:solrClientEmailQ";
+    public static final String EMAIL_ROUTE_ID = "solrClientEmailQ";
+
+    public static final String CGD_UPDATE_ITEM_BARCODE = "itemBarcode";
+    public static final String OWNING_INST = "owningInstitution";
+    public static final String OLD_CGD = "oldCollectionGroupDesignation";
+    public static final String NEW_CGD = "newCollectionGroupDesignation";
+    public static final String CGD_CHANGE_NOTES = "cgdChangeNotes";
+
 }

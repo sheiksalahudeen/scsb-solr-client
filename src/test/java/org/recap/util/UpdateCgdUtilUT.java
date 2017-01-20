@@ -130,7 +130,7 @@ public class UpdateCgdUtilUT extends BaseTestCase {
             assertEquals("Shared", fetchedItemSolr.getCollectionGroupDesignation());
         }
 
-        updateCgdUtil.updateCGDForItem(itemBarcode, "Private", "Notes for updating CGD");
+        updateCgdUtil.updateCGDForItem(itemBarcode, "PUL", "Shared", "Private", "Notes for updating CGD");
 
         List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemEntities);

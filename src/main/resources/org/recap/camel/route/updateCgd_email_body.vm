@@ -1,0 +1,3 @@
+The item, ${header.emailPayLoad.itemBarcode}, belonging to ${header.emailPayLoad.itemInstitution}, has undergone a change in CGD from ${header.emailPayLoad.oldCgd} to ${header.emailPayLoad.newCgd} for the following reason -
+
+${header.emailPayLoad.notes}.

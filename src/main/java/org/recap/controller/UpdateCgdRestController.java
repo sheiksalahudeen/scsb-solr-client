@@ -24,10 +24,10 @@ public class UpdateCgdRestController {
     UpdateCgdUtil updateCgdUtil;
 
     @RequestMapping(value="/updateCgd", method = RequestMethod.GET)
-    public String updateCgdForItem(@RequestParam String itemBarcode, @RequestParam String newCollectionGroupDesignation, @RequestParam String cgdChangeNotes) {
+    public String updateCgdForItem(@RequestParam String itemBarcode, @RequestParam String owningInstitution, @RequestParam String oldCollectionGroupDesignation, @RequestParam String newCollectionGroupDesignation, @RequestParam String cgdChangeNotes) {
         String statusMessage = null;
         try {
-            statusMessage = updateCgdUtil.updateCGDForItem(itemBarcode, newCollectionGroupDesignation, cgdChangeNotes);
+            statusMessage = updateCgdUtil.updateCGDForItem(itemBarcode, owningInstitution, oldCollectionGroupDesignation, newCollectionGroupDesignation, cgdChangeNotes);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

@@ -17,14 +17,18 @@ public class UpdateCgdRestControllerUT extends BaseControllerUT {
 
     @Test
     public void updateCgdForItem() throws Exception {
-        Integer itemId = 1;
+        String itemBarcode = "1";
+        String owningInstitution = "PUL";
+        String oldCollectionGroupDesignation = "Private";
         String newCollectionGroupDesignation = "Private";
         String cgdChangeNotes = "Notes";
         MvcResult savedResult = this.mockMvc.perform(get("/updateCgdService/updateCgd")
                 .headers(getHttpHeaders())
-                .param("itemId", String.valueOf(itemId))
-                .param("newCollectionGroupDesignation", newCollectionGroupDesignation)
-                .param("cgdChangeNotes", cgdChangeNotes))
+                .param(RecapConstants.CGD_UPDATE_ITEM_BARCODE, itemBarcode)
+                .param(RecapConstants.OWNING_INST, owningInstitution)
+                .param(RecapConstants.OLD_CGD, oldCollectionGroupDesignation)
+                .param(RecapConstants.NEW_CGD, newCollectionGroupDesignation)
+                .param(RecapConstants.CGD_CHANGE_NOTES, cgdChangeNotes))
                 .andExpect(status().isOk())
                 .andReturn();
 
