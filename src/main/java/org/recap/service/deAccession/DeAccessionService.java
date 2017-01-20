@@ -305,6 +305,5 @@ public class DeAccessionService {
         for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
             bibliographicIdList.add(bibliographicEntity.getBibliographicId());
         }
-        bibliographicDetailsRepository.updateBibItemLastUpdatedDate(bibliographicIdList,userName,lastUpdatedDate);
     }
 }

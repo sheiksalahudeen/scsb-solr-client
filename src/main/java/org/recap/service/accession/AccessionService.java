@@ -231,8 +231,6 @@ public class AccessionService {
             bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
             bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
             bibliographicEntity.setLastUpdatedDate(currentDate);
-            bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
-            bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
             bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
             bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
             bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
@@ -392,8 +390,6 @@ public class AccessionService {
             fetchBibliographicEntity.setDeleted(bibliographicEntity.isDeleted());
             fetchBibliographicEntity.setLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
             fetchBibliographicEntity.setLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
-            fetchBibliographicEntity.setBibHoldinglastUpdatedDate(bibliographicEntity.getBibHoldinglastUpdatedDate());
-            fetchBibliographicEntity.setBibItemlastUpdatedDate(bibliographicEntity.getBibItemlastUpdatedDate());
 
             // Holding
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
