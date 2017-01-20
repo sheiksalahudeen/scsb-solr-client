@@ -1,8 +1,10 @@
 package org.recap.util;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.recap.RecapConstants;
+import org.recap.model.camel.EmailPayLoad;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.ItemChangeLogEntity;
@@ -48,15 +50,18 @@ public class UpdateCgdUtil {
     @Autowired
     SolrTemplate solrTemplate;
 
-    public String updateCGDForItem(String itemBarcode, String newCollectionGroupDesignation, String cgdChangeNotes) {
+    @Autowired
+    ProducerTemplate producerTemplate;
+
+    public String updateCGDForItem(String itemBarcode, String owningInstitution, String oldCollectionGroupDesignation, String newCollectionGroupDesignation, String cgdChangeNotes) {
         String username = RecapConstants.GUEST;
         List<ItemEntity> itemEntities = new ArrayList<>();
         Date lastUpdatedDate = new Date();
         try {
             updateCGDForItemInDB(itemBarcode, newCollectionGroupDesignation, username, lastUpdatedDate);
-            updateBibliographicWithLastUpdatedDate(itemBarcode,username,lastUpdatedDate);
             updateCGDForItemInSolr(itemBarcode, itemEntities);
             saveItemChangeLogEntity(itemEntities, username, lastUpdatedDate, RecapConstants.UPDATE_CGD, cgdChangeNotes);
+            sendEmail(itemBarcode, owningInstitution, oldCollectionGroupDesignation, newCollectionGroupDesignation, cgdChangeNotes);
             return RecapConstants.SUCCESS;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -67,17 +72,6 @@ public class UpdateCgdUtil {
     public void updateCGDForItemInDB(String itemBarcode, String newCollectionGroupDesignation, String username, Date lastUpdatedDate) {
         CollectionGroupEntity collectionGroupEntity = collectionGroupDetailsRepository.findByCollectionGroupCode(newCollectionGroupDesignation);
         itemDetailsRepository.updateCollectionGroupIdByItemBarcode(collectionGroupEntity.getCollectionGroupId(), itemBarcode, username, lastUpdatedDate);
-    }
-
-    public void updateBibliographicWithLastUpdatedDate(String itemBarcode,String userName,Date lastUpdatedDate){
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcode(itemBarcode);
-        for(ItemEntity itemEntity:itemEntityList){
-            List<BibliographicEntity> bibliographicEntityList = itemEntity.getBibliographicEntities();
-            List<Integer> bibliographicIdList = new ArrayList<>();
-            for(BibliographicEntity bibliographicEntity : bibliographicEntityList){
-                bibliographicIdList.add(bibliographicEntity.getBibliographicId());
-            }
-        }
     }
 
     public void updateCGDForItemInSolr(String itemBarcode, List<ItemEntity> itemEntities) {
@@ -108,5 +102,15 @@ public class UpdateCgdUtil {
                 itemChangeLogDetailsRepository.save(itemChangeLogEntity);
             }
         }
+    }
+
+    private void sendEmail(String itemBarcode, String owningInstitution, String oldCollectionGroupDesignation, String newCollectionGroupDesignation, String cgdChangeNotes) {
+        EmailPayLoad emailPayLoad = new EmailPayLoad();
+        emailPayLoad.setItemBarcode(itemBarcode);
+        emailPayLoad.setItemInstitution(owningInstitution);
+        emailPayLoad.setOldCgd(oldCollectionGroupDesignation);
+        emailPayLoad.setNewCgd(newCollectionGroupDesignation);
+        emailPayLoad.setNotes(cgdChangeNotes);
+        producerTemplate.sendBody(RecapConstants.EMAIL_Q, emailPayLoad);
     }
 }
