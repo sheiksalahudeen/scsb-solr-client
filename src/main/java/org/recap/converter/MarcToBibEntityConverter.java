@@ -179,8 +179,6 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setCreatedBy("accession");
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy("accession");
-        bibliographicEntity.setBibItemlastUpdatedDate(currentDate);
-        bibliographicEntity.setBibHoldinglastUpdatedDate(currentDate);
         bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String bibContent = marcUtil.writeMarcXml(bibRecord);

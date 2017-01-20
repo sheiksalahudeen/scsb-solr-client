@@ -225,8 +225,8 @@ public class BibJSONUtil extends MarcUtil {
             bib.setBibCreatedDate(bibliographicEntity.getCreatedDate());
             bib.setBibLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
             bib.setBibLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
-            bib.setBibHoldingLastUpdatedDate(bibliographicEntity.getBibHoldinglastUpdatedDate());
-            bib.setBibItemLastUpdatedDate(bibliographicEntity.getBibItemlastUpdatedDate());
+            bib.setBibHoldingLastUpdatedDate(getBitHoldingLastUpdatedDate(bibliographicEntity));
+            bib.setBibItemLastUpdatedDate(getBitItemLastUpdatedDate(bibliographicEntity));
 
             bib.setDeletedBib(bibliographicEntity.isDeleted());
             bib.setBibCatalogingStatus(bibliographicEntity.getCatalogingStatus());
@@ -235,6 +235,24 @@ public class BibJSONUtil extends MarcUtil {
             saveExceptionReportForBib(bibliographicEntity, e);
         }
         return null;
+    }
+
+    public Date getBitItemLastUpdatedDate(BibliographicEntity bibliographicEntity){
+        List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
+        List<Date> dateList = new ArrayList<>();
+        for(ItemEntity itemEntity: itemEntityList){
+            dateList.add(itemEntity.getLastUpdatedDate());
+        }
+        return Collections.max(dateList);
+    }
+
+    public Date getBitHoldingLastUpdatedDate(BibliographicEntity bibliographicEntity){
+        List<HoldingsEntity> holdingsEntityList = bibliographicEntity.getHoldingsEntities();
+        List<Date> dateList = new ArrayList<>();
+        for(HoldingsEntity holdingsEntity: holdingsEntityList){
+            dateList.add(holdingsEntity.getLastUpdatedDate());
+        }
+        return Collections.max(dateList);
     }
 
     private void saveExceptionReportForBib(BibliographicEntity bibliographicEntity, Exception e) {
