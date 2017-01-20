@@ -75,8 +75,10 @@ function saveReport() {
         url = "/matchingAlgorithm/full";
     } else if (criteria === 'Reports') {
         url = "/matchingAlgorithm/reports";
-    } else if (criteria === 'UpdateCGD') {
-        url = "/matchingAlgorithm/updateCGD";
+    } else if (criteria === 'UpdateCGDInDB') {
+        url = "/matchingAlgorithm/updateCGDInDB";
+    } else if (criteria === 'UpdateCGDInSolr') {
+        url = "/matchingAlgorithm/updateCGDInSolr";
     }
     if(url !== '') {
         var request = $.ajax({

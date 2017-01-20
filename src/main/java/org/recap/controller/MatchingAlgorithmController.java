@@ -92,8 +92,8 @@ public class MatchingAlgorithmController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/updateCGD", method = RequestMethod.POST)
-    public String updateCGD() {
+    @RequestMapping(value = "/matchingAlgorithm/updateCGDInDB", method = RequestMethod.POST)
+    public String updateCGDInDB() {
         StringBuilder stringBuilder = new StringBuilder();
         Integer batchSize = 1000;
         try {
@@ -101,7 +101,7 @@ public class MatchingAlgorithmController {
             stopWatch.start();
             matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(batchSize);
             stopWatch.stop();
-            logger.info("Total Time taken to Update CGD For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
+            logger.info("Total Time taken to Update CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
             stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
@@ -111,7 +111,25 @@ public class MatchingAlgorithmController {
         return stringBuilder.toString();
     }
 
-
+    @ResponseBody
+    @RequestMapping(value = "/matchingAlgorithm/updateCGDInSolr", method = RequestMethod.POST)
+    public String updateCGDInSolr() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Integer batchSize = 1000;
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(new Date(), batchSize);
+            stopWatch.stop();
+            logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
+            stringBuilder.append("Status  : Done" ).append("\n");
+            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+        } catch (Exception e) {
+            logger.error("Exception : " + e.getMessage());
+            stringBuilder.append("Status : Failed");
+        }
+        return stringBuilder.toString();
+    }
 
     private void runReportsForMatchingAlgorithm(Integer batchSize) {
         Integer pulMatchingCount = 0;
