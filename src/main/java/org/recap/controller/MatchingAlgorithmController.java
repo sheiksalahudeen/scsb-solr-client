@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -113,13 +116,22 @@ public class MatchingAlgorithmController {
 
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/updateCGDInSolr", method = RequestMethod.POST)
-    public String updateCGDInSolr() {
+    public String updateCGDInSolr(@Valid @ModelAttribute("matchingAlgoDate") String matchingAlgoDate) {
         StringBuilder stringBuilder = new StringBuilder();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
+        Date lastUpdatedDate = null;
+        if(StringUtils.isNotBlank(matchingAlgoDate)) {
+            try {
+                lastUpdatedDate = sdf.parse(matchingAlgoDate);
+            } catch (ParseException e) {
+                logger.error("Exception while parsing Date : " + e.getMessage());
+            }
+        }
         Integer batchSize = 1000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(new Date(), batchSize);
+            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(lastUpdatedDate != null ? lastUpdatedDate : new Date(), batchSize);
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");

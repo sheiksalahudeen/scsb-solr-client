@@ -133,7 +133,12 @@ public class MatchingAlgorithmUpdateCGDService {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date lastUpdatedFromDate = cal.getTime();
-        Page<ItemEntity> itemEntityPage = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, batchSize), lastUpdatedFromDate, lastUpdatedDate);
+        cal.setTime(lastUpdatedDate);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date lastUpdatedToDate = cal.getTime();
+        Page<ItemEntity> itemEntityPage = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, batchSize), lastUpdatedFromDate, lastUpdatedToDate);
         int totalPages = itemEntityPage.getTotalPages();
         logger.info("Total Elements : " + itemEntityPage.getTotalElements());
         logger.info("Total Pages : " + totalPages);

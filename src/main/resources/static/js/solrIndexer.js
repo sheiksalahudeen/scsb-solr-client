@@ -21,7 +21,13 @@ jQuery(document).ready(function ($) {
     $('#createdDate').datepicker({
         format: "yyyy/mm/dd"
     });
+    
+    $('#matchingAlgoDate').datepicker({
+        format: "yyyy/mm/dd"
+    });
+    
     showOrHideFields();
+    showDateField();
 });
 
 
@@ -70,6 +76,7 @@ function saveReport() {
     $("#saveReport").attr('disabled', 'disabled');
     document.getElementById("matchingAlgorithmStatus").value = '';
     var criteria = $('#matchingCriteria').val();
+    var matchingAlgoDate = $('#matchingAlgoDate').val();
     var url = '';
     if(criteria === 'ALL') {
         url = "/matchingAlgorithm/full";
@@ -78,7 +85,7 @@ function saveReport() {
     } else if (criteria === 'UpdateCGDInDB') {
         url = "/matchingAlgorithm/updateCGDInDB";
     } else if (criteria === 'UpdateCGDInSolr') {
-        url = "/matchingAlgorithm/updateCGDInSolr";
+        url = "/matchingAlgorithm/updateCGDInSolr?matchingAlgoDate="+matchingAlgoDate;
     }
     if(url !== '') {
         var request = $.ajax({
@@ -138,5 +145,14 @@ function showOrHideFields() {
     } else {
         $('#matchingCriteriaDiv').hide();
         $('#reportInstitutionNameDiv').show();
+    }
+}
+
+function showDateField() {
+    var criteria = $('#matchingCriteria').val();
+    if(criteria === 'UpdateCGDInSolr') {
+        $('#matchingAlgoDateDiv').show();
+    } else {
+        $('#matchingAlgoDateDiv').hide();
     }
 }
