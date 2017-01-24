@@ -87,6 +87,7 @@ public class SolrIndexController {
     @RequestMapping("/")
     public String solrIndexer(Model model){
         model.addAttribute("solrIndexRequest",new SolrIndexRequest());
+        model.addAttribute("matchingAlgoDate", "");
         return "solrIndexer";
     }
 
