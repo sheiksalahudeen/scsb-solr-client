@@ -142,7 +142,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         }
 
         SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem(querForItemString) ;
-        log.info("solr query for data dump --->"+querForItemString);
         QueryResponse queryResponse = null;
         try {
             queryResponse = solrTemplate.getSolrClient().query(solrQueryForItem);
