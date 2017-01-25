@@ -126,41 +126,41 @@ public class MatchingAlgorithmUpdateCGDService {
         executorService.shutdown();
     }
 
-    public void updateCGDForItemsInSolr(Date lastUpdatedDate, Integer batchSize) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(lastUpdatedDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date lastUpdatedFromDate = cal.getTime();
-        cal.setTime(lastUpdatedDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        Date lastUpdatedToDate = cal.getTime();
-        Page<ItemEntity> itemEntityPage = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, batchSize), lastUpdatedFromDate, lastUpdatedToDate);
-        int totalPages = itemEntityPage.getTotalPages();
-        logger.info("Total Elements : " + itemEntityPage.getTotalElements());
+    public void updateCGDForItemsInSolr(Integer batchSize) {
+        String operationType = "MatchingAlgorithm";
+        Page<Integer> recordIdList = itemChangeLogDetailsRepository.getRecordIdByOperationType(new PageRequest(0, batchSize), operationType);
+        int totalPages = recordIdList.getTotalPages();
+        logger.info("Total Elements : " + recordIdList.getTotalElements());
         logger.info("Total Pages : " + totalPages);
-        List<ItemEntity> itemEntities = itemEntityPage.getContent();
+        List<Integer> recordIds = recordIdList.getContent();
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
         List<SolrInputDocument> bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
         saveSolrInputDocuments(bibSolrInputDocuments);
         for(int i=1; i < totalPages; i++) {
-            itemEntityPage = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(i, batchSize), lastUpdatedFromDate, lastUpdatedDate);
-            itemEntities = itemEntityPage.getContent();
+            recordIdList = itemChangeLogDetailsRepository.getRecordIdByOperationType(new PageRequest(i, batchSize), operationType);
+            recordIds = recordIdList.getContent();
+            itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
             bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
             saveSolrInputDocuments(bibSolrInputDocuments);
         }
     }
 
     private void saveSolrInputDocuments(List<SolrInputDocument> bibSolrInputDocuments) {
-        if (!org.springframework.util.CollectionUtils.isEmpty(bibSolrInputDocuments)) {
-            solrTemplate.saveDocuments(bibSolrInputDocuments);
-            solrTemplate.commit();
+        logger.info("Before Committing to Solr.");
+        if (CollectionUtils.isNotEmpty(bibSolrInputDocuments)) {
+            try{
+                solrTemplate.saveDocuments(bibSolrInputDocuments);
+                solrTemplate.commit();
+                logger.info(bibSolrInputDocuments.size() + " Documents committed in solr.");
+            } catch (Exception ex) {
+                logger.error("Exception While Indexing solr Documents : " + ex.getMessage());
+                ex.printStackTrace();
+            }
         }
     }
 
     private List<SolrInputDocument> prepareSolrInputDocument(List<ItemEntity> itemEntities) {
+        logger.info("Preparing Bib Solr Documents for " + itemEntities.size() + " Items.") ;
         List<SolrInputDocument> bibSolrInputDocuments = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(itemEntities)) {
             for(ItemEntity itemEntity : itemEntities) {
@@ -172,12 +172,14 @@ public class MatchingAlgorithmUpdateCGDService {
                                     bibliographicDetailsRepository, holdingsDetailsRepository);
                             bibSolrInputDocuments.add(bibSolrInputDocument);
                         } catch (Exception ex) {
-                            logger.error("Exception in Callable : " + ex.getMessage());
+                            logger.error("Exception while preparing solr document : " + ex.getMessage());
+                            ex.printStackTrace();
                         }
                     }
                 }
             }
         }
+        logger.info("Prepared Bib Solr Document for " + bibSolrInputDocuments.size() + " records");
         return bibSolrInputDocuments;
     }
 

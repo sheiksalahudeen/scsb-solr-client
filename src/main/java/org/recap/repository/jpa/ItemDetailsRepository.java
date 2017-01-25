@@ -53,4 +53,6 @@ public interface ItemDetailsRepository extends PagingAndSortingRepository<ItemEn
 
     @Query(value = "select item from ItemEntity item where item.lastUpdatedDate between ?1 and ?2")
     Page<ItemEntity> findByLastUpdatedDate(Pageable pageable, Date lastUpdatedDate, Date lastUpdateDateTime);
+
+    List<ItemEntity> findByItemIdIn(List<Integer> itemIds);
 }
