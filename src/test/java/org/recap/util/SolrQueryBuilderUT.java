@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Created by peris on 9/30/16.
  */
-public class SolrQueryBuilderTest {
+public class SolrQueryBuilderUT {
     @Test
     public void allFieldsNoValueQuery() throws Exception {
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();

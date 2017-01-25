@@ -3,10 +3,13 @@ package org.recap.model.solr;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
@@ -23,6 +26,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -31,7 +35,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-
 public class BibAT extends BaseTestCase {
 
     @PersistenceContext
@@ -112,6 +115,13 @@ public class BibAT extends BaseTestCase {
         assertEquals(indexedBib.getSubject(),"Arab countries Politics and government.");
         assertEquals(indexedBib.getPublicationPlace(),"Paris");
         assertEquals(indexedBib.getLccn(),"71448228");
+
+        deleteByDocId("BibId",indexedBib.getBibId().toString());
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     @Test
@@ -448,7 +458,12 @@ public class BibAT extends BaseTestCase {
         assertEquals(bibliographicEntity.getItemEntities().get(0).getLastUpdatedBy(), fetchedItemFromSolr.getItemLastUpdatedBy());
         assertEquals(DateUtils.round(bibliographicEntity.getItemEntities().get(0).getLastUpdatedDate(), Calendar.SECOND), DateUtils.round(fetchedItemFromSolr.getItemLastUpdatedDate(), Calendar.SECOND));
         assertFalse(fetchedItemFromSolr.isDeletedItem());
+
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
+
 
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
         Random random = new Random();

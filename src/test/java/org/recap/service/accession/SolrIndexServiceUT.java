@@ -1,6 +1,8 @@
 package org.recap.service.accession;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -48,6 +51,14 @@ public class SolrIndexServiceUT extends BaseTestCase {
 
         Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
         assertNotNull(bib);
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     @Test
@@ -63,6 +74,9 @@ public class SolrIndexServiceUT extends BaseTestCase {
         solrIndexService.deleteByDocId("BibId",String.valueOf(bibliographicId));
         Bib bib1 = bibSolrCrudRepository.findByBibId(bibliographicId);
         assertNull(bib1);
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     private BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {

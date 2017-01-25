@@ -1,7 +1,10 @@
 package org.recap.util;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -123,6 +127,79 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         assertEquals(1, reportsResponse.getDeaccessionPrivatePulCount());
         assertEquals(1, reportsResponse.getDeaccessionPrivateCulCount());
         assertEquals(1, reportsResponse.getDeaccessionPrivateNyplCount());
+
+        deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity1.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity1.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity1.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity2.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity2.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity2.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity3.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity3.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity3.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity4.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity4.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity4.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity5.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity5.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity5.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity6.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity6.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity6.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity7.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity7.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity7.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity8.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity8.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity8.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity9.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity9.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity9.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity10.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity10.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity10.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity11.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity11.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity11.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity12.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity12.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity12.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity13.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity13.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity13.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity14.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity14.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity14.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity15.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity15.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity15.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity16.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity16.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity16.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity17.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity17.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity17.getItemEntities().get(0).getItemId().toString());
+
     }
 
     @Test
@@ -169,6 +246,48 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         assertEquals(1, reportsResponse.getPrivatePulCgdCount());
         assertEquals(1, reportsResponse.getPrivateCulCgdCount());
         assertEquals(1, reportsResponse.getPrivateNyplCgdCount());
+
+        deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity1.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity1.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity1.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity2.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity2.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity2.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity3.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity3.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity3.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity4.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity4.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity4.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity5.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity5.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity5.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity6.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity6.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity6.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity7.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity7.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity7.getItemEntities().get(0).getItemId().toString());
+
+        deleteByDocId("BibId",bibliographicEntity8.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity8.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity8.getItemEntities().get(0).getItemId().toString());
+
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     @Test
@@ -189,6 +308,9 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         List<DeaccessionItemResultsRow> deaccessionItemResultsRows = reportsResponse.getDeaccessionItemResultsRows();
         assertNotNull(deaccessionItemResultsRows);
         assertTrue(deaccessionItemResultsRows.size() > 0);
+        deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     private BibliographicEntity saveBibHoldingItemEntity(Integer owningInstitutionId, Integer collectionGroupId, boolean isDeleted) throws Exception {

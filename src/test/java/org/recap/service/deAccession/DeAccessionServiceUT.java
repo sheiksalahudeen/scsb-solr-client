@@ -9,6 +9,7 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.report.ReportGenerator;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,10 +18,7 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +26,9 @@ import static org.junit.Assert.*;
  * Created by angelind on 10/11/16.
  */
 public class DeAccessionServiceUT extends BaseTestCase{
+
+    @Autowired
+    ReportGenerator reportGenerator;
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -86,6 +87,31 @@ public class DeAccessionServiceUT extends BaseTestCase{
 
         assertNotNull(reportEntity.getReportDataEntities());
         assertTrue(reportEntity.getReportDataEntities().size()==4);
+        Date createdDate = reportEntities.get(0).getCreatedDate();
+        String generatedReportFileNameInFileSyatem = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        Thread.sleep(1000);
+        assertNotNull(generatedReportFileNameInFileSyatem);
+        String generatedReportFileNameInFTP = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        Thread.sleep(1000);
+        assertNotNull(generatedReportFileNameInFTP);
+    }
+
+    private Date getFromDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return  cal.getTime();
+    }
+
+    private Date getToDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        return cal.getTime();
     }
 
     private BibliographicEntity getBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {
@@ -147,5 +173,8 @@ public class DeAccessionServiceUT extends BaseTestCase{
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
+
+
+
 
 }

@@ -3,6 +3,7 @@ package org.recap.camel.route;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.solr.SolrConstants;
 import org.apache.solr.common.SolrInputDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;

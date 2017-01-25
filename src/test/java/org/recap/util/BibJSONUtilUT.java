@@ -2,6 +2,8 @@ package org.recap.util;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.marc4j.marc.Record;
@@ -14,6 +16,7 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
@@ -186,12 +189,22 @@ public class BibJSONUtilUT extends BaseTestCase{
 
         holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
         bibliographicEntities.add(bibliographicEntity);
         itemEntity.setBibliographicEntities(bibliographicEntities);
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
+        deleteByDocId("id",solrInputDocument.get("id").toString());
+        /*deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());*/
+
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     @Test
@@ -254,7 +267,7 @@ public class BibJSONUtilUT extends BaseTestCase{
         Record marcRecord = records.get(0);
         String titleSort = bibJSONUtil.getTitleSort(marcRecord, bibJSONUtil.getTitleDisplay(marcRecord));
         assertNotNull(titleSort);
-        assertEquals(titleSort,"Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī /");
+        assertEquals(titleSort,"Baḥrayn : mushkilāt al-taghyīr al-siyāsī wa-al-ijtimāʻī / Muḥammad al-Rumayḥī.");
     }
 
     @Test

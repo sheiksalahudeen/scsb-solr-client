@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
@@ -14,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
@@ -41,6 +44,8 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     private Integer batchSize = 10000;
 
+
+
     @Before
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
@@ -48,15 +53,19 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     @Test
     public void matchingAlgorithmFullTest() throws Exception{
-        doNothing().when(matchingAlgorithmHelperService).findMatchingAndPopulateMatchPointsEntities();
-        doNothing().when(matchingAlgorithmHelperService).populateMatchingBibEntities();
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCandISBN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCAndISSN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForOCLCAndLCCN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForISBNAndISSN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForISBNAndLCCN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForISSNAndLCCN(batchSize);
-        doNothing().when(matchingAlgorithmHelperService).populateReportsForSingleMatch(batchSize);
+        Map<String,Integer> matchingAlgoMap = new HashMap<>();
+        matchingAlgoMap.put("pulMatchingCount",1);
+        matchingAlgoMap.put("culMatchingCount",2);
+        matchingAlgoMap.put("nyplMatchingCount",3);
+        Mockito.when(matchingAlgorithmHelperService.findMatchingAndPopulateMatchPointsEntities()).thenReturn(new Long(10));
+        Mockito.when(matchingAlgorithmHelperService.populateMatchingBibEntities()).thenReturn(new Long(10));
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize)).thenReturn(matchingAlgoMap);
         String response = matchingAlgorithmController.matchingAlgorithmFull();
         assertTrue(response.contains("Status  : Done"));
     }

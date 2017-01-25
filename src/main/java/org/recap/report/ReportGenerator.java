@@ -83,8 +83,10 @@ public class ReportGenerator {
 
         if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
             fileName = fileName+"-"+institutionName;
-        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REPORT)){
-            fileName = fileName+"-"+institutionName;
+        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+            fileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
+        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
+            fileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
         }
 
         stopWatch.stop();

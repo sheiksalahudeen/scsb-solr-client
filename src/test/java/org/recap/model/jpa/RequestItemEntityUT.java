@@ -1,30 +1,26 @@
-package org.recap.repository.jpa;
+package org.recap.model.jpa;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.*;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
- * Created by rajeshbabuk on 29/10/16.
+ * Created by hemalathas on 17/1/17.
  */
-public class NotesDetailsRepositoryUT extends BaseTestCase {
+public class RequestItemEntityUT extends BaseTestCase{
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Autowired
-    NotesDetailsRepository notesDetailsRepository;
 
     @Autowired
     RequestTypeDetailsRepository requestTypeDetailsRepository;
@@ -33,9 +29,9 @@ public class NotesDetailsRepositoryUT extends BaseTestCase {
     RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Test
-    public void saveNotesEntity() throws Exception {
+    public void createRequestItem() throws Exception {
         InstitutionEntity institutionEntity = new InstitutionEntity();
-        institutionEntity.setInstitutionCode("UC");
+        institutionEntity.setInstitutionCode("UOC");
         institutionEntity.setInstitutionName("University of Chicago");
         InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
         assertNotNull(entity);
@@ -66,23 +62,7 @@ public class NotesDetailsRepositoryUT extends BaseTestCase {
         requestItemEntity.setRequestExpirationDate(new Date());
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
-
-        NotesEntity notesEntity = new NotesEntity();
-        notesEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        notesEntity.setRequestId(savedRequestItemEntity.getRequestId());
-        notesEntity.setNotes("Test Notes");
-
-        NotesEntity savedNotesEntity = notesDetailsRepository.save(notesEntity);
-        entityManager.refresh(savedNotesEntity);
-        assertNotNull(savedNotesEntity);
-        assertNotNull(savedNotesEntity.getNotesId());
-
-        NotesEntity notesEntity1 = notesDetailsRepository.findByItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        assertNotNull(notesEntity1);
-        assertEquals("Test Notes",notesEntity1.getNotes());
     }
-
-
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
         Random random = new Random();
@@ -130,4 +110,5 @@ public class NotesDetailsRepositoryUT extends BaseTestCase {
         return savedBibliographicEntity;
 
     }
+
 }

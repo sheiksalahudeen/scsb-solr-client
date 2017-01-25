@@ -1,7 +1,10 @@
 package org.recap.model.solr;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -15,12 +18,14 @@ import org.recap.util.BibJSONUtil;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -106,10 +111,19 @@ public class SolrUnicodeAT extends BaseTestCase {
         assertNotNull(sourceTitle);
 
         assertEquals(sourceTitle.trim(), solrTitle.trim());
+
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     public File getUnicodeContentFile() throws URISyntaxException {
         URL resource = getClass().getResource("UnicodeBibContent.xml");
         return new File(resource.toURI());
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 }

@@ -1,6 +1,8 @@
 package org.recap.service.accession;
 
 import junit.framework.TestCase;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.junit.Test;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -41,7 +44,7 @@ public class AccessionServiceUT extends BaseTestCase {
     NyplOauthTokenApiService nyplOauthTokenApiService;
 
     @Test
-    public void processForPUL(){
+    public void processForPUL() throws IOException, SolrServerException {
         accessionService.processRequest("32101062128309", null, "PUL");
         List<BibliographicEntity> fetchedBibliographicEntityList = bibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
@@ -56,20 +59,35 @@ public class AccessionServiceUT extends BaseTestCase {
         TestCase.assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("K25 .xN5", field852.getSubfield('h').getData());
+        for(BibliographicEntity bibliographicEntity : fetchedBibliographicEntityList){
+            deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
+            deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+            deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
+        }
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     @Test
-    public void accessionUnavilableBarcode(){
+    public void accessionUnavilableBarcode() throws IOException, SolrServerException {
         accessionService.processRequest("3210106212830", "PA", "PUL");
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
         assertTrue(itemEntities.size() > 0);
         assertNotNull(itemEntities.get(0));
         assertEquals("dummycallnumber",itemEntities.get(0).getCallNumber());
+        for(ItemEntity itemEntity : itemEntities){
+            deleteByDocId("BibId",itemEntity.getBibliographicEntities().get(0).getBibliographicId().toString());
+            deleteByDocId("HoldingId",itemEntity.getBibliographicEntities().get(0).getHoldingsEntities().get(0).getHoldingsId().toString());
+            deleteByDocId("ItemId",itemEntity.getItemId().toString());
+        }
     }
 
     @Test
-    public void accessionUnavilableBarcodeAvoidDuplicate(){
+    public void accessionUnavilableBarcodeAvoidDuplicate() throws IOException, SolrServerException {
         accessionService.processRequest("3210106212830", "PA", "PUL");
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
@@ -85,11 +103,16 @@ public class AccessionServiceUT extends BaseTestCase {
         assertTrue(itemEntities1.size() > 0);
         assertNotNull(itemEntities1.get(0));
         assertEquals(1,itemEntities1.get(0).getBibliographicEntities().size());
+        for(ItemEntity itemEntity : itemEntities){
+            deleteByDocId("ItemId",itemEntity.getItemId().toString());
+            deleteByDocId("HoldingId",itemEntity.getBibliographicEntities().get(0).getHoldingsEntities().get(0).getHoldingsId().toString());
+            deleteByDocId("BibId",itemEntity.getBibliographicEntities().get(0).getBibliographicId().toString());
+        }
 
     }
 
     @Test
-    public void processForNYPL(){
+    public void processForNYPL() throws IOException, SolrServerException {
         accessionService.processRequest("33433002031718", "NA","NYPL");
         List<BibliographicEntity> fetchedBibliographicEntityList = bibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
@@ -104,6 +127,11 @@ public class AccessionServiceUT extends BaseTestCase {
         TestCase.assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("*OFX 84-1995", field852.getSubfield('h').getData());
+        for(BibliographicEntity bibliographicEntity : fetchedBibliographicEntityList){
+            deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
+            deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+            deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
+        }
     }
 
     private List<Record> readMarcXml(String marcXmlString) {

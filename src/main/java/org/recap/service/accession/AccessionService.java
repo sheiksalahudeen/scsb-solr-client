@@ -96,6 +96,10 @@ public class AccessionService {
         return marcToBibEntityConverter;
     }
 
+    public SCSBToBibEntityConverter getScsbToBibEntityConverter() {
+        return scsbToBibEntityConverter;
+    }
+
     public ReportDetailRepository getReportDetailRepository() {
         return reportDetailRepository;
     }
@@ -160,7 +164,7 @@ public class AccessionService {
         List<Map<String,String>> responseMapList = new ArrayList<>();
         try {
             if (owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-                bibDataResponse = princetonService.getBibData(itemBarcode);
+                bibDataResponse = getPrincetonService().getBibData(itemBarcode);
                 List<Record> records = new ArrayList<>();
                 if (StringUtils.isNotBlank(bibDataResponse)) {
                     records = getMarcUtil().readMarcXml(bibDataResponse);
@@ -214,7 +218,7 @@ public class AccessionService {
         if (bibliographicEntity != null) {
             BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
             if (null != savedBibliographicEntity) {
-                solrIndexService.indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
+                getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
                 response = RecapConstants.SUCCESS;
             }
         }
@@ -372,7 +376,7 @@ public class AccessionService {
 
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntityList.add(reportEntity);
-        reportDetailRepository.save(reportEntityList);
+        getReportDetailRepository().save(reportEntityList);
     }
 
     public BibliographicEntity updateBibliographicEntity(BibliographicEntity bibliographicEntity) {
@@ -380,8 +384,8 @@ public class AccessionService {
         BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
         if(fetchBibliographicEntity ==null) { // New Bib Record
 
-            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-            entityManager.refresh(savedBibliographicEntity);
+            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(bibliographicEntity);
+            getEntityManager().refresh(savedBibliographicEntity);
         }else{ // Existing bib Record
             // Bib
             fetchBibliographicEntity.setContent(bibliographicEntity.getContent());
@@ -446,8 +450,8 @@ public class AccessionService {
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
 
-            savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(fetchBibliographicEntity);
-            entityManager.refresh(savedBibliographicEntity);
+            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
+            getEntityManager().refresh(savedBibliographicEntity);
         }
         return savedBibliographicEntity;
     }
@@ -493,9 +497,9 @@ public class AccessionService {
 
     private XmlToBibEntityConverterInterface getConverter(String institutionId){
         if(institutionId.equalsIgnoreCase(RecapConstants.PRINCETON)){
-            return marcToBibEntityConverter;
+            return getMarcToBibEntityConverter();
         } else if(institutionId.equalsIgnoreCase(RecapConstants.NYPL)){
-            return scsbToBibEntityConverter;
+            return getScsbToBibEntityConverter();
         }
         return null;
     }
