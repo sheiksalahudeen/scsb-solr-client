@@ -136,7 +136,9 @@ public class MatchingAlgorithmUpdateCGDService {
         List<ItemEntity> itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
         List<SolrInputDocument> bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
         saveSolrInputDocuments(bibSolrInputDocuments);
+        logger.info("Current Page : 1");
         for(int i=1; i < totalPages; i++) {
+            logger.info("Current Page : " + i+1);
             recordIdList = itemChangeLogDetailsRepository.getRecordIdByOperationType(new PageRequest(i, batchSize), operationType);
             recordIds = recordIdList.getContent();
             itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
