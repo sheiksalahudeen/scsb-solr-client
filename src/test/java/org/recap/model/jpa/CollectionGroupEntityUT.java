@@ -25,7 +25,6 @@ public class CollectionGroupEntityUT extends BaseTestCase{
         System.out.println("collection group created date-->"+entity.getCreatedDate());
         assertEquals(entity.getCollectionGroupCode(),"public");
         assertEquals(entity.getCollectionGroupDescription(),"public");
-        assertEquals(collectionGroupEntity.getLastUpdatedDate().toString(),new Date().toString());
         collectionGroupDetailRepository.delete(collectionGroupEntity);
     }
 

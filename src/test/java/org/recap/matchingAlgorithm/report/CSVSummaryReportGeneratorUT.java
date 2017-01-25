@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 13/9/16.
  */
-public class CSVSummaryReportGeneratorTest extends BaseTestCase{
+public class CSVSummaryReportGeneratorUT extends BaseTestCase{
 
 
     @Autowired

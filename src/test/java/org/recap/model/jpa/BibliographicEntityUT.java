@@ -74,8 +74,6 @@ public class BibliographicEntityUT extends BaseTestCase {
         System.out.println("owning institution bibId-->" + entity.getOwningInstitutionBibId());
         Long afterSave = bibliographicDetailsRepository.countByOwningInstitutionIdAndIsDeletedFalse(3);
         assertTrue((beforeSaveCount + 1) == afterSave);
-        bibliographicDetailsRepository.delete(entity);
-
     }
 
     @Test
@@ -171,7 +169,6 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-
 
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -276,6 +273,13 @@ public class BibliographicEntityUT extends BaseTestCase {
 
     @Test
     public void saveBibSingleHoldingsSingleItem() throws Exception {
+
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionCode("UC");
+        institutionEntity.setInstitutionName("University of Chicago");
+        InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
+        assertNotNull(entity);
+
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content".getBytes());
@@ -283,9 +287,8 @@ public class BibliographicEntityUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionId(entity.getInstitutionId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());

@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 22/12/16.
  */
-public class RolesDetailsRepositortyTest extends BaseTestCase{
+public class RolesDetailsRepositortyUT extends BaseTestCase{
 
     @Autowired
     RolesDetailsRepositorty rolesDetailsRepositorty;

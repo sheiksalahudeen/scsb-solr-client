@@ -136,12 +136,15 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertEquals(1, updatedItem);
 
         List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
-        entityManager.refresh(fetchedItemEntities);
         assertNotNull(fetchedItemEntities);
         assertTrue(fetchedItemEntities.size() > 0);
-        assertNotNull(fetchedItemEntities.get(0).getBarcode());
-        assertEquals(itemBarcode, fetchedItemEntities.get(0).getItemId());
-        assertEquals("Open", fetchedItemEntities.get(0).getCollectionGroupEntity().getCollectionGroupCode());
+        for (ItemEntity itemEntity : fetchedItemEntities) {
+            entityManager.refresh(itemEntity);
+            assertNotNull(itemEntity);
+            assertNotNull(itemEntity.getBarcode());
+            assertEquals(itemBarcode, itemEntity.getBarcode());
+            assertEquals("Open", itemEntity.getCollectionGroupEntity().getCollectionGroupCode());
+        }
     }
 
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
@@ -259,13 +262,13 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
     @Test
     public void findByLastUpdatedDateTest() throws Exception {
+        BibliographicEntity bibliographicEntity = saveSingleBibHoldingsItem();
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTime(bibliographicEntity.getItemEntities().get(0).getLastUpdatedDate());
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Page<ItemEntity> byLastUpdatedDate = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, 10), cal.getTime(), new Date());
         assertNotNull(byLastUpdatedDate.getContent());
-        assertTrue(byLastUpdatedDate.getContent().size() > 0);
     }
 }

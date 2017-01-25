@@ -42,7 +42,7 @@ public class FSSubmitCollectionExceptionReportGenerator implements ReportGenerat
             SubmitCollectionReportRecord submitCollectionReportRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
             submitCollectionReportRecordList.add(submitCollectionReportRecord);
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q, submitCollectionReportRecordList, "fileName", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT);
+        producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
 
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";

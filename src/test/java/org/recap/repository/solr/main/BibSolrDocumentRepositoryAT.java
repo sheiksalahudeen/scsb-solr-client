@@ -2,7 +2,10 @@ package org.recap.repository.solr.main;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
@@ -28,6 +31,7 @@ import org.springframework.data.solr.core.query.result.ScoredPage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -103,6 +107,15 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertTrue(bibItems.size() > 0);
         assertEquals(bibliographicEntity.getOwningInstitutionBibId(), bibItems.get(0).getOwningInstitutionBibId());
         solrTemplate.rollback();
+
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
+    }
+
+    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
+        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.commit();
     }
 
     public File getUnicodeContentFile() throws URISyntaxException {
@@ -164,6 +177,10 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertTrue(bibItems.get(0).getItems().size() > 0);
         assertEquals(bibliographicEntity.getItemEntities().get(0).getBarcode(), bibItems.get(0).getItems().get(0).getBarcode());
         solrTemplate.rollback();
+
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     @Test
@@ -215,6 +232,10 @@ public class BibSolrDocumentRepositoryAT extends BaseTestCase {
         assertNotNull(sourceTitle245a);
         assertEquals(sourceTitle245a, "al-Ḥuṭayʼah : fī sīratihi wa-nafsīyatihi wa-shiʻrihi /");
         solrTemplate.rollback();
+
+        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
+        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
+        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     private BibliographicEntity getBibliographicEntity(String sourceBibContent, String owningInstitutionBibId) {

@@ -209,6 +209,7 @@ public class BibItemRecordSetupCallableUT extends BaseTestCase {
         bibliographicEntity.setHoldingsEntities(holdingsEntities);
 
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
+        holdingsEntity.setItemEntities(itemEntities);
 
         BibItemRecordSetupCallable bibItemRecordSetupCallable = new BibItemRecordSetupCallable(bibliographicEntity, mockSolrTemplate, mockBibliographicDetailsRepository, mockHoldingsDetailsRepository, producerTemplate);
         SolrInputDocument bibItem = (SolrInputDocument) bibItemRecordSetupCallable.call();

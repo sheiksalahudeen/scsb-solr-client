@@ -15,6 +15,7 @@ import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.service.accession.AccessionService;
 import org.recap.service.accession.SolrIndexService;
+import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,6 +67,9 @@ public class AccessionSummaryReportUT extends BaseTestCase{
 
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Autowired
+    PrincetonService princetonService;
 
     @Value("${ils.princeton.bibdata}")
     String ilsprincetonBibData;
@@ -279,6 +283,7 @@ public class AccessionSummaryReportUT extends BaseTestCase{
         Mockito.when(accessionService.getEntityManager()).thenReturn(entityManager);
         Mockito.when(accessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
         Mockito.when(accessionService.getInstitutionDetailsRepository()).thenReturn(institutionDetailsRepository);
+        Mockito.when(accessionService.getPrincetonService()).thenReturn(princetonService);
         String response = accessionService.processRequest(barcode,"PB",owningInstitution);
         assertNotNull(response);
         assertEquals(response, RecapConstants.SUCCESS);

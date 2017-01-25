@@ -13,10 +13,17 @@ import java.util.List;
 public class UsersEntity implements Serializable{
     @Id
     @Column(name="user_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer userId;
 
     @Column(name="login_id")
     private String loginId;
+
+    @Column(name="user_institution")
+    private Integer institutionId;
+
+    @Column(name="user_description")
+    private String userDescription;
 
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -27,7 +34,7 @@ public class UsersEntity implements Serializable{
             })
     private List<RoleEntity> userRole;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "user_institution", insertable = false, updatable = false)
     private InstitutionEntity institutionEntity;
 
@@ -62,5 +69,21 @@ public class UsersEntity implements Serializable{
 
     public void setInstitutionEntity(InstitutionEntity institutionEntity) {
         this.institutionEntity = institutionEntity;
+    }
+
+    public Integer getInstitutionId() {
+        return institutionId;
+    }
+
+    public void setInstitutionId(Integer institutionId) {
+        this.institutionId = institutionId;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
     }
 }

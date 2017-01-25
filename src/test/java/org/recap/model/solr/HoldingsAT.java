@@ -1,6 +1,7 @@
 package org.recap.model.solr;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 

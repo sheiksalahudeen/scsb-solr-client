@@ -109,7 +109,7 @@ public class SCSBToBibEntityConverterUT extends BaseTestCase{
             "                    <datafield ind1=\"0\" ind2=\"0\" tag=\"907\">\n" +
             "                        <subfield code=\"a\">.b100000186</subfield>\n" +
             "                    </datafield>\n" +
-            "                    <leader>00000cam 2200265 i 4500</leader>\n" +
+            "                    <leader>00777cam a2200229 i 4500</leader>\n" +
             "                </record>\n" +
             "            </collection>\n" +
             "        </content>\n" +
