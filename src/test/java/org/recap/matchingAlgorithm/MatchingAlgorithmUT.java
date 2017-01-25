@@ -121,7 +121,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(new Date(), batchSize);
+        matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(batchSize);
 
         stopWatch.stop();
         logger.info("Total Time taken to update CGD in Solr is : " + stopWatch.getTotalTimeSeconds());

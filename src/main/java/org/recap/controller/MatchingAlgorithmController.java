@@ -131,7 +131,7 @@ public class MatchingAlgorithmController {
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(lastUpdatedDate != null ? lastUpdatedDate : new Date(), batchSize);
+            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(batchSize);
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
