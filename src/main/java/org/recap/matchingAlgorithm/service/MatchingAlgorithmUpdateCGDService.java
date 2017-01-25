@@ -168,6 +168,7 @@ public class MatchingAlgorithmUpdateCGDService {
                     for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
                         try {
                             BibJSONUtil bibJSONUtil = new BibJSONUtil();
+                            bibJSONUtil.setProducerTemplate(producerTemplate);
                             SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate,
                                     bibliographicDetailsRepository, holdingsDetailsRepository);
                             bibSolrInputDocuments.add(bibSolrInputDocument);

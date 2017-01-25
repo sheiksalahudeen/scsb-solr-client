@@ -256,6 +256,7 @@ public class BibJSONUtil extends MarcUtil {
     }
 
     private void saveExceptionReportForBib(BibliographicEntity bibliographicEntity, Exception e) {
+        logger.error("Exception in Bib Id : " + (bibliographicEntity != null ? bibliographicEntity.getBibliographicId() : "BibliographicEntity is Null"));
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
