@@ -9,6 +9,7 @@ import org.recap.report.ReportGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
@@ -42,11 +43,13 @@ public class MatchingAlgorithmController {
     @Autowired
     MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
 
+    @Value("${matching.algorithm.batchSize}")
+    public String matchingAlgoBatchSize;
+
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/full", method = RequestMethod.POST)
     public String matchingAlgorithmFull() {
         StringBuilder stringBuilder = new StringBuilder();
-        Integer batchSize = 10000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -61,7 +64,7 @@ public class MatchingAlgorithmController {
             matchingAlgorithmHelperService.populateMatchingBibEntities();
             stopWatch1.stop();
             logger.info("Time taken to save Matching Bib Entity : " + stopWatch1.getTotalTimeSeconds());
-            runReportsForMatchingAlgorithm(batchSize);
+            runReportsForMatchingAlgorithm(Integer.valueOf(matchingAlgoBatchSize));
 
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
@@ -78,11 +81,10 @@ public class MatchingAlgorithmController {
     @RequestMapping(value = "/matchingAlgorithm/reports", method = RequestMethod.POST)
     public String matchingAlgorithmOnlyReports() {
         StringBuilder stringBuilder = new StringBuilder();
-        Integer batchSize = 10000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            runReportsForMatchingAlgorithm(batchSize);
+            runReportsForMatchingAlgorithm(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm Reports : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
@@ -98,11 +100,10 @@ public class MatchingAlgorithmController {
     @RequestMapping(value = "/matchingAlgorithm/updateCGDInDB", method = RequestMethod.POST)
     public String updateCGDInDB() {
         StringBuilder stringBuilder = new StringBuilder();
-        Integer batchSize = 1000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(batchSize);
+            matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
@@ -127,11 +128,10 @@ public class MatchingAlgorithmController {
                 logger.error("Exception while parsing Date : " + e.getMessage());
             }
         }
-        Integer batchSize = 1000;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(batchSize);
+            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append("Status  : Done" ).append("\n");
