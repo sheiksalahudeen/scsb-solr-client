@@ -11,6 +11,7 @@ import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
 import org.recap.util.MatchingAlgorithmUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -29,6 +30,9 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
 
     @InjectMocks
     MatchingAlgorithmController matchingAlgorithmController= new MatchingAlgorithmController();
+
+    @Autowired
+    MatchingAlgorithmController matchingAlgoController;
 
     @Mock
     ReportGenerator reportGenerator;
@@ -66,7 +70,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         Mockito.when(matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
         Mockito.when(matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
         Mockito.when(matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize)).thenReturn(matchingAlgoMap);
-        String response = matchingAlgorithmController.matchingAlgorithmFull();
+        String response = matchingAlgoController.matchingAlgorithmFull();
         assertTrue(response.contains("Status  : Done"));
     }
 
