@@ -64,6 +64,7 @@ public class NotesDetailsRepositoryUT extends BaseTestCase {
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
+        requestItemEntity.setRequestStatusId(4);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
 
