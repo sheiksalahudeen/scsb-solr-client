@@ -51,6 +51,7 @@ public class MatchingBibInfoDetailService {
         Integer pageCount = getPageCount(matchingCount,batchSize);
         logger.info("pageCount--->"+pageCount);
         for(int count=0;count<pageCount;count++){
+            logger.info("Current page--->"+count);
             Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByType(new PageRequest(count, batchSize),typeList);
             List<Integer> recordNumberList = recordNumbers.getContent();
             logger.info("recordNumberList size----->"+recordNumberList.size());
@@ -59,6 +60,7 @@ public class MatchingBibInfoDetailService {
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = populateMatchingBibInfoDetail(reportDataEntityMap);
             matchingBibInfoDetailRepository.save(matchingBibInfoDetailList);
             matchingBibInfoDetailRepository.flush();
+            logger.info("Page "+count+"saved to db");
         }
         logger.info("Population of info completed......");
         return "Success";
