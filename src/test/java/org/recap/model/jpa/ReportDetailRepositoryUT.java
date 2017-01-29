@@ -5,6 +5,8 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -259,4 +261,29 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         assertTrue(byRecordNumberIn.size() >= 1);
     }
 
+    @Test
+    public void getCountByType(){
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setFileName("OCLC,ISBN");
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setType("MultiMatch");
+        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+        reportDetailRepository.saveAndFlush(reportEntity);
+
+        List<String> typeList = new ArrayList<>();
+        typeList.add("MultiMatch");
+        Integer matchingBibCount = reportDetailRepository.getCountByType(typeList);
+        assertNotNull(matchingBibCount);
+        assertEquals(new Integer(1), matchingBibCount);
+    }
+
+    @Test
+    public void getRecordNumByType(){
+        List<String> typeList = new ArrayList<>();
+        typeList.add("SingleMatch");
+        typeList.add("MultiMatch");
+        Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByType(new PageRequest(0, 10),typeList);
+        List<Integer> recordNumList = recordNumbers.getContent();
+        assertNotNull(recordNumList);
+    }
 }

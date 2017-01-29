@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
+import org.recap.matchingAlgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ public class MatchingAlgorithmController {
 
     @Autowired
     MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
+
+    @Autowired
+    MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @Value("${matching.algorithm.batchSize}")
     public String matchingAlgoBatchSize;
@@ -141,6 +145,18 @@ public class MatchingAlgorithmController {
             stringBuilder.append("Status : Failed");
         }
         return stringBuilder.toString();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/matchingAlgorithm/populateDataForDataDump", method = RequestMethod.POST)
+    public String populateDataForDataDump(){
+        String respone  = null;
+        try {
+            respone = matchingBibInfoDetailService.populateMatchingBibInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return respone;
     }
 
     private void runReportsForMatchingAlgorithm(Integer batchSize) {

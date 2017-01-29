@@ -1,6 +1,8 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.ReportEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -51,4 +53,10 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
 
     @Query(value = "select * from report_t where FILE_NAME=?1 and TYPE=?2 limit ?3,?4", nativeQuery = true)
     List<ReportEntity> findByFileNameAndTypeAndRange(String fileName, String type, long from, long to);
+
+    @Query(value = "SELECT COUNT(recordNumber) FROM ReportEntity WHERE TYPE IN (?1)")
+    Integer getCountByType(List<String> typeList);
+
+    @Query(value = "SELECT recordNumber FROM ReportEntity WHERE TYPE IN (?1)")
+    Page<Integer> getRecordNumByType(Pageable pageable,List<String> typeList);
 }
