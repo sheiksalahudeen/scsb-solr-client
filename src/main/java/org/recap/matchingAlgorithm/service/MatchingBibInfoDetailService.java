@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,8 +51,12 @@ public class MatchingBibInfoDetailService {
         logger.info("matchingCount------>"+matchingCount);
         Integer pageCount = getPageCount(matchingCount,batchSize);
         logger.info("pageCount--->"+pageCount);
+        StopWatch stopWatchFull = new StopWatch();
+        stopWatchFull.start();
         for(int count=0;count<pageCount;count++){
             logger.info("Current page--->"+count);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByType(new PageRequest(count, batchSize),typeList);
             List<Integer> recordNumberList = recordNumbers.getContent();
             logger.info("recordNumberList size----->"+recordNumberList.size());
@@ -60,9 +65,12 @@ public class MatchingBibInfoDetailService {
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = populateMatchingBibInfoDetail(reportDataEntityMap);
             matchingBibInfoDetailRepository.save(matchingBibInfoDetailList);
             matchingBibInfoDetailRepository.flush();
+            stopWatch.stop();
+            logger.info("Time taken to save-->"+stopWatch.getTotalTimeSeconds());
             logger.info("Page "+count+"saved to db");
         }
-        logger.info("Population of info completed......");
+        stopWatchFull.stop();
+        logger.info("Loade matching bib info in "+stopWatchFull.getTotalTimeSeconds()+" seconds");
         return "Success";
     }
 
