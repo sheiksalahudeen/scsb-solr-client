@@ -4,26 +4,18 @@ import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrInputDocument;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.MatchingAlgorithmCGDCallable;
 import org.recap.matchingAlgorithm.MatchingCounter;
-import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.*;
-import org.recap.util.BibJSONUtil;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.UpdateCgdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -70,9 +62,6 @@ public class MatchingAlgorithmUpdateCGDService {
 
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
-
-    @Autowired
-    SolrTemplate solrTemplate;
 
     private ExecutorService executorService;
     private Map collectionGroupMap;
@@ -124,66 +113,6 @@ public class MatchingAlgorithmUpdateCGDService {
         }
 
         executorService.shutdown();
-    }
-
-    public void updateCGDForItemsInSolr(Integer batchSize) {
-        String operationType = "MatchingAlgorithm";
-        Page<Integer> recordIdList = itemChangeLogDetailsRepository.getRecordIdByOperationType(new PageRequest(0, batchSize), operationType);
-        int totalPages = recordIdList.getTotalPages();
-        logger.info("Total Elements : " + recordIdList.getTotalElements());
-        logger.info("Total Pages : " + totalPages);
-        List<Integer> recordIds = recordIdList.getContent();
-        List<ItemEntity> itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
-        List<SolrInputDocument> bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
-        saveSolrInputDocuments(bibSolrInputDocuments);
-        logger.info("Current Page : 1");
-        for(int i=1; i < totalPages; i++) {
-            logger.info("Current Page : " + i+1);
-            recordIdList = itemChangeLogDetailsRepository.getRecordIdByOperationType(new PageRequest(i, batchSize), operationType);
-            recordIds = recordIdList.getContent();
-            itemEntities = itemDetailsRepository.findByItemIdIn(recordIds);
-            bibSolrInputDocuments = prepareSolrInputDocument(itemEntities);
-            saveSolrInputDocuments(bibSolrInputDocuments);
-        }
-    }
-
-    private void saveSolrInputDocuments(List<SolrInputDocument> bibSolrInputDocuments) {
-        logger.info("Before Committing to Solr.");
-        if (CollectionUtils.isNotEmpty(bibSolrInputDocuments)) {
-            try{
-                solrTemplate.saveDocuments(bibSolrInputDocuments);
-                solrTemplate.commit();
-                logger.info(bibSolrInputDocuments.size() + " Documents committed in solr.");
-            } catch (Exception ex) {
-                logger.error("Exception While Indexing solr Documents : " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    private List<SolrInputDocument> prepareSolrInputDocument(List<ItemEntity> itemEntities) {
-        logger.info("Preparing Bib Solr Documents for " + itemEntities.size() + " Items.") ;
-        List<SolrInputDocument> bibSolrInputDocuments = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(itemEntities)) {
-            for(ItemEntity itemEntity : itemEntities) {
-                if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
-                    for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
-                        try {
-                            BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                            bibJSONUtil.setProducerTemplate(producerTemplate);
-                            SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate,
-                                    bibliographicDetailsRepository, holdingsDetailsRepository);
-                            bibSolrInputDocuments.add(bibSolrInputDocument);
-                        } catch (Exception ex) {
-                            logger.error("Exception while preparing solr document : " + ex.getMessage());
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-        logger.info("Prepared Bib Solr Document for " + bibSolrInputDocuments.size() + " records");
-        return bibSolrInputDocuments;
     }
 
     private Map<String, List<Integer>> executeCallables(ExecutorService executorService, List<Callable<Integer>> callables) {

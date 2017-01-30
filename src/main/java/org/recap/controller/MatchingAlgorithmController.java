@@ -2,6 +2,7 @@ package org.recap.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
+import org.recap.executors.MatchingBibItemIndexExecutorService;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
 import org.recap.matchingAlgorithm.service.MatchingBibInfoDetailService;
@@ -49,6 +50,9 @@ public class MatchingAlgorithmController {
 
     @Value("${matching.algorithm.batchSize}")
     public String matchingAlgoBatchSize;
+
+    @Autowired
+    MatchingBibItemIndexExecutorService matchingBibItemIndexExecutorService;
 
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/full", method = RequestMethod.POST)
@@ -135,10 +139,12 @@ public class MatchingAlgorithmController {
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            matchingAlgorithmUpdateCGDService.updateCGDForItemsInSolr(Integer.valueOf(matchingAlgoBatchSize));
+            Integer totalProcessedRecords = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.MATCHING_OPERATION_TYPE);
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
+            String status = "Total number of records processed : " + totalProcessedRecords;
+            stringBuilder.append("Status  : Done").append("\n");
+            stringBuilder.append(status).append("\n");
             stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
             logger.error("Exception : " + e.getMessage());

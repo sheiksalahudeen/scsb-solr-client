@@ -116,6 +116,7 @@ public class RecapConstants {
     public static final String MATCHING_USE_RESTRICTIONS = "UseRestrictions";
     public static final String MATCHING_SUMMARY_HOLDINGS = "SummaryHoldings";
     public static final String MATCHING_MATERIAL_TYPE = "MaterialType";
+    public static final String MATCHING_OPERATION_TYPE = "MatchingAlgorithm";
 
     public static final String SUMMARY_NUM_BIBS_IN_TABLE = "CountOfBibsInTable";
     public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "CountOfItemsInTable";
