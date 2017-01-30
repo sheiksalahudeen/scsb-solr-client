@@ -13,6 +13,7 @@ public class SearchRecordsResponse {
     private String totalBibRecordsCount = "0";
     private String totalItemRecordsCount = "0";
     private String totalRecordsCount = "0";
+    private boolean showTotalCount;
     private String errorMessage;
 
     public List<SearchResultRow> getSearchResultRows() {
@@ -53,6 +54,14 @@ public class SearchRecordsResponse {
 
     public void setTotalRecordsCount(String totalRecordsCount) {
         this.totalRecordsCount = totalRecordsCount;
+    }
+
+    public boolean isShowTotalCount() {
+        return showTotalCount;
+    }
+
+    public void setShowTotalCount(boolean showTotalCount) {
+        this.showTotalCount = showTotalCount;
     }
 
     public String getErrorMessage() {
