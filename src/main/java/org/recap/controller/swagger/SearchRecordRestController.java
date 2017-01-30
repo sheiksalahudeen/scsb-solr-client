@@ -39,6 +39,7 @@ public class SearchRecordRestController {
             searchRecordsResponse.setTotalItemRecordsCount(searchRecordsRequest.getTotalItemRecordsCount());
             searchRecordsResponse.setTotalRecordsCount(searchRecordsRequest.getTotalRecordsCount());
             searchRecordsResponse.setTotalPageCount(searchRecordsRequest.getTotalPageCount());
+            searchRecordsResponse.setShowTotalCount(searchRecordsRequest.isShowTotalCount());
             searchRecordsResponse.setErrorMessage(searchRecordsRequest.getErrorMessage());
         } catch (Exception e) {
             logger.error(e.getMessage());
