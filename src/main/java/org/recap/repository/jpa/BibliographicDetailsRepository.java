@@ -71,4 +71,14 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     @Query("UPDATE BibliographicEntity bib SET bib.isDeleted = true, bib.lastUpdatedBy = :lastUpdatedBy, bib.lastUpdatedDate = :lastUpdatedDate WHERE bib.bibliographicId IN :bibliographicIds")
     int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
+    @Query(value = "SELECT distinct BIB FROM BibliographicEntity as BIB WHERE BIB.bibliographicId IN " +
+            "(SELECT DISTINCT BIB1.bibliographicId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.itemEntities AS ITEMS " +
+            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1))")
+    Page<BibliographicEntity> getBibliographicEntitiesForChangedItems(Pageable pageable, String operationType);
+
+    @Query(value = "SELECT count(distinct BIB) FROM BibliographicEntity as BIB WHERE BIB.bibliographicId IN " +
+            "(SELECT DISTINCT BIB1.bibliographicId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.itemEntities AS ITEMS " +
+            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1))")
+    Long getCountOfBibliographicEntitiesForChangedItems(String operationType);
+
 }
