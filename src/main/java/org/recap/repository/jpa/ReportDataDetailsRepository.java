@@ -25,5 +25,8 @@ public interface ReportDataDetailsRepository extends JpaRepository<ReportDataEnt
 
     @Query(value = "select * from report_data_t where record_num in (?1) and HEADER_NAME=?2", nativeQuery = true)
     List<ReportDataEntity> getReportDataEntityByRecordNumIn(List<Integer> recordNum, String headerName);
+
+    @Query(value = "SELECT RDE FROM ReportDataEntity RDE WHERE recordNum IN (?1) AND headerName IN (?2)")
+    List<ReportDataEntity> getRecordsForMatchingBibInfo(List<String> recordNumList,List<String> headerNameList);
 }
 

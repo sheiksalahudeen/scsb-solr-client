@@ -86,6 +86,8 @@ function saveReport() {
         url = "/matchingAlgorithm/updateCGDInDB";
     } else if (criteria === 'UpdateCGDInSolr') {
         url = "/matchingAlgorithm/updateCGDInSolr?matchingAlgoDate="+matchingAlgoDate;
+    } else if (criteria === 'PopulateDataForDataDump') {
+        url = "/matchingAlgorithm/populateDataForDataDump";
     }
     if(url !== '') {
         var request = $.ajax({

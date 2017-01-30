@@ -61,4 +61,16 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
         return reportDetailRepository.save(reportEntity);
     }
 
+    @Test
+    public void getRecordsForMatchingBibInfo(){
+        List<String> recordNumList = new ArrayList<>();
+        recordNumList.add("1");
+        List<String> headerNameList = new ArrayList<>();
+        headerNameList.add("BibId");
+        headerNameList.add("OwningInstitution");
+        headerNameList.add("OwningInstitutionBibId");
+        List<ReportDataEntity> reportDataEntityList = reportDataDetailsRepository.getRecordsForMatchingBibInfo(recordNumList,headerNameList);
+        assertNotNull(reportDataEntityList);
+    }
+
 }
