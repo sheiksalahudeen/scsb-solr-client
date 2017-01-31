@@ -47,12 +47,18 @@ public abstract class MatchingIndexExecutorService {
     @Value("${solr.router.uri.type}")
     String solrRouterURI;
 
+    @Value("${matching.algorithm.indexing.batchsize}")
+    Integer batchSize;
+
+    @Value("${matching.algorithm.commit.interval}")
+    Integer commitInterval;
+
     public Integer indexingForMatchingAlgorithm(String operationType) {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
         Integer numThreads = 5;
-        Integer docsPerThread = 1000;
-        Integer commitIndexesInterval = 10000;
+        Integer docsPerThread = batchSize;
+        Integer commitIndexesInterval = commitInterval;
         String coreName = solrCore;
         Integer totalBibsProcessed = 0;
 
