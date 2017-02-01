@@ -505,6 +505,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
     private RequestItemEntity saveRequestEntity(Integer itemId, Integer requestTypeId, Integer requestingInstID, Integer patronID) throws Exception {
         RequestItemEntity requestItemEntity = new RequestItemEntity();
+        requestItemEntity.setCreatedBy("test");
         requestItemEntity.setItemId(itemId);
         requestItemEntity.setRequestTypeId(requestTypeId);
         requestItemEntity.setRequestingInstitutionId(requestingInstID);
