@@ -90,7 +90,8 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         }
 
         updateCgdUtil.updateCGDForItemInDB(itemBarcode, "Open", "guest", new Date());
-        updateCgdUtil.updateCGDForItemInSolr(new ArrayList<>());
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+        updateCgdUtil.updateCGDForItemInSolr(itemEntities);
         solrTemplate.commit();
 
         List<Item> fetchedItemsSolrAfterUpdate = itemCrudRepository.findByBarcode(itemBarcode);
