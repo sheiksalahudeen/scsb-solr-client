@@ -6,6 +6,8 @@ import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 /**
@@ -31,6 +33,10 @@ public class UsersEntityUT extends BaseTestCase{
         usersEntity.setLoginId("123");
         usersEntity.setInstitutionId(entity.getInstitutionId());
         usersEntity.setUserDescription("test");
+        usersEntity.setCreatedBy("test");
+        usersEntity.setCreatedDate(new Date());
+        usersEntity.setLastUpdatedDate(new Date());
+        usersEntity.setLastUpdatedBy("test");
         UsersEntity savedUserEntity = userDetailsRepository.save(usersEntity);
         assertNotNull(savedUserEntity);
         assertNotNull(savedUserEntity.getUserId());

@@ -48,6 +48,9 @@ public class RequestItemEntity implements Serializable {
     @Column(name = "REQUEST_STATUS_ID")
     private Integer requestStatusId;
 
+    @Column(name = "CREATED_BY")
+    private String createdBy;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "REQUESTING_INST_ID", insertable = false, updatable = false)
     private InstitutionEntity institutionEntity;
@@ -185,5 +188,13 @@ public class RequestItemEntity implements Serializable {
 
     public void setRequestStatusId(Integer requestStatusId) {
         this.requestStatusId = requestStatusId;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }
