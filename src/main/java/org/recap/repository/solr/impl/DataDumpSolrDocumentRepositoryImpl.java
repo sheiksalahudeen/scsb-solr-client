@@ -58,7 +58,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             searchRecordsRequest.setShowTotalCount(true);
             searchRecordsRequest.setFieldName(StringUtils.isEmpty(searchRecordsRequest.getFieldName()) ? RecapConstants.ALL_FIELDS : searchRecordsRequest.getFieldName());
             if(searchRecordsRequest.isDeleted()) {
-                bibItems = searchByItem(searchRecordsRequest);
+                bibItems = searchByItemForDeleted(searchRecordsRequest);
             } else {
                 bibItems = searchByBib(searchRecordsRequest);
             }
@@ -104,9 +104,22 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
-    public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
+    public List<BibItem> searchByItemForDeleted(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
-        SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest);
+        List<BibItem> onlyDeletedList = searchByItem(searchRecordsRequest,false);
+        if(onlyDeletedList != null && onlyDeletedList.size() > 0){
+            bibItems.addAll(onlyDeletedList);
+        }
+        List<BibItem> cgdChangedToPrivate = searchByItem(searchRecordsRequest,true);
+        if(cgdChangedToPrivate != null && cgdChangedToPrivate.size() > 0){
+            bibItems.addAll(cgdChangedToPrivate);
+        }
+        return bibItems;
+    }
+
+    public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) throws SolrServerException, IOException {
+        List<BibItem> bibItems = new ArrayList<>();
+        SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest,isCGDChangedToPrivate);
         queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
         queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);

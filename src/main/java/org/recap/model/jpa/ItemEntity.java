@@ -92,6 +92,9 @@ public class ItemEntity implements Serializable {
     @ManyToMany(mappedBy = "itemEntities")
     private List<BibliographicEntity> bibliographicEntities;
 
+    @Transient
+    private String cgdChangeLog;
+
     public ItemEntity() {
     }
 
@@ -278,6 +281,14 @@ public class ItemEntity implements Serializable {
 
     public void setBibliographicEntities(List<BibliographicEntity> bibliographicEntities) {
         this.bibliographicEntities = bibliographicEntities;
+    }
+
+    public String getCgdChangeLog() {
+        return cgdChangeLog;
+    }
+
+    public void setCgdChangeLog(String cgdChangeLog) {
+        this.cgdChangeLog = cgdChangeLog;
     }
 }
 

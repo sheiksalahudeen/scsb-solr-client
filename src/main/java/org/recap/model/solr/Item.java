@@ -85,6 +85,9 @@ public class Item {
     @Field("ItemCatalogingStatus")
     private String itemCatalogingStatus;
 
+    @Field("CGDChangeLog")
+    private String cgdChangeLog;
+
     @Ignore
     private String root;
 
@@ -286,5 +289,13 @@ public class Item {
 
     public void setItemCatalogingStatus(String itemCatalogingStatus) {
         this.itemCatalogingStatus = itemCatalogingStatus;
+    }
+
+    public String getCgdChangeLog() {
+        return cgdChangeLog;
+    }
+
+    public void setCgdChangeLog(String cgdChangeLog) {
+        this.cgdChangeLog = cgdChangeLog;
     }
 }

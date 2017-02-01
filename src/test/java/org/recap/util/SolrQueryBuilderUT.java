@@ -6,6 +6,8 @@ import org.recap.model.search.SearchRecordsRequest;
 
 import java.util.Arrays;
 
+import static junit.framework.TestCase.assertNotNull;
+
 /**
  * Created by peris on 9/30/16.
  */
@@ -109,6 +111,20 @@ public class SolrQueryBuilderUT {
         SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
         SolrQuery quryForAllFieldsNoValue = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
         System.out.println(quryForAllFieldsNoValue);
+    }
+
+    @Test
+    public void getDeletedQueryForDataDump(){
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("BibLastUpdatedDate");
+        searchRecordsRequest.setFieldValue("2016-10-21T14:30Z TO NOW");
+        searchRecordsRequest.getOwningInstitutions().addAll(Arrays.asList("CUL", "PUL"));
+        searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
+
+        SolrQueryBuilder solrQueryBuilder = new SolrQueryBuilder();
+        SolrQuery queryForAllFieldsNoValue = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest,true);
+        System.out.println(queryForAllFieldsNoValue);
+        assertNotNull(queryForAllFieldsNoValue);
     }
 
 

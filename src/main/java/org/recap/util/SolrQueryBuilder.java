@@ -30,6 +30,8 @@ public class SolrQueryBuilder {
 
     String and = " AND ";
 
+    String or = " OR ";
+
     String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
     String coreChildFilterQuery = "{!child of=\"ContentType:parent\"}";
@@ -124,6 +126,11 @@ public class SolrQueryBuilder {
         return stringBuilder.toString();
     }
 
+    public String getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate(SearchRecordsRequest searchRecordsRequest) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(buildQueryForMatchChildReturnParent(RecapConstants.COLLECTION_GROUP_DESIGNATION, Arrays.asList(RecapConstants.PRIVATE)));
+        return stringBuilder.toString();
+    }
 
     private String buildQueryForParentGivenChild(String fieldName, List<String> values, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -267,11 +274,20 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
-    public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest) {
+    public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
-        String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
         String queryForBibCriteria = buildQueryForBibFacetCriteria(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryForBibCriteria);
+        String queryStringForItemCriteria = null;
+        SolrQuery solrQuery;
+        if (isCGDChangedToPrivate) {
+            queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate(searchRecordsRequest);
+            solrQuery = new SolrQuery(queryStringForItemCriteria + and +"("+ ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_SHARED_TO_PRIVATE + "\"" +")")
+                    + or + ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_OPEN_TO_PRIVATE +"\"" +")") +")"
+                    + and + queryForFieldCriteria + queryForBibCriteria);
+        } else{
+            queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
+            solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryForBibCriteria);
+        }
         return solrQuery;
     }
 

@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.UpdateCgdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,16 @@ public class UpdateItemStatusController {
     @Autowired
     UpdateCgdUtil updateCgdUtil;
 
+    @Autowired
+    ItemDetailsRepository itemDetailsRepository;
+
     @RequestMapping(value = "/updateItemAvailablityStatus", method = RequestMethod.GET)
     public String updateCgdForItem(@RequestParam String itemBarcode) {
         String statusMessage = null;
+        List<ItemEntity> itemEntities = null;
         try {
-            updateCgdUtil.updateCGDForItemInSolr(itemBarcode, new ArrayList<>());
+            itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+            updateCgdUtil.updateCGDForItemInSolr(itemEntities);
             statusMessage = "Solr Indexing Successful";
         } catch (Exception e) {
             statusMessage = "Solr Indexing Failed";

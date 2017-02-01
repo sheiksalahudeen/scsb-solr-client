@@ -57,9 +57,12 @@ public class UpdateCgdUtil {
         String username = RecapConstants.GUEST;
         List<ItemEntity> itemEntities = new ArrayList<>();
         Date lastUpdatedDate = new Date();
+        String cgdChangeLog = oldCollectionGroupDesignation + RecapConstants.TO + newCollectionGroupDesignation;
         try {
             updateCGDForItemInDB(itemBarcode, newCollectionGroupDesignation, username, lastUpdatedDate);
-            updateCGDForItemInSolr(itemBarcode, itemEntities);
+            itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+            setCGDChangeLogToItemEntity(cgdChangeLog,itemEntities);
+            updateCGDForItemInSolr(itemEntities);
             saveItemChangeLogEntity(itemEntities, username, lastUpdatedDate, RecapConstants.UPDATE_CGD, cgdChangeNotes);
             sendEmail(itemBarcode, owningInstitution, oldCollectionGroupDesignation, newCollectionGroupDesignation, cgdChangeNotes);
             return RecapConstants.SUCCESS;
@@ -74,9 +77,8 @@ public class UpdateCgdUtil {
         itemDetailsRepository.updateCollectionGroupIdByItemBarcode(collectionGroupEntity.getCollectionGroupId(), itemBarcode, username, lastUpdatedDate);
     }
 
-    public void updateCGDForItemInSolr(String itemBarcode, List<ItemEntity> itemEntities) {
+    public void updateCGDForItemInSolr(List<ItemEntity> itemEntities) {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        itemEntities.addAll(itemDetailsRepository.findByBarcode(itemBarcode));
         if (CollectionUtils.isNotEmpty(itemEntities)) {
             for (ItemEntity itemEntity : itemEntities) {
                 if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
@@ -112,5 +114,11 @@ public class UpdateCgdUtil {
         emailPayLoad.setNewCgd(newCollectionGroupDesignation);
         emailPayLoad.setNotes(cgdChangeNotes);
         producerTemplate.sendBody(RecapConstants.EMAIL_Q, emailPayLoad);
+    }
+
+    private void setCGDChangeLogToItemEntity(String cgdChangeLog,List<ItemEntity> itemEntityList){
+        for(ItemEntity itemEntity:itemEntityList){
+            itemEntity.setCgdChangeLog(cgdChangeLog);
+        }
     }
 }

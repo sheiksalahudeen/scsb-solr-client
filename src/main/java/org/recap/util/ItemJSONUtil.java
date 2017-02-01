@@ -45,7 +45,8 @@ public class ItemJSONUtil extends MarcUtil{
             item.setItemLastUpdatedBy(itemEntity.getLastUpdatedBy());
             item.setItemLastUpdatedDate(itemEntity.getLastUpdatedDate());
             item.setDeletedItem(itemEntity.isDeleted());
-            item.setItemCatalogingStatus(itemEntity.getCatalogingStatus());
+            item.setItemCatalogingStatus(itemEntity.getCatalogingStatus() != null ? itemEntity.getCatalogingStatus():"");
+            item.setCgdChangeLog(itemEntity.getCgdChangeLog());
 
             List<Integer> bibIdList = new ArrayList<>();
             List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();

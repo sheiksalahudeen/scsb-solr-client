@@ -16,6 +16,7 @@ public class RecapConstants {
     public static final String HOLDING_ID = "HoldingId";
     public static final String ITEM_ID = "ItemId";
     public static final String SEARCH = "search";
+    public static final String PRIVATE = "Private";
     public static final String BIB_OWNING_INSTITUTION = "BibOwningInstitution";
     public static final String HOLDINGS_OWNING_INSTITUTION = "HoldingsOwningInstitution";
     public static final String ITEM_OWNING_INSTITUTION = "ItemOwningInstitution";
@@ -42,6 +43,9 @@ public class RecapConstants {
     public static final String IS_DELETED_HOLDINGS = "IsDeletedHoldings";
     public static final String IS_DELETED_ITEM = "IsDeletedItem";
     public static final String PUBLICATION_DATE = "PublicationDate";
+    public static final String CGD_CHANAGE_LOG = "CGDChangeLog";
+    public static final String CGD_CHANAGE_LOG_SHARED_TO_PRIVATE = "SharedToPrivate";
+    public static final String CGD_CHANAGE_LOG_OPEN_TO_PRIVATE = "OpenToPrivate";
 
     public static final String USE_RESTRICTION = "UseRestriction_search";
     public static final String NO_RESTRICTIONS = "No Restrictions";
@@ -273,10 +277,6 @@ public class RecapConstants {
     public static final String FAILURE_ITEM_REASON = "ReasonForFailureItem";
     public static final String ITEMBARCODE = "itemBarcode";
 
-    public static final String USER_ROLES="userRolesSearch";
-    public static final Integer CGD_PRIVATE=3;
-
-    public static final String REJECTION_REPORT = "Rejection";
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
     public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
     public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
@@ -312,23 +312,12 @@ public class RecapConstants {
     public static final String REPORTS_OPEN = "Open";
     public static final String REPORTS_SHARED = "Shared";
     public static final String REPORTS_PRIVATE = "Private";
-    public static final Integer PUL_INST_ID = 1;
-    public static final Integer CUL_INST_ID = 2;
-    public static final Integer NYPL_INST_ID = 3;
-    public static final Integer CGD_SHARED = 1;
-    public static final Integer CGD_OPEN = 2;
     public static final String RETRIEVAL = "RETRIEVAL";
     public static final String RECALL = "RECALL";
     public static final String EDD = "EDD";
     public static final String BORROW_DIRECT = "BORROW DIRECT";
 
-    public static final String ROLES = "roles";
-    public static final String INVALID_ROLE_NAME = "Please give one valid role name";
-    public static final String WRONG_PERMISSION = "This permission is not given to this role";
-    public static final String INVALID_PERMISSION = "Please give one valid permission name";
-    public static final String SPECIAL_CHARACTERS_NOT_ALLOWED = "Special characters and spaces are not allowed";
 
-    public static final String  BIB_LASTUPDATED_DATE = "BibLastUpdatedDate";
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
 
@@ -340,5 +329,5 @@ public class RecapConstants {
     public static final String OLD_CGD = "oldCollectionGroupDesignation";
     public static final String NEW_CGD = "newCollectionGroupDesignation";
     public static final String CGD_CHANGE_NOTES = "cgdChangeNotes";
-
+    public static final String TO = "To";
 }
