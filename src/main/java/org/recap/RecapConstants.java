@@ -330,4 +330,6 @@ public class RecapConstants {
     public static final String NEW_CGD = "newCollectionGroupDesignation";
     public static final String CGD_CHANGE_NOTES = "cgdChangeNotes";
     public static final String TO = "To";
+    public static final String ITEM_CATALOGING_STATUS = "ItemCatalogingStatus";
+    public static final String BIB_CATALOGING_STATUS = "BibCatalogingStatus";
 }
