@@ -75,7 +75,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
 
     private List<BibItem> searchByBib(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
-        SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteria(searchRecordsRequest);
+        SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteriaForDataDump(searchRecordsRequest);
         queryForParentAndChildCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         queryForParentAndChildCriteria.setRows(searchRecordsRequest.getPageSize());
         queryForParentAndChildCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
@@ -149,7 +149,8 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
 
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
         String querForItemString = "_root_:" + getRootIds(bibItems) + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
-                + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted();
+                + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + RecapConstants.ITEM_CATALOGING_STATUS + ":"
+                + RecapConstants.COMPLETE_STATUS;
         if(searchRecordsRequest.getFieldName().contains(RecapConstants.BIBITEM_LASTUPDATED_DATE)){
             querForItemString = querForItemString + and + RecapConstants.ITEM_LASTUPDATED_DATE + ":["+searchRecordsRequest.getFieldValue()+"]";
         }
