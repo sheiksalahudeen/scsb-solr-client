@@ -107,7 +107,11 @@ public class ReportsServiceUtil {
         long numFound = solrDocuments.getNumFound();
         reportsResponse.setTotalRecordsCount(String.valueOf(numFound));
         int totalPagesCount = (int) Math.ceil((double) numFound / (double) reportsRequest.getPageSize());
-        reportsResponse.setTotalPageCount(totalPagesCount);
+        if(totalPagesCount == 0){
+            reportsResponse.setTotalPageCount(1);
+        }else{
+            reportsResponse.setTotalPageCount(totalPagesCount);
+        }
         List<Item> itemList = new ArrayList<>();
         List<Integer> itemIdList = new ArrayList<>();
         for (Iterator<SolrDocument> solrDocumentIterator = solrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
