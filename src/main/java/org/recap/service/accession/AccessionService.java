@@ -251,7 +251,7 @@ public class AccessionService {
             }
             count++;
         }
-        responseMessageBuffer.append(RecapConstants.VERIFY_ONGOING_ACCESSION_REPORT_MSG);
+        responseMessageBuffer.append(", ").append(RecapConstants.VERIFY_ONGOING_ACCESSION_REPORT_MSG);
         return responseMessageBuffer.toString();
     }
 
