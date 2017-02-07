@@ -347,4 +347,6 @@ public class RecapConstants {
     public static final String VERIFY_ONGOING_ACCESSION_REPORT_MSG = "Please verify ongoing accession report";
     public static final String DUMMY_BIB_CONTENT_XML = "dummybibcontent.xml";
     public static final String DUMMY_HOLDING_CONTENT_XML = "dummyholdingcontent.xml";
+    public static final String ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE = "Input limit exceeded, maximum allowed input limit is ";
+
 }

@@ -1,6 +1,5 @@
 package org.recap.controller;
 
-import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
@@ -11,6 +10,7 @@ import org.recap.service.deAccession.DeAccessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +38,9 @@ public class SharedCollectionRestController {
 
     @Autowired
     AccessionService accessionService;
+
+    @Value(("${ongoing.accession.input.limit}"))
+    private Integer inputLimit;
 
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.GET)
     @ResponseBody
@@ -72,8 +75,13 @@ public class SharedCollectionRestController {
     @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
-        String response = accessionService.processRequest(accessionRequestList);
-        ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+        ResponseEntity responseEntity;
+        if (accessionRequestList.size() > inputLimit) {
+            return new ResponseEntity(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE+inputLimit,getHttpHeaders(),HttpStatus.OK);
+        } else {
+            String response = accessionService.processRequest(accessionRequestList);
+            responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+        }
         return responseEntity;
     }
 
