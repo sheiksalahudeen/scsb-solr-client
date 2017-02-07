@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,17 +71,10 @@ public class SharedCollectionRestController {
 
     @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity accession(@RequestBody AccessionRequest accessionRequest) {
-        String owningInstitution = accessionService.getOwningInstitution(accessionRequest.getCustomerCode());
-        String customerCode = accessionRequest.getCustomerCode();
-        if (StringUtils.isBlank(owningInstitution)) {
-            ResponseEntity responseEntity = new ResponseEntity(RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
-        } else {
-            String response = accessionService.processRequest(accessionRequest.getItemBarcode(),customerCode, owningInstitution);
-            ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
-        }
+    public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
+        String response = accessionService.processRequest(accessionRequestList);
+        ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+        return responseEntity;
     }
 
     private HttpHeaders getHttpHeaders() {

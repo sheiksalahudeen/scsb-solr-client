@@ -1,5 +1,8 @@
 package org.recap.service.partnerservice;
 
+import org.recap.RecapConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -12,6 +15,8 @@ import javax.net.ssl.HostnameVerifier;
  */
 @Service
 public class PrincetonService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PrincetonService.class);
 
     @Value("${ils.princeton.bibdata}")
     String ilsprincetonBibData;
@@ -27,12 +32,12 @@ public class PrincetonService {
         try {
             bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
         } catch (HttpClientErrorException e) {
-            e.printStackTrace();
-            response = "Item Barcode not found";
+            logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
+            response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
         } catch (Exception e) {
-            e.printStackTrace();
-            response = ilsprincetonBibData + " Service is Unavailable.";
+            logger.error(RecapConstants.SERVICE_UNAVAILABLE);
+            response = ilsprincetonBibData + RecapConstants.SERVICE_UNAVAILABLE;
             throw new RuntimeException(response);
         }
         return bibDataResponse;

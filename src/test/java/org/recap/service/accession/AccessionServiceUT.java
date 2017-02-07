@@ -10,6 +10,7 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.service.authorization.NyplOauthTokenApiService;
 import org.recap.model.jpa.BibliographicEntity;
@@ -45,7 +46,12 @@ public class AccessionServiceUT extends BaseTestCase {
 
     @Test
     public void processForPUL() throws IOException, SolrServerException {
-        accessionService.processRequest("32101062128309", null, "PUL");
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PB");
+        accessionRequest.setItemBarcode("32101062128309");
+        accessionRequestList.add(accessionRequest);
+        accessionService.processRequest(accessionRequestList);
         List<BibliographicEntity> fetchedBibliographicEntityList = bibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
         List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);
@@ -73,7 +79,12 @@ public class AccessionServiceUT extends BaseTestCase {
 
     @Test
     public void accessionUnavilableBarcode() throws IOException, SolrServerException {
-        accessionService.processRequest("3210106212830", "PA", "PUL");
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("3210106212830");
+        accessionRequestList.add(accessionRequest);
+        accessionService.processRequest(accessionRequestList);
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
         assertTrue(itemEntities.size() > 0);
@@ -88,7 +99,12 @@ public class AccessionServiceUT extends BaseTestCase {
 
     @Test
     public void accessionUnavilableBarcodeAvoidDuplicate() throws IOException, SolrServerException {
-        accessionService.processRequest("3210106212830", "PA", "PUL");
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("3210106212830");
+        accessionRequestList.add(accessionRequest);
+        accessionService.processRequest(accessionRequestList);
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
         assertTrue(itemEntities.size() > 0);
@@ -96,7 +112,7 @@ public class AccessionServiceUT extends BaseTestCase {
         assertEquals(1,itemEntities.get(0).getBibliographicEntities().size());
         assertEquals("dummycallnumber",itemEntities.get(0).getCallNumber());
 
-        String respose = accessionService.processRequest("3210106212830", "PA", "PUL");
+        String respose = accessionService.processRequest(accessionRequestList);
         assertEquals(RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG,respose);
         List<ItemEntity> itemEntities1 = itemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities1);
@@ -113,7 +129,12 @@ public class AccessionServiceUT extends BaseTestCase {
 
     @Test
     public void processForNYPL() throws IOException, SolrServerException {
-        accessionService.processRequest("33433002031718", "NA","NYPL");
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("NA");
+        accessionRequest.setItemBarcode("33433002031718");
+        accessionRequestList.add(accessionRequest);
+        accessionService.processRequest(accessionRequestList);
         List<BibliographicEntity> fetchedBibliographicEntityList = bibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
         List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);

@@ -1,12 +1,12 @@
 package org.recap.controller;
 
 import org.junit.Test;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.report.ReportGenerator;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -19,22 +19,17 @@ import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 23/11/16.
@@ -269,11 +264,15 @@ public class AccessionSummaryReportUT extends BaseTestCase{
 
     @Test
     public void testSuccessfullAccessionAndReport() throws Exception{
-        String owningInstitution = "PUL";
         String barcode = "32101058378587";
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PB");
+        accessionRequest.setItemBarcode("32101058378587");
+        accessionRequestList.add(accessionRequest);
         Mockito.when(mockRestTemplate.getForObject(ilsprincetonBibData + barcode, String.class)).thenReturn(bibMarcRecord);
         Mockito.when(accessionService.getRestTemplate()).thenReturn(mockRestTemplate);
-        Mockito.when(accessionService.processRequest(barcode,"PB",owningInstitution)).thenCallRealMethod();
+        Mockito.when(accessionService.processRequest(accessionRequestList)).thenCallRealMethod();
         Mockito.when(accessionService.updateBibliographicEntity(Mockito.any())).thenCallRealMethod();
         Mockito.when(accessionService.getMarcUtil()).thenReturn(new MarcUtil());
         Mockito.when(accessionService.getMarcToBibEntityConverter()).thenReturn(marcToBibEntityConverter);
@@ -284,7 +283,7 @@ public class AccessionSummaryReportUT extends BaseTestCase{
         Mockito.when(accessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
         Mockito.when(accessionService.getInstitutionDetailsRepository()).thenReturn(institutionDetailsRepository);
         Mockito.when(accessionService.getPrincetonService()).thenReturn(princetonService);
-        String response = accessionService.processRequest(barcode,"PB",owningInstitution);
+        String response = accessionService.processRequest(accessionRequestList);
         assertNotNull(response);
         assertEquals(response, RecapConstants.SUCCESS);
 
@@ -311,13 +310,5 @@ public class AccessionSummaryReportUT extends BaseTestCase{
         cal.set(Calendar.SECOND, 59);
         return cal.getTime();
     }
-
-    /*class MockAccessionService extends AccessionService {
-        @Override
-        public RestTemplate getRestTemplate() {
-            return mockRestTemplate;
-        }
-    }*/
-
 
 }

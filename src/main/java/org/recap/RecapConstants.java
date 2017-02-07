@@ -73,6 +73,8 @@ public class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionRejectionReportQ";
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionExceptionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionExceptionReportQ";
+    public static final String FTP_ONGOING_ACCESSON_REPORT_Q = "scsbactivemq:queue:ftpOngoingAccessionReportQ";
+    public static final String FS_ONGOING_ACCESSION_REPORT_Q = "scsbactivemq:queue:fsOngoingAccessionReportQ";
 
 
     public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
@@ -218,6 +220,8 @@ public class RecapConstants {
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
     public static final int BARCODE_LIMIT = 10;
+    public static final String ACCESSION_SUCCESS = "One or more record got accessioned";
+    public static final String ACCESSION_DUMMY_RECORD = "Dummy record created";
 
     //Request
     public static final String REQUEST_ID = "requestId";
@@ -256,6 +260,8 @@ public class RecapConstants {
 
     public static final String FS_ACCESSION_SUMMARY_REPORT_ID = "fsAccessionSummaryReportQ";
     public static final String FTP_ACCESSION_SUMMARY_REPORT_ID = "ftpAccessionSummaryReportQ";
+    public static final String FS_ONGOING_ACCESSION_REPORT_ID = "fsOngoingAccessionReportQ";
+    public static final String FTP_ONGOING_ACCESSION_REPORT_ID = "ftpOngingAccessionReportQ";
     public static final String DEACCESION_DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyyHHmmss";
     public static final String ACCESSION_SUMMARY_REPORT = "Accession_Summary_Report";
     public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
@@ -332,4 +338,13 @@ public class RecapConstants {
     public static final String TO = "To";
     public static final String ITEM_CATALOGING_STATUS = "ItemCatalogingStatus";
     public static final String BIB_CATALOGING_STATUS = "BibCatalogingStatus";
+    public static final String MESSAGE = "Message";
+    public static final String ONGOING_ACCESSION_REPORT = "Ongoing_Accession_Report";
+    public static final String ERROR = "error->";
+    public static final String EXCEPTION = "exception->";
+    public static final String ITEM_BARCODE_NOT_FOUND = "Item Barcode not found";
+    public static final String SERVICE_UNAVAILABLE =" Service is Unavailable.";
+    public static final String VERIFY_ONGOING_ACCESSION_REPORT_MSG = "Please verify ongoing accession report";
+    public static final String DUMMY_BIB_CONTENT_XML = "dummybibcontent.xml";
+    public static final String DUMMY_HOLDING_CONTENT_XML = "dummyholdingcontent.xml";
 }
