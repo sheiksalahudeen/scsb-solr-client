@@ -52,6 +52,8 @@ public class GenerateReportController {
             fileName = RecapConstants.DEACCESSION_REPORT;
         }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
             fileName = RecapConstants.ACCESSION_REPORT;
+        }else if(reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
+            fileName = RecapConstants.ACCESSION_REPORT;
         }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
             fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
         }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
