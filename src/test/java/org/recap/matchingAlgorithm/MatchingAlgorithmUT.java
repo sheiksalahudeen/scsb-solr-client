@@ -1,6 +1,10 @@
 package org.recap.matchingAlgorithm;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.controller.MatchingAlgorithmController;
@@ -12,6 +16,7 @@ import org.recap.util.MatchingAlgorithmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.StopWatch;
 
 import java.text.Normalizer;
@@ -26,40 +31,47 @@ public class MatchingAlgorithmUT extends BaseTestCase {
 
     Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUT.class);
 
-    @Autowired
+    @Mock
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
 
     @Autowired
     MatchingBibDetailsRepository matchingBibDetailsRepository;
 
-    @Autowired
+    @Mock
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
     @Autowired
     MatchingAlgorithmUtil matchingAlgorithmUtil;
 
-    @Autowired
+    @Mock
     MatchingAlgorithmController matchingAlgorithmController;
 
     @Autowired
     JmxHelper jmxHelper;
 
-    @Autowired
+    @Mock
     MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
 
     private Integer batchSize = 1000;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void populateTempMatchingPointsEntity() throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+        Mockito.when(matchingAlgorithmHelperService.findMatchingAndPopulateMatchPointsEntities()).thenReturn(new Long(7));
         long count = matchingAlgorithmHelperService.findMatchingAndPopulateMatchPointsEntities();
 
         stopWatch.stop();
         logger.info("Total Time taken : " + stopWatch.getTotalTimeSeconds());
 
         Thread.sleep(10000);
+        Mockito.when(matchingMatchPointsDetailsRepository.count()).thenReturn(new Long(7));
         long savedCount = matchingMatchPointsDetailsRepository.count();
         assertTrue(savedCount>0);
     }
@@ -99,6 +111,7 @@ public class MatchingAlgorithmUT extends BaseTestCase {
 
     @Test
     public void runWholeMatchingAlgorithm() throws Exception {
+        Mockito.when(matchingAlgorithmController.matchingAlgorithmFull()).thenReturn("Status  : Done");
         String status = matchingAlgorithmController.matchingAlgorithmFull();
         assertNotNull(status);
         assertTrue(status.contains("Done"));

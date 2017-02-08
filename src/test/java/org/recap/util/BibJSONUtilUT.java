@@ -196,16 +196,9 @@ public class BibJSONUtilUT extends BaseTestCase{
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
         assertNotNull(solrInputDocument);
-        deleteByDocId("id",solrInputDocument.get("id").toString());
-        /*deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());*/
 
     }
 
-    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
-        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
-        solrTemplate.commit();
-    }
 
     @Test
     public void testLccnTrimValue() throws Exception {

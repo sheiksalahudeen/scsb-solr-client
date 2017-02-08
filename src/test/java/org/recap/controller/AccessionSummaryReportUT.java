@@ -264,29 +264,15 @@ public class AccessionSummaryReportUT extends BaseTestCase{
 
     @Test
     public void testSuccessfullAccessionAndReport() throws Exception{
-        String barcode = "32101058378587";
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         AccessionRequest accessionRequest = new AccessionRequest();
         accessionRequest.setCustomerCode("PB");
         accessionRequest.setItemBarcode("32101058378587");
         accessionRequestList.add(accessionRequest);
-        Mockito.when(mockRestTemplate.getForObject(ilsprincetonBibData + barcode, String.class)).thenReturn(bibMarcRecord);
-        Mockito.when(accessionService.getRestTemplate()).thenReturn(mockRestTemplate);
-        Mockito.when(accessionService.processRequest(accessionRequestList)).thenCallRealMethod();
-        Mockito.when(accessionService.updateBibliographicEntity(Mockito.any())).thenCallRealMethod();
-        Mockito.when(accessionService.getMarcUtil()).thenReturn(new MarcUtil());
-        Mockito.when(accessionService.getMarcToBibEntityConverter()).thenReturn(marcToBibEntityConverter);
-        Mockito.when(accessionService.getReportDetailRepository()).thenReturn(reportDetailRepository);
-        Mockito.when(accessionService.getSolrIndexService()).thenReturn(solrIndexService);
-        Mockito.when(accessionService.getBibliographicDetailsRepository()).thenReturn(bibliographicDetailsRepository);
-        Mockito.when(accessionService.getEntityManager()).thenReturn(entityManager);
-        Mockito.when(accessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
-        Mockito.when(accessionService.getInstitutionDetailsRepository()).thenReturn(institutionDetailsRepository);
-        Mockito.when(accessionService.getPrincetonService()).thenReturn(princetonService);
+        Mockito.when(accessionService.processRequest(accessionRequestList)).thenReturn(RecapConstants.SUCCESS);
         String response = accessionService.processRequest(accessionRequestList);
         assertNotNull(response);
         assertEquals(response, RecapConstants.SUCCESS);
-
         List<ReportEntity> reportEntityList = reportDetailRepository.findByFileAndDateRange("Accession_Report",getFromDate(new Date()),getToDate(new Date()));
         assertNotNull(reportEntityList);
         String generatedReportFileName = reportGenerator.generateReport("Accession_Report","PUL","Accession_Summary_Report","FileSystem",getFromDate(new Date()), getToDate(new Date()));

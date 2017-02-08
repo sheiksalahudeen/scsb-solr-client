@@ -148,7 +148,7 @@ public class AccessionService {
     public String getOwningInstitution(String customerCode) {
         String owningInstitution = null;
         try {
-            CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(customerCode);
+            CustomerCodeEntity customerCodeEntity = getCustomerCodeDetailsRepository().findByCustomerCode(customerCode);
             if (null != customerCodeEntity) {
                 owningInstitution = customerCodeEntity.getInstitutionEntity().getInstitutionCode();
             }

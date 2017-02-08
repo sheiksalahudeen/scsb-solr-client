@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by angelind on 18/10/16.
  */
-public class MatchingSolrQueryUT extends BaseTestCase {
+public class MatchingSolrQueryAT extends BaseTestCase {
 
     @Resource
     private SolrTemplate solrTemplate;

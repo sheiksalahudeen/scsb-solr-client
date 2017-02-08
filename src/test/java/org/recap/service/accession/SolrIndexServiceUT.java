@@ -4,11 +4,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,8 +33,11 @@ import static org.junit.Assert.assertNull;
  */
 public class SolrIndexServiceUT extends BaseTestCase {
 
-    @Autowired
+    @Mock
     SolrIndexService solrIndexService;
+
+    @Mock
+    BibSolrCrudRepository mockedBibSolrCrudRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -48,12 +54,10 @@ public class SolrIndexServiceUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getItemEntities());
 
         solrIndexService.indexByBibliographicId(bibliographicId);
-
-        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
+        Mockito.when(mockedBibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(new Bib());
+        Bib bib = mockedBibSolrCrudRepository.findByBibId(bibliographicId);
         assertNotNull(bib);
-        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
+
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
@@ -69,14 +73,14 @@ public class SolrIndexServiceUT extends BaseTestCase {
         entityManager.refresh(savedBibliographicEntity);
         Integer bibliographicId = savedBibliographicEntity.getBibliographicId();
         solrIndexService.indexByBibliographicId(bibliographicId);
-        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
+        Mockito.when(mockedBibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(new Bib());
+        Bib bib = mockedBibSolrCrudRepository.findByBibId(bibliographicId);
         assertNotNull(bib);
         solrIndexService.deleteByDocId("BibId",String.valueOf(bibliographicId));
-        Bib bib1 = bibSolrCrudRepository.findByBibId(bibliographicId);
+        Mockito.when(mockedBibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(null);
+        Bib bib1 = mockedBibSolrCrudRepository.findByBibId(bibliographicId);
         assertNull(bib1);
-        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
+
     }
 
     private BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {

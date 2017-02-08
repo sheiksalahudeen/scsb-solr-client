@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
@@ -42,12 +43,44 @@ public class SharedCollectionRestController {
     @Value(("${ongoing.accession.input.limit}"))
     private Integer inputLimit;
 
+    public ItemAvailabilityService getItemAvailabilityService() {
+        return itemAvailabilityService;
+    }
+
+    public void setItemAvailabilityService(ItemAvailabilityService itemAvailabilityService) {
+        this.itemAvailabilityService = itemAvailabilityService;
+    }
+
+    public DeAccessionService getDeAccessionService() {
+        return deAccessionService;
+    }
+
+    public void setDeAccessionService(DeAccessionService deAccessionService) {
+        this.deAccessionService = deAccessionService;
+    }
+
+    public AccessionService getAccessionService() {
+        return accessionService;
+    }
+
+    public void setAccessionService(AccessionService accessionService) {
+        this.accessionService = accessionService;
+    }
+
+    public Integer getInputLimit() {
+        return inputLimit;
+    }
+
+    public void setInputLimit(Integer inputLimit) {
+        this.inputLimit = inputLimit;
+    }
+
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity itemAvailabilityStatus(@RequestParam String itemBarcode) {
         String itemStatus = null;
         try {
-            itemStatus = itemAvailabilityService.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
+            itemStatus = getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
         } catch (Exception exception) {
             ResponseEntity responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
             return responseEntity;
@@ -64,7 +97,7 @@ public class SharedCollectionRestController {
     @RequestMapping(value = "/deAccession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity deAccession(@RequestBody DeAccessionRequest deAccessionRequest) {
-        Map<String, String> resultMap = deAccessionService.deAccession(deAccessionRequest);
+        Map<String, String> resultMap = getDeAccessionService().deAccession(deAccessionRequest);
         if (resultMap != null) {
             ResponseEntity responseEntity = new ResponseEntity(resultMap, getHttpHeaders(), HttpStatus.OK);
             return responseEntity;
@@ -76,10 +109,10 @@ public class SharedCollectionRestController {
     @ResponseBody
     public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
         ResponseEntity responseEntity;
-        if (accessionRequestList.size() > inputLimit) {
+        if (accessionRequestList.size() > getInputLimit()) {
             return new ResponseEntity(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE+inputLimit,getHttpHeaders(),HttpStatus.OK);
         } else {
-            String response = accessionService.processRequest(accessionRequestList);
+            String response = getAccessionService().processRequest(accessionRequestList);
             responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;

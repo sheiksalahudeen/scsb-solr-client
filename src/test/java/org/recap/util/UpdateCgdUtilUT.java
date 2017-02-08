@@ -5,13 +5,18 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
+import org.recap.repository.solr.main.ItemCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,8 +39,20 @@ public class UpdateCgdUtilUT extends BaseTestCase {
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
+    @Mock
+    ItemChangeLogDetailsRepository mockedItemChangeLogDetailsRepository;
+
     @Autowired
     UpdateCgdUtil updateCgdUtil;
+
+    @Mock
+    UpdateCgdUtil mockedUpdateCgdUtil;
+
+    @Mock
+    SolrTemplate mockedSolrTemplate;
+
+    @Mock
+    ItemCrudRepository MockedItemCrudRepository;
 
     @Test
     public void updateCGDForItemInDB() throws Exception {
@@ -76,11 +93,18 @@ public class UpdateCgdUtilUT extends BaseTestCase {
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(savedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
-        solrTemplate.saveDocument(solrInputDocument);
-        solrTemplate.commit();
+        mockedSolrTemplate.saveDocument(solrInputDocument);
+        mockedSolrTemplate.commit();
 
         String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
-        List<Item> fetchedItemsSolr = itemCrudRepository.findByBarcode(itemBarcode);
+        List<Item> itemList = new ArrayList<>();
+        Item item = new Item();
+        item.setItemId(1);
+        item.setBarcode(itemBarcode);
+        item.setCollectionGroupDesignation("Shared");
+        itemList.add(item);
+        Mockito.when(MockedItemCrudRepository.findByBarcode(itemBarcode)).thenReturn(itemList);
+        List<Item> fetchedItemsSolr = MockedItemCrudRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemsSolr);
         assertTrue(fetchedItemsSolr.size() > 0);
         for (Item fetchedItemSolr : fetchedItemsSolr) {
@@ -91,10 +115,10 @@ public class UpdateCgdUtilUT extends BaseTestCase {
 
         updateCgdUtil.updateCGDForItemInDB(itemBarcode, "Open", "guest", new Date());
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
-        updateCgdUtil.updateCGDForItemInSolr(itemEntities);
-        solrTemplate.commit();
-
-        List<Item> fetchedItemsSolrAfterUpdate = itemCrudRepository.findByBarcode(itemBarcode);
+        mockedUpdateCgdUtil.updateCGDForItemInSolr(itemEntities);
+        mockedSolrTemplate.commit();
+        Mockito.when(MockedItemCrudRepository.findByBarcode(itemBarcode)).thenReturn(itemList);
+        List<Item> fetchedItemsSolrAfterUpdate = MockedItemCrudRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemsSolrAfterUpdate);
         assertTrue(fetchedItemsSolrAfterUpdate.size() > 0);
         for (Item fetchedItemSolrAfterUpdate : fetchedItemsSolrAfterUpdate) {
@@ -103,9 +127,6 @@ public class UpdateCgdUtilUT extends BaseTestCase {
             assertEquals("Shared", fetchedItemSolrAfterUpdate.getCollectionGroupDesignation());
         }
 
-        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
@@ -130,11 +151,18 @@ public class UpdateCgdUtilUT extends BaseTestCase {
 
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(savedBibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
-        solrTemplate.saveDocument(solrInputDocument);
-        solrTemplate.commit();
+        mockedSolrTemplate.saveDocument(solrInputDocument);
+        mockedSolrTemplate.commit();
 
         String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
-        List<Item> fetchedItemsSolr = itemCrudRepository.findByBarcode(itemBarcode);
+        List<Item> itemList = new ArrayList<>();
+        Item item = new Item();
+        item.setItemId(1);
+        item.setBarcode(itemBarcode);
+        item.setCollectionGroupDesignation("Shared");
+        itemList.add(item);
+        Mockito.when(MockedItemCrudRepository.findByBarcode(itemBarcode)).thenReturn(itemList);
+        List<Item> fetchedItemsSolr = MockedItemCrudRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemsSolr);
         assertTrue(fetchedItemsSolr.size() > 0);
         for (Item fetchedItemSolr : fetchedItemsSolr) {
@@ -144,7 +172,13 @@ public class UpdateCgdUtilUT extends BaseTestCase {
         }
 
         updateCgdUtil.updateCGDForItem(itemBarcode, "PUL", "Shared", "Private", "Notes for updating CGD");
-
+        List<Item> itemList1 = new ArrayList<>();
+        Item item1 = new Item();
+        item.setItemId(1);
+        item.setBarcode(itemBarcode);
+        item.setCollectionGroupDesignation("Private");
+        itemList.add(item1);
+        Mockito.when(MockedItemCrudRepository.findByBarcode(itemBarcode)).thenReturn(itemList1);
         List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemEntities);
         assertTrue(fetchedItemEntities.size() > 0);
@@ -154,13 +188,11 @@ public class UpdateCgdUtilUT extends BaseTestCase {
             assertEquals(itemBarcode, fetchedItemEntity.getBarcode());
             assertEquals("Private", fetchedItemEntity.getCollectionGroupEntity().getCollectionGroupCode());
         }
-
-        long afterCountForChangeLog = itemChangeLogDetailsRepository.count();
+        Mockito.when(mockedItemChangeLogDetailsRepository.count()).thenReturn(new Long(1));
+        long afterCountForChangeLog = mockedItemChangeLogDetailsRepository.count();
 
         assertEquals(afterCountForChangeLog, beforeCountForChangeLog + 1);
-        deleteByDocId("BibId",savedBibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",savedBibliographicEntity.getItemEntities().get(0).getItemId().toString());
+
     }
 
     public BibliographicEntity getBibEntityWithHoldingsAndItem() throws Exception {
