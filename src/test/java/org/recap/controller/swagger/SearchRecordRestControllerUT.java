@@ -3,6 +3,8 @@ package org.recap.controller.swagger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.controller.BaseControllerUT;
 import org.recap.model.search.SearchRecordsRequest;
@@ -34,6 +36,9 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
 
     @Autowired
     private SearchRecordRestController searchRecordRestController;
+
+    @Mock
+    SearchResultRow mockedSearchResultRow;
 
     @Before
     public void setUp() {
@@ -141,7 +146,8 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
         if(searchResultRowL.size()>0) {
             searchResultRow = (SearchResultRow) searchResultRowL.get(0);
         }
-        int iBibiid=searchResultRow.getBibId().intValue();
+        Mockito.when(mockedSearchResultRow.getBibId().intValue()).thenReturn(12345);
+        int iBibiid=mockedSearchResultRow.getBibId().intValue();
         assertNotNull(iBibiid);
 
         /*

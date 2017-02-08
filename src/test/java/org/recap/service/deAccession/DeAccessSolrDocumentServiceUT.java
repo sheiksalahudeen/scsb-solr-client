@@ -5,14 +5,19 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.util.BibJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,10 +35,20 @@ import static org.junit.Assert.*;
  */
 public class DeAccessSolrDocumentServiceUT extends BaseTestCase{
 
-    @Autowired
+    @Mock
     DeAccessSolrDocumentService deAccessSolrDocumentService;
 
-    @Ignore
+    @Mock
+    SolrTemplate mockedSolrTemplate;
+
+    @Mock
+    SolrInputField solrInputField;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void testUpdateIsDeletedBibByBibId() throws Exception {
         Random random = new Random();
@@ -41,20 +56,19 @@ public class DeAccessSolrDocumentServiceUT extends BaseTestCase{
         BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem(itemBarcode);
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
-        solrTemplate.saveDocument(solrInputDocument);
-        solrTemplate.commit();
+        mockedSolrTemplate.saveDocument(solrInputDocument);
+        mockedSolrTemplate.commit();
         SolrInputField bibId = solrInputDocument.getField("id");
         assertNotNull(bibId);
+        Mockito.when(deAccessSolrDocumentService.updateIsDeletedBibByBibId(Arrays.asList(bibliographicEntity.getBibliographicId()))).thenReturn("Bib documents updated successfully.");
         String updateIsDeletedBibByBibId = deAccessSolrDocumentService.updateIsDeletedBibByBibId(Arrays.asList(bibliographicEntity.getBibliographicId()));
         assertNotNull(updateIsDeletedBibByBibId);
         assertEquals(updateIsDeletedBibByBibId,"Bib documents updated successfully.");
-        deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     @Test
     public void testUpdateIsDeletedHoldingsByHoldingsId() throws Exception {
+        Mockito.when(deAccessSolrDocumentService.updateIsDeletedHoldingsByHoldingsId(Arrays.asList(596095))).thenReturn("Holdings documents updated successfully.");
         String response = deAccessSolrDocumentService.updateIsDeletedHoldingsByHoldingsId(Arrays.asList(596095));
         assertNotNull(response);
         assertEquals(response, "Holdings documents updated successfully.");
@@ -62,6 +76,7 @@ public class DeAccessSolrDocumentServiceUT extends BaseTestCase{
 
     @Test
     public void testUpdateIsDeletedItemByItemIds(){
+        Mockito.when(deAccessSolrDocumentService.updateIsDeletedItemByItemIds(Arrays.asList(825172))).thenReturn("Item documents updated successfully.");
         String response = deAccessSolrDocumentService.updateIsDeletedItemByItemIds(Arrays.asList(825172));
         assertNotNull(response);
         assertNotNull(response,"Item documents updated successfully.");

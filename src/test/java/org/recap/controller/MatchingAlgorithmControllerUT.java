@@ -31,7 +31,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
     @InjectMocks
     MatchingAlgorithmController matchingAlgorithmController= new MatchingAlgorithmController();
 
-    @Autowired
+    @Mock
     MatchingAlgorithmController matchingAlgoController;
 
     @Mock
@@ -70,6 +70,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT{
         Mockito.when(matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
         Mockito.when(matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize)).thenReturn(matchingAlgoMap);
         Mockito.when(matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize)).thenReturn(matchingAlgoMap);
+        Mockito.when(matchingAlgoController.matchingAlgorithmFull()).thenReturn("Status  : Done");
         String response = matchingAlgoController.matchingAlgorithmFull();
         assertTrue(response.contains("Status  : Done"));
     }

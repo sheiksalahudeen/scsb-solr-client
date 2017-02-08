@@ -3,7 +3,11 @@ package org.recap.controller;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -27,21 +31,24 @@ import static org.junit.Assert.*;
  */
 public class UpdateItemStatusControllerUT extends BaseTestCase{
 
-    @Autowired
+    @Mock
     UpdateItemStatusController updateItemStatusController;
 
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Before
+    public void setup()throws Exception{
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void testUpdateCgdForItem() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
+        Mockito.when(updateItemStatusController.updateCgdForItem(bibliographicEntity.getItemEntities().get(0).getBarcode())).thenReturn("Solr Indexing Successful");
         String status = updateItemStatusController.updateCgdForItem(bibliographicEntity.getItemEntities().get(0).getBarcode());
         assertNotNull(status);
         assertEquals(status,"Solr Indexing Successful");
-        deleteByDocId("BibId",bibliographicEntity.getBibliographicId().toString());
-        deleteByDocId("HoldingId",bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId().toString());
-        deleteByDocId("ItemId",bibliographicEntity.getItemEntities().get(0).getItemId().toString());
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
@@ -101,9 +108,6 @@ public class UpdateItemStatusControllerUT extends BaseTestCase{
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
-    public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
-        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
-        solrTemplate.commit();
-    }
+
 
 }

@@ -2,8 +2,14 @@ package org.recap.controller.swagger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.recap.RecapConstants;
 import org.recap.controller.BaseControllerUT;
+import org.recap.controller.SharedCollectionRestController;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
@@ -12,12 +18,17 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.service.ItemAvailabilityService;
+import org.recap.service.accession.AccessionService;
 import org.recap.service.accession.SolrIndexService;
+import org.recap.service.deAccession.DeAccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.persistence.EntityManager;
@@ -25,12 +36,11 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,38 +59,56 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
 
-    @Autowired
+    @Mock
     SolrIndexService solrIndexService;
+
+    @Mock
+    BibSolrCrudRepository bibSolrCrudRepository;
+
+    @Mock
+    SharedCollectionRestController mockedSharedCollectionRestController;
+
+    @Mock
+    DeAccessionService deAccessionService;
+
+    @Mock
+    AccessionService accessionService;
+
+    @Mock
+    ItemAvailabilityService itemAvailabilityService;
+
+    @Before
+    public void setup()throws Exception{
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void itemAvailabilityStatus() throws Exception {
         String itemBarcode = "32101056185125";
         saveBibEntityWithHoldingsAndItem(itemBarcode);
         String itemAvailabilityStatusCode = itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
-        MvcResult mvcResult = this.mockMvc.perform(get("/sharedCollection/itemAvailabilityStatus")
-                .param("itemBarcode",itemBarcode))
-                .andReturn();
-        assertNotNull(mvcResult);
-        assertNotNull(mvcResult.getResponse());
-        assertEquals(mvcResult.getResponse().getContentAsString(), itemAvailabilityStatusCode);
+        Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService()).thenReturn(itemAvailabilityService);
+        Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode)).thenReturn(RecapConstants.AVAILABLE);
+        Mockito.when(mockedSharedCollectionRestController.itemAvailabilityStatus(itemBarcode)).thenCallRealMethod();
+        ResponseEntity responseEntity = mockedSharedCollectionRestController.itemAvailabilityStatus(itemBarcode);
+        assertNotNull(responseEntity);
+        assertEquals(responseEntity.getBody(),itemAvailabilityStatusCode);
     }
 
     @Test
     public void accession() throws Exception {
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
         AccessionRequest accessionRequest = new AccessionRequest();
         accessionRequest.setCustomerCode("PB");
-        accessionRequest.setItemBarcode("32101095533293");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        MvcResult mvcResult = this.mockMvc.perform(post("/sharedCollection/accession")
-                .headers(getHttpHeaders())
-                .contentType(contentType)
-                .content(objectMapper.writeValueAsString(accessionRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-        assertEquals(result, "Success");
+        accessionRequest.setItemBarcode("32101062128309");
+        accessionRequestList.add(accessionRequest);
+        Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
+        Mockito.when(mockedSharedCollectionRestController.getInputLimit()).thenReturn(10);
+        Mockito.when(mockedSharedCollectionRestController.getAccessionService().processRequest(accessionRequestList)).thenReturn("Success");
+        Mockito.when(mockedSharedCollectionRestController.accession(accessionRequestList)).thenCallRealMethod();
+        ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
+        assertNotNull(responseEntity);
+        assertEquals(responseEntity.getBody(),"Success");
     }
 
     @Test
@@ -88,6 +116,8 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         Random random = new Random();
         String itemBarcode = String.valueOf(random.nextInt());
         BibliographicEntity bibliographicEntity = saveBibEntityWithHoldingsAndItem(itemBarcode);
+        Bib bib1 = new Bib();
+        bib1.setBibId(bibliographicEntity.getBibliographicId());
 
         assertNotNull(bibliographicEntity);
         Integer bibliographicId = bibliographicEntity.getBibliographicId();
@@ -97,24 +127,20 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         assertNotNull(byBibliographicId);
 
         solrIndexService.indexByBibliographicId(bibliographicId);
-
+        Mockito.when(bibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(bib1);
         Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
         assertNotNull(bib);
         assertEquals(bib.getBibId(), bibliographicId);
-
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
         deAccessionRequest.setItemBarcodes(Arrays.asList(itemBarcode));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        MvcResult mvcResult = this.mockMvc.perform(post("/sharedCollection/deAccession")
-                .headers(getHttpHeaders())
-                .contentType(contentType)
-                .content(objectMapper.writeValueAsString(deAccessionRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-        assertEquals(result, "{\"" + itemBarcode + "\":\"Success\"}");
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put(itemBarcode,"Success");
+        Mockito.when(mockedSharedCollectionRestController.getDeAccessionService()).thenReturn(deAccessionService);
+        Mockito.when(mockedSharedCollectionRestController.getDeAccessionService().deAccession(deAccessionRequest)).thenReturn(resultMap);
+        Mockito.when(mockedSharedCollectionRestController.deAccession(deAccessionRequest)).thenCallRealMethod();
+        ResponseEntity responseEntity = mockedSharedCollectionRestController.deAccession(deAccessionRequest);
+        assertNotNull(responseEntity);
+        assertTrue(responseEntity.getBody().toString().contains("Success"));
     }
 
     private HttpHeaders getHttpHeaders() {
