@@ -67,9 +67,6 @@ public class BaseTestCase {
     public RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
-    public NotesDetailsRepository notesDetailsRepository;
-
-    @Autowired
     public ItemCrudRepository itemCrudRepository;
 
     @Autowired
