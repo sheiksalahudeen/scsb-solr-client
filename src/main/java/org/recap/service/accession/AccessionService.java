@@ -1,10 +1,13 @@
 package org.recap.service.accession;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
+import org.recap.camel.activemq.JmxHelper;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.converter.SCSBToBibEntityConverter;
 import org.recap.converter.XmlToBibEntityConverterInterface;
@@ -16,10 +19,11 @@ import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
-import org.recap.util.MarcUtil;
+import org.recap.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -82,6 +86,9 @@ public class AccessionService {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
 
     private Map<String,Integer> institutionEntityMap;
 
@@ -302,7 +309,8 @@ public class AccessionService {
         if (bibliographicEntity != null) {
             BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
             if (null != savedBibliographicEntity) {
-                getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
+                SolrInputDocument solrInputDocument = getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
+                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
                 response = RecapConstants.SUCCESS;
             }
         }

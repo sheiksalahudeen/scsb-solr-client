@@ -6,9 +6,7 @@ import org.recap.RecapConstants;
 import org.recap.matchingAlgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.ReportDataDetailsRepository;
+import org.recap.repository.jpa.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +28,11 @@ public class MatchingAlgorithmCGDCallable implements Callable {
     private Map collectionGroupMap;
     private Map institutionMap;
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     public MatchingAlgorithmCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
-                                        int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap, ItemChangeLogDetailsRepository itemChangeLogDetailsRepository) {
+                                        int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
+                                        ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
         this.reportDataDetailsRepository = reportDataDetailsRepository;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.pageNum = pageNum;
@@ -41,6 +41,7 @@ public class MatchingAlgorithmCGDCallable implements Callable {
         this.collectionGroupMap = collectionGroupMap;
         this.institutionMap = institutionMap;
         this.itemChangeLogDetailsRepository = itemChangeLogDetailsRepository;
+        this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
     }
 
     @Override
@@ -62,7 +63,7 @@ public class MatchingAlgorithmCGDCallable implements Callable {
             }
             Set<String> materialTypeSet = new HashSet<>();
             MatchingAlgorithmCGDProcessor matchingAlgorithmCGDProcessor = new MatchingAlgorithmCGDProcessor(bibliographicDetailsRepository, producerTemplate, collectionGroupMap,
-                    institutionMap, itemChangeLogDetailsRepository);
+                    institutionMap, itemChangeLogDetailsRepository, RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository);
             boolean isMonograph = matchingAlgorithmCGDProcessor.checkForMonographAndPopulateValues(materialTypeSet,useRestrictionMap, itemEntityMap, bibIdList);
             if(isMonograph) {
                 matchingAlgorithmCGDProcessor.updateCGDProcess(useRestrictionMap, itemEntityMap);

@@ -17,7 +17,7 @@ public class MatchingIndexExecutorServiceAT extends BaseTestCase{
 
     @Test
     public void indexingForMatchingAlgorithmTest() {
-        Integer count = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.MATCHING_OPERATION_TYPE);
+        Integer count = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE);
         assertTrue(count > 0);
     }
 

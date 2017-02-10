@@ -1,8 +1,8 @@
 package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -87,10 +86,7 @@ public class MatchingBibItemIndexCallable implements Callable {
         executorService.shutdown();
 
         if (!CollectionUtils.isEmpty(solrInputDocumentsToIndex)) {
-            SolrTemplate solrTemplate = new SolrTemplate(new HttpSolrClient(solrURL + File.separator + coreName));
-            solrTemplate.setSolrCore(coreName);
-            solrTemplate.saveDocuments(solrInputDocumentsToIndex);
-            solrTemplate.commit();
+            producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, solrInputDocumentsToIndex, RecapConstants.SOLR_CORE, coreName);
         }
         return solrInputDocumentsToIndex.size();
     }
