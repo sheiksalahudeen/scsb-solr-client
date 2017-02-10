@@ -139,7 +139,7 @@ public class MatchingAlgorithmController {
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            Integer totalProcessedRecords = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.MATCHING_OPERATION_TYPE);
+            Integer totalProcessedRecords = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE);
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             String status = "Total number of records processed : " + totalProcessedRecords;

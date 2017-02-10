@@ -70,15 +70,7 @@ public class MatchingAlgorithmUpdateCGDService {
     public void updateCGDProcessForMonographs(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start");
 
-        MatchingCounter.reset();
-
-        MatchingCounter.setPulSharedCount(matchingAlgorithmUtil.getCGDCountBasedOnInst(RecapConstants.PRINCETON));
-        MatchingCounter.setCulSharedCount(matchingAlgorithmUtil.getCGDCountBasedOnInst(RecapConstants.COLUMBIA));
-        MatchingCounter.setNyplSharedCount(matchingAlgorithmUtil.getCGDCountBasedOnInst(RecapConstants.NYPL));
-
-        logger.info("PUL Initial Counter Value: " + MatchingCounter.getPulSharedCount());
-        logger.info("CUL Initial Counter Value: " + MatchingCounter.getCulSharedCount());
-        logger.info("NYPL Initial Counter Value: " + MatchingCounter.getNyplSharedCount());
+        matchingAlgorithmUtil.populateMatchingCounter();
 
         ExecutorService executorService = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
@@ -88,7 +80,7 @@ public class MatchingAlgorithmUpdateCGDService {
         logger.info("Total Pages : " + totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new MatchingAlgorithmCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
-                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository);
+                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository);
             callables.add(callable);
         }
         Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executorService, callables);

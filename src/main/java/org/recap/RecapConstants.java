@@ -33,6 +33,7 @@ public class RecapConstants {
     public static final String NOTES = "Notes";
     public static final String LEADER_MATERIAL_TYPE = "LeaderMaterialType";
     public static final String MONOGRAPH = "Monograph";
+    public static final String MONOGRAPHIC_SET = "MonographicSet";
     public static final String SERIAL = "Serial";
     public static final String OTHER = "Other";
     public static final String AND = "AND";
@@ -122,7 +123,8 @@ public class RecapConstants {
     public static final String MATCHING_USE_RESTRICTIONS = "UseRestrictions";
     public static final String MATCHING_SUMMARY_HOLDINGS = "SummaryHoldings";
     public static final String MATCHING_MATERIAL_TYPE = "MaterialType";
-    public static final String MATCHING_OPERATION_TYPE = "MatchingAlgorithm";
+    public static final String INITIAL_MATCHING_OPERATION_TYPE = "InitialMatchingAlgorithm";
+    public static final String ONGOING_MATCHING_OPERATION_TYPE = "OngoingMatchingAlgorithm";
 
     public static final String SUMMARY_NUM_BIBS_IN_TABLE = "CountOfBibsInTable";
     public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "CountOfItemsInTable";
@@ -172,6 +174,8 @@ public class RecapConstants {
 
     public static final String MATCHING_REPORT_ENTITY_MAP = "matchingReportEntityMap";
     public static final String EXCEPTION_REPORT_ENTITY_MAP = "exceptionReportEntityMap";
+
+    public static final String ONGOING_MATCHING_ALGORITHM = "OngoingMatchingAlgorithm";
 
     //Error Message
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";

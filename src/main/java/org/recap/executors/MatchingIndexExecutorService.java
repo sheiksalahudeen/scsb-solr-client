@@ -2,6 +2,9 @@ package org.recap.executors;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.jms.JmsQueueEndpoint;
+import org.apache.camel.component.solr.SolrConstants;
+import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
@@ -89,16 +92,46 @@ public abstract class MatchingIndexExecutorService {
                 int futureCount = 0;
                 List<List<Callable<Integer>>> partitions = Lists.partition(new ArrayList<Callable<Integer>>(callables), callableCountByCommitInterval);
                 for (List<Callable<Integer>> partitionCallables : partitions) {
+
+                    List<Future<Integer>> futures = executorService.invokeAll(partitionCallables);
+                    futures
+                            .stream()
+                            .map(future -> {
+                                try {
+                                    return future.get();
+                                } catch (Exception e) {
+                                    throw new IllegalStateException(e);
+                                }
+                            });
+                    logger.info("No of Futures Added : " + futures.size());
+
                     int numOfBibsProcessed = 0;
-                    for (Iterator<Callable<Integer>> iterator = partitionCallables.iterator(); iterator.hasNext(); ) {
-                        Callable<Integer> callable = iterator.next();
-                        Future<Integer> future = executorService.submit(callable);
-                        Integer entitiesCount = (Integer) future.get();
-                        numOfBibsProcessed += entitiesCount;
-                        totalBibsProcessed += entitiesCount;
-                        logger.info("Num of bibs fetched by thread : " + entitiesCount);
-                        futureCount++;
+                    for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                        Future future = iterator.next();
+                        try {
+                            Integer entitiesCount = (Integer) future.get();
+                            numOfBibsProcessed += entitiesCount;
+                            totalBibsProcessed += entitiesCount;
+                            logger.info("Num of bibs fetched by thread : " + entitiesCount);
+                            futureCount++;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
                     }
+
+                    JmsQueueEndpoint solrQJmsEndPoint = (JmsQueueEndpoint) producerTemplate.getCamelContext().getEndpoint(RecapConstants.SOLR_QUEUE);
+                    Integer solrQSize = solrQJmsEndPoint.getExchanges().size();
+                    logger.info("Solr Queue size : " + solrQSize);
+                    while (solrQSize != 0) {
+                        solrQSize = solrQJmsEndPoint.getExchanges().size();
+                    }
+                    Future<Object> future = producerTemplate.asyncRequestBodyAndHeader(solrRouterURI + "://" + solrUrl + "/" + coreName, "", SolrConstants.OPERATION, SolrConstants.OPERATION_COMMIT);
+                    while (!future.isDone()) {
+                        //NoOp.
+                    }
+                    logger.info("Commit future done : " + future.isDone());
 
                     logger.info("Num of Bibs Processed and indexed to core " + coreName + " on commit interval : " + numOfBibsProcessed);
                     logger.info("Total Num of Bibs Processed and indexed to core " + coreName + " : " + totalBibsProcessed);

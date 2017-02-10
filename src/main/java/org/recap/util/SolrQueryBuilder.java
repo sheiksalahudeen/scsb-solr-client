@@ -404,6 +404,22 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    public String solrQueryForOngoingMatching(String fieldName, List<String> matchingPointValues) {
+        StringBuilder query = new StringBuilder();
+        query.append(buildQueryForMatchChildReturnParent(fieldName, matchingPointValues));
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false").append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
+                .append(":").append(RecapConstants.SHARED_CGD);
+        return query.toString();
+    }
+
+    public String solrQueryForOngoingMatching(String fieldName, String matchingPointValue) {
+        StringBuilder query = new StringBuilder();
+        query.append(fieldName).append(":").append(matchingPointValue);
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false").append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
+                .append(":").append(RecapConstants.SHARED_CGD);
+        return query.toString();
+    }
+
     public SolrQuery buildSolrQueryForAccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
         query.append("DocType:Item").append(and);

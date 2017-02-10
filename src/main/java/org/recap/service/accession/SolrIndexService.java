@@ -36,7 +36,7 @@ public class SolrIndexService {
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
 
-    public void indexByBibliographicId(@RequestBody Integer bibliographicId) {
+    public SolrInputDocument indexByBibliographicId(@RequestBody Integer bibliographicId) {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         bibJSONUtil.setProducerTemplate(producerTemplate);
         BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
@@ -45,6 +45,7 @@ public class SolrIndexService {
             solrTemplate.saveDocument(solrInputDocument);
             solrTemplate.commit();
         }
+        return solrInputDocument;
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
