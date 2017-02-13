@@ -1,6 +1,8 @@
 package org.recap.model.jpa;
 
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -22,6 +24,9 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
 
     @Autowired
     private ReportDetailRepository reportDetailRepository;
+
+    @Mock
+    ReportDetailRepository getReportDetailRepository;
 
     @Test
     public void testSaveReportEntity() {
@@ -256,7 +261,10 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
 
     @Test
     public void testFindByRecordNumberIn() throws Exception {
-        List<ReportEntity> byRecordNumberIn = reportDetailRepository.findByRecordNumberIn(Arrays.asList(1, 2, 3, 4, 5));
+        ArrayList<ReportEntity> reportEntities = new ArrayList<>();
+        reportEntities.add(new ReportEntity());
+        Mockito.when(getReportDetailRepository.findByRecordNumberIn(Arrays.asList(1, 2, 3, 4, 5))).thenReturn(reportEntities);
+        List<ReportEntity> byRecordNumberIn = getReportDetailRepository.findByRecordNumberIn(Arrays.asList(1, 2, 3, 4, 5));
         assertNotNull(byRecordNumberIn);
         assertTrue(byRecordNumberIn.size() >= 1);
     }
