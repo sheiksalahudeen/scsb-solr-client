@@ -271,7 +271,7 @@ public class OngoingMatchingAlgorithmUtil {
             bibIdList.add(bibItem.getBibId());
             materialTypes.add(bibItem.getLeaderMaterialType());
             materialTypeList.add(bibItem.getLeaderMaterialType());
-            owningInstBibIds.add(bibItem.getLeaderMaterialType());
+            owningInstBibIds.add(bibItem.getOwningInstitutionBibId());
             if(CollectionUtils.isNotEmpty(bibItem.getOclcNumber())) oclcNumbers.addAll(bibItem.getOclcNumber());
             if(CollectionUtils.isNotEmpty(bibItem.getIsbn())) isbns.addAll(bibItem.getIsbn());
             if(CollectionUtils.isNotEmpty(bibItem.getIssn())) issns.addAll(bibItem.getIssn());
