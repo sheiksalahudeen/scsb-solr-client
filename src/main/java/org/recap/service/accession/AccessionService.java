@@ -1,13 +1,11 @@
 package org.recap.service.accession;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
-import org.recap.camel.activemq.JmxHelper;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.converter.SCSBToBibEntityConverter;
 import org.recap.converter.XmlToBibEntityConverterInterface;
@@ -19,11 +17,11 @@ import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
-import org.recap.util.*;
+import org.recap.util.MarcUtil;
+import org.recap.util.OngoingMatchingAlgorithmUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -168,16 +166,16 @@ public class AccessionService {
     @Transactional
     public String processRequest(List<AccessionRequest> accessionRequestList) {
         String response = null;
+        StringBuilder responseBuilder = new StringBuilder();
         String bibDataResponse = null;
         List<Map<String, String>> responseMapList = new ArrayList<>();
         String owningInstitution = null;
         String customerCode = null;
-        Set<String> messageSet = new HashSet<>();
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         for (AccessionRequest accessionRequest : accessionRequestList) {
             owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
             if (owningInstitution == null) {
-                messageSet.add(RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
+                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+accessionRequest.getCustomerCode()+" "+RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
             } else {
                 try {
@@ -191,7 +189,7 @@ public class AccessionService {
                         if (CollectionUtils.isNotEmpty(records)) {
                             for (Record record : records) {
                                 response = updateData(record, owningInstitution, responseMapList);
-                                messageSet.add(response);
+                                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                             }
                         }
@@ -200,34 +198,34 @@ public class AccessionService {
                         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
                         for (BibRecord bibRecord : bibRecords.getBibRecords()) {
                             response = updateData(bibRecord, owningInstitution, responseMapList);
-                            messageSet.add(response);
+                            setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                             reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                         }
                     }
                 } catch (Exception ex) {
                     response = ex.getMessage();
+                    setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                     reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                 }
                 //Create dummy record
-                response = createDummyRecordIfAny(response, owningInstitution, customerCode, messageSet, reportDataEntityList, accessionRequest);
+                createDummyRecordIfAny(response, owningInstitution, customerCode, responseBuilder, reportDataEntityList, accessionRequest);
                 generateAccessionSummaryReport(responseMapList, owningInstitution);
             }
         }
         saveReportEntity(owningInstitution, reportDataEntityList);
-        response = getResponseMessage(messageSet);
-        return response;
+        return responseBuilder.toString();
     }
 
-    private String createDummyRecordIfAny(String response, String owningInstitution, String customerCode, Set<String> messageSet, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
+    private String createDummyRecordIfAny(String response, String owningInstitution, String customerCode, StringBuilder responseBuilder, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
         if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
             BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(accessionRequest.getItemBarcode());
             if (fetchBibliographicEntity == null) {
                 response = createDummyRecord(accessionRequest.getItemBarcode(), customerCode, owningInstitution);
-                messageSet.add(response);
+                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
             } else {
                 response = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
-                messageSet.add(response);
+                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
             }
         }
@@ -236,30 +234,17 @@ public class AccessionService {
 
     private void saveReportEntity(String owningInstitution, List<ReportDataEntity> reportDataEntityList) {
         ReportEntity reportEntity;
-        reportEntity = getReportEntity(owningInstitution!=null ? owningInstitution : RecapConstants.PRINCETON);
+        reportEntity = getReportEntity(owningInstitution!=null ? owningInstitution : RecapConstants.UNKNOWN_INSTITUTION);
         reportEntity.setReportDataEntities(reportDataEntityList);
         reportDetailRepository.save(reportEntity);
     }
 
-    private String getResponseMessage(Set<String> messageSet){
-        Iterator<String> iterator = messageSet.iterator();
-        StringBuffer responseMessageBuffer = new StringBuffer();
-        String message = null;
-        int count = 0;
-        while(iterator.hasNext()){
-            message = iterator.next();
-            if(count>0){
-                responseMessageBuffer.append(", ");
-            }
-            if (message.equals(RecapConstants.SUCCESS)) {
-                responseMessageBuffer.append(RecapConstants.ACCESSION_SUCCESS);
-            } else {
-                responseMessageBuffer.append(message);
-            }
-            count++;
+    private void setResponseMessage(StringBuilder responseBuilder, String message){
+        if(responseBuilder.length()>0){
+            responseBuilder.append(", ").append(message);
+        }else{
+            responseBuilder.append(message);
         }
-        responseMessageBuffer.append(", ").append(RecapConstants.VERIFY_ONGOING_ACCESSION_REPORT_MSG);
-        return responseMessageBuffer.toString();
     }
 
     private ReportEntity getReportEntity(String owningInstitution){
@@ -408,7 +393,7 @@ public class AccessionService {
             }
             if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib)){
                 if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
-                    reasonForFailureItem = (String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE)+ "," +reasonForFailureItem;
+                    reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," +reasonForFailureItem;
                 }
             }
         }

@@ -236,6 +236,7 @@ public class RecapConstants {
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
+    public static final String UNKNOWN_INSTITUTION = "UNKNOWN";
     public static final String NYPL = "NYPL";
     public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
     public static final String TITLE = "Title";
@@ -352,5 +353,6 @@ public class RecapConstants {
     public static final String DUMMY_BIB_CONTENT_XML = "dummybibcontent.xml";
     public static final String DUMMY_HOLDING_CONTENT_XML = "dummyholdingcontent.xml";
     public static final String ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE = "Input limit exceeded, maximum allowed input limit is ";
+    public static final String HYPHEN = " - ";
 
 }
