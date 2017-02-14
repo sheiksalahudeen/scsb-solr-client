@@ -1,6 +1,5 @@
 package org.recap.controller;
 
-import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
