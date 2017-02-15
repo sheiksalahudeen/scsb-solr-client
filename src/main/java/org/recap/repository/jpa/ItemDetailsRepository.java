@@ -36,6 +36,8 @@ public interface ItemDetailsRepository extends JpaRepository<ItemEntity, ItemPK>
 
     List<ItemEntity> findByBarcode(String barcode);
 
+    List<ItemEntity> findByBarcodeAndCustomerCode(String barcode,String customerCode);
+
     @Modifying
     @Transactional
     @Query("update ItemEntity item set item.collectionGroupId = :collectionGroupId, item.lastUpdatedBy = :lastUpdatedBy, item.lastUpdatedDate = :lastUpdatedDate where item.barcode = :itemBarcode")

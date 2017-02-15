@@ -197,6 +197,16 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         return bibliographicEntity;
     }
 
+    @Test
+    public void findByBarcodeAndCustomerCode(){
+        saveSingleBibHoldingsItem();
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode("12316433","PA");
+        assertNotNull(itemEntityList);
+        assertEquals("12316433",itemEntityList.get(0).getBarcode());
+        assertEquals("PA",itemEntityList.get(0).getCustomerCode());
+    }
+
+
     public File getBibContentFile() throws URISyntaxException {
         URL resource = getClass().getResource("BibContent.xml");
         return new File(resource.toURI());
