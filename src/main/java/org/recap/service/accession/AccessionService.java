@@ -41,7 +41,7 @@ import java.util.*;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AccessionService {
 
-    Logger log = Logger.getLogger(AccessionService.class);
+    private static final Logger logger = Logger.getLogger(AccessionService.class);
 
     @Autowired
     MarcToBibEntityConverter marcToBibEntityConverter;
@@ -147,7 +147,7 @@ public class AccessionService {
     }
 
     public Logger getLog() {
-        return log;
+        return logger;
     }
 
     public String getOwningInstitution(String customerCode) {
@@ -158,7 +158,7 @@ public class AccessionService {
                 owningInstitution = customerCodeEntity.getInstitutionEntity().getInstitutionCode();
             }
         } catch (Exception e) {
-            log.error("Exception " + e);
+            logger.error(RecapConstants.EXCEPTION,e);
         }
         return owningInstitution;
     }
@@ -173,47 +173,62 @@ public class AccessionService {
         String customerCode = null;
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         for (AccessionRequest accessionRequest : accessionRequestList) {
+            boolean itemExists = checkItemBarcodeAlreadyExist(accessionRequest);
             owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
-            if (owningInstitution == null) {
-                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+accessionRequest.getCustomerCode()+" "+RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
-                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
-            } else {
-                try {
-                    customerCode = accessionRequest.getCustomerCode();
-                    if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-                        bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
-                        List<Record> records = new ArrayList<>();
-                        if (StringUtils.isNotBlank(bibDataResponse)) {
-                            records = getMarcUtil().readMarcXml(bibDataResponse);
-                        }
-                        if (CollectionUtils.isNotEmpty(records)) {
-                            for (Record record : records) {
-                                response = updateData(record, owningInstitution, responseMapList);
+            if (!itemExists) {
+                if (owningInstitution == null) {
+                    setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+accessionRequest.getCustomerCode()+" "+RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
+                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
+                } else {
+                    try {
+                        customerCode = accessionRequest.getCustomerCode();
+                        if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                            bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
+                            List<Record> records = new ArrayList<>();
+                            if (StringUtils.isNotBlank(bibDataResponse)) {
+                                records = getMarcUtil().readMarcXml(bibDataResponse);
+                            }
+                            if (CollectionUtils.isNotEmpty(records)) {
+                                for (Record record : records) {
+                                    response = updateData(record, owningInstitution, responseMapList);
+                                    setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
+                                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+                                }
+                            }
+                        } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                            bibDataResponse = nyplService.getBibData(accessionRequest.getItemBarcode(), customerCode);
+                            BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
+                            for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+                                response = updateData(bibRecord, owningInstitution, responseMapList);
                                 setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                             }
                         }
-                    } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
-                        bibDataResponse = nyplService.getBibData(accessionRequest.getItemBarcode(), customerCode);
-                        BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
-                        for (BibRecord bibRecord : bibRecords.getBibRecords()) {
-                            response = updateData(bibRecord, owningInstitution, responseMapList);
-                            setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
-                            reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
-                        }
+                    } catch (Exception ex) {
+                        response = ex.getMessage();
+                        setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
+                        reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                     }
-                } catch (Exception ex) {
-                    response = ex.getMessage();
-                    setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
-                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+                    //Create dummy record
+                    createDummyRecordIfAny(response, owningInstitution, customerCode, responseBuilder, reportDataEntityList, accessionRequest);
+                    generateAccessionSummaryReport(responseMapList, owningInstitution);
                 }
-                //Create dummy record
-                createDummyRecordIfAny(response, owningInstitution, customerCode, responseBuilder, reportDataEntityList, accessionRequest);
-                generateAccessionSummaryReport(responseMapList, owningInstitution);
+            } else {
+                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+RecapConstants.ITEM_ALREADY_ACCESSIONED);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
             }
         }
         saveReportEntity(owningInstitution, reportDataEntityList);
         return responseBuilder.toString();
+    }
+
+    private boolean checkItemBarcodeAlreadyExist(AccessionRequest accessionRequest){
+        boolean itemExists = false;
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
+        if(itemEntityList.size()>0){
+            itemExists = true;
+        }
+        return itemExists;
     }
 
     private String createDummyRecordIfAny(String response, String owningInstitution, String customerCode, StringBuilder responseBuilder, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
@@ -476,8 +491,8 @@ public class AccessionService {
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
             List<HoldingsEntity> holdingsEntities = new ArrayList<>(bibliographicEntity.getHoldingsEntities());
 
-            log.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
-            log.info("holdingsEntities = "+holdingsEntities.size());
+            logger.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
+            logger.info("holdingsEntities = "+holdingsEntities.size());
 
             for (Iterator iholdings = holdingsEntities.iterator(); iholdings.hasNext();) {
                 HoldingsEntity holdingsEntity =(HoldingsEntity) iholdings.next();
@@ -502,14 +517,14 @@ public class AccessionService {
                 }
             }
             fetchHoldingsEntities.addAll(holdingsEntities);
-            log.info("Holding Final Count = "+fetchHoldingsEntities.size());
+            logger.info("Holding Final Count = "+fetchHoldingsEntities.size());
 
             // Item
             List<ItemEntity> fetchItemsEntities =fetchBibliographicEntity.getItemEntities();
             List<ItemEntity> itemsEntities = new ArrayList<>(bibliographicEntity.getItemEntities());
 
-            log.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
-            log.info("holdingsEntities = "+itemsEntities.size());
+            logger.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
+            logger.info("holdingsEntities = "+itemsEntities.size());
 
             for (Iterator iItems=itemsEntities.iterator();iItems.hasNext();) {
                 ItemEntity itemEntity =(ItemEntity) iItems.next();
@@ -522,7 +537,7 @@ public class AccessionService {
                 }
             }
             fetchItemsEntities.addAll(itemsEntities);
-            log.info("Item Final Count = "+fetchItemsEntities.size());
+            logger.info("Item Final Count = "+fetchItemsEntities.size());
 
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
@@ -591,7 +606,7 @@ public class AccessionService {
                     institutionEntityMap.put( institutionEntity.getInstitutionCode(),institutionEntity.getInstitutionId());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.EXCEPTION,e);
             }
         }
         return institutionEntityMap;
@@ -607,7 +622,7 @@ public class AccessionService {
                     itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.EXCEPTION,e);
             }
         }
         return itemStatusMap;
@@ -623,7 +638,7 @@ public class AccessionService {
                     collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.EXCEPTION,e);
             }
         }
         return collectionGroupMap;
@@ -644,7 +659,7 @@ public class AccessionService {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.EXCEPTION,e);
         }
         return out.toString();
     }
