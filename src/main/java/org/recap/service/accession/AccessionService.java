@@ -525,7 +525,7 @@ public class AccessionService {
 
             // Holding
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
-            List<HoldingsEntity> holdingsEntities = new ArrayList<>(bibliographicEntity.getHoldingsEntities());
+            List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
 
             logger.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
             logger.info("holdingsEntities = "+holdingsEntities.size());
@@ -537,18 +537,6 @@ public class AccessionService {
                     if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
                         copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
-                    }else{
-                        List<ItemEntity> fetchedItemEntityList = fetchHolding.getItemEntities();
-                        List<ItemEntity> itemEntityList = holdingsEntity.getItemEntities();
-                        for(ItemEntity fetchedItemEntity : fetchedItemEntityList){
-                            for(ItemEntity itemEntity : itemEntityList){
-                                if(fetchedItemEntity.getOwningInstitutionItemId().equals(itemEntity.getOwningInstitutionItemId())){
-                                    copyHoldingsEntity(fetchHolding,holdingsEntity);
-                                    iholdings.remove();
-                                }
-                            }
-                        }
-
                     }
                 }
             }
@@ -557,7 +545,7 @@ public class AccessionService {
 
             // Item
             List<ItemEntity> fetchItemsEntities =fetchBibliographicEntity.getItemEntities();
-            List<ItemEntity> itemsEntities = new ArrayList<>(bibliographicEntity.getItemEntities());
+            List<ItemEntity> itemsEntities = bibliographicEntity.getItemEntities();
 
             logger.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
             logger.info("holdingsEntities = "+itemsEntities.size());
@@ -578,8 +566,12 @@ public class AccessionService {
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
 
-            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
-            getEntityManager().refresh(savedBibliographicEntity);
+            try {
+                savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
+                getEntityManager().refresh(savedBibliographicEntity);
+            } catch (Exception e) {
+                logger.info(RecapConstants.EXCEPTION,e);
+            }
         }
         return savedBibliographicEntity;
     }
@@ -602,6 +594,7 @@ public class AccessionService {
         fetchHoldingsEntity.setDeleted(holdingsEntity.isDeleted());
         fetchHoldingsEntity.setLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
         fetchHoldingsEntity.setLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
+        fetchHoldingsEntity.getItemEntities().addAll(holdingsEntity.getItemEntities());
         return fetchHoldingsEntity;
     }
 
