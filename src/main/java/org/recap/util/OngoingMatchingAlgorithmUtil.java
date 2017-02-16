@@ -1,6 +1,5 @@
 package org.recap.util;
 
-import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +11,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.recap.RecapConstants;
-import org.recap.camel.activemq.JmxHelper;
 import org.recap.matchingAlgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.*;
 import org.recap.model.search.resolver.BibValueResolver;
@@ -64,9 +62,6 @@ public class OngoingMatchingAlgorithmUtil {
     MatchingAlgorithmUtil matchingAlgorithmUtil;
 
     @Autowired
-    JmxHelper jmxHelper;
-
-    @Autowired
     UpdateCgdUtil updateCgdUtil;
 
     private List<BibValueResolver> bibValueResolvers;
@@ -112,17 +107,15 @@ public class OngoingMatchingAlgorithmUtil {
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                 }
-            }
-
-            DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
-
-            while (updateItemsQ.getQueueSize() != 0) {
-                //Waiting for the updateItemQ messages finish processing
+            } else {
+                logger.info("No Match Found.");
             }
 
             if(CollectionUtils.isNotEmpty(itemIds)) {
                 updateCGDForItemInSolr(itemIds);
             }
+        } else {
+            logger.info("No Match Found.");
         }
     }
 
@@ -312,7 +305,7 @@ public class OngoingMatchingAlgorithmUtil {
             Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap = new HashMap<>();
             Map<Integer, ItemEntity> itemEntityMap = new HashMap<>();
             MatchingAlgorithmCGDProcessor matchingAlgorithmCGDProcessor = new MatchingAlgorithmCGDProcessor(bibliographicDetailsRepository, producerTemplate,
-                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, RecapConstants.ONGOING_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository);
+                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, RecapConstants.ONGOING_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository, itemDetailsRepository);
             boolean isMonograph = matchingAlgorithmCGDProcessor.checkForMonographAndPopulateValues(materialTypes, useRestrictionMap, itemEntityMap, bibIdList);
             if(isMonograph) {
                 matchingAlgorithmCGDProcessor.updateCGDProcess(useRestrictionMap, itemEntityMap);

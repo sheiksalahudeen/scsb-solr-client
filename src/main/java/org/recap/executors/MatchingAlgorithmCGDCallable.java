@@ -29,10 +29,12 @@ public class MatchingAlgorithmCGDCallable implements Callable {
     private Map institutionMap;
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
     public MatchingAlgorithmCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
                                         int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
-                                        ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
+                                        ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
+                                        ItemDetailsRepository itemDetailsRepository) {
         this.reportDataDetailsRepository = reportDataDetailsRepository;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.pageNum = pageNum;
@@ -42,6 +44,7 @@ public class MatchingAlgorithmCGDCallable implements Callable {
         this.institutionMap = institutionMap;
         this.itemChangeLogDetailsRepository = itemChangeLogDetailsRepository;
         this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
+        this.itemDetailsRepository = itemDetailsRepository;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class MatchingAlgorithmCGDCallable implements Callable {
             }
             Set<String> materialTypeSet = new HashSet<>();
             MatchingAlgorithmCGDProcessor matchingAlgorithmCGDProcessor = new MatchingAlgorithmCGDProcessor(bibliographicDetailsRepository, producerTemplate, collectionGroupMap,
-                    institutionMap, itemChangeLogDetailsRepository, RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository);
+                    institutionMap, itemChangeLogDetailsRepository, RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository, itemDetailsRepository);
             boolean isMonograph = matchingAlgorithmCGDProcessor.checkForMonographAndPopulateValues(materialTypeSet,useRestrictionMap, itemEntityMap, bibIdList);
             if(isMonograph) {
                 matchingAlgorithmCGDProcessor.updateCGDProcess(useRestrictionMap, itemEntityMap);
@@ -71,7 +74,9 @@ public class MatchingAlgorithmCGDCallable implements Callable {
                 if(materialTypeSet.size() > 1) {
                     exceptionRecordNums.add(Integer.valueOf(reportDataEntity.getRecordNum()));
                 } else {
-                    nonMonographRecordNums.add(Integer.valueOf(reportDataEntity.getRecordNum()));
+                    if(materialTypeSet.contains(RecapConstants.MONOGRAPHIC_SET)) {
+                        nonMonographRecordNums.add(Integer.valueOf(reportDataEntity.getRecordNum()));
+                    }
                 }
             }
         }

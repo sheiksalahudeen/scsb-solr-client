@@ -11,6 +11,7 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +31,11 @@ public class MatchingAlgorithmCGDProcessor {
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
     private String matchingType;
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
     public MatchingAlgorithmCGDProcessor(BibliographicDetailsRepository bibliographicDetailsRepository, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
-                                         ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, String matchingType, CollectionGroupDetailsRepository collectionGroupDetailsRepository) {
+                                         ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, String matchingType, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
+                                         ItemDetailsRepository itemDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.producerTemplate = producerTemplate;
         this.collectionGroupMap = collectionGroupMap;
@@ -40,6 +43,7 @@ public class MatchingAlgorithmCGDProcessor {
         this.itemChangeLogDetailsRepository = itemChangeLogDetailsRepository;
         this.matchingType = matchingType;
         this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
+        this.itemDetailsRepository = itemDetailsRepository;
     }
 
     public void updateCGDProcess(Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, Map<Integer, ItemEntity> itemEntityMap) {
@@ -83,7 +87,11 @@ public class MatchingAlgorithmCGDProcessor {
             itemChangeLogEntities.add(getItemChangeLogEntity(oldCgd, itemEntity));
         }
         if(CollectionUtils.isNotEmpty(itemEntitiesToUpdate) && CollectionUtils.isNotEmpty(itemChangeLogEntities)) {
-            producerTemplate.sendBody("scsbactivemq:queue:updateItemsQ", itemEntitiesToUpdate);
+            if(matchingType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM)) {
+                itemDetailsRepository.save(itemEntitiesToUpdate);
+            } else {
+                producerTemplate.sendBody("scsbactivemq:queue:updateItemsQ", itemEntitiesToUpdate);
+            }
             itemChangeLogDetailsRepository.save(itemChangeLogEntities);
         }
     }
