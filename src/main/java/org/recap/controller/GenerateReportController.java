@@ -43,6 +43,10 @@ public class GenerateReportController {
         if(createdDate == null) {
             createdDate = new Date();
         }
+        Date toDate = solrIndexRequest.getToDate();
+        if(toDate == null) {
+            toDate = new Date();
+        }
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName = null;
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
@@ -61,7 +65,7 @@ public class GenerateReportController {
         }else{
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
         }
-        generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(createdDate));
+        generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         if(StringUtils.isEmpty(generatedReportFileName)) {
             status = "Report wasn't generated! Please contact help desk!";
         } else {
