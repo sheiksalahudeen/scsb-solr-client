@@ -259,7 +259,7 @@ public class AccessionService {
 
     private boolean checkItemBarcodeAlreadyExist(AccessionRequest accessionRequest){
         boolean itemExists = false;
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCodeAndIsDeleted(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode(), false);
         if(itemEntityList.size()>0){
             itemExists = true;
         }
