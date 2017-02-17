@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
@@ -183,26 +184,60 @@ public class AccessionService {
                     try {
                         customerCode = accessionRequest.getCustomerCode();
                         if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                            StopWatch stopWatch = new StopWatch();
+                            stopWatch.start();
                             bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
+                            stopWatch.stop();
+                            logger.info("Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
+                            stopWatch = new StopWatch();
+                            stopWatch.start();
                             List<Record> records = new ArrayList<>();
                             if (StringUtils.isNotBlank(bibDataResponse)) {
                                 records = getMarcUtil().readMarcXml(bibDataResponse);
                             }
                             if (CollectionUtils.isNotEmpty(records)) {
+                                List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
                                 for (Record record : records) {
-                                    response = updateData(record, owningInstitution, responseMapList);
+                                    response = updateData(record, owningInstitution, responseMapList, solrInputDocumentList);
                                     setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                                     reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                                 }
+                                stopWatch.stop();
+                                logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
+                                stopWatch = new StopWatch();
+                                stopWatch.start();
+                                for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
+                                    SolrInputDocument solrInputDocument = iterator.next();
+                                    ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+                                }
+                                stopWatch.stop();
+                                logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
                             }
                         } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
+                            StopWatch stopWatch = new StopWatch();
+                            stopWatch.start();
                             bibDataResponse = nyplService.getBibData(accessionRequest.getItemBarcode(), customerCode);
+                            stopWatch.stop();
+                            logger.info("Total Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
                             BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
+                            List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
+                            stopWatch = new StopWatch();
+                            stopWatch.start();
                             for (BibRecord bibRecord : bibRecords.getBibRecords()) {
-                                response = updateData(bibRecord, owningInstitution, responseMapList);
+                                response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList);
                                 setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                             }
+                            stopWatch.stop();
+                            logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
+                            stopWatch = new StopWatch();
+                            stopWatch.start();
+                            for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
+                                SolrInputDocument solrInputDocument = iterator.next();
+                                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+                            }
+                            stopWatch.stop();
+                            logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
                         }
                     } catch (Exception ex) {
                         logger.error(RecapConstants.LOG_ERROR,ex);
@@ -225,7 +260,7 @@ public class AccessionService {
 
     private boolean checkItemBarcodeAlreadyExist(AccessionRequest accessionRequest){
         boolean itemExists = false;
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCodeAndIsDeleted(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode(), false);
         if(!itemEntityList.isEmpty()){
             itemExists = true;
         }
@@ -298,7 +333,7 @@ public class AccessionService {
         return response;
     }
 
-    private String updateData(Object record, String owningInstitution, List<Map<String,String>> responseMapList){
+    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, List<SolrInputDocument> solrInputDocumentList){
         String response = null;
         Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution);
         responseMapList.add(responseMap);
@@ -311,7 +346,8 @@ public class AccessionService {
             BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
             if (null != savedBibliographicEntity) {
                 SolrInputDocument solrInputDocument = getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
-                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+                if(solrInputDocument != null)
+                    solrInputDocumentList.add(solrInputDocument);
                 response = RecapConstants.SUCCESS;
             }
         }
@@ -488,7 +524,7 @@ public class AccessionService {
 
             // Holding
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
-            List<HoldingsEntity> holdingsEntities = new ArrayList<>(bibliographicEntity.getHoldingsEntities());
+            List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
 
             logger.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
             logger.info("holdingsEntities = "+holdingsEntities.size());
@@ -500,18 +536,6 @@ public class AccessionService {
                     if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
                         copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
-                    }else{
-                        List<ItemEntity> fetchedItemEntityList = fetchHolding.getItemEntities();
-                        List<ItemEntity> itemEntityList = holdingsEntity.getItemEntities();
-                        for(ItemEntity fetchedItemEntity : fetchedItemEntityList){
-                            for(ItemEntity itemEntity : itemEntityList){
-                                if(fetchedItemEntity.getOwningInstitutionItemId().equals(itemEntity.getOwningInstitutionItemId())){
-                                    copyHoldingsEntity(fetchHolding,holdingsEntity);
-                                    iholdings.remove();
-                                }
-                            }
-                        }
-
                     }
                 }
             }
@@ -520,7 +544,7 @@ public class AccessionService {
 
             // Item
             List<ItemEntity> fetchItemsEntities =fetchBibliographicEntity.getItemEntities();
-            List<ItemEntity> itemsEntities = new ArrayList<>(bibliographicEntity.getItemEntities());
+            List<ItemEntity> itemsEntities = bibliographicEntity.getItemEntities();
 
             logger.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
             logger.info("holdingsEntities = "+itemsEntities.size());
@@ -541,8 +565,12 @@ public class AccessionService {
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
 
-            savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
-            getEntityManager().refresh(savedBibliographicEntity);
+            try {
+                savedBibliographicEntity = getBibliographicDetailsRepository().saveAndFlush(fetchBibliographicEntity);
+                getEntityManager().refresh(savedBibliographicEntity);
+            } catch (Exception e) {
+                logger.info(RecapConstants.EXCEPTION,e);
+            }
         }
         return savedBibliographicEntity;
     }
@@ -565,6 +593,7 @@ public class AccessionService {
         fetchHoldingsEntity.setDeleted(holdingsEntity.isDeleted());
         fetchHoldingsEntity.setLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
         fetchHoldingsEntity.setLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
+        fetchHoldingsEntity.getItemEntities().addAll(holdingsEntity.getItemEntities());
         return fetchHoldingsEntity;
     }
 

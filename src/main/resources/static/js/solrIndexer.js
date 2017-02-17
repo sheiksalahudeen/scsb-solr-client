@@ -21,6 +21,10 @@ jQuery(document).ready(function ($) {
     $('#createdDate').datepicker({
         format: "yyyy/mm/dd"
     });
+
+    $('#todate').datepicker({
+        format: "yyyy/mm/dd"
+    });
     
     $('#matchingAlgoDate').datepicker({
         format: "yyyy/mm/dd"
