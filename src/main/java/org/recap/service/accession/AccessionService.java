@@ -537,6 +537,19 @@ public class AccessionService {
                     if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
                         copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
+                    }else{
+                        // Added for Boundwith scenarios
+                        List<ItemEntity> fetchedItemEntityList = fetchHolding.getItemEntities();
+                        List<ItemEntity> itemEntityList = holdingsEntity.getItemEntities();
+                        for(ItemEntity fetchedItemEntity : fetchedItemEntityList){
+                            for(ItemEntity itemEntity : itemEntityList){
+                                if(fetchedItemEntity.getOwningInstitutionItemId().equals(itemEntity.getOwningInstitutionItemId())){
+                                    copyHoldingsEntity(fetchHolding,holdingsEntity);
+                                    iholdings.remove();
+                                }
+                            }
+                        }
+
                     }
                 }
             }
