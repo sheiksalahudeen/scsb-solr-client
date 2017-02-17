@@ -96,6 +96,7 @@ public class ItemEntity implements Serializable {
     private String cgdChangeLog;
 
     public ItemEntity() {
+        //Do nothing
     }
 
 

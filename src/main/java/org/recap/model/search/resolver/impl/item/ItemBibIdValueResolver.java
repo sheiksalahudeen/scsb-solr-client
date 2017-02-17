@@ -11,7 +11,7 @@ import java.util.List;
 public class ItemBibIdValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("ItemBibId");
+        return "ItemBibId".equalsIgnoreCase(field);
     }
 
     @Override

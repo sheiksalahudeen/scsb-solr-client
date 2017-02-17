@@ -1,6 +1,7 @@
 package org.recap.controller.swagger;
 
 import io.swagger.annotations.*;
+import org.recap.RecapConstants;
 import org.recap.model.search.DataDumpSearchResult;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchRecordsResponse;
@@ -42,7 +43,7 @@ public class SearchRecordRestController {
             searchRecordsResponse.setShowTotalCount(searchRecordsRequest.isShowTotalCount());
             searchRecordsResponse.setErrorMessage(searchRecordsRequest.getErrorMessage());
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
             searchRecordsResponse.setErrorMessage(e.getMessage());
         }
         return searchRecordsResponse;
@@ -60,7 +61,7 @@ public class SearchRecordRestController {
             responseMap.put("totalRecordsCount", searchRecordsRequest.getTotalRecordsCount());
             responseMap.put("dataDumpSearchResults", dataDumpSearchResults);
         } catch (Exception e) {
-            logger.info("search : "+e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return responseMap;
     }

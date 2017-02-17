@@ -5,6 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.recap.RecapConstants;
 import org.recap.model.camel.EmailPayLoad;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import java.io.*;
  */
 @Component
 public class EmailRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
 
     private String emailBody;
     private String emailPassword;
@@ -58,7 +62,7 @@ public class EmailRouteBuilder {
                             }
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error(RecapConstants.LOG_ERROR,e);
                     }
                     emailBody = out.toString();
                 }
@@ -69,13 +73,13 @@ public class EmailRouteBuilder {
                         try {
                             emailPassword = FileUtils.readFileToString(file, "UTF-8").trim();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            logger.error(RecapConstants.LOG_ERROR,e);
                         }
                     }
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 

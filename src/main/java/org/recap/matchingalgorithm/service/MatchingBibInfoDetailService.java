@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.service;
+package org.recap.matchingalgorithm.service;
 
 import org.recap.model.jpa.MatchingBibInfoDetail;
 import org.recap.model.jpa.ReportDataEntity;
@@ -77,8 +77,7 @@ public class MatchingBibInfoDetailService {
     public int getPageCount(int totalRecordCount,int batchSize){
         int quotient = totalRecordCount / batchSize;
         int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
-        int loopCount = remainder == 0 ? quotient : quotient + 1;
-        return loopCount;
+        return remainder == 0 ? quotient : quotient + 1;
     }
 
     private List<String> getStringList(List<Integer> integerList){
@@ -110,11 +109,11 @@ public class MatchingBibInfoDetailService {
             String[] institutionArray = null;
             String[] owningInstitutionBibIdArray = null;
             for(ReportDataEntity reportDataEntity : entry.getValue()) {
-                if (reportDataEntity.getHeaderName().equals("BibId")) {
+                if ("BibId".equals(reportDataEntity.getHeaderName())) {
                     bibidArray = reportDataEntity.getHeaderValue().split(",");
-                } else if (reportDataEntity.getHeaderName().equals("OwningInstitution")) {
+                } else if ("OwningInstitution".equals(reportDataEntity.getHeaderName())) {
                     institutionArray = reportDataEntity.getHeaderValue().split(",");
-                } else if (reportDataEntity.getHeaderName().equals("OwningInstitutionBibId")) {
+                } else if ("OwningInstitutionBibId".equals(reportDataEntity.getHeaderName())) {
                     owningInstitutionBibIdArray = reportDataEntity.getHeaderValue().split(",");
                 }
             }

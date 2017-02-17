@@ -2,7 +2,6 @@ package org.recap.executors;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.model.solr.Item;
 import org.recap.util.ItemJSONUtil;
 
 import java.util.concurrent.Callable;
@@ -24,7 +23,6 @@ public class ItemRecordSetupCallable implements Callable {
     public Object call() throws Exception {
         ItemJSONUtil itemJSONUtil = new ItemJSONUtil();
         itemJSONUtil.setProducerTemplate(producerTemplate);
-        Item item = itemJSONUtil.generateItemForIndex(itemEntity);
-        return item;
+        return itemJSONUtil.generateItemForIndex(itemEntity);
     }
 }

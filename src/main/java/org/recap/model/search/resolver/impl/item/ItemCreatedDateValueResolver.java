@@ -12,7 +12,7 @@ public class ItemCreatedDateValueResolver implements ItemValueResolver {
 
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("ItemCreatedDate");
+        return "ItemCreatedDate".equals(field);
     }
 
     @Override

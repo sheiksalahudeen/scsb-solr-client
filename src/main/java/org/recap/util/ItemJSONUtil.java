@@ -23,6 +23,7 @@ public class ItemJSONUtil extends MarcUtil{
     private ProducerTemplate producerTemplate;
 
     public ItemJSONUtil() {
+        //Do Nothing
     }
 
     public Item generateItemForIndex(ItemEntity itemEntity) {

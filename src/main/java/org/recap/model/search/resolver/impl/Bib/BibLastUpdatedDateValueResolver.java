@@ -11,7 +11,7 @@ import java.util.Date;
 public class BibLastUpdatedDateValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("BibLastUpdatedDate");
+        return "BibLastUpdatedDate".equalsIgnoreCase(field);
     }
 
     @Override

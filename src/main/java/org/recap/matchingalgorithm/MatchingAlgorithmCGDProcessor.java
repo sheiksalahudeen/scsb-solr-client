@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm;
+package org.recap.matchingalgorithm;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;

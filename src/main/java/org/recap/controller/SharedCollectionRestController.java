@@ -39,7 +39,7 @@ public class SharedCollectionRestController {
     @Autowired
     AccessionService accessionService;
 
-    @Value(("${ongoing.accession.input.limit}"))
+    @Value("${ongoing.accession.input.limit}")
     private Integer inputLimit;
 
     public ItemAvailabilityService getItemAvailabilityService() {
@@ -81,15 +81,14 @@ public class SharedCollectionRestController {
         try {
             itemStatus = getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
         } catch (Exception exception) {
-            ResponseEntity responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
-            return responseEntity;
+            logger.error(RecapConstants.LOG_ERROR,exception);
+            return new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
         }
         if (StringUtils.isEmpty(itemStatus)) {
-            ResponseEntity responseEntity = new ResponseEntity(RecapConstants.ITEM_BARCDE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
+            return new ResponseEntity(RecapConstants.ITEM_BARCDE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
+
         } else {
-            ResponseEntity responseEntity = new ResponseEntity(itemStatus, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
+            return new ResponseEntity(itemStatus, getHttpHeaders(), HttpStatus.OK);
         }
     }
 
@@ -98,8 +97,7 @@ public class SharedCollectionRestController {
     public ResponseEntity deAccession(@RequestBody DeAccessionRequest deAccessionRequest) {
         Map<String, String> resultMap = getDeAccessionService().deAccession(deAccessionRequest);
         if (resultMap != null) {
-            ResponseEntity responseEntity = new ResponseEntity(resultMap, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
+            return new ResponseEntity(resultMap, getHttpHeaders(), HttpStatus.OK);
         }
         return null;
     }

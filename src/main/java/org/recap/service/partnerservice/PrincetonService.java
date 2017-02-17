@@ -32,10 +32,12 @@ public class PrincetonService {
         try {
             bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
         } catch (HttpClientErrorException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
             logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
             response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
         } catch (Exception e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
             logger.error(RecapConstants.SERVICE_UNAVAILABLE);
             response = ilsprincetonBibData + RecapConstants.SERVICE_UNAVAILABLE;
             throw new RuntimeException(response);

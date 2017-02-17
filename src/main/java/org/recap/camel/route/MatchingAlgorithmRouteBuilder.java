@@ -2,6 +2,7 @@ package org.recap.camel.route;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.recap.RecapConstants;
 import org.recap.camel.processor.MatchingAlgorithmProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class MatchingAlgorithmRouteBuilder {
             });
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 }

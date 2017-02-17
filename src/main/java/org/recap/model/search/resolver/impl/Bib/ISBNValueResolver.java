@@ -11,7 +11,7 @@ import java.util.List;
 public class ISBNValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("ISBN");
+        return "ISBN".equalsIgnoreCase(field);
     }
 
     @Override

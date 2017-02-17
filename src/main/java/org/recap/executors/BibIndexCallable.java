@@ -73,15 +73,16 @@ public class BibIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Bib bib = (Bib) future.get();
-                if(bib != null) bibsToIndex.add(bib);
+                if(bib != null)
+                    bibsToIndex.add(bib);
             } catch (Exception e) {
-                logger.error("Exception : " + e.getMessage());
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
 
         executorService.shutdown();
 
-        logger.info("No of Bibs to index : " + bibsToIndex.size());
+        logger.info("No of Bibs to index : ",bibsToIndex.size());
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);

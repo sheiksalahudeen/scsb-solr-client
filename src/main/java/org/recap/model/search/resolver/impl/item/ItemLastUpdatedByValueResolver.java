@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class ItemLastUpdatedByValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("ItemLastUpdatedBy");
+        return "ItemLastUpdatedBy".equals(field);
     }
 
     @Override

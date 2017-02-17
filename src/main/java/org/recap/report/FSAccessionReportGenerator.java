@@ -33,8 +33,8 @@ public class FSAccessionReportGenerator implements ReportGeneratorInterface{
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
-        String generatedFileName = null;
-        List<AccessionSummaryRecord> accessionSummaryRecordList = new ArrayList<>();
+        String generatedFileName;
+        List<AccessionSummaryRecord> accessionSummaryRecordList;
         AccessionSummaryRecordGenerator accessionSummaryRecordGenerator = new AccessionSummaryRecordGenerator();
         accessionSummaryRecordList = accessionSummaryRecordGenerator.prepareAccessionSummaryReportRecord(reportEntityList);
         producerTemplate.sendBodyAndHeader(RecapConstants.FS_ACCESSION_SUMMARY_REPORT_Q, accessionSummaryRecordList, "fileName", fileName);

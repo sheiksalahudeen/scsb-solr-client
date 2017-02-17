@@ -54,7 +54,7 @@ public class MatchingBibItemIndexCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        Page<BibliographicEntity> bibliographicEntities = null;
+        Page<BibliographicEntity> bibliographicEntities;
 
         bibliographicEntities = bibliographicDetailsRepository.getBibliographicEntitiesForChangedItems(new PageRequest(pageNum, docsPerPage), operationType);
 
@@ -70,16 +70,17 @@ public class MatchingBibItemIndexCallable implements Callable {
             futures.add(submit);
         }
 
-        logger.info("Num futures to prepare Bib and Associated data : " + futures.size());
+        logger.info("Num futures to prepare Bib and Associated data : ",futures.size());
 
         List<SolrInputDocument> solrInputDocumentsToIndex = new ArrayList<>();
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {
             try {
                 Future future = futureIterator.next();
                 SolrInputDocument solrInputDocument = (SolrInputDocument) future.get();
-                if(solrInputDocument != null) solrInputDocumentsToIndex.add(solrInputDocument);
+                if(solrInputDocument != null)
+                    solrInputDocumentsToIndex.add(solrInputDocument);
             } catch (Exception e) {
-                logger.error("Exception : " + e.getMessage());
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
 

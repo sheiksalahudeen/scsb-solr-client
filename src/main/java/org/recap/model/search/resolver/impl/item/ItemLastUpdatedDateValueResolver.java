@@ -11,7 +11,7 @@ import java.util.Date;
 public class ItemLastUpdatedDateValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("ItemLastUpdatedDate");
+        return "ItemLastUpdatedDate".equals(field);
     }
 
     @Override

@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +29,7 @@ public class OngoingAccessionReportGenerator {
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
         OngoingAccessionReportRecord ongoingAccessionReportRecord = null;
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
-            if (ongoingAccessionReportRecordList.size()==0 && ongoingAccessionReportRecord == null) {
+            if (ongoingAccessionReportRecordList.isEmpty() && ongoingAccessionReportRecord == null) {
                 ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
             } else if(ongoingAccessionReportRecord.getCustomerCode()!=null && ongoingAccessionReportRecord.getItemBarcode()!=null && ongoingAccessionReportRecord.getMessage()!=null){
                 ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
@@ -42,8 +41,6 @@ public class OngoingAccessionReportGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(ongoingAccessionReportRecord, headerValue);
-                } catch (InvocationTargetException e) {
-                    logger.error(RecapConstants.EXCEPTION,e);
                 } catch (Exception e) {
                     logger.error(RecapConstants.EXCEPTION,e);
                 }
@@ -58,10 +55,9 @@ public class OngoingAccessionReportGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, OngoingAccessionReportRecord.class));
-            return writeMethod;
+            propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, OngoingAccessionReportRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }
@@ -69,10 +65,9 @@ public class OngoingAccessionReportGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }

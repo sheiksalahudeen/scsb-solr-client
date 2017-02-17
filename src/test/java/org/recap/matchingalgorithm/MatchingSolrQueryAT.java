@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm;
+package org.recap.matchingalgorithm;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;

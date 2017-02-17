@@ -5,6 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.recap.RecapConstants;
 import org.recap.model.csv.DeAccessionSummaryRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import java.io.File;
  */
 @Component
 public class FSDeAccessionSummaryReportRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(FSDeAccessionSummaryReportRouteBuilder .class);
 
     @Autowired
     public FSDeAccessionSummaryReportRouteBuilder(CamelContext context, @Value("${scsb.collection.report.directory}") String reportsDirectory) {
@@ -30,7 +34,7 @@ public class FSDeAccessionSummaryReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 

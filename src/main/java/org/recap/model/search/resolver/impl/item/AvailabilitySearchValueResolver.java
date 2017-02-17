@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class AvailabilitySearchValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("Availability_search");
+        return "Availability_search".equals(field);
     }
 
     @Override

@@ -1,9 +1,12 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.recap.RecapConstants;
 import org.recap.model.csv.MatchingReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -17,6 +20,8 @@ import java.util.List;
  */
 public class ReCAPCSVMatchingRecordGenerator {
 
+    Logger logger = LoggerFactory.getLogger(ReCAPCSVMatchingRecordGenerator.class);
+
     public MatchingReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -29,10 +34,8 @@ public class ReCAPCSVMatchingRecordGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(matchingReportReCAPCSVRecord, headerValue);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (InvocationTargetException|IllegalAccessException e) {
+                    logger.error(RecapConstants.LOG_ERROR,e);
                 }
             }
         }
@@ -42,21 +45,18 @@ public class ReCAPCSVMatchingRecordGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, MatchingReportReCAPCSVRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, MatchingReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
-        }
+            logger.error(RecapConstants.LOG_ERROR,e);        }
         return null;
     }
 
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, MatchingReportReCAPCSVRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, MatchingReportReCAPCSVRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }

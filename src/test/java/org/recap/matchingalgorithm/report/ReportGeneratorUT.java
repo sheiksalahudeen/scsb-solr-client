@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.matchingalgorithm.report;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;

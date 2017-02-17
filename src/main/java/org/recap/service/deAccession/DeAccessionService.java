@@ -7,6 +7,8 @@ import org.recap.model.deAccession.DeAccessionDBResponseEntity;
 import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,8 @@ import java.util.*;
  */
 @Component
 public class DeAccessionService {
+
+    Logger logger = LoggerFactory.getLogger(DeAccessionService.class);
 
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
@@ -105,14 +109,14 @@ public class DeAccessionService {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,ex);
         }
         return deAccessionDBResponseEntities;
     }
 
     public List<ReportEntity> processAndSave(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities) {
         List<ReportEntity> reportEntities = new ArrayList<>();
-        ReportEntity reportEntity = null;
+        ReportEntity reportEntity;
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
             for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
                 List<String> owningInstitutionBibIds = deAccessionDBResponseEntity.getOwningInstitutionBibIds();
@@ -213,7 +217,7 @@ public class DeAccessionService {
             try {
                 populateDeAccessionDBResponseEntity(itemEntity, deAccessionDBResponseEntity);
             } catch (JSONException e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
         return deAccessionDBResponseEntity;
@@ -293,7 +297,7 @@ public class DeAccessionService {
                     //TODO
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
     }

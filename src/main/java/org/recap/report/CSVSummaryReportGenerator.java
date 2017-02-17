@@ -58,16 +58,15 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : " + summaryReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : ",stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : ",summaryReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(summaryReportReCAPCSVRecords)) {
 
             producer.sendBodyAndHeader(RecapConstants.CSV_SUMMARY_ALGO_REPORT_Q, summaryReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
 
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return fileName + "-" + df.format(new Date()) + ".csv";
         }
 
         return null;

@@ -66,15 +66,16 @@ public class HoldingsIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Holdings holdings = (Holdings) future.get();
-                if(holdings != null) holdingsToIndex.add(holdings);
+                if(holdings != null)
+                    holdingsToIndex.add(holdings);
             } catch (Exception e) {
-                logger.error("Exception : " + e.getMessage());
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
 
         executorService.shutdown();
 
-        logger.info("No of Holdings to index : " + holdingsToIndex.size());
+        logger.info("No of Holdings to index : ",holdingsToIndex.size());
 
         if (!CollectionUtils.isEmpty(holdingsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);

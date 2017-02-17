@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class LeaderMaterialTypeValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("LeaderMaterialType");
+        return "LeaderMaterialType".equalsIgnoreCase(field);
     }
 
     @Override

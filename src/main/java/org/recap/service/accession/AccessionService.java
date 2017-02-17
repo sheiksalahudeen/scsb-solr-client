@@ -167,7 +167,7 @@ public class AccessionService {
     public String processRequest(List<AccessionRequest> accessionRequestList) {
         String response = null;
         StringBuilder responseBuilder = new StringBuilder();
-        String bibDataResponse = null;
+        String bibDataResponse;
         List<Map<String, String>> responseMapList = new ArrayList<>();
         String owningInstitution = null;
         String customerCode = null;
@@ -205,6 +205,7 @@ public class AccessionService {
                             }
                         }
                     } catch (Exception ex) {
+                        logger.error(RecapConstants.LOG_ERROR,ex);
                         response = ex.getMessage();
                         setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                         reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
@@ -225,7 +226,7 @@ public class AccessionService {
     private boolean checkItemBarcodeAlreadyExist(AccessionRequest accessionRequest){
         boolean itemExists = false;
         List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
-        if(itemEntityList.size()>0){
+        if(!itemEntityList.isEmpty()){
             itemExists = true;
         }
         return itemExists;
@@ -364,7 +365,7 @@ public class AccessionService {
             bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
             bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
@@ -401,11 +402,9 @@ public class AccessionService {
             if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
                 itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
             }
-            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE))){
-                if(!reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
+            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
                     reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
                 }
-            }
             if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib)){
                 if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
                     reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," +reasonForFailureItem;
@@ -472,7 +471,7 @@ public class AccessionService {
     }
 
     public BibliographicEntity updateBibliographicEntity(BibliographicEntity bibliographicEntity) {
-        BibliographicEntity savedBibliographicEntity=null;
+        BibliographicEntity savedBibliographicEntity;
         BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
         if(fetchBibliographicEntity ==null) { // New Bib Record
 
@@ -553,7 +552,7 @@ public class AccessionService {
         itemBarcodeList.add(itemBarcode);
         List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodeList);
         BibliographicEntity fetchedBibliographicEntity = null;
-        if(itemEntityList != null && itemEntityList.size() > 0 && itemEntityList.get(0).getBibliographicEntities() != null){
+        if(itemEntityList != null && !itemEntityList.isEmpty() && itemEntityList.get(0).getBibliographicEntities() != null){
             fetchedBibliographicEntity = itemEntityList.get(0).getBibliographicEntities().get(0);
         }
         return fetchedBibliographicEntity;

@@ -11,7 +11,7 @@ import java.util.Date;
 public class HoldingsCreatedDateValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("HoldingsCreatedDate");
+        return "HoldingsCreatedDate".equalsIgnoreCase(field);
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.recap.model.solr.Holdings;
 public class DocTypeValueResolver implements HoldingsValueResolver{
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("DocType");
+        return "DocType".equals(field);
     }
 
     @Override

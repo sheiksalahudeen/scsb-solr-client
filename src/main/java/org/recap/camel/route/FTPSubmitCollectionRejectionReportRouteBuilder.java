@@ -5,6 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.recap.RecapConstants;
 import org.recap.model.csv.SubmitCollectionReportRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class FTPSubmitCollectionRejectionReportRouteBuilder {
+
+    Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionRejectionReportRouteBuilder.class);
+
     @Autowired
     public FTPSubmitCollectionRejectionReportRouteBuilder(CamelContext context,
                                                           @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.report}") String ftpRemoteServer,
@@ -29,7 +34,7 @@ public class FTPSubmitCollectionRejectionReportRouteBuilder {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 

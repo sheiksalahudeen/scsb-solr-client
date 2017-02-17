@@ -10,7 +10,7 @@ public class HoldingsPK implements Serializable {
     private String owningInstitutionHoldingsId;
 
     public HoldingsPK() {
-
+        //Do nothing
     }
 
     public HoldingsPK(Integer owningInstitutionId, String owningInstitutionHoldingsId) {

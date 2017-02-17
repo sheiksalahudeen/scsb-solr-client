@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class OwningInstitutionValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("BibOwningInstitution");
+        return "BibOwningInstitution".equalsIgnoreCase(field);
     }
 
     @Override

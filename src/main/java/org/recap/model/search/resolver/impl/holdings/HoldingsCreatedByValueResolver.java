@@ -9,7 +9,7 @@ import org.recap.model.solr.Holdings;
 public class HoldingsCreatedByValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("HoldingsCreatedBy");
+        return "HoldingsCreatedBy".equalsIgnoreCase(field);
     }
 
     @Override

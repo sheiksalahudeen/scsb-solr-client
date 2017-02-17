@@ -9,7 +9,7 @@ import org.recap.model.solr.Holdings;
 public class HoldingsLastUpdatedByValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("HoldingsLastUpdatedBy");
+        return "HoldingsLastUpdatedBy".equalsIgnoreCase(field);
     }
 
     @Override

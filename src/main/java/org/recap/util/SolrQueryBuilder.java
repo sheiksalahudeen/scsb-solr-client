@@ -262,32 +262,29 @@ public class SolrQueryBuilder {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
-        return solrQuery;
+        return new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
     }
 
     public SolrQuery getQueryForParentAndChildCriteriaForDataDump(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() +
+        return new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() +
                 and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS
                 + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
-        return solrQuery;
     }
 
     public SolrQuery getQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
         String queryStringForParentCriteriaForChild = getQueryStringForParentCriteriaForChild(searchRecordsRequest);
-        SolrQuery solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryStringForParentCriteriaForChild);
-        return solrQuery;
+        return new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryStringForParentCriteriaForChild);
     }
 
     public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryForBibCriteria = buildQueryForBibFacetCriteria(searchRecordsRequest);
-        String queryStringForItemCriteria = null;
+        String queryStringForItemCriteria;
         SolrQuery solrQuery;
         if (isCGDChangedToPrivate) {
             queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate(searchRecordsRequest);
@@ -325,7 +322,7 @@ public class SolrQueryBuilder {
      * @return
      */
     public String parseSearchRequest(String searchText) {
-        StringBuffer modifiedText = new StringBuffer();
+        StringBuilder modifiedText = new StringBuilder();
         StringCharacterIterator stringCharacterIterator = new StringCharacterIterator(searchText);
         char character = stringCharacterIterator.current();
         while (character != CharacterIterator.DONE) {

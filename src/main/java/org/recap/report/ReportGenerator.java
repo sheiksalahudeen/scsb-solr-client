@@ -99,14 +99,14 @@ public class ReportGenerator {
         }
 
         stopWatch.stop();
-        logger.info("Total Time taken to fetch Report Entities From DB : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of Report Entities Fetched From DB : " + reportEntityList.size());
+        logger.info("Total Time taken to fetch Report Entities From DB : " , stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of Report Entities Fetched From DB : " , reportEntityList.size());
 
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
                 String generatedFileName = reportGeneratorInterface.generateReport(fileName, reportEntityList);
-                logger.info("The Generated File Name is : " + generatedFileName);
+                logger.info("The Generated File Name is : " , generatedFileName);
                 return generatedFileName;
             }
         }

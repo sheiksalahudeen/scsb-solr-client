@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.service;
+package org.recap.matchingalgorithm.service;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;

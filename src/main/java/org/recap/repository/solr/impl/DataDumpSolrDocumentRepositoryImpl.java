@@ -63,11 +63,8 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 bibItems = searchByBib(searchRecordsRequest);
             }
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-            response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            log.error(RecapConstants.LOG_ERROR,e);
             response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         }
         return response;
@@ -107,11 +104,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
     public List<BibItem> searchByItemForDeleted(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
         List<BibItem> onlyDeletedList = searchByItem(searchRecordsRequest,false);
-        if(onlyDeletedList != null && onlyDeletedList.size() > 0){
+        if(onlyDeletedList != null && !onlyDeletedList.isEmpty()){
             bibItems.addAll(onlyDeletedList);
         }
         List<BibItem> cgdChangedToPrivate = searchByItem(searchRecordsRequest,true);
-        if(cgdChangedToPrivate != null && cgdChangedToPrivate.size() > 0){
+        if(cgdChangedToPrivate != null && !cgdChangedToPrivate.isEmpty()){
             bibItems.addAll(cgdChangedToPrivate);
         }
         return bibItems;
@@ -176,10 +173,8 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                     }
                 }
             }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            log.error(RecapConstants.LOG_ERROR,e);
         }
     }
 
@@ -224,7 +219,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(RecapConstants.LOG_ERROR,e);
         }
     }
 

@@ -56,7 +56,7 @@ public abstract class MatchingIndexExecutorService {
     @Value("${matching.algorithm.commit.interval}")
     Integer commitInterval;
 
-    public Integer indexingForMatchingAlgorithm(String operationType) {
+    public Integer indexingForMatchingAlgorithm(String operationType) throws InterruptedException {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
         Integer numThreads = 5;
@@ -72,13 +72,13 @@ public abstract class MatchingIndexExecutorService {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
                 Integer loopCount = remainder == 0 ? quotient : quotient + 1;
-                logger.info("Loop Count Value : " + loopCount);
-                logger.info("Commit Indexes Interval : " + commitIndexesInterval);
+                logger.info("Loop Count Value : ",loopCount);
+                logger.info("Commit Indexes Interval : ",commitIndexesInterval);
                 Integer callableCountByCommitInterval = commitIndexesInterval / (docsPerThread);
                 if (callableCountByCommitInterval == 0) {
                     callableCountByCommitInterval = 1;
                 }
-                logger.info("Number of callables to execute to commit indexes : " + callableCountByCommitInterval);
+                logger.info("Number of callables to execute to commit indexes : ",callableCountByCommitInterval);
 
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
@@ -103,7 +103,7 @@ public abstract class MatchingIndexExecutorService {
                                     throw new IllegalStateException(e);
                                 }
                             });
-                    logger.info("No of Futures Added : " + futures.size());
+                    logger.info("No of Futures Added : ",futures.size());
 
                     int numOfBibsProcessed = 0;
                     for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
@@ -112,18 +112,16 @@ public abstract class MatchingIndexExecutorService {
                             Integer entitiesCount = (Integer) future.get();
                             numOfBibsProcessed += entitiesCount;
                             totalBibsProcessed += entitiesCount;
-                            logger.info("Num of bibs fetched by thread : " + entitiesCount);
+                            logger.info("Num of bibs fetched by thread : ",entitiesCount);
                             futureCount++;
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            logger.error(RecapConstants.LOG_ERROR,e);
                         }
                     }
 
                     JmsQueueEndpoint solrQJmsEndPoint = (JmsQueueEndpoint) producerTemplate.getCamelContext().getEndpoint(RecapConstants.SOLR_QUEUE);
                     Integer solrQSize = solrQJmsEndPoint.getExchanges().size();
-                    logger.info("Solr Queue size : " + solrQSize);
+                    logger.info("Solr Queue size : ",solrQSize);
                     while (solrQSize != 0) {
                         solrQSize = solrQJmsEndPoint.getExchanges().size();
                     }
@@ -131,23 +129,23 @@ public abstract class MatchingIndexExecutorService {
                     while (!future.isDone()) {
                         //NoOp.
                     }
-                    logger.info("Commit future done : " + future.isDone());
+                    logger.info("Commit future done : ",future.isDone());
 
-                    logger.info("Num of Bibs Processed and indexed to core " + coreName + " on commit interval : " + numOfBibsProcessed);
-                    logger.info("Total Num of Bibs Processed and indexed to core " + coreName + " : " + totalBibsProcessed);
+                    logger.info("Num of Bibs Processed and indexed to core ",coreName," on commit interval : ",numOfBibsProcessed);
+                    logger.info("Total Num of Bibs Processed and indexed to core ",coreName, " : " , totalBibsProcessed);
                 }
-                logger.info("Total futures executed: " + futureCount);
+                logger.info("Total futures executed: ",futureCount);
                 stopWatch.stop();
-                logger.info("Time taken to fetch " + totalBibsProcessed + " Bib Records and index to recap core : " + stopWatch.getTotalTimeSeconds() + " seconds");
+                logger.info("Time taken to fetch ",totalBibsProcessed," Bib Records and index to recap core : ",stopWatch.getTotalTimeSeconds()," seconds");
                 executorService.shutdown();
             } else {
                 logger.info("No records found to index for the criteria");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         stopWatch1.stop();
-        logger.info("Total time taken:" + stopWatch1.getTotalTimeSeconds() + " secs");
+        logger.info("Total time taken:",stopWatch1.getTotalTimeSeconds()," secs");
         return totalBibsProcessed;
     }
 

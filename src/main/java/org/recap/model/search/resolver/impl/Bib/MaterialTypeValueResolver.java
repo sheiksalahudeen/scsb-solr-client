@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class MaterialTypeValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("MaterialType");
+        return "MaterialType".equalsIgnoreCase(field);
     }
 
     @Override

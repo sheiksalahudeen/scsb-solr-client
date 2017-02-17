@@ -73,11 +73,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 bibItems = searchByBib(searchRecordsRequest);
             }
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-            response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            log.error(RecapConstants.LOG_ERROR,e);
             response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         }
         return response;
@@ -162,10 +159,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     }
                 }
             }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            log.error(RecapConstants.LOG_ERROR,e);
         }
         return bibItems;
     }
@@ -199,10 +194,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     }
                 }
             }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            log.error(RecapConstants.LOG_ERROR,e);
         }
     }
 
@@ -367,6 +360,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return holdingsValueResolvers;
     }
 
+    @Override
     public Integer getPageNumberOnPageSizeChange(SearchRecordsRequest searchRecordsRequest) {
         int totalRecordsCount;
         Integer pageNumber = searchRecordsRequest.getPageNumber();

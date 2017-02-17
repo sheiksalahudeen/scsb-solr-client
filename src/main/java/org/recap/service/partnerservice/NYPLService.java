@@ -1,6 +1,9 @@
 package org.recap.service.partnerservice;
 
+import org.recap.RecapConstants;
 import org.recap.service.authorization.NyplOauthTokenApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -17,6 +20,8 @@ import java.util.Map;
  */
 @Service
 public class NYPLService {
+
+    Logger logger = LoggerFactory.getLogger(NYPLService.class);
 
     @Value("${ils.nypl.bibdata}")
     String ilsNYPLBibData;
@@ -45,11 +50,11 @@ public class NYPLService {
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
         } catch (HttpClientErrorException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
             response = "Item Barcode not found";
             throw new RuntimeException(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
             response = ilsNYPLBibData + " Service is Unavailable.";
             throw new RuntimeException(response);
         }

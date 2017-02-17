@@ -1,13 +1,15 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.recap.RecapConstants;
 import org.recap.model.csv.SubmitCollectionReportRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
  * Created by hemalathas on 20/12/16.
  */
 public class SubmitCollectionReportGenerator {
+
+    Logger logger = LoggerFactory.getLogger(SubmitCollectionReportGenerator.class);
 
     public SubmitCollectionReportRecord prepareSubmitCollectionRejectionRecord(ReportEntity reportEntity) {
 
@@ -29,10 +33,8 @@ public class SubmitCollectionReportGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(submitCollectionReportRecord, headerValue);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(RecapConstants.LOG_ERROR,e);
                 }
             }
         }
@@ -42,10 +44,9 @@ public class SubmitCollectionReportGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }
@@ -53,10 +54,9 @@ public class SubmitCollectionReportGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, SubmitCollectionReportRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }

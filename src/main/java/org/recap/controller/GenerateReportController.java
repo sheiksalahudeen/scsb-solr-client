@@ -44,7 +44,7 @@ public class GenerateReportController {
             createdDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         String status = "";
         String fileName = "";

@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class CollectionGroupDesignationValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("CollectionGroupDesignation");
+        return "CollectionGroupDesignation".equals(field);
     }
 
     @Override

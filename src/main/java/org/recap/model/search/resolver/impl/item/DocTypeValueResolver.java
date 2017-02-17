@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class DocTypeValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("DocType");
+        return "DocType".equals(field);
     }
 
     @Override

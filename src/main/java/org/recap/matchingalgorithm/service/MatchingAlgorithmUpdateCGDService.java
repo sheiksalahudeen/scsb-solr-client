@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.service;
+package org.recap.matchingalgorithm.service;
 
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
@@ -7,7 +7,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.MatchingAlgorithmCGDCallable;
-import org.recap.matchingAlgorithm.MatchingCounter;
+import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.repository.jpa.*;
@@ -85,8 +85,8 @@ public class MatchingAlgorithmUpdateCGDService {
         }
         Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executorService, callables);
 
-        List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get("NonMonographRecordNums");
-        List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get("ExceptionRecordNums");
+        List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS);
+        List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS);
 
         matchingAlgorithmUtil.updateMonographicSetRecords(nonMonographRecordNums, batchSize);
 
@@ -118,21 +118,19 @@ public class MatchingAlgorithmUpdateCGDService {
             try {
                 Map<String, List<Integer>> recordNumberMap = (Map<String, List<Integer>>) future.get();
                 if(recordNumberMap != null) {
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get("NonMonographRecordNums"))) {
-                        nonMonographRecordNumbers.addAll(recordNumberMap.get("NonMonographRecordNums"));
+                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS))) {
+                        nonMonographRecordNumbers.addAll(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS));
                     }
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get("ExceptionRecordNums"))) {
-                        exceptionRecordNumbers.addAll(recordNumberMap.get("ExceptionRecordNums"));
+                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS))) {
+                        exceptionRecordNumbers.addAll(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS));
                     }
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error(RecapConstants.LOG_ERROR+e);
             }
         }
-        unProcessedRecordNumberMap.put("NonMonographRecordNums", nonMonographRecordNumbers);
-        unProcessedRecordNumberMap.put("ExceptionRecordNums", exceptionRecordNumbers);
+        unProcessedRecordNumberMap.put(RecapConstants.NON_MONOGRAPH_RECORD_NUMS, nonMonographRecordNumbers);
+        unProcessedRecordNumberMap.put(RecapConstants.EXCEPTION_RECORD_NUMS, exceptionRecordNumbers);
         return unProcessedRecordNumberMap;
     }
 
@@ -145,14 +143,12 @@ public class MatchingAlgorithmUpdateCGDService {
                     .map(future -> {
                         try {
                             return future.get();
-                        } catch (InterruptedException e) {
-                            throw new IllegalStateException(e);
-                        } catch (ExecutionException e) {
+                        } catch (InterruptedException | ExecutionException e) {
                             throw new IllegalStateException(e);
                         }
                     });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR+e);
         }
         return futures;
     }

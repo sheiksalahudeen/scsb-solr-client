@@ -3,8 +3,6 @@ package org.recap.model.search;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Comparator;
-
 /**
  * Created by rajesh on 18-Jul-16.
  */

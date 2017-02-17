@@ -67,7 +67,7 @@ public class UpdateCgdUtil {
             sendEmail(itemBarcode, owningInstitution, oldCollectionGroupDesignation, newCollectionGroupDesignation, cgdChangeNotes);
             return RecapConstants.SUCCESS;
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
             return RecapConstants.FAILURE + "-" + e.getMessage();
         }
     }

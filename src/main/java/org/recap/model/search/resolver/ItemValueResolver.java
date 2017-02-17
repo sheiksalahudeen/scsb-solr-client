@@ -1,6 +1,5 @@
 package org.recap.model.search.resolver;
 
-import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 
 /**

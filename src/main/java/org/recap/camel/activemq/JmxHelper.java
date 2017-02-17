@@ -1,6 +1,9 @@
 package org.recap.camel.activemq;
 
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
+import org.recap.RecapConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +22,8 @@ import java.io.IOException;
 @Component
 public class JmxHelper {
 
+    Logger logger = LoggerFactory.getLogger(JmxHelper.class);
+
     @Value("${activemq.jmx.service.url}")
     private String serviceUrl;
     private MBeanServerConnection connection;
@@ -26,10 +31,9 @@ public class JmxHelper {
     public DestinationViewMBean getBeanForQueueName(String queueName) {
         try {
             ObjectName nameConsumers = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,destinationType=Queue,destinationName="+ queueName);
-            DestinationViewMBean mbView = MBeanServerInvocationHandler.newProxyInstance(getConnection(), nameConsumers, DestinationViewMBean.class, true);
-            return mbView;
+            return MBeanServerInvocationHandler.newProxyInstance(getConnection(), nameConsumers, DestinationViewMBean.class, true);
         } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }
@@ -41,7 +45,7 @@ public class JmxHelper {
                 connector = JMXConnectorFactory.connect(new JMXServiceURL(serviceUrl));
                 connection = connector.getMBeanServerConnection();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
         return connection;

@@ -10,7 +10,7 @@ public class BibliographicPK implements Serializable {
     private String owningInstitutionBibId;
 
     public BibliographicPK() {
-
+        //Do nothing
     }
 
     public BibliographicPK(Integer owningInstitutionId, String owningInstitutionBibId) {

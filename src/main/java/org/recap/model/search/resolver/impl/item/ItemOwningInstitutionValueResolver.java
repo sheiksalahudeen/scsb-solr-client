@@ -1,8 +1,6 @@
 package org.recap.model.search.resolver.impl.item;
 
 import org.recap.model.search.resolver.ItemValueResolver;
-import org.recap.model.search.resolver.ValueResolver;
-import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 
 /**
@@ -11,7 +9,7 @@ import org.recap.model.solr.Item;
 public class ItemOwningInstitutionValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("ItemOwningInstitution");
+        return "ItemOwningInstitution".equals(field);
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.recap.service.accession;
 import org.apache.camel.ProducerTemplate;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -49,7 +48,7 @@ public class SolrIndexService {
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
-        UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
+        solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
         solrTemplate.commit();
     }
 }
