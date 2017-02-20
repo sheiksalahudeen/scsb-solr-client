@@ -65,12 +65,12 @@ public class SolrAdmin {
                 if (!isCoreExist(coreName)) {
                     coreAdminResponse = coreAdminRequest.process(solrAdminClient);
                     if (coreAdminResponse.getStatus() == 0) {
-                        logger.info("Created Solr core with name: ",coreName);
+                        logger.info("Created Solr core with name: {}",coreName);
                     } else {
-                        logger.error("Error in creating Solr core with name: ",coreName);
+                        logger.error("Error in creating Solr core with name: {}",coreName);
                     }
                 } else {
-                    logger.info("Solr core with name ",coreName," already exists.");
+                    logger.info("Solr core with name {} already exists.",coreName);
                 }
             } catch (SolrServerException | IOException e) {
                 logger.error(RecapConstants.LOG_ERROR,e);

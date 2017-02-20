@@ -58,8 +58,8 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : ",stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : ",summaryReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : {} ",stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : {} ",summaryReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(summaryReportReCAPCSVRecords)) {
 

@@ -76,7 +76,7 @@ public class ItemIndexCallable implements Callable {
 
         executorService.shutdown();
 
-        logger.info("No of Items to index : ",itemsToIndex.size());
+        logger.info("No of Items to index : {}",itemsToIndex.size());
 
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);

@@ -75,7 +75,7 @@ public class HoldingsIndexCallable implements Callable {
 
         executorService.shutdown();
 
-        logger.info("No of Holdings to index : ",holdingsToIndex.size());
+        logger.info("No of Holdings to index : {}",holdingsToIndex.size());
 
         if (!CollectionUtils.isEmpty(holdingsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, holdingsToIndex, RecapConstants.SOLR_CORE, coreName);

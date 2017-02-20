@@ -58,8 +58,8 @@ public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : " , stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : " , solrExceptionReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : {} " , stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : {} " , solrExceptionReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(solrExceptionReportReCAPCSVRecords)) {
             producer.sendBodyAndHeader(RecapConstants.FTP_SOLR_EXCEPTION_REPORT_Q, solrExceptionReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);

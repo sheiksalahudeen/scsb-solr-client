@@ -43,7 +43,7 @@ public class MatchingAlgorithmProcessor {
         try {
             matchingBibDetailsRepository.save(matchingBibEntities);
         } catch (Exception ex) {
-            logger.info("Exception : ",ex);
+            logger.info("Exception : {}",ex);
             for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
                 try {
                     matchingBibDetailsRepository.save(matchingBibEntity);

@@ -83,20 +83,20 @@ public abstract class IndexExecutorService {
                 from = dateFormatter.parse(fromDate);
             }
             Integer totalDocCount = getTotalDocCount(owningInstitutionId, from);
-            logger.info("Total Document Count From DB : ",totalDocCount);
+            logger.info("Total Document Count From DB : {}",totalDocCount);
 
             if (totalDocCount > 0) {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
                 Integer loopCount = remainder == 0 ? quotient : quotient + 1;
                 logger.info("Loop Count Value : ",loopCount);
-                logger.info("Commit Indexes Interval : ",commitIndexesInterval);
+                logger.info("Commit Indexes Interval : {}",commitIndexesInterval);
 
                 Integer callableCountByCommitInterval = commitIndexesInterval / (docsPerThread);
                 if (callableCountByCommitInterval == 0) {
                     callableCountByCommitInterval = 1;
                 }
-                logger.info("Number of callables to execute to commit indexes : ",callableCountByCommitInterval);
+                logger.info("Number of callables to execute to commit indexes : {}",callableCountByCommitInterval);
 
                 List<String> coreNames = new ArrayList<>();
                 if (!isIncremental) {
@@ -131,7 +131,7 @@ public abstract class IndexExecutorService {
                                     throw new IllegalStateException(e);
                                 }
                             });
-                    logger.info("No of Futures Added : ",futures.size());
+                    logger.info("No of Futures Added : {}",futures.size());
 
                     int numOfBibsProcessed = 0;
                     for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
@@ -140,7 +140,7 @@ public abstract class IndexExecutorService {
                             Integer entitiesCount = (Integer) future.get();
                             numOfBibsProcessed += entitiesCount;
                             totalBibsProcessed += entitiesCount;
-                            logger.info("Num of bibs fetched by thread : ",entitiesCount);
+                            logger.info("Num of bibs fetched by thread : {}",entitiesCount);
                             futureCount++;
                         } catch (InterruptedException | ExecutionException e) {
                             logger.error(RecapConstants.LOG_ERROR,e);
@@ -154,14 +154,14 @@ public abstract class IndexExecutorService {
                         }
                         deleteTempIndexes(coreNames, solrServerProtocol + solrUrl);
                     }
-                    logger.info("Num of Bibs Processed and indexed to core ",coreName," on commit interval : ",numOfBibsProcessed);
-                    logger.info("Total Num of Bibs Processed and indexed to core ",coreName," : ",totalBibsProcessed);
+                    logger.info("Num of Bibs Processed and indexed to core {} on commit interval : {} ",coreName,numOfBibsProcessed);
+                    logger.info("Total Num of Bibs Processed and indexed to core {} : {}",coreName,totalBibsProcessed);
                     Long solrBibCount = bibSolrCrudRepository.countByDocType(RecapConstants.BIB);
-                    logger.info("Total number of Bibs in Solr in recap core : ",solrBibCount);
+                    logger.info("Total number of Bibs in Solr in recap core : {}",solrBibCount);
                 }
                 logger.info("Total futures executed: ",futureCount);
                 stopWatch.stop();
-                logger.info("Time taken to fetch ",totalBibsProcessed," Bib Records and index to recap core : ",stopWatch.getTotalTimeSeconds()," seconds");
+                logger.info("Time taken to fetch {} Bib Records and index to recap core : {} seconds {}",totalBibsProcessed,stopWatch.getTotalTimeSeconds());
                 if (!isIncremental) {
                     solrAdmin.unLoadCores(coreNames);
                 }
@@ -173,7 +173,7 @@ public abstract class IndexExecutorService {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
         stopWatch1.stop();
-        logger.info("Total time taken:",stopWatch1.getTotalTimeSeconds()," secs");
+        logger.info("Total time taken:{} secs",stopWatch1.getTotalTimeSeconds());
         return totalBibsProcessed;
     }
 

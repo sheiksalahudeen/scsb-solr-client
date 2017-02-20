@@ -75,9 +75,9 @@ public class MatchingAlgorithmUpdateCGDService {
         ExecutorService executorService = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
         long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
-        logger.info("Total Records : " + countOfRecordNum);
+        logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) Math.ceil(countOfRecordNum / batchSize);
-        logger.info("Total Pages : " + totalPagesCount);
+        logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new MatchingAlgorithmCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
                     getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
@@ -94,9 +94,9 @@ public class MatchingAlgorithmUpdateCGDService {
 
         matchingAlgorithmUtil.saveCGDUpdatedSummaryReport();
 
-        logger.info("PUL Final Counter Value: " + MatchingCounter.getPulSharedCount());
-        logger.info("CUL Final Counter Value: " + MatchingCounter.getCulSharedCount());
-        logger.info("NYPL Final Counter Value: " + MatchingCounter.getNyplSharedCount());
+        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
+        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
+        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
 
         DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
 

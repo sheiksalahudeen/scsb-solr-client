@@ -82,7 +82,7 @@ public class BibIndexCallable implements Callable {
 
         executorService.shutdown();
 
-        logger.info("No of Bibs to index : ",bibsToIndex.size());
+        logger.info("No of Bibs to index : {}",bibsToIndex.size());
 
         if (!CollectionUtils.isEmpty(bibsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, bibsToIndex, RecapConstants.SOLR_CORE, coreName);

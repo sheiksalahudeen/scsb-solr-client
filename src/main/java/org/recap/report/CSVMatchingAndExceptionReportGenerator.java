@@ -70,8 +70,8 @@ public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : ",stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : ",matchingReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : {} ",stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : {} ",matchingReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(matchingReportReCAPCSVRecords)) {
             if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {

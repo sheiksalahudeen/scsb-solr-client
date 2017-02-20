@@ -104,9 +104,7 @@ public class SolrIndexController {
         }
         Integer commitInterval = solrIndexRequest.getCommitInterval();
 
-        logger.info("Document Type : ",docType,"   Number of Threads : ",numberOfThread,"   Number of Docs :",numberOfDoc,
-                 "   Commit Interval :",commitInterval,
-                "   From Date : ",solrIndexRequest.getDateFrom());
+        logger.info("Document Type : {} Number of Threads : {} Number of Docs : {} Commit Interval : {} From Date : {}",docType,numberOfThread,numberOfDoc,commitInterval,solrIndexRequest.getDateFrom());
 
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();

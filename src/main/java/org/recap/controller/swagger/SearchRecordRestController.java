@@ -108,7 +108,7 @@ public class SearchRecordRestController {
             searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
         } catch (Exception e) {
             searchResultRows = new ArrayList<>();
-            logger.error("Exception",e);
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return searchResultRows;
     }

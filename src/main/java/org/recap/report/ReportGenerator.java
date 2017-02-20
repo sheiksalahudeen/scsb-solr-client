@@ -99,8 +99,8 @@ public class ReportGenerator {
         }
 
         stopWatch.stop();
-        logger.info("Total Time taken to fetch Report Entities From DB : " , stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of Report Entities Fetched From DB : " , reportEntityList.size());
+        logger.info("Total Time taken to fetch Report Entities From DB : {} " , stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of Report Entities Fetched From DB : {} " , reportEntityList.size());
 
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();

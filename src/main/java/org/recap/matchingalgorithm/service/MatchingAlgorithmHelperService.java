@@ -93,7 +93,7 @@ public class MatchingAlgorithmHelperService {
         count = count + matchingMatchPointsEntities.size();
         matchingAlgorithmUtil.saveMatchingMatchPointEntities(matchingMatchPointsEntities);
 
-        logger.info("Total count : " , count);
+        logger.info("Total count : {} " , count);
 
         DestinationViewMBean saveMatchingMatchPointsQ = jmxHelper.getBeanForQueueName("saveMatchingMatchPointsQ");
 

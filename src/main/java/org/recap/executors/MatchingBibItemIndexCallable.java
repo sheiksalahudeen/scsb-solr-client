@@ -70,7 +70,7 @@ public class MatchingBibItemIndexCallable implements Callable {
             futures.add(submit);
         }
 
-        logger.info("Num futures to prepare Bib and Associated data : ",futures.size());
+        logger.info("Num futures to prepare Bib and Associated data : {} ",futures.size());
 
         List<SolrInputDocument> solrInputDocumentsToIndex = new ArrayList<>();
         for (Iterator<Future> futureIterator = futures.iterator(); futureIterator.hasNext(); ) {

@@ -507,7 +507,7 @@ public class AccessionService {
     }
 
     public BibliographicEntity updateBibliographicEntity(BibliographicEntity bibliographicEntity) {
-        BibliographicEntity savedBibliographicEntity;
+        BibliographicEntity savedBibliographicEntity=null;
         BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
         if(fetchBibliographicEntity ==null) { // New Bib Record
 
