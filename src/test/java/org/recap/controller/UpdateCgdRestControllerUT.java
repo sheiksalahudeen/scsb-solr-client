@@ -35,11 +35,4 @@ public class UpdateCgdRestControllerUT extends BaseControllerUT {
         String statusResponse = savedResult.getResponse().getContentAsString();
         assertNotNull(statusResponse);
     }
-
-    private HttpHeaders getHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(RecapConstants.API_KEY, RecapConstants.RECAP);
-        return headers;
-    }
 }

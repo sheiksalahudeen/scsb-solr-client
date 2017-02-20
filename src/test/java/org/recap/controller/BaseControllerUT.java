@@ -3,7 +3,9 @@ package org.recap.controller;
 import org.junit.Assert;
 import org.junit.Before;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -51,5 +53,12 @@ public class BaseControllerUT extends BaseTestCase {
     protected Object jsonToObject(String json, Class clazz) throws IOException {
         MockHttpInputMessage mockHttpInputMessage = new MockHttpInputMessage(json.getBytes());
         return this.mappingJackson2HttpMessageConverter.read(clazz, mockHttpInputMessage);
+    }
+
+    protected HttpHeaders getHttpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(RecapConstants.API_KEY, RecapConstants.RECAP);
+        return headers;
     }
 }

@@ -134,13 +134,6 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         assertTrue(responseEntity.getBody().toString().contains("Success"));
     }
 
-    private HttpHeaders getHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("api_key", "recap");
-        return headers;
-    }
-
     private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {
         Random random = new Random();
         File bibContentFile = getBibContentFile();
