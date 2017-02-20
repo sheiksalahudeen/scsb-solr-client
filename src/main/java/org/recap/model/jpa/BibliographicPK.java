@@ -43,6 +43,10 @@ public class BibliographicPK implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         BibliographicPK bibliographicPK  = (BibliographicPK) obj;
         if(bibliographicPK.getOwningInstitutionId().equals(owningInstitutionId) && bibliographicPK.getOwningInstitutionBibId().equals(owningInstitutionBibId)){
             return true;

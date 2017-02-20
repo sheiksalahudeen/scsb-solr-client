@@ -126,7 +126,7 @@ public class MatchingAlgorithmUpdateCGDService {
                     }
                 }
             } catch (InterruptedException | ExecutionException e) {
-                logger.error(RecapConstants.LOG_ERROR+e);
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
         unProcessedRecordNumberMap.put(RecapConstants.NON_MONOGRAPH_RECORD_NUMS, nonMonographRecordNumbers);
@@ -148,7 +148,7 @@ public class MatchingAlgorithmUpdateCGDService {
                         }
                     });
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR+e);
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return futures;
     }
