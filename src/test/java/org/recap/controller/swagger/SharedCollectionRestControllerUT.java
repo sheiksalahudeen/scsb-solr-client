@@ -10,21 +10,16 @@ import org.recap.RecapConstants;
 import org.recap.controller.BaseControllerUT;
 import org.recap.controller.SharedCollectionRestController;
 import org.recap.model.accession.AccessionRequest;
-import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.model.solr.Bib;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
 import org.recap.service.accession.SolrIndexService;
-import org.recap.service.deAccession.DeAccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import javax.persistence.EntityManager;
@@ -34,7 +29,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by chenchulakshmig on 14/10/16.
@@ -58,9 +54,6 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
 
     @Mock
     SharedCollectionRestController mockedSharedCollectionRestController;
-
-    @Mock
-    DeAccessionService deAccessionService;
 
     @Mock
     AccessionService accessionService;
@@ -100,38 +93,6 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
         assertNotNull(responseEntity);
         assertEquals(responseEntity.getBody(),"Success");
-    }
-
-    @Test
-    public void deAccession() throws Exception {
-        Random random = new Random();
-        String itemBarcode = String.valueOf(random.nextInt());
-        BibliographicEntity bibliographicEntity = saveBibEntityWithHoldingsAndItem(itemBarcode);
-        Bib bib1 = new Bib();
-        bib1.setBibId(bibliographicEntity.getBibliographicId());
-
-        assertNotNull(bibliographicEntity);
-        Integer bibliographicId = bibliographicEntity.getBibliographicId();
-        assertNotNull(bibliographicId);
-
-        BibliographicEntity byBibliographicId = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
-        assertNotNull(byBibliographicId);
-
-        solrIndexService.indexByBibliographicId(bibliographicId);
-        Mockito.when(bibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(bib1);
-        Bib bib = bibSolrCrudRepository.findByBibId(bibliographicId);
-        assertNotNull(bib);
-        assertEquals(bib.getBibId(), bibliographicId);
-        DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
-        deAccessionRequest.setItemBarcodes(Arrays.asList(itemBarcode));
-        Map<String, String> resultMap = new HashMap<>();
-        resultMap.put(itemBarcode,"Success");
-        Mockito.when(mockedSharedCollectionRestController.getDeAccessionService()).thenReturn(deAccessionService);
-        Mockito.when(mockedSharedCollectionRestController.getDeAccessionService().deAccession(deAccessionRequest)).thenReturn(resultMap);
-        Mockito.when(mockedSharedCollectionRestController.deAccession(deAccessionRequest)).thenCallRealMethod();
-        ResponseEntity responseEntity = mockedSharedCollectionRestController.deAccession(deAccessionRequest);
-        assertNotNull(responseEntity);
-        assertTrue(responseEntity.getBody().toString().contains("Success"));
     }
 
     private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {
