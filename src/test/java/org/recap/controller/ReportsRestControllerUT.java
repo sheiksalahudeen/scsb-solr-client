@@ -72,11 +72,4 @@ public class ReportsRestControllerUT extends BaseControllerUT {
         String result = mvcResult.getResponse().getContentAsString();
         assertNotNull(result);
     }
-
-    private HttpHeaders getHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(RecapConstants.API_KEY, RecapConstants.RECAP);
-        return headers;
-    }
 }

@@ -3,10 +3,8 @@ package org.recap.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
-import org.recap.model.deAccession.DeAccessionRequest;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
-import org.recap.service.deAccession.DeAccessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chenchulakshmig on 6/10/16.
@@ -34,9 +31,6 @@ public class SharedCollectionRestController {
     private ItemAvailabilityService itemAvailabilityService;
 
     @Autowired
-    DeAccessionService deAccessionService;
-
-    @Autowired
     AccessionService accessionService;
 
     @Value("${ongoing.accession.input.limit}")
@@ -48,14 +42,6 @@ public class SharedCollectionRestController {
 
     public void setItemAvailabilityService(ItemAvailabilityService itemAvailabilityService) {
         this.itemAvailabilityService = itemAvailabilityService;
-    }
-
-    public DeAccessionService getDeAccessionService() {
-        return deAccessionService;
-    }
-
-    public void setDeAccessionService(DeAccessionService deAccessionService) {
-        this.deAccessionService = deAccessionService;
     }
 
     public AccessionService getAccessionService() {
@@ -90,16 +76,6 @@ public class SharedCollectionRestController {
         } else {
             return new ResponseEntity(itemStatus, getHttpHeaders(), HttpStatus.OK);
         }
-    }
-
-    @RequestMapping(value = "/deAccession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity deAccession(@RequestBody DeAccessionRequest deAccessionRequest) {
-        Map<String, String> resultMap = getDeAccessionService().deAccession(deAccessionRequest);
-        if (resultMap != null) {
-            return new ResponseEntity(resultMap, getHttpHeaders(), HttpStatus.OK);
-        }
-        return null;
     }
 
     @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
