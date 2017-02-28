@@ -1,4 +1,4 @@
-package org.recap.service.deAccession;
+package org.recap.service.deaccession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrInputDocument;

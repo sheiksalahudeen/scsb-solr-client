@@ -2,10 +2,8 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
-import org.recap.model.deAccession.DeAccessionSolrRequest;
-import org.recap.service.deAccession.DeAccessSolrDocumentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.recap.model.deaccession.DeAccessionSolrRequest;
+import org.recap.service.deaccession.DeAccessSolrDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/deaccessionInSolrService")
 public class DeaccessionSolrController {
-
-    private Logger logger = LoggerFactory.getLogger(DeaccessionSolrController.class);
 
     @Autowired
     DeAccessSolrDocumentService deAccessSolrDocumentService;
