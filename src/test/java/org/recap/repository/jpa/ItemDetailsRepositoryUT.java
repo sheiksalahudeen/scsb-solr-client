@@ -200,7 +200,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
     @Test
     public void findByBarcodeAndCustomerCode(){
         saveSingleBibHoldingsItem();
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCodeAndIsDeleted("12316433","PA", false);
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode("12316433","PA");
         assertNotNull(itemEntityList);
         assertEquals("12316433",itemEntityList.get(0).getBarcode());
         assertEquals("PA",itemEntityList.get(0).getCustomerCode());
