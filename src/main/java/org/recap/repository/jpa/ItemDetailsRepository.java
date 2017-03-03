@@ -36,7 +36,7 @@ public interface ItemDetailsRepository extends JpaRepository<ItemEntity, ItemPK>
 
     List<ItemEntity> findByBarcode(String barcode);
 
-    List<ItemEntity> findByBarcodeAndCustomerCodeAndIsDeleted(String barcode, String customerCode, boolean isDeleted);
+    List<ItemEntity> findByBarcodeAndCustomerCode(String barcode, String customerCode);
 
     @Modifying
     @Transactional

@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
-import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
@@ -88,6 +87,9 @@ public class AccessionServiceUT extends BaseTestCase {
         TestCase.assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("JFL 81-165", field852.getSubfield('h').getData());
+        List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
+        assertEquals("32101062128309",itemEntityList.get(0).getBarcode());
+
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
@@ -160,6 +162,8 @@ public class AccessionServiceUT extends BaseTestCase {
         TestCase.assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("JFL 81-165", field852.getSubfield('h').getData());
+        List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
+        assertEquals("33433002031718",itemEntityList.get(0).getBarcode());
     }
 
     private List<Record> readMarcXml(String marcXmlString) {
