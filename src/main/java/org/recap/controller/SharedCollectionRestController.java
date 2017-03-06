@@ -1,7 +1,11 @@
 package org.recap.controller;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
+import org.recap.model.ItemAvailabilityResponse;
+import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
@@ -15,8 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by chenchulakshmig on 6/10/16.
@@ -60,22 +63,23 @@ public class SharedCollectionRestController {
         this.inputLimit = inputLimit;
     }
 
-    @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
     @ResponseBody
-    public ResponseEntity itemAvailabilityStatus(@RequestParam String itemBarcode) {
-        String itemStatus = null;
+    public List<ItemAvailabilityResponse> itemAvailabilityStatus(@RequestBody ItemAvailabityStatusRequest itemAvailabityStatusRequest) {
+        List<ItemAvailabilityResponse> itemAvailabilityResponses = new ArrayList<>();
+        ResponseEntity responseEntity;
         try {
-            itemStatus = getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
+            itemAvailabilityResponses=getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalseList(itemAvailabityStatusRequest.getBarcodes());
         } catch (Exception exception) {
-            ResponseEntity responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
-            return responseEntity;
+            responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            return itemAvailabilityResponses;
         }
-        if (StringUtils.isEmpty(itemStatus)) {
-            ResponseEntity responseEntity = new ResponseEntity(RecapConstants.ITEM_BARCDE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
+        if (CollectionUtils.isEmpty(itemAvailabilityResponses)) {
+            responseEntity = new ResponseEntity(RecapConstants.ITEM_BARCDE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
+            return itemAvailabilityResponses;
         } else {
-            ResponseEntity responseEntity = new ResponseEntity(itemStatus, getHttpHeaders(), HttpStatus.OK);
-            return responseEntity;
+            responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+            return itemAvailabilityResponses;
         }
     }
 

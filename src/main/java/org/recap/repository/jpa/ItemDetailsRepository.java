@@ -53,6 +53,9 @@ public interface ItemDetailsRepository extends JpaRepository<ItemEntity, ItemPK>
     @Query(value = "select itemStatus.statusCode from ItemEntity item, ItemStatusEntity itemStatus where item.itemAvailabilityStatusId = itemStatus.itemStatusId and item.barcode = :barcode and item.isDeleted = 0")
     String getItemStatusByBarcodeAndIsDeletedFalse(@Param("barcode") String barcode);
 
+    @Query(value = "select item from ItemEntity item where item.itemAvailabilityStatusId in (1,2) and item.barcode in (:barcode) and item.isDeleted = 0")
+    List<ItemEntity> getItemStatusByBarcodeAndIsDeletedFalseList(@Param("barcode") List<String> barcodeList);
+
     @Query(value = "select item from ItemEntity item where item.lastUpdatedDate between ?1 and ?2")
     Page<ItemEntity> findByLastUpdatedDate(Pageable pageable, Date lastUpdatedDate, Date lastUpdateDateTime);
 

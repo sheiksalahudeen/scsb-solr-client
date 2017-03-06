@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
 import org.recap.controller.BaseControllerUT;
 import org.recap.controller.SharedCollectionRestController;
+import org.recap.model.ItemAvailabilityResponse;
+import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -69,16 +71,27 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     @Test
     public void itemAvailabilityStatus() throws Exception {
         String itemBarcode = "32101056185125";
-        saveBibEntityWithHoldingsAndItem(itemBarcode);
-        String itemAvailabilityStatusCode = itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode);
+        BibliographicEntity bibliographicEntity = saveBibEntityWithHoldingsAndItem(itemBarcode);
+        ItemAvailabityStatusRequest itemAvailabityStatusRequest = new ItemAvailabityStatusRequest();
+        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+        String barcode = null;
+        String status = null;
+        for (ItemEntity itemEntity : itemEntities) {
+            barcode  = itemEntity.getBarcode();
+            status = itemEntity.getItemStatusEntity().getStatusDescription();
+        }
+        List<String>  barcodeList = new ArrayList<>();
+        barcodeList.add(barcode);
+        itemAvailabityStatusRequest.setBarcodes(barcodeList);
         Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService()).thenReturn(itemAvailabilityService);
         Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode)).thenReturn(RecapConstants.AVAILABLE);
-        Mockito.when(mockedSharedCollectionRestController.itemAvailabilityStatus(itemBarcode)).thenCallRealMethod();
-        ResponseEntity responseEntity = mockedSharedCollectionRestController.itemAvailabilityStatus(itemBarcode);
-        assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(),itemAvailabilityStatusCode);
+        Mockito.when(mockedSharedCollectionRestController.itemAvailabilityStatus(itemAvailabityStatusRequest)).thenCallRealMethod();
+        List<ItemAvailabilityResponse> itemAvailabilityResponses = mockedSharedCollectionRestController.itemAvailabilityStatus(itemAvailabityStatusRequest);
+        assertNotNull(itemAvailabilityResponses);
+        for (ItemAvailabilityResponse itemAvailabilityResponse : itemAvailabilityResponses) {
+            assertEquals(itemAvailabilityResponse.getItemAvailabilityStatus(),status);
+        }
     }
-
     @Test
     public void accession() throws Exception {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
