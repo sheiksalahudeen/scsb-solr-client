@@ -174,8 +174,10 @@ public class AccessionService {
         String customerCode = null;
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         for (AccessionRequest accessionRequest : accessionRequestList) {
-            boolean itemExists = checkItemBarcodeAlreadyExist(accessionRequest);
             owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
+            List<ItemEntity> itemEntityList = getItemEntityList(accessionRequest);
+            boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
+            boolean isDeaccessionedItem = isItemDeaccessioned(itemEntityList);
             if (!itemExists) {
                 if (owningInstitution == null) {
                     setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+accessionRequest.getCustomerCode()+" "+RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
@@ -249,7 +251,13 @@ public class AccessionService {
                     createDummyRecordIfAny(response, owningInstitution, customerCode, responseBuilder, reportDataEntityList, accessionRequest);
                     generateAccessionSummaryReport(responseMapList, owningInstitution);
                 }
-            } else {
+            } else if(isDeaccessionedItem) {
+                response = reAccessionItem(itemEntityList);
+                if (response.equals(RecapConstants.SUCCESS)) {
+                    response = indexReaccessionedItem(itemEntityList);
+                }
+                setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
+            }else {
                 setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+RecapConstants.ITEM_ALREADY_ACCESSIONED);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
             }
@@ -258,13 +266,27 @@ public class AccessionService {
         return responseBuilder.toString();
     }
 
-    private boolean checkItemBarcodeAlreadyExist(AccessionRequest accessionRequest){
+    private List<ItemEntity> getItemEntityList(AccessionRequest accessionRequest){
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
+        return itemEntityList;
+    }
+
+    private boolean checkItemBarcodeAlreadyExist(List<ItemEntity> itemEntityList){
         boolean itemExists = false;
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCodeAndIsDeleted(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode(), false);
-        if(!itemEntityList.isEmpty()){
+        if (itemEntityList != null && !itemEntityList.isEmpty()) {
             itemExists = true;
         }
         return itemExists;
+    }
+
+    private boolean isItemDeaccessioned(List<ItemEntity> itemEntityList){
+        boolean itemDeleted = false;
+        if (itemEntityList != null && itemEntityList.size()>0) {
+            for(ItemEntity itemEntity : itemEntityList){
+                return itemEntity.isDeleted();
+            }
+        }
+        return itemDeleted;
     }
 
     private String createDummyRecordIfAny(String response, String owningInstitution, String customerCode, StringBuilder responseBuilder, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
@@ -345,12 +367,18 @@ public class AccessionService {
         if (bibliographicEntity != null) {
             BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
             if (null != savedBibliographicEntity) {
-                SolrInputDocument solrInputDocument = getSolrIndexService().indexByBibliographicId(savedBibliographicEntity.getBibliographicId());
-                if(solrInputDocument != null)
-                    solrInputDocumentList.add(solrInputDocument);
-                response = RecapConstants.SUCCESS;
+                response = indexBibliographicRecord(solrInputDocumentList, savedBibliographicEntity.getBibliographicId());
             }
         }
+        return response;
+    }
+
+    private String indexBibliographicRecord(List<SolrInputDocument> solrInputDocumentList, Integer bibliographicId) {
+        String response;
+        SolrInputDocument solrInputDocument = getSolrIndexService().indexByBibliographicId(bibliographicId);
+        if(solrInputDocument != null)
+            solrInputDocumentList.add(solrInputDocument);
+        response = RecapConstants.SUCCESS;
         return response;
     }
 
@@ -407,10 +435,6 @@ public class AccessionService {
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedBibliographicEntity);
         return savedBibliographicEntity;
-    }
-
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
     }
 
     private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
@@ -588,6 +612,43 @@ public class AccessionService {
         return savedBibliographicEntity;
     }
 
+    private String reAccessionItem(List<ItemEntity> itemEntityList){
+        try {
+            for(ItemEntity itemEntity:itemEntityList){
+                itemEntity.setDeleted(false);
+                for (HoldingsEntity holdingsEntity:itemEntity.getHoldingsEntities()) {
+                    holdingsEntity.setDeleted(false);
+                }
+                for(BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()){
+                    bibliographicEntity.setDeleted(false);
+                }
+            }
+            itemDetailsRepository.save(itemEntityList);
+            itemDetailsRepository.flush();
+
+        } catch (Exception e) {
+            logger.error(RecapConstants.EXCEPTION,e);
+            return RecapConstants.FAILURE;
+        }
+        return RecapConstants.SUCCESS;
+    }
+
+    private String indexReaccessionedItem(List<ItemEntity> itemEntityList){
+        try {
+            for(ItemEntity itemEntity:itemEntityList){
+                itemEntity.getBibliographicEntities();
+                for (BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()) {
+                    List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
+                    indexBibliographicRecord(solrInputDocumentList,bibliographicEntity.getBibliographicId());
+                }
+            }
+        } catch (Exception e) {
+            logger.error(RecapConstants.EXCEPTION,e);
+            return RecapConstants.FAILURE;
+        }
+        return RecapConstants.SUCCESS;
+    }
+
     private BibliographicEntity getBibEntityUsingBarcodeForIncompleteRecord(String itemBarcode){
         List<String> itemBarcodeList = new ArrayList<>();
         itemBarcodeList.add(itemBarcode);
@@ -637,7 +698,7 @@ public class AccessionService {
         return null;
     }
 
-    public Map getInstitutionEntityMap() {
+    private Map getInstitutionEntityMap() {
         if (null == institutionEntityMap) {
             institutionEntityMap = new HashMap();
             try {
@@ -653,7 +714,7 @@ public class AccessionService {
         return institutionEntityMap;
     }
 
-    public Map getItemStatusMap() {
+    private Map getItemStatusMap() {
         if (null == itemStatusMap) {
             itemStatusMap = new HashMap();
             try {
@@ -669,7 +730,7 @@ public class AccessionService {
         return itemStatusMap;
     }
 
-    public Map getCollectionGroupMap() {
+    private Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
             try {
