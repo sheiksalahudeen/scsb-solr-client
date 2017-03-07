@@ -22,7 +22,7 @@ import java.util.*;
 @Api(value="search", description="Search Records", position = 1)
 public class SearchRecordRestController {
 
-    private Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
 
     @Autowired
     SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();

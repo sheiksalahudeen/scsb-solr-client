@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class DeAccessionSummaryRecordGenerator {
 
-    Logger logger = LoggerFactory.getLogger(DeAccessionSummaryRecordGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeAccessionSummaryRecordGenerator.class);
 
     public DeAccessionSummaryRecord prepareDeAccessionSummaryReportRecord(ReportEntity reportEntity) {
 

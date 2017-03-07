@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
  */
 public class HoldingsIndexCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(HoldingsIndexCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(HoldingsIndexCallable.class);
 
     private final int pageNum;
     private final int docsPerPage;

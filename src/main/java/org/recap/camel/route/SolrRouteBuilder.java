@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SolrRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(SolrRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrRouteBuilder.class);
 
     @Autowired
     public SolrRouteBuilder(CamelContext camelContext,

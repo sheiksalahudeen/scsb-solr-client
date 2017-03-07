@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
  */
 public class BibItemIndexCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(BibItemIndexCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibItemIndexCallable.class);
 
     private final int pageNum;
     private final int docsPerPage;

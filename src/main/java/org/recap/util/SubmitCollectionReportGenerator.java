@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class SubmitCollectionReportGenerator {
 
-    Logger logger = LoggerFactory.getLogger(SubmitCollectionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubmitCollectionReportGenerator.class);
 
     public SubmitCollectionReportRecord prepareSubmitCollectionRejectionRecord(ReportEntity reportEntity) {
 

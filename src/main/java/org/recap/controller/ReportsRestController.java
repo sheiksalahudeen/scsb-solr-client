@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/reportsService")
 public class ReportsRestController {
 
-    private Logger logger = LoggerFactory.getLogger(ReportsRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsRestController.class);
 
     @Autowired
     ReportsServiceUtil reportsServiceUtil;

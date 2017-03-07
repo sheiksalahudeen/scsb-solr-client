@@ -22,7 +22,7 @@ import java.util.List;
 @Component
 public class ReportGenerator {
 
-    Logger logger = LoggerFactory.getLogger(ReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

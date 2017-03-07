@@ -34,7 +34,7 @@ import java.util.Map;
 @Controller
 public class MatchingAlgorithmController {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
 
     @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;

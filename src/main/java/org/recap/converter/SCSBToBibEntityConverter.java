@@ -29,7 +29,7 @@ import java.util.*;
 @Service
 public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterface {
 
-    Logger logger = LoggerFactory.getLogger(SCSBToBibEntityConverter.class);
+    private static final Logger logger = LoggerFactory.getLogger(SCSBToBibEntityConverter.class);
 
     @Autowired
     private DBReportUtil dbReportUtil;

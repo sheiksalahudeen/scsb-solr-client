@@ -26,7 +26,7 @@ import java.util.Date;
 @Controller
 public class GenerateReportController {
 
-    Logger logger = LoggerFactory.getLogger(GenerateReportController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenerateReportController.class);
 
     @Autowired
     ReportGenerator reportGenerator;

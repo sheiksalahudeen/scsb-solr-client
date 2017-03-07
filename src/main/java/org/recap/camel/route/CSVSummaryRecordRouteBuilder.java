@@ -20,7 +20,7 @@ import java.io.File;
 @Component
 public class CSVSummaryRecordRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(CSVSummaryRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVSummaryRecordRouteBuilder.class);
 
     @Autowired
     public CSVSummaryRecordRouteBuilder(CamelContext context, @Value("${matching.report.directory}") String matchingReportsDirectory) {

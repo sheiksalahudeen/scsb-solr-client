@@ -2,7 +2,6 @@ package org.recap.service.accession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
@@ -19,12 +18,13 @@ import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,7 +42,7 @@ import java.util.*;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AccessionService {
 
-    private static final Logger logger = Logger.getLogger(AccessionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccessionService.class);
 
     @Autowired
     MarcToBibEntityConverter marcToBibEntityConverter;
@@ -145,10 +145,6 @@ public class AccessionService {
 
     public EntityManager getEntityManager() {
         return entityManager;
-    }
-
-    public Logger getLog() {
-        return logger;
     }
 
     public String getOwningInstitution(String customerCode) {

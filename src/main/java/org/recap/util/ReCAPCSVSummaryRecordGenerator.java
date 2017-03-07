@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ReCAPCSVSummaryRecordGenerator {
 
-    Logger logger = LoggerFactory.getLogger(ReCAPCSVSummaryRecordGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVSummaryRecordGenerator.class);
 
     public SummaryReportReCAPCSVRecord prepareSummaryReportReCAPCSVRecord(ReportEntity reportEntity, SummaryReportReCAPCSVRecord summaryReportReCAPCSVRecord) {
 

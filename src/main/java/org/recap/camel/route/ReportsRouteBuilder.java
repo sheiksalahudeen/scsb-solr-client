@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ReportsRouteBuilder {
-    Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
     @Autowired
     public ReportsRouteBuilder(CamelContext camelContext, ReportProcessor reportProcessor) {

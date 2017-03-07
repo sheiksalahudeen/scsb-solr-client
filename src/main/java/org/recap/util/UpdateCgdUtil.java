@@ -27,7 +27,7 @@ import java.util.List;
 @Service
 public class UpdateCgdUtil {
 
-    Logger logger = LoggerFactory.getLogger(UpdateCgdUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCgdUtil.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

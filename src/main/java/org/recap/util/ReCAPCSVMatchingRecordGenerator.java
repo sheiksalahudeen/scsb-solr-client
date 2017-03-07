@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class ReCAPCSVMatchingRecordGenerator {
 
-    Logger logger = LoggerFactory.getLogger(ReCAPCSVMatchingRecordGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVMatchingRecordGenerator.class);
 
     public MatchingReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
 

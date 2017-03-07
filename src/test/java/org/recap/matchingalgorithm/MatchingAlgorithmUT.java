@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  */
 public class MatchingAlgorithmUT extends BaseTestCase {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUT.class);
 
     @Mock
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;

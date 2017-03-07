@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FTPSummaryRecordRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FTPSummaryRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSummaryRecordRouteBuilder.class);
 
     @Autowired
     public FTPSummaryRecordRouteBuilder(CamelContext context,

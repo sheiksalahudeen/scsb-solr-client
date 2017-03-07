@@ -24,7 +24,7 @@ import java.util.concurrent.*;
  */
 public abstract class MatchingIndexExecutorService {
 
-    Logger logger = LoggerFactory.getLogger(MatchingIndexExecutorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingIndexExecutorService.class);
 
     @Autowired
     SolrAdmin solrAdmin;

@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

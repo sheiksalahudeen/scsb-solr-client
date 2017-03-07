@@ -32,7 +32,7 @@ import java.util.*;
 @Component
 public class OngoingMatchingAlgorithmUtil {
 
-    Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmUtil.class);
 
     @Autowired
     SolrQueryBuilder solrQueryBuilder;

@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(FTPSolrExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSolrExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

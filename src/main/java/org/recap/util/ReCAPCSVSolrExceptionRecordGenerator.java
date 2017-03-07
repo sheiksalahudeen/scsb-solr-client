@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ReCAPCSVSolrExceptionRecordGenerator {
 
-    Logger logger= LoggerFactory.getLogger(ReCAPCSVSolrExceptionRecordGenerator.class);
+    private static final Logger logger= LoggerFactory.getLogger(ReCAPCSVSolrExceptionRecordGenerator.class);
 
     public SolrExceptionReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord) {
 

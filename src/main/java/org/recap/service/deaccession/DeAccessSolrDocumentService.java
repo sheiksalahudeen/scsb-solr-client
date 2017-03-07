@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class DeAccessSolrDocumentService {
 
-    Logger logger = LoggerFactory.getLogger(DeAccessSolrDocumentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeAccessSolrDocumentService.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

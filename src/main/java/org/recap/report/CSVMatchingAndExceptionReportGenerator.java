@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVMatchingAndExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVMatchingAndExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

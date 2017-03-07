@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
  */
 public class MatchingAlgoReportUT extends BaseTestCase {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgoReportUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgoReportUT.class);
 
     @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;

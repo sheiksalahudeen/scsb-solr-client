@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
  */
 public class SaveMatchingBibsCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
 
     private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
     private String matchCriteria;

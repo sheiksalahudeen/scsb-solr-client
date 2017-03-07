@@ -19,7 +19,7 @@ import java.io.File;
 @Component
 public class FSSubmitCollectionExceptionReportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FSSubmitCollectionExceptionReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FSSubmitCollectionExceptionReportRouteBuilder.class);
 
     @Autowired
     public FSSubmitCollectionExceptionReportRouteBuilder(CamelContext context, @Value("${submit.collection.report.directory}") String reportsDirectory) {

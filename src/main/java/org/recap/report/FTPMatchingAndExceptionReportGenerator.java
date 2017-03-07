@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorInterface {
 
-    Logger logger = LoggerFactory.getLogger(FTPMatchingAndExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPMatchingAndExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

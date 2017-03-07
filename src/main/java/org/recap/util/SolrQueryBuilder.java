@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Component
 public class SolrQueryBuilder {
 
-    private Logger logger = LoggerFactory.getLogger(SolrQueryBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrQueryBuilder.class);
 
     String and = " AND ";
 

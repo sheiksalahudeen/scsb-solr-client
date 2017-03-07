@@ -33,7 +33,7 @@ import java.util.*;
 @Service
 public class ReportsServiceUtil {
 
-    private Logger logger = LoggerFactory.getLogger(ReportsServiceUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsServiceUtil.class);
 
     @Autowired
     SolrTemplate solrTemplate;

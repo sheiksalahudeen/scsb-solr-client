@@ -29,7 +29,7 @@ import java.util.concurrent.*;
 
 public abstract class IndexExecutorService {
 
-    Logger logger = LoggerFactory.getLogger(IndexExecutorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(IndexExecutorService.class);
 
     @Autowired
     SolrAdmin solrAdmin;

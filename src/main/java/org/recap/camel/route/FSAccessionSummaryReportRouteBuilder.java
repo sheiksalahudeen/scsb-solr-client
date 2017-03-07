@@ -19,7 +19,7 @@ import java.io.File;
 @Component
 public class FSAccessionSummaryReportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FSAccessionSummaryReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FSAccessionSummaryReportRouteBuilder.class);
 
     @Autowired
     public FSAccessionSummaryReportRouteBuilder (CamelContext context, @Value("${scsb.collection.report.directory}") String reportsDirectory){

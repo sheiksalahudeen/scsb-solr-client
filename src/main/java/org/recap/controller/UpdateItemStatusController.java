@@ -22,7 +22,7 @@ import java.util.List;
 public class UpdateItemStatusController {
 
 
-    private Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
 
     @Autowired
     UpdateCgdUtil updateCgdUtil;

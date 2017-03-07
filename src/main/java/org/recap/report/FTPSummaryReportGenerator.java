@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class FTPSummaryReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

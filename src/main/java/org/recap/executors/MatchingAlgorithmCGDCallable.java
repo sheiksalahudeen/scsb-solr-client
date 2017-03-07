@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
  */
 public class MatchingAlgorithmCGDCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDCallable.class);
 
     private ReportDataDetailsRepository reportDataDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;

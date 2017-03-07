@@ -19,7 +19,7 @@ import java.io.*;
 @Component
 public class EmailRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
 
     private String emailBody;
     private String emailPassword;

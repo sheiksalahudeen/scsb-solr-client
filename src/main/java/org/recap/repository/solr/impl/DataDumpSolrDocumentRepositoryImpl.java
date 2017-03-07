@@ -3,7 +3,6 @@ package org.recap.repository.solr.impl;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -22,6 +21,8 @@ import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.recap.util.SolrQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
@@ -36,7 +37,7 @@ import java.util.*;
 @Repository
 public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
-    private static final Logger log = Logger.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
 
     String and = " AND ";
     String or = " OR ";
@@ -64,7 +65,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             }
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
         } catch (IOException|SolrServerException e) {
-            log.error(RecapConstants.LOG_ERROR,e);
+            logger.error(RecapConstants.LOG_ERROR,e);
             response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         }
         return response;
@@ -174,7 +175,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 }
             }
         } catch (IOException|SolrServerException e) {
-            log.error(RecapConstants.LOG_ERROR,e);
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 
@@ -219,7 +220,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 }
             }
         } catch (Exception e) {
-            log.error(RecapConstants.LOG_ERROR,e);
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 

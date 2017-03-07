@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class ItemJSONUtilUT extends BaseTestCase {
 
-    Logger logger = LoggerFactory.getLogger(ItemJSONUtilUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(ItemJSONUtilUT.class);
 
     @Test
     public void generateItemForIndex(){

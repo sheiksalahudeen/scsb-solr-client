@@ -21,7 +21,7 @@ import java.util.Map;
 @Service
 public class NYPLService {
 
-    Logger logger = LoggerFactory.getLogger(NYPLService.class);
+    private static final Logger logger = LoggerFactory.getLogger(NYPLService.class);
 
     @Value("${ils.nypl.bibdata}")
     String ilsNYPLBibData;

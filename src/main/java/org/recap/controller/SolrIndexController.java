@@ -37,7 +37,7 @@ import java.util.Map;
 @Controller
 public class SolrIndexController {
 
-    Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
 
     @Autowired
     BibIndexExecutorService bibIndexExecutorService;

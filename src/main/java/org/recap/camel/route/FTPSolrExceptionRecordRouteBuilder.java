@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FTPSolrExceptionRecordRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FTPSolrExceptionRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSolrExceptionRecordRouteBuilder.class);
 
     @Autowired
     public FTPSolrExceptionRecordRouteBuilder(CamelContext context,

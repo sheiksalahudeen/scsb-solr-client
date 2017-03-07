@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class MatchingAlgorithmProcessor {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmProcessor.class);
 
     @Autowired
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;

@@ -19,7 +19,7 @@ import java.io.File;
 @Component
 public class CSVSolrExceptionRecordRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(CSVSolrExceptionRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVSolrExceptionRecordRouteBuilder.class);
 
     @Autowired
     public CSVSolrExceptionRecordRouteBuilder(CamelContext context, @Value("${solr.report.directory}") String matchingReportsDirectory) {

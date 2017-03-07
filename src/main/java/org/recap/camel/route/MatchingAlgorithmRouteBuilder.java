@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MatchingAlgorithmRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmRouteBuilder.class);
 
     @Autowired
     public MatchingAlgorithmRouteBuilder(CamelContext camelContext) {

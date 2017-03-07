@@ -25,7 +25,7 @@ import java.util.List;
 @Component
 public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;

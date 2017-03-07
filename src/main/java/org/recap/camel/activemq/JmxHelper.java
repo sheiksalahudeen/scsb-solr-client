@@ -22,7 +22,7 @@ import java.io.IOException;
 @Component
 public class JmxHelper {
 
-    Logger logger = LoggerFactory.getLogger(JmxHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(JmxHelper.class);
 
     @Value("${activemq.jmx.service.url}")
     private String serviceUrl;

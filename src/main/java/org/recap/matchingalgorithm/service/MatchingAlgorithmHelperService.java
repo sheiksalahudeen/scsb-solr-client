@@ -34,7 +34,7 @@ import java.util.concurrent.*;
 @Service
 public class MatchingAlgorithmHelperService {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmHelperService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmHelperService.class);
 
     @Autowired
     MatchingBibDetailsRepository matchingBibDetailsRepository;

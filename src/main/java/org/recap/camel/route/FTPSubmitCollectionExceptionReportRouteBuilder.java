@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FTPSubmitCollectionExceptionReportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
 
     @Autowired
     public FTPSubmitCollectionExceptionReportRouteBuilder(CamelContext context,

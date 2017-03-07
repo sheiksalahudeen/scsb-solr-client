@@ -1,13 +1,14 @@
 package org.recap.service.accession;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.util.BibJSONUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.io.IOException;
 @Service
 public class SolrIndexService {
 
-    Logger logger = Logger.getLogger(SolrIndexService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrIndexService.class);
 
     @Autowired
     ProducerTemplate producerTemplate;

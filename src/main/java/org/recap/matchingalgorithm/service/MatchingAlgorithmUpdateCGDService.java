@@ -28,7 +28,7 @@ import java.util.concurrent.*;
 @Component
 public class MatchingAlgorithmUpdateCGDService {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUpdateCGDService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUpdateCGDService.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;

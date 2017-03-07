@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class RecapErrorPageController implements ErrorController {
 
-    Logger logger = LoggerFactory.getLogger(RecapErrorPageController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecapErrorPageController.class);
 
     private static final String PATH = "/error";
 

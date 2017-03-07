@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class MatchingAlgorithmCGDProcessor {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDProcessor.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ProducerTemplate producerTemplate;

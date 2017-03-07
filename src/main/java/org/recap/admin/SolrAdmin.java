@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 public class SolrAdmin {
 
-    Logger logger = LoggerFactory.getLogger(SolrAdmin.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrAdmin.class);
 
     @Value("${solr.configsets.dir}")
     String configSetsDir;

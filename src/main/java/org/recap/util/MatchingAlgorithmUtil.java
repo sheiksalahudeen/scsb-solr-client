@@ -36,7 +36,7 @@ import java.util.*;
 @Component
 public class MatchingAlgorithmUtil {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
 
     @Autowired
     ProducerTemplate producerTemplate;

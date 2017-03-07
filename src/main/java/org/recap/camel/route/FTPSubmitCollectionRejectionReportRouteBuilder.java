@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FTPSubmitCollectionRejectionReportRouteBuilder {
 
-    Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionRejectionReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionRejectionReportRouteBuilder.class);
 
     @Autowired
     public FTPSubmitCollectionRejectionReportRouteBuilder(CamelContext context,

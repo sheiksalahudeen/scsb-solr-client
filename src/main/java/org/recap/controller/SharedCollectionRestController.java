@@ -28,7 +28,7 @@ import java.util.*;
 @RequestMapping("/sharedCollection")
 public class SharedCollectionRestController {
 
-    private Logger logger = LoggerFactory.getLogger(SharedCollectionRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SharedCollectionRestController.class);
 
     @Autowired
     private ItemAvailabilityService itemAvailabilityService;
