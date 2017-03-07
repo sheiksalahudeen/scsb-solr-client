@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm;
+package org.recap.matchingalgorithm;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,19 +8,17 @@ import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.controller.MatchingAlgorithmController;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmUpdateCGDService;
 import org.recap.repository.jpa.MatchingBibDetailsRepository;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.StopWatch;
 
 import java.text.Normalizer;
-import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +27,7 @@ import static org.junit.Assert.*;
  */
 public class MatchingAlgorithmUT extends BaseTestCase {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUT.class);
 
     @Mock
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;

@@ -356,4 +356,20 @@ public class RecapConstants {
     public static final String HYPHEN = " - ";
     public static final String ITEM_ALREADY_ACCESSIONED = "Item already accessioned";
 
+    public static final String STATUS_DONE="Status  : Done";
+    public static final String TOTAL_TIME_TAKEN="Total Time Taken  : ";
+    public static final String STATUS_FAILED="Status : Failed";
+    public static final String PUL_MATCHING_COUNT="pulMatchingCount";
+    public static final String CUL_MATCHING_COUNT="culMatchingCount";
+    public static final String NYPL_MATCHING_COUNT="nyplMatchingCount";
+    public static final String GENERATED_REPORT_FILE_NAME="The Generated Report File Name : ";
+    public static final String TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME="Total time taken to generate File : ";
+    public static final String ACCESSION_FAILURE_REPORT="Accession_Failure_Report";
+    public static final String TOTAL_BIB_ID_PARTITION_LIST="Total Bib Id partition List : ";
+    public static final String NON_MONOGRAPH_RECORD_NUMS="NonMonographRecordNums";
+    public static final String EXCEPTION_RECORD_NUMS="ExceptionRecordNums";
+
+    //Logger
+    public static final String LOG_ERROR="error-->";
+
 }

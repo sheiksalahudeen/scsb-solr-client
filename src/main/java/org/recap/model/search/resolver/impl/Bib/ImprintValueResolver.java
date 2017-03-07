@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class ImprintValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("Imprint");
+        return "Imprint".equalsIgnoreCase(field);
     }
 
     @Override

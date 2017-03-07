@@ -35,7 +35,7 @@ public class FSOngoingAccessionReportGenerator implements ReportGeneratorInterfa
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
-        String generatedFileName = null;
+        String generatedFileName;
         List<OngoingAccessionReportRecord> ongoingAccessionReportRecordList = new ArrayList<>();
         OngoingAccessionReportGenerator ongoingAccessionReportGenerator = new OngoingAccessionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {

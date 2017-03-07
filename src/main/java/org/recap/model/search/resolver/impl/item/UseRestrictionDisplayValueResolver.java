@@ -10,7 +10,7 @@ public class UseRestrictionDisplayValueResolver implements ItemValueResolver {
 
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("UseRestriction_display");
+        return "UseRestriction_display".equals(field);
     }
 
     @Override

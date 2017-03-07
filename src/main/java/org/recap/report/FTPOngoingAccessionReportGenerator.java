@@ -3,10 +3,8 @@ package org.recap.report;
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
 import org.recap.model.csv.OngoingAccessionReportRecord;
-import org.recap.model.csv.SubmitCollectionReportRecord;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.util.OngoingAccessionReportGenerator;
-import org.recap.util.SubmitCollectionReportGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +35,7 @@ public class FTPOngoingAccessionReportGenerator implements ReportGeneratorInterf
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
-        String generatedFileName = null;
+        String generatedFileName;
         List<OngoingAccessionReportRecord> ongoingAccessionReportRecordList = new ArrayList<>();
         OngoingAccessionReportGenerator ongoingAccessionReportGenerator = new OngoingAccessionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {

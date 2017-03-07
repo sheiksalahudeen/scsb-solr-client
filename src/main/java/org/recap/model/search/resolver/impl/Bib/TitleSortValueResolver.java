@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class TitleSortValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("Title_sort");
+        return "Title_sort".equalsIgnoreCase(field);
     }
 
     @Override

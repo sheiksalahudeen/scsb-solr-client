@@ -35,7 +35,7 @@ public class FTPSubmitCollectionExceptionReportGenerator implements ReportGenera
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
-        String generatedFileName = null;
+        String generatedFileName;
         List<SubmitCollectionReportRecord> submitCollectionReportRecordList = new ArrayList<>();
         SubmitCollectionReportGenerator submitCollectionReportGenerator = new SubmitCollectionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {

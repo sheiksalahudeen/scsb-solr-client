@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class VolumePartYearValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("VolumePartYear");
+        return "VolumePartYear".equals(field);
     }
 
     @Override

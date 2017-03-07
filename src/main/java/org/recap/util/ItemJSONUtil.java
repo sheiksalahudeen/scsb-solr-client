@@ -18,11 +18,12 @@ import java.util.List;
  */
 public class ItemJSONUtil extends MarcUtil{
 
-    Logger logger = LoggerFactory.getLogger(ItemJSONUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ItemJSONUtil.class);
 
     private ProducerTemplate producerTemplate;
 
     public ItemJSONUtil() {
+        //Do Nothing
     }
 
     public Item generateItemForIndex(ItemEntity itemEntity) {

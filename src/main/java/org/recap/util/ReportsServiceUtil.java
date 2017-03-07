@@ -33,7 +33,7 @@ import java.util.*;
 @Service
 public class ReportsServiceUtil {
 
-    private Logger logger = LoggerFactory.getLogger(ReportsServiceUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsServiceUtil.class);
 
     @Autowired
     SolrTemplate solrTemplate;
@@ -254,7 +254,7 @@ public class ReportsServiceUtil {
 
     private String getFormattedDateString(Date inputDate) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
-        String utcStr = null;
+        String utcStr;
         String dateString = simpleDateFormat.format(inputDate);
         Date date = simpleDateFormat.parse(dateString);
         DateFormat format = new SimpleDateFormat(RecapConstants.UTC_DATE_FORMAT);

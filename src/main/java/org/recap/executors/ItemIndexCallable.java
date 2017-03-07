@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
  */
 public class ItemIndexCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(ItemIndexCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(ItemIndexCallable.class);
 
     private int pageNum;
     private int docsPerPage;
@@ -67,15 +67,16 @@ public class ItemIndexCallable implements Callable {
             try {
                 Future future = futureIterator.next();
                 Item item = (Item) future.get();
-                if(item != null) itemsToIndex.add(item);
+                if(item != null)
+                    itemsToIndex.add(item);
             } catch (Exception e) {
-                logger.error("Exception : " + e.getMessage());
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
 
         executorService.shutdown();
 
-        logger.info("No of Items to index : " + itemsToIndex.size());
+        logger.info("No of Items to index : {}",itemsToIndex.size());
 
         if (!CollectionUtils.isEmpty(itemsToIndex)) {
             producerTemplate.sendBodyAndHeader(RecapConstants.SOLR_QUEUE, itemsToIndex, RecapConstants.SOLR_CORE, coreName);

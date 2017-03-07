@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
  */
 public class BibItemIndexExecutorServiceUT extends BaseTestCase{
 
-    Logger logger = LoggerFactory.getLogger(BibItemIndexExecutorServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibItemIndexExecutorServiceUT.class);
 
     @Mock
     BibliographicDetailsRepository mockBibliographicDetailsRepository;

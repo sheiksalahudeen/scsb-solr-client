@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.UpdateCgdUtil;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +22,7 @@ import java.util.List;
 public class UpdateItemStatusController {
 
 
-    private Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
 
     @Autowired
     UpdateCgdUtil updateCgdUtil;
@@ -40,7 +40,7 @@ public class UpdateItemStatusController {
             statusMessage = "Solr Indexing Successful";
         } catch (Exception e) {
             statusMessage = "Solr Indexing Failed";
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return statusMessage;
     }

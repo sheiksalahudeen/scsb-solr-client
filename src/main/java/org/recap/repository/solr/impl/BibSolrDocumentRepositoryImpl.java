@@ -2,7 +2,6 @@ package org.recap.repository.solr.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -26,6 +25,8 @@ import org.recap.model.solr.Holdings;
 import org.recap.model.solr.Item;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.recap.util.SolrQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
@@ -42,7 +43,7 @@ import java.util.*;
 @Repository
 public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
-    Logger log = Logger.getLogger(BibSolrDocumentRepositoryImpl.class);
+    Logger logger = LoggerFactory.getLogger(BibSolrDocumentRepositoryImpl.class);
 
     @Resource
     private SolrTemplate solrTemplate;
@@ -73,11 +74,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 bibItems = searchByBib(searchRecordsRequest);
             }
             response.put(RecapConstants.SEARCH_SUCCESS_RESPONSE, bibItems);
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-            response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
             response.put(RecapConstants.SEARCH_ERROR_RESPONSE, e.getMessage());
         }
         return response;
@@ -162,10 +160,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     }
                 }
             }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return bibItems;
     }
@@ -199,10 +195,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     }
                 }
             }
-        } catch (SolrServerException e) {
-            log.error(e.getMessage());
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException|SolrServerException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
     }
 
@@ -367,6 +361,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return holdingsValueResolvers;
     }
 
+    @Override
     public Integer getPageNumberOnPageSizeChange(SearchRecordsRequest searchRecordsRequest) {
         int totalRecordsCount;
         Integer pageNumber = searchRecordsRequest.getPageNumber();
@@ -383,7 +378,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 pageNumber = totalPagesCount - 1;
             }
         } catch (ParseException e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return pageNumber;
     }

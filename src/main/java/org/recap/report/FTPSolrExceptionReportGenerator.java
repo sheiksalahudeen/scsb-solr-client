@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
-    Logger logger = LoggerFactory.getLogger(FTPSolrExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSolrExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -58,14 +58,13 @@ public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : " + solrExceptionReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : {} " , stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : {} " , solrExceptionReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(solrExceptionReportReCAPCSVRecords)) {
             producer.sendBodyAndHeader(RecapConstants.FTP_SOLR_EXCEPTION_REPORT_Q, solrExceptionReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return fileName + "-" + df.format(new Date()) + ".csv";
         }
 
         return null;

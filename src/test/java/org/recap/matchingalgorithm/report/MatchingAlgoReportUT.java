@@ -1,8 +1,8 @@
-package org.recap.matchingAlgorithm.report;
+package org.recap.matchingalgorithm.report;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
  */
 public class MatchingAlgoReportUT extends BaseTestCase {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgoReportUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgoReportUT.class);
 
     @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;

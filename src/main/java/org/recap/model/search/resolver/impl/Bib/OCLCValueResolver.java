@@ -11,7 +11,7 @@ import java.util.List;
 public class OCLCValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("OCLCNumber");
+        return "OCLCNumber".equalsIgnoreCase(field);
     }
 
     @Override

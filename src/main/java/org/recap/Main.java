@@ -1,6 +1,5 @@
 package org.recap;
 
-import org.apache.catalina.connector.Connector;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,19 +43,13 @@ public class Main {
 
 	@Bean
 	public SolrTemplate solrTemplate(SolrClient solrClient) throws Exception {
-		SolrTemplate solrTemplate = new SolrTemplate(solrClient);
-		return solrTemplate;
+		return new SolrTemplate(solrClient);
 	}
 
 	@Bean
 	public EmbeddedServletContainerFactory servletContainerFactory() {
 		TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
-		factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
-			@Override
-			public void customize(Connector connector) {
-				connector.setMaxParameterCount(tomcatMaxParameterCount);
-			}
-		});
+		factory.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> connector.setMaxParameterCount(tomcatMaxParameterCount));
 		return factory;
 	}
 

@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.recap.RecapConstants;
 import org.recap.model.reports.ReportsRequest;
 import org.recap.model.reports.ReportsResponse;
 import org.recap.util.ReportsServiceUtil;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/reportsService")
 public class ReportsRestController {
 
-    private Logger logger = LoggerFactory.getLogger(ReportsRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportsRestController.class);
 
     @Autowired
     ReportsServiceUtil reportsServiceUtil;
@@ -30,7 +31,7 @@ public class ReportsRestController {
         try {
             reportsResponse = reportsServiceUtil.populateAccessionDeaccessionItemCounts(reportsRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
             reportsResponse.setMessage(e.getMessage());
         }
         return reportsResponse;
@@ -42,7 +43,7 @@ public class ReportsRestController {
         try {
             reportsResponse = reportsServiceUtil.populateCgdItemCounts(reportsRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
             reportsResponse.setMessage(e.getMessage());
         }
         return reportsResponse;
@@ -54,7 +55,7 @@ public class ReportsRestController {
         try {
             reportsResponse = reportsServiceUtil.populateDeaccessionResults(reportsRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
             reportsResponse.setMessage(e.getMessage());
         }
         return reportsResponse;

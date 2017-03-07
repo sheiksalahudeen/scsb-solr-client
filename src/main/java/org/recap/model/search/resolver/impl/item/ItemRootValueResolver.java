@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class ItemRootValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("_root_");
+        return "_root_".equals(field);
     }
 
     @Override

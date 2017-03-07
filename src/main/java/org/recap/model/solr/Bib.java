@@ -411,18 +411,25 @@ public class Bib {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Bib)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Bib))
+            return false;
 
         Bib bib = (Bib) o;
 
-        if (getId() != null ? !getId().equals(bib.getId()) : bib.getId() != null) return false;
+        if (getId() != null ? !getId().equals(bib.getId()) : bib.getId() != null)
+            return false;
         if (getContentType() != null ? !getContentType().equals(bib.getContentType()) : bib.getContentType() != null)
             return false;
-        if (getBibId() != null ? !getBibId().equals(bib.getBibId()) : bib.getBibId() != null) return false;
-        if (getDocType() != null ? !getDocType().equals(bib.getDocType()) : bib.getDocType() != null) return false;
-        if (getBarcode() != null ? !getBarcode().equals(bib.getBarcode()) : bib.getBarcode() != null) return false;
-        if (getTitle() != null ? !getTitle().equals(bib.getTitle()) : bib.getTitle() != null) return false;
+        if (getBibId() != null ? !getBibId().equals(bib.getBibId()) : bib.getBibId() != null)
+            return false;
+        if (getDocType() != null ? !getDocType().equals(bib.getDocType()) : bib.getDocType() != null)
+            return false;
+        if (getBarcode() != null ? !getBarcode().equals(bib.getBarcode()) : bib.getBarcode() != null)
+            return false;
+        if (getTitle() != null ? !getTitle().equals(bib.getTitle()) : bib.getTitle() != null)
+            return false;
         if (getTitleDisplay() != null ? !getTitleDisplay().equals(bib.getTitleDisplay()) : bib.getTitleDisplay() != null)
             return false;
         if (getTitleStartsWith() != null ? !getTitleStartsWith().equals(bib.getTitleStartsWith()) : bib.getTitleStartsWith() != null)
@@ -439,16 +446,22 @@ public class Bib {
             return false;
         if (getPublicationDate() != null ? !getPublicationDate().equals(bib.getPublicationDate()) : bib.getPublicationDate() != null)
             return false;
-        if (getSubject() != null ? !getSubject().equals(bib.getSubject()) : bib.getSubject() != null) return false;
-        if (getIsbn() != null ? !getIsbn().equals(bib.getIsbn()) : bib.getIsbn() != null) return false;
-        if (getIssn() != null ? !getIssn().equals(bib.getIssn()) : bib.getIssn() != null) return false;
+        if (getSubject() != null ? !getSubject().equals(bib.getSubject()) : bib.getSubject() != null)
+            return false;
+        if (getIsbn() != null ? !getIsbn().equals(bib.getIsbn()) : bib.getIsbn() != null)
+            return false;
+        if (getIssn() != null ? !getIssn().equals(bib.getIssn()) : bib.getIssn() != null)
+            return false;
         if (getOclcNumber() != null ? !getOclcNumber().equals(bib.getOclcNumber()) : bib.getOclcNumber() != null)
             return false;
         if (getMaterialType() != null ? !getMaterialType().equals(bib.getMaterialType()) : bib.getMaterialType() != null)
             return false;
-        if (getNotes() != null ? !getNotes().equals(bib.getNotes()) : bib.getNotes() != null) return false;
-        if (getLccn() != null ? !getLccn().equals(bib.getLccn()) : bib.getLccn() != null) return false;
-        if (getImprint() != null ? !getImprint().equals(bib.getImprint()) : bib.getImprint() != null) return false;
+        if (getNotes() != null ? !getNotes().equals(bib.getNotes()) : bib.getNotes() != null)
+            return false;
+        if (getLccn() != null ? !getLccn().equals(bib.getLccn()) : bib.getLccn() != null)
+            return false;
+        if (getImprint() != null ? !getImprint().equals(bib.getImprint()) : bib.getImprint() != null)
+            return false;
         if (getHoldingsIdList() != null ? !getHoldingsIdList().equals(bib.getHoldingsIdList()) : bib.getHoldingsIdList() != null)
             return false;
         if (getOwningInstHoldingsIdList() != null ? !getOwningInstHoldingsIdList().equals(bib.getOwningInstHoldingsIdList()) : bib.getOwningInstHoldingsIdList() != null)

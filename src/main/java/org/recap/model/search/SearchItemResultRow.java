@@ -3,8 +3,6 @@ package org.recap.model.search;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Comparator;
-
 /**
  * Created by rajesh on 18-Jul-16.
  */
@@ -108,5 +106,22 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
             return this.getChronologyAndEnum().compareTo(searchItemResultRow.getChronologyAndEnum());
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SearchItemResultRow))
+            return false;
+
+        SearchItemResultRow searchItemResultRow = (SearchItemResultRow) o;
+
+        return chronologyAndEnum.equals(searchItemResultRow.chronologyAndEnum);
+    }
+
+    @Override
+    public int hashCode() {
+        return chronologyAndEnum.hashCode();
     }
 }

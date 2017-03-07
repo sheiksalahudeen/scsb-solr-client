@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class MatchingAlgorithmProcessor {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmProcessor.class);
 
     @Autowired
     MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
@@ -43,12 +43,12 @@ public class MatchingAlgorithmProcessor {
         try {
             matchingBibDetailsRepository.save(matchingBibEntities);
         } catch (Exception ex) {
-            logger.info("Exception : " + ex.getMessage());
+            logger.info("Exception : {}",ex);
             for(MatchingBibEntity matchingBibEntity : matchingBibEntities) {
                 try {
                     matchingBibDetailsRepository.save(matchingBibEntity);
                 } catch (Exception e) {
-                    logger.info("Exception for single Entity : " + e.getMessage());
+                    logger.info("Exception for single Entity : " , e);
                     logger.info("ISBN : " + matchingBibEntity.getIsbn());
                 }
             }

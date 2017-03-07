@@ -1,7 +1,5 @@
 package org.recap.model.search.resolver;
 
-import org.recap.model.solr.BibItem;
-
 /**
  * Created by peris on 9/29/16.
  */

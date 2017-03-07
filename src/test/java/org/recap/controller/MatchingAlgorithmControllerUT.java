@@ -7,11 +7,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
-import org.recap.util.MatchingAlgorithmUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -20,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 /**

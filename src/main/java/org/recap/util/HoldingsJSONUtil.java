@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class HoldingsJSONUtil extends MarcUtil {
 
-    Logger logger = LoggerFactory.getLogger(HoldingsJSONUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HoldingsJSONUtil.class);
 
     private ProducerTemplate producerTemplate;
 

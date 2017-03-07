@@ -37,7 +37,7 @@ import java.util.Map;
 @Controller
 public class SolrIndexController {
 
-    Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
 
     @Autowired
     BibIndexExecutorService bibIndexExecutorService;
@@ -104,21 +104,15 @@ public class SolrIndexController {
         }
         Integer commitInterval = solrIndexRequest.getCommitInterval();
 
-        logger.info("Document Type : " + docType
-                + "   Number of Threads : " + numberOfThread
-                + "   Number of Docs :" + numberOfDoc
-                + "   Commit Interval :" + commitInterval
-                + "   From Date : " + solrIndexRequest.getDateFrom());
+        logger.info("Document Type : {} Number of Threads : {} Number of Docs : {} Commit Interval : {} From Date : {}",docType,numberOfThread,numberOfDoc,commitInterval,solrIndexRequest.getDateFrom());
 
         if (solrIndexRequest.isDoClean()) {
             bibSolrCrudRepository.deleteAll();
             itemCrudRepository.deleteAll();
             try {
                 solrAdmin.unloadTempCores();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SolrServerException e) {
-                e.printStackTrace();
+            } catch (IOException | SolrServerException e) {
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
 
@@ -145,7 +139,7 @@ public class SolrIndexController {
             response = RecapConstants.SUCCESS;
         } catch (Exception e) {
             response = RecapConstants.FAILURE;
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return response;
     }
@@ -164,7 +158,7 @@ public class SolrIndexController {
             response = RecapConstants.SUCCESS;
         } catch (Exception e) {
             response = RecapConstants.FAILURE;
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return response;
     }

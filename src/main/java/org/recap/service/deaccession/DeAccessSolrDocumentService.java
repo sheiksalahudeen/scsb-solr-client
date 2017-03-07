@@ -1,4 +1,4 @@
-package org.recap.service.deAccession;
+package org.recap.service.deaccession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -10,6 +10,8 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.BibJSONUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,9 @@ import java.util.List;
 
 @Component
 public class DeAccessSolrDocumentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeAccessSolrDocumentService.class);
+
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
@@ -47,6 +52,7 @@ public class DeAccessSolrDocumentService {
             }
             return "Bib documents updated successfully.";
         }catch(Exception ex){
+            logger.error(RecapConstants.LOG_ERROR,ex);
             return "Bib documents failed to update.";
         }
     }
@@ -71,6 +77,7 @@ public class DeAccessSolrDocumentService {
             }
             return "Holdings documents updated successfully.";
         }catch(Exception ex){
+            logger.error(RecapConstants.LOG_ERROR,ex);
             return "Holdings documents failed to update.";
         }
     }
@@ -86,7 +93,7 @@ public class DeAccessSolrDocumentService {
                         for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
                             for (SolrInputDocument itemSolrInputDocument : holdingsSolrInputDocument.getChildDocuments()) {
                                 if (itemId.equals(itemSolrInputDocument.get(RecapConstants.ITEM_ID).getValue())) {
-                                    itemSolrInputDocument.setField(RecapConstants.IS_DELETED_ITEM,true);;
+                                    itemSolrInputDocument.setField(RecapConstants.IS_DELETED_ITEM,true);
                                 }
                             }
                         }
@@ -97,6 +104,7 @@ public class DeAccessSolrDocumentService {
             }
             return "Item documents updated successfully.";
         }catch(Exception ex){
+            logger.error(RecapConstants.LOG_ERROR,ex);
             return "Item documents failed to update.";
         }
     }

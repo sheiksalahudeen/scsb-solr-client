@@ -1,10 +1,10 @@
 package org.recap.controller;
 
+import org.recap.RecapConstants;
 import org.recap.util.UpdateCgdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/updateCgdService")
 public class UpdateCgdRestController {
 
-    private Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
 
     @Autowired
     UpdateCgdUtil updateCgdUtil;
@@ -29,7 +29,7 @@ public class UpdateCgdRestController {
         try {
             statusMessage = updateCgdUtil.updateCGDForItem(itemBarcode, owningInstitution, oldCollectionGroupDesignation, newCollectionGroupDesignation, cgdChangeNotes);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return statusMessage;
     }

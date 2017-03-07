@@ -1,7 +1,6 @@
 package org.recap.model.search.resolver.impl.Bib;
 
 import org.recap.model.search.resolver.BibValueResolver;
-import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;
 
 /**
@@ -10,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class BibIdValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("BibId");
+        return "BibId".equalsIgnoreCase(field);
     }
 
     @Override

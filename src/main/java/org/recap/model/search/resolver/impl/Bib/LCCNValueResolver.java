@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class LCCNValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("LCCN");
+        return "LCCN".equalsIgnoreCase(field);
     }
 
     @Override

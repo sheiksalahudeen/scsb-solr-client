@@ -144,7 +144,7 @@ public class MarcRecordViewUtil {
                 }
                 List<Subfield> subfields = marcDataField.getSubfields();
                 if (!CollectionUtils.isEmpty(subfields)) {
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     for (Subfield subfield : subfields) {
                         buffer.append("|").append(subfield.getCode());
                         buffer.append(" ").append(subfield.getData()).append(" ");

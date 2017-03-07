@@ -3,9 +3,9 @@ package org.recap.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.executors.MatchingBibItemIndexExecutorService;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmUpdateCGDService;
-import org.recap.matchingAlgorithm.service.MatchingBibInfoDetailService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmUpdateCGDService;
+import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import java.util.Map;
 @Controller
 public class MatchingAlgorithmController {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
 
     @Autowired
     MatchingAlgorithmHelperService matchingAlgorithmHelperService;
@@ -76,11 +76,11 @@ public class MatchingAlgorithmController {
 
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+            stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-            stringBuilder.append("Status : Failed");
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
         }
         return stringBuilder.toString();
     }
@@ -95,11 +95,11 @@ public class MatchingAlgorithmController {
             runReportsForMatchingAlgorithm(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
             logger.info("Total Time taken to process Matching Algorithm Reports : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+            stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-            stringBuilder.append("Status : Failed");
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
         }
         return stringBuilder.toString();
     }
@@ -114,11 +114,11 @@ public class MatchingAlgorithmController {
             matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
-            stringBuilder.append("Status  : Done" ).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+            stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-            stringBuilder.append("Status : Failed");
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
         }
         return stringBuilder.toString();
     }
@@ -128,7 +128,7 @@ public class MatchingAlgorithmController {
     public String updateCGDInSolr(@Valid @ModelAttribute("matchingAlgoDate") String matchingAlgoDate) {
         StringBuilder stringBuilder = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
-        Date lastUpdatedDate = null;
+        Date lastUpdatedDate;
         if(StringUtils.isNotBlank(matchingAlgoDate)) {
             try {
                 lastUpdatedDate = sdf.parse(matchingAlgoDate);
@@ -143,12 +143,12 @@ public class MatchingAlgorithmController {
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             String status = "Total number of records processed : " + totalProcessedRecords;
-            stringBuilder.append("Status  : Done").append("\n");
+            stringBuilder.append(RecapConstants.STATUS_DONE).append("\n");
             stringBuilder.append(status).append("\n");
-            stringBuilder.append("Total Time Taken  : " + stopWatch.getTotalTimeSeconds()).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
-            logger.error("Exception : " + e.getMessage());
-            stringBuilder.append("Status : Failed");
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
         }
         return stringBuilder.toString();
     }
@@ -160,7 +160,7 @@ public class MatchingAlgorithmController {
         try {
             respone = matchingBibInfoDetailService.populateMatchingBibInfo();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return respone;
     }
@@ -172,57 +172,57 @@ public class MatchingAlgorithmController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Map<String, Integer> matchingCountsMap = matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save OCLC&ISBN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save OCLC&ISSN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save OCLC&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save ISBN&ISSN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save ISBN&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save ISSN&LCCN Combination Reports : " + stopWatch.getTotalTimeSeconds());
         stopWatch = new StopWatch();
         stopWatch.start();
         matchingCountsMap = matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize);
-        pulMatchingCount = pulMatchingCount + matchingCountsMap.get("pulMatchingCount");
-        culMatchingCount = culMatchingCount + matchingCountsMap.get("culMatchingCount");
-        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get("nyplMatchingCount");
+        pulMatchingCount = pulMatchingCount + matchingCountsMap.get(RecapConstants.PUL_MATCHING_COUNT);
+        culMatchingCount = culMatchingCount + matchingCountsMap.get(RecapConstants.CUL_MATCHING_COUNT);
+        nyplMatchingCount = nyplMatchingCount + matchingCountsMap.get(RecapConstants.NYPL_MATCHING_COUNT);
         stopWatch.stop();
         logger.info("Time taken to save Single Matching Reports : " + stopWatch.getTotalTimeSeconds());
 
@@ -245,7 +245,7 @@ public class MatchingAlgorithmController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
@@ -253,9 +253,9 @@ public class MatchingAlgorithmController {
         } else {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
-        String status = "The Generated Report File Name : " + generatedReportFileName;
+        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
-        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
         return status;
     }
 
@@ -275,7 +275,7 @@ public class MatchingAlgorithmController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
@@ -283,9 +283,9 @@ public class MatchingAlgorithmController {
         } else {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
-        String status = "The Generated Report File Name : " + generatedReportFileName;
+        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
-        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
         return status;
     }
 
@@ -305,7 +305,7 @@ public class MatchingAlgorithmController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
@@ -313,9 +313,9 @@ public class MatchingAlgorithmController {
         } else {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
-        String status = "The Generated Report File Name : " + generatedReportFileName;
+        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
-        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
         return status;
     }
 
@@ -335,7 +335,7 @@ public class MatchingAlgorithmController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
@@ -343,9 +343,9 @@ public class MatchingAlgorithmController {
         } else {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
-        String status = "The Generated Report File Name : " + generatedReportFileName;
+        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
-        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
         return status;
     }
 
@@ -365,7 +365,7 @@ public class MatchingAlgorithmController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
@@ -373,9 +373,9 @@ public class MatchingAlgorithmController {
         } else {
             generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
-        String status = "The Generated Report File Name : " + generatedReportFileName;
+        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
-        logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
+        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
         return status;
     }
 

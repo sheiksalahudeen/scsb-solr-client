@@ -1,9 +1,6 @@
 package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.recap.RecapConstants;
 import org.recap.model.csv.DeAccessionSummaryRecord;
 import org.recap.model.jpa.ReportEntity;
@@ -38,7 +35,7 @@ public class FSDeAccessionReportGenerator implements ReportGeneratorInterface {
 
     @Override
     public String generateReport(String fileName, List<ReportEntity> reportEntityList) {
-        String generatedFileName = null;
+        String generatedFileName;
         List<DeAccessionSummaryRecord> deAccessionSummaryRecordList = new ArrayList<>();
         DeAccessionSummaryRecordGenerator deAccessionSummaryRecordGenerator = new DeAccessionSummaryRecordGenerator();
 

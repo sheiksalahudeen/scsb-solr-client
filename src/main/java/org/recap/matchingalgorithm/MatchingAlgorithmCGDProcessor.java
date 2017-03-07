@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm;
+package org.recap.matchingalgorithm;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class MatchingAlgorithmCGDProcessor {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDProcessor.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ProducerTemplate producerTemplate;

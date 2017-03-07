@@ -54,7 +54,6 @@ function fullIndex() {
         type: 'post',
         data: $form.serialize(),
         success: function (response) {
-            console.log("completed");
             $("#submit").removeAttr('disabled');
             document.getElementById("fullIndexingStatus").value = response;
         }
@@ -133,7 +132,6 @@ function generateReport() {
             type: 'post',
             data: $form.serialize(),
             success: function (response) {
-                console.log("completed");
                 $("#report").removeAttr('disabled');
             }
         });

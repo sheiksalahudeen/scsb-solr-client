@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
  */
 public class AccessionServiceUT extends BaseTestCase {
 
-    private Logger logger = LoggerFactory.getLogger(AccessionServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccessionServiceUT.class);
 
     @Mock
     private AccessionService accessionService;

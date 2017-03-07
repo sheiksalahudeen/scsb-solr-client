@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class ItemCreatedByValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("ItemCreatedBy");
+        return "ItemCreatedBy".equals(field);
     }
 
     @Override

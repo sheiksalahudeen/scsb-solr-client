@@ -1,8 +1,6 @@
 package org.recap.model.search.resolver.impl.holdings;
 
-import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.HoldingsValueResolver;
-import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Holdings;
 
 /**
@@ -11,7 +9,7 @@ import org.recap.model.solr.Holdings;
 public class SummaryHoldingsValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("SummaryHoldings");
+        return "SummaryHoldings".equalsIgnoreCase(field);
     }
 
     @Override

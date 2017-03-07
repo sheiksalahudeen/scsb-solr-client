@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class CallNumberSearchValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("CallNumber_search");
+        return "CallNumber_search".equals(field);
     }
 
     @Override

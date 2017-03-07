@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class IdValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("id");
+        return "id".equalsIgnoreCase(field);
     }
 
     @Override

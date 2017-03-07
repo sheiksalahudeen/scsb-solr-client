@@ -9,7 +9,7 @@ import org.recap.model.solr.BibItem;
 public class PublicationDateValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("PublicationDate");
+        return "PublicationDate".equalsIgnoreCase(field);
     }
 
     @Override

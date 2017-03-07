@@ -11,7 +11,7 @@ import java.util.Date;
 public class HoldingsLastUpdatedDateValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("HoldingsLastUpdatedDate");
+        return "HoldingsLastUpdatedDate".equalsIgnoreCase(field);
     }
 
     @Override

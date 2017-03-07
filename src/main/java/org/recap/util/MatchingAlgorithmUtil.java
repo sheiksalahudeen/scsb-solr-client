@@ -10,7 +10,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.MatchingCounter;
+import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.jpa.ReportDataEntity;
@@ -36,7 +36,7 @@ import java.util.*;
 @Component
 public class MatchingAlgorithmUtil {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
 
     @Autowired
     ProducerTemplate producerTemplate;
@@ -73,12 +73,12 @@ public class MatchingAlgorithmUtil {
         stopWatch.start();
         List<Integer> singleMatchBibIdsBasedOnMatching = matchingBibDetailsRepository.getSingleMatchBibIdsBasedOnMatching(matching);
         stopWatch.stop();
-        logger.info("Time taken to fetch " + matching + " from db : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total " + matching + " : " + singleMatchBibIdsBasedOnMatching.size());
+        logger.info("Time taken to fetch {} from db : {} ",matching,stopWatch.getTotalTimeSeconds());
+        logger.info("Total {}  : {} " ,matching ,singleMatchBibIdsBasedOnMatching.size());
 
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(singleMatchBibIdsBasedOnMatching)) {
             List<List<Integer>> bibIdLists = Lists.partition(singleMatchBibIdsBasedOnMatching, batchSize);
-            logger.info("Total " + matching + " list : " + bibIdLists.size());
+            logger.info("Total {} list : {} ",matching, bibIdLists.size());
             for (Iterator<List<Integer>> iterator = bibIdLists.iterator(); iterator.hasNext(); ) {
                 List<Integer> bibIds = iterator.next();
                 List<MatchingBibEntity> matchingBibEntities = matchingBibDetailsRepository.getBibEntityBasedOnBibIds(bibIds);
@@ -536,7 +536,7 @@ public class MatchingAlgorithmUtil {
         stopWatch.start();
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         stopWatch.stop();
-        logger.info("Total Time Taken to get "+ fieldName +" duplicates from solr : " + stopWatch.getTotalTimeSeconds());
+        logger.info("Total Time Taken to get {} duplicates from solr : {}  ",fieldName ,stopWatch.getTotalTimeSeconds());
         List<FacetField> facetFields = queryResponse.getFacetFields();
         for (FacetField facetField : facetFields) {
             List<FacetField.Count> values = facetField.getValues();

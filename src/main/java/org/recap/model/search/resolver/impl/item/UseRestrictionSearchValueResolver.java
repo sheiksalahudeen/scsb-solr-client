@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class UseRestrictionSearchValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("UseRestriction_search");
+        return "UseRestriction_search".equals(field);
     }
 
     @Override

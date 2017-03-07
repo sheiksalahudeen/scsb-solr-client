@@ -9,7 +9,7 @@ import org.recap.model.solr.Holdings;
 public class HoldingsIdValueResolver implements HoldingsValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("HoldingsId");
+        return "HoldingsId".equals(field);
     }
 
     @Override

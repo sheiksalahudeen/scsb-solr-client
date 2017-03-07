@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
  */
 public class ItemIndexExecutorServiceUT {
 
-    Logger logger = LoggerFactory.getLogger(ItemIndexExecutorServiceUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(ItemIndexExecutorServiceUT.class);
 
     @Mock
     BibliographicDetailsRepository mockBibliographicDetailsRepository;

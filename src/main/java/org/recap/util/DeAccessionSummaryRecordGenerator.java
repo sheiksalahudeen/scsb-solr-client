@@ -1,15 +1,15 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
+import org.recap.RecapConstants;
 import org.recap.model.csv.DeAccessionSummaryRecord;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +18,8 @@ import java.util.List;
  * Created by chenchulakshmig on 13/10/16.
  */
 public class DeAccessionSummaryRecordGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeAccessionSummaryRecordGenerator.class);
 
     public DeAccessionSummaryRecord prepareDeAccessionSummaryReportRecord(ReportEntity reportEntity) {
 
@@ -31,10 +33,8 @@ public class DeAccessionSummaryRecordGenerator {
             if(null != setterMethod){
                 try {
                     setterMethod.invoke(deAccessionSummaryRecord, headerValue);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(RecapConstants.LOG_ERROR,e);
                 }
             }
         }
@@ -44,10 +44,9 @@ public class DeAccessionSummaryRecordGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DeAccessionSummaryRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, DeAccessionSummaryRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }
@@ -55,10 +54,9 @@ public class DeAccessionSummaryRecordGenerator {
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            Method writeMethod = propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DeAccessionSummaryRecord.class));
-            return writeMethod;
+            return propertyUtilsBean.getReadMethod(new PropertyDescriptor(propertyName, DeAccessionSummaryRecord.class));
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }

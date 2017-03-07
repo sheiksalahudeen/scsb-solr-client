@@ -11,7 +11,7 @@ import java.util.Date;
 public class BibCreatedDateValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equalsIgnoreCase("BibCreatedDate");
+        return "BibCreatedDate".equalsIgnoreCase(field);
     }
 
     @Override

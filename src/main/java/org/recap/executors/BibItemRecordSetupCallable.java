@@ -1,6 +1,5 @@
 package org.recap.executors;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.camel.ProducerTemplate;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -35,7 +34,6 @@ public class BibItemRecordSetupCallable implements Callable {
     public Object call() throws Exception {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         bibJSONUtil.setProducerTemplate(producerTemplate);
-        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-        return solrInputDocument ;
+        return bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
     }
 }

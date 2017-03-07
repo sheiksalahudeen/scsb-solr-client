@@ -26,7 +26,7 @@ import java.util.Date;
 @Controller
 public class GenerateReportController {
 
-    Logger logger = LoggerFactory.getLogger(GenerateReportController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenerateReportController.class);
 
     @Autowired
     ReportGenerator reportGenerator;
@@ -48,7 +48,7 @@ public class GenerateReportController {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName = null;
+        String generatedReportFileName;
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         String status = "";
         String fileName = "";

@@ -2,7 +2,7 @@ package org.recap.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
-import org.recap.model.deAccession.DeAccessionSolrRequest;
+import org.recap.model.deaccession.DeAccessionSolrRequest;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.Assert.assertNotNull;

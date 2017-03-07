@@ -2,7 +2,6 @@ package org.recap.service.accession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
@@ -19,12 +18,13 @@ import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,7 +42,7 @@ import java.util.*;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AccessionService {
 
-    private static final Logger logger = Logger.getLogger(AccessionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccessionService.class);
 
     @Autowired
     MarcToBibEntityConverter marcToBibEntityConverter;
@@ -147,10 +147,6 @@ public class AccessionService {
         return entityManager;
     }
 
-    public Logger getLog() {
-        return logger;
-    }
-
     public String getOwningInstitution(String customerCode) {
         String owningInstitution = null;
         try {
@@ -168,7 +164,7 @@ public class AccessionService {
     public String processRequest(List<AccessionRequest> accessionRequestList) {
         String response = null;
         StringBuilder responseBuilder = new StringBuilder();
-        String bibDataResponse = null;
+        String bibDataResponse;
         List<Map<String, String>> responseMapList = new ArrayList<>();
         String owningInstitution = null;
         String customerCode = null;
@@ -242,6 +238,7 @@ public class AccessionService {
                             logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
                         }
                     } catch (Exception ex) {
+                        logger.error(RecapConstants.LOG_ERROR,ex);
                         response = ex.getMessage();
                         setResponseMessage(responseBuilder,accessionRequest.getItemBarcode()+RecapConstants.HYPHEN+response);
                         reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
@@ -272,7 +269,7 @@ public class AccessionService {
 
     private boolean checkItemBarcodeAlreadyExist(List<ItemEntity> itemEntityList){
         boolean itemExists = false;
-        if (itemEntityList != null && itemEntityList.size()>0) {
+        if (itemEntityList != null && !itemEntityList.isEmpty()) {
             itemExists = true;
         }
         return itemExists;
@@ -428,7 +425,7 @@ public class AccessionService {
             bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
             bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
 
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
@@ -461,11 +458,9 @@ public class AccessionService {
             if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
                 itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
             }
-            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE))){
-                if(!reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
+            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
                     reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
                 }
-            }
             if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib)){
                 if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
                     reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," +reasonForFailureItem;
@@ -655,7 +650,7 @@ public class AccessionService {
         itemBarcodeList.add(itemBarcode);
         List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodeList);
         BibliographicEntity fetchedBibliographicEntity = null;
-        if(itemEntityList != null && itemEntityList.size() > 0 && itemEntityList.get(0).getBibliographicEntities() != null){
+        if(itemEntityList != null && !itemEntityList.isEmpty() && itemEntityList.get(0).getBibliographicEntities() != null){
             fetchedBibliographicEntity = itemEntityList.get(0).getBibliographicEntities().get(0);
         }
         return fetchedBibliographicEntity;

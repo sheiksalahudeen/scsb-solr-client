@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
  */
 public class SaveMatchingBibsCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
 
     private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
     private String matchCriteria;
@@ -42,6 +42,7 @@ public class SaveMatchingBibsCallable implements Callable {
     private static Set<Integer> bibIdList;
 
     public SaveMatchingBibsCallable() {
+        //Do nothing
     }
 
     public SaveMatchingBibsCallable(MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository, String matchCriteria,
@@ -113,18 +114,18 @@ public class SaveMatchingBibsCallable implements Callable {
         }
     }
 
-    public synchronized static boolean addBibIdToList(Integer bibId) {
+    public static synchronized boolean addBibIdToList(Integer bibId) {
         return getBibIdList().add(bibId);
     }
 
-    public synchronized static Set<Integer> getBibIdList() {
+    public static synchronized Set<Integer> getBibIdList() {
         if(bibIdList == null) {
             bibIdList = new HashSet<>();
         }
         return bibIdList;
     }
 
-    public synchronized static boolean isBibIdDuplicate(Integer bibId) {
+    public static synchronized boolean isBibIdDuplicate(Integer bibId) {
         if(getBibIdList().contains(bibId)) {
             return true;
         }

@@ -9,7 +9,7 @@ import org.recap.model.solr.Item;
 public class BarcodeValueResolver implements ItemValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return field.equals("Barcode");
+        return "Barcode".equals(field);
     }
 
     @Override

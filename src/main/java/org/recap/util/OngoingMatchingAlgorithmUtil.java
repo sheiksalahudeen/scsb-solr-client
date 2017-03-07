@@ -11,7 +11,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.MatchingAlgorithmCGDProcessor;
+import org.recap.matchingalgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.*;
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.impl.Bib.*;
@@ -32,7 +32,7 @@ import java.util.*;
 @Component
 public class OngoingMatchingAlgorithmUtil {
 
-    Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmUtil.class);
 
     @Autowired
     SolrQueryBuilder solrQueryBuilder;
@@ -77,16 +77,20 @@ public class OngoingMatchingAlgorithmUtil {
         List<Integer> itemIds = new ArrayList<>();
 
         tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.OCLC_NUMBER);
-        if(tempMap != null && tempMap.size() > 0) bibItemMap.putAll(tempMap);
+        if(tempMap != null && tempMap.size() > 0)
+            bibItemMap.putAll(tempMap);
 
         tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.ISBN_CRITERIA);
-        if(tempMap != null && tempMap.size() > 0) bibItemMap.putAll(tempMap);
+        if(tempMap != null && tempMap.size() > 0)
+            bibItemMap.putAll(tempMap);
 
         tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.ISSN_CRITERIA);
-        if(tempMap != null && tempMap.size() > 0) bibItemMap.putAll(tempMap);
+        if(tempMap != null && tempMap.size() > 0)
+            bibItemMap.putAll(tempMap);
 
         tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.LCCN_CRITERIA);
-        if(tempMap != null && tempMap.size() > 0) bibItemMap.putAll(tempMap);
+        if(tempMap != null && tempMap.size() > 0)
+            bibItemMap.putAll(tempMap);
 
         if(bibItemMap != null && bibItemMap.size() > 0) {
             if(matchPointString.size() > 1) {
@@ -94,10 +98,8 @@ public class OngoingMatchingAlgorithmUtil {
                 logger.info("Multi Match Found.");
                 try {
                     itemIds = saveReportAndUpdateCGDForMultiMatch(bibItemMap);
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                } catch (SolrServerException e) {
-                    logger.error(e.getMessage());
+                } catch (IOException | SolrServerException e) {
+                    logger.error(RecapConstants.LOG_ERROR,e);
                 }
             } else if(matchPointString.size() == 1) {
                 // Single Match
@@ -105,7 +107,7 @@ public class OngoingMatchingAlgorithmUtil {
                 try {
                     itemIds = saveReportAndUpdateCGDForSingleMatch(bibItemMap, matchPointString.iterator().next());
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error(RecapConstants.LOG_ERROR,e);
                 }
             } else {
                 logger.info("No Match Found.");
@@ -187,7 +189,7 @@ public class OngoingMatchingAlgorithmUtil {
                     try {
                         itemIds = checkForMonographAndUpdateCGD(reportEntity, bibIds, materialTypeList, materialTypeSet);
                     } catch (Exception e) {
-                        logger.error(e.getMessage());
+                        logger.error(RecapConstants.LOG_ERROR,e);
                     }
                 }
             } else {
@@ -230,10 +232,8 @@ public class OngoingMatchingAlgorithmUtil {
             matchingAlgorithmUtil.getReportDataEntity(matchPointValue, matchPointString, reportDataEntityList);
             matchingReportEntity.addAll(reportDataEntityList);
             producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(matchingReportEntity));
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        } catch (SolrServerException e) {
-            logger.error(e.getMessage());
+        } catch (IOException | SolrServerException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return itemIds;
     }
@@ -265,10 +265,14 @@ public class OngoingMatchingAlgorithmUtil {
             materialTypes.add(bibItem.getLeaderMaterialType());
             materialTypeList.add(bibItem.getLeaderMaterialType());
             owningInstBibIds.add(bibItem.getOwningInstitutionBibId());
-            if(CollectionUtils.isNotEmpty(bibItem.getOclcNumber())) oclcNumbers.addAll(bibItem.getOclcNumber());
-            if(CollectionUtils.isNotEmpty(bibItem.getIsbn())) isbns.addAll(bibItem.getIsbn());
-            if(CollectionUtils.isNotEmpty(bibItem.getIssn())) issns.addAll(bibItem.getIssn());
-            if(StringUtils.isNotBlank(bibItem.getLccn())) lccns.add(bibItem.getLccn());
+            if(CollectionUtils.isNotEmpty(bibItem.getOclcNumber()))
+                oclcNumbers.addAll(bibItem.getOclcNumber());
+            if(CollectionUtils.isNotEmpty(bibItem.getIsbn()))
+                isbns.addAll(bibItem.getIsbn());
+            if(CollectionUtils.isNotEmpty(bibItem.getIssn()))
+                issns.addAll(bibItem.getIssn());
+            if(StringUtils.isNotBlank(bibItem.getLccn()))
+                lccns.add(bibItem.getLccn());
         }
 
         if(owningInstSet.size() > 1) {
@@ -373,10 +377,8 @@ public class OngoingMatchingAlgorithmUtil {
                     bibItemMap.put(bibItem.getBibId(), bibItem);
                 }
             }
-        } catch (SolrServerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException|SolrServerException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return bibItemMap;
     }

@@ -1,7 +1,6 @@
 package org.recap.model.camel;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by rajeshbabuk on 19/1/17.

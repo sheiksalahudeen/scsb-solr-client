@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm.service;
+package org.recap.matchingalgorithm.service;
 
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
@@ -7,7 +7,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.MatchingAlgorithmCGDCallable;
-import org.recap.matchingAlgorithm.MatchingCounter;
+import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.repository.jpa.*;
@@ -28,7 +28,7 @@ import java.util.concurrent.*;
 @Component
 public class MatchingAlgorithmUpdateCGDService {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUpdateCGDService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUpdateCGDService.class);
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -75,9 +75,9 @@ public class MatchingAlgorithmUpdateCGDService {
         ExecutorService executorService = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
         long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
-        logger.info("Total Records : " + countOfRecordNum);
+        logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) Math.ceil(countOfRecordNum / batchSize);
-        logger.info("Total Pages : " + totalPagesCount);
+        logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new MatchingAlgorithmCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
                     getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
@@ -85,8 +85,8 @@ public class MatchingAlgorithmUpdateCGDService {
         }
         Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executorService, callables);
 
-        List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get("NonMonographRecordNums");
-        List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get("ExceptionRecordNums");
+        List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS);
+        List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS);
 
         matchingAlgorithmUtil.updateMonographicSetRecords(nonMonographRecordNums, batchSize);
 
@@ -94,9 +94,9 @@ public class MatchingAlgorithmUpdateCGDService {
 
         matchingAlgorithmUtil.saveCGDUpdatedSummaryReport();
 
-        logger.info("PUL Final Counter Value: " + MatchingCounter.getPulSharedCount());
-        logger.info("CUL Final Counter Value: " + MatchingCounter.getCulSharedCount());
-        logger.info("NYPL Final Counter Value: " + MatchingCounter.getNyplSharedCount());
+        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
+        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
+        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
 
         DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
 
@@ -118,21 +118,19 @@ public class MatchingAlgorithmUpdateCGDService {
             try {
                 Map<String, List<Integer>> recordNumberMap = (Map<String, List<Integer>>) future.get();
                 if(recordNumberMap != null) {
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get("NonMonographRecordNums"))) {
-                        nonMonographRecordNumbers.addAll(recordNumberMap.get("NonMonographRecordNums"));
+                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS))) {
+                        nonMonographRecordNumbers.addAll(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS));
                     }
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get("ExceptionRecordNums"))) {
-                        exceptionRecordNumbers.addAll(recordNumberMap.get("ExceptionRecordNums"));
+                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS))) {
+                        exceptionRecordNumbers.addAll(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS));
                     }
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error(RecapConstants.LOG_ERROR,e);
             }
         }
-        unProcessedRecordNumberMap.put("NonMonographRecordNums", nonMonographRecordNumbers);
-        unProcessedRecordNumberMap.put("ExceptionRecordNums", exceptionRecordNumbers);
+        unProcessedRecordNumberMap.put(RecapConstants.NON_MONOGRAPH_RECORD_NUMS, nonMonographRecordNumbers);
+        unProcessedRecordNumberMap.put(RecapConstants.EXCEPTION_RECORD_NUMS, exceptionRecordNumbers);
         return unProcessedRecordNumberMap;
     }
 
@@ -145,14 +143,12 @@ public class MatchingAlgorithmUpdateCGDService {
                     .map(future -> {
                         try {
                             return future.get();
-                        } catch (InterruptedException e) {
-                            throw new IllegalStateException(e);
-                        } catch (ExecutionException e) {
+                        } catch (InterruptedException | ExecutionException e) {
                             throw new IllegalStateException(e);
                         }
                     });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return futures;
     }

@@ -3,7 +3,7 @@ package org.recap.executors;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.MatchingAlgorithmCGDProcessor;
+import org.recap.matchingalgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.repository.jpa.*;
@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
  */
 public class MatchingAlgorithmCGDCallable implements Callable {
 
-    Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDCallable.class);
 
     private ReportDataDetailsRepository reportDataDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -50,7 +50,7 @@ public class MatchingAlgorithmCGDCallable implements Callable {
     @Override
     public Object call() throws Exception {
 
-        long from = pageNum * batchSize;
+        long from = pageNum * Long.valueOf(batchSize);
         List<ReportDataEntity> reportDataEntities =  reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, from, batchSize);
         List<Integer> nonMonographRecordNums = new ArrayList<>();
         List<Integer> exceptionRecordNums = new ArrayList<>();

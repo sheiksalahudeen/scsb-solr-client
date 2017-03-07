@@ -3,7 +3,7 @@ package org.recap.report;
 import com.google.common.collect.Ordering;
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.matchingAlgorithm.service.MatchingAlgorithmHelperService;
+import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.model.csv.MatchingReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorInterface {
 
-    Logger logger = LoggerFactory.getLogger(FTPMatchingAndExceptionReportGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPMatchingAndExceptionReportGenerator.class);
 
     @Autowired
     ReportDetailRepository reportDetailRepository;
@@ -71,8 +71,8 @@ public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorIn
         }
 
         stopWatch.stop();
-        logger.info("Total time taken to prepare CSVRecords : " + stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of CSVRecords Prepared : " + matchingReportReCAPCSVRecords.size());
+        logger.info("Total time taken to prepare CSVRecords : {} " , stopWatch.getTotalTimeSeconds());
+        logger.info("Total Num of CSVRecords Prepared : {} " , matchingReportReCAPCSVRecords.size());
 
         if(!CollectionUtils.isEmpty(matchingReportReCAPCSVRecords)) {
             if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
@@ -87,8 +87,7 @@ public class FTPMatchingAndExceptionReportGenerator implements ReportGeneratorIn
             producer.sendBodyAndHeader(RecapConstants.FTP_MATCHING_ALGO_REPORT_Q, matchingReportReCAPCSVRecords, RecapConstants.REPORT_FILE_NAME, fileName);
 
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
-            String generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
-            return generatedFileName;
+            return fileName + "-" + df.format(new Date()) + ".csv";
         }
 
         return null;

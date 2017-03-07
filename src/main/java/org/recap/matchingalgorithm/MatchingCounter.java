@@ -1,4 +1,4 @@
-package org.recap.matchingAlgorithm;
+package org.recap.matchingalgorithm;
 
 /**
  * Created by angelind on 6/1/17.
@@ -17,75 +17,75 @@ public class MatchingCounter {
     private static Integer culCGDUpdatedOpenCount;
     private static Integer nyplCGDUpdatedOpenCount;
 
-    public synchronized static Integer getPulSharedCount() {
+    public static synchronized Integer getPulSharedCount() {
         return pulSharedCount;
     }
 
-    public synchronized static void setPulSharedCount(Integer pulSharedCount) {
+    public static synchronized void setPulSharedCount(Integer pulSharedCount) {
         MatchingCounter.pulSharedCount = pulSharedCount;
     }
 
-    public synchronized static Integer getCulSharedCount() {
+    public static synchronized Integer getCulSharedCount() {
         return culSharedCount;
     }
 
-    public synchronized static void setCulSharedCount(Integer culSharedCount) {
+    public static synchronized void setCulSharedCount(Integer culSharedCount) {
         MatchingCounter.culSharedCount = culSharedCount;
     }
 
-    public synchronized static Integer getNyplSharedCount() {
+    public static synchronized Integer getNyplSharedCount() {
         return nyplSharedCount;
     }
 
-    public synchronized static void setNyplSharedCount(Integer nyplSharedCount) {
+    public static synchronized void setNyplSharedCount(Integer nyplSharedCount) {
         MatchingCounter.nyplSharedCount = nyplSharedCount;
     }
 
-    public synchronized static Integer getPulCGDUpdatedSharedCount() {
+    public static synchronized Integer getPulCGDUpdatedSharedCount() {
         return pulCGDUpdatedSharedCount;
     }
 
-    public synchronized static void setPulCGDUpdatedSharedCount(Integer pulCGDUpdatedSharedCount) {
+    public static synchronized void setPulCGDUpdatedSharedCount(Integer pulCGDUpdatedSharedCount) {
         MatchingCounter.pulCGDUpdatedSharedCount = pulCGDUpdatedSharedCount;
     }
 
-    public synchronized static Integer getCulCGDUpdatedSharedCount() {
+    public static synchronized Integer getCulCGDUpdatedSharedCount() {
         return culCGDUpdatedSharedCount;
     }
 
-    public synchronized static void setCulCGDUpdatedSharedCount(Integer culCGDUpdatedSharedCount) {
+    public static synchronized void setCulCGDUpdatedSharedCount(Integer culCGDUpdatedSharedCount) {
         MatchingCounter.culCGDUpdatedSharedCount = culCGDUpdatedSharedCount;
     }
 
-    public synchronized static Integer getNyplCGDUpdatedSharedCount() {
+    public static synchronized Integer getNyplCGDUpdatedSharedCount() {
         return nyplCGDUpdatedSharedCount;
     }
 
-    public synchronized static void setNyplCGDUpdatedSharedCount(Integer nyplCGDUpdatedSharedCount) {
+    public static synchronized void setNyplCGDUpdatedSharedCount(Integer nyplCGDUpdatedSharedCount) {
         MatchingCounter.nyplCGDUpdatedSharedCount = nyplCGDUpdatedSharedCount;
     }
 
-    public synchronized static Integer getPulCGDUpdatedOpenCount() {
+    public static synchronized Integer getPulCGDUpdatedOpenCount() {
         return pulCGDUpdatedOpenCount;
     }
 
-    public synchronized static void setPulCGDUpdatedOpenCount(Integer pulCGDUpdatedOpenCount) {
+    public static synchronized void setPulCGDUpdatedOpenCount(Integer pulCGDUpdatedOpenCount) {
         MatchingCounter.pulCGDUpdatedOpenCount = pulCGDUpdatedOpenCount;
     }
 
-    public synchronized static Integer getCulCGDUpdatedOpenCount() {
+    public static synchronized Integer getCulCGDUpdatedOpenCount() {
         return culCGDUpdatedOpenCount;
     }
 
-    public synchronized static void setCulCGDUpdatedOpenCount(Integer culCGDUpdatedOpenCount) {
+    public static synchronized void setCulCGDUpdatedOpenCount(Integer culCGDUpdatedOpenCount) {
         MatchingCounter.culCGDUpdatedOpenCount = culCGDUpdatedOpenCount;
     }
 
-    public synchronized static Integer getNyplCGDUpdatedOpenCount() {
+    public static synchronized Integer getNyplCGDUpdatedOpenCount() {
         return nyplCGDUpdatedOpenCount;
     }
 
-    public synchronized static void setNyplCGDUpdatedOpenCount(Integer nyplCGDUpdatedOpenCount) {
+    public static synchronized void setNyplCGDUpdatedOpenCount(Integer nyplCGDUpdatedOpenCount) {
         MatchingCounter.nyplCGDUpdatedOpenCount = nyplCGDUpdatedOpenCount;
     }
 
@@ -101,7 +101,7 @@ public class MatchingCounter {
         nyplCGDUpdatedOpenCount = 0;
     }
 
-    public synchronized static void updateCounter(Integer owningInstitution, boolean isOpen) {
+    public static synchronized void updateCounter(Integer owningInstitution, boolean isOpen) {
         if (owningInstitution == 1) {
             if(isOpen) {
                 pulCGDUpdatedOpenCount++;
