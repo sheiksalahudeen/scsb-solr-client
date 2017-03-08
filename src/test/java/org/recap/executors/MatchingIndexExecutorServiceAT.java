@@ -16,7 +16,7 @@ public class MatchingIndexExecutorServiceAT extends BaseTestCase{
     MatchingBibItemIndexExecutorService matchingBibItemIndexExecutorService;
 
     @Test
-    public void indexingForMatchingAlgorithmTest() {
+    public void indexingForMatchingAlgorithmTest() throws InterruptedException {
         Integer count = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE);
         assertTrue(count > 0);
     }
