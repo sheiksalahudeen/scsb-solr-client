@@ -16,7 +16,7 @@ public class PermissionsRepositoryUT extends BaseTestCase{
     PermissionsRepository permissionsRepository;
 
     @Test
-    public void testPermissionByDescription(){
+    public void testPermissionByName(){
         PermissionEntity permissionEntity = permissionsRepository.findByPermissionName("Deaccession");
         assertNotNull(permissionEntity);
     }

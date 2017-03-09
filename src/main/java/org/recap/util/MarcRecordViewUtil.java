@@ -31,10 +31,18 @@ public class MarcRecordViewUtil {
     @Autowired
     CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
-    public BibliographicMarcForm buildBibliographicMarcForm(Integer bibId, Integer itemId,UserDetailsForm userDetailsForm) {
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public CustomerCodeDetailsRepository getCustomerCodeDetailsRepository() {
+        return customerCodeDetailsRepository;
+    }
+
+    public BibliographicMarcForm buildBibliographicMarcForm(Integer bibId, Integer itemId, UserDetailsForm userDetailsForm) {
         BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
         bibliographicMarcForm.setCollectionAction(RecapConstants.UPDATE_CGD);
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicIdAndIsDeletedFalse(bibId);
+        BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicIdAndIsDeletedFalse(bibId);
         if (null == bibliographicEntity) {
             bibliographicMarcForm.setErrorMessage(RecapConstants.RECORD_NOT_AVAILABLE);
         } else {
@@ -54,7 +62,7 @@ public class MarcRecordViewUtil {
                 if (null != institutionEntity) {
                     bibliographicMarcForm.setOwningInstitution(institutionEntity.getInstitutionCode());
                 }
-                List<ItemEntity> nonDeletedItemEntities = bibliographicDetailsRepository.getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+                List<ItemEntity> nonDeletedItemEntities = getBibliographicDetailsRepository().getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
                 if (CollectionUtils.isNotEmpty(nonDeletedItemEntities)) {
                     if (nonDeletedItemEntities.size() == 1 && RecapConstants.MONOGRAPH.equals(bibliographicMarcForm.getLeaderMaterialType())) {
                         CollectionGroupEntity collectionGroupEntity = nonDeletedItemEntities.get(0).getCollectionGroupEntity();
@@ -90,10 +98,10 @@ public class MarcRecordViewUtil {
                                         bibliographicMarcForm.setDeaccessionType(RecapConstants.PERMANENT_WITHDRAWAL_INDIRECT);
                                     }
                                 }
-                                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(bibliographicMarcForm.getCustomerCode());
+                                CustomerCodeEntity customerCodeEntity = getCustomerCodeDetailsRepository().findByCustomerCode(bibliographicMarcForm.getCustomerCode());
                                 if (null != customerCodeEntity && StringUtils.isNotBlank(customerCodeEntity.getDeliveryRestrictions())) {
                                     List<String> deliveryLocations = new ArrayList<>();
-                                    List<CustomerCodeEntity> customerCodeEntities = customerCodeDetailsRepository.findByCustomerCodeIn(Arrays.asList(customerCodeEntity.getDeliveryRestrictions().split(",")));
+                                    List<CustomerCodeEntity> customerCodeEntities = getCustomerCodeDetailsRepository().findByCustomerCodeIn(Arrays.asList(customerCodeEntity.getDeliveryRestrictions().split(",")));
                                     if (CollectionUtils.isNotEmpty(customerCodeEntities)) {
                                         for (CustomerCodeEntity custCodeEntity : customerCodeEntities) {
                                             deliveryLocations.add(custCodeEntity.getDescription());

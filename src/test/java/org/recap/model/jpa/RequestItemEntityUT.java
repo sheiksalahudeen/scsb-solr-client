@@ -51,6 +51,10 @@ public class RequestItemEntityUT extends BaseTestCase{
         RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
         assertNotNull(savedRequestTypeEntity);
 
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setRequestStatusCode("REFILE");
+        requestStatusEntity.setRequestStatusDescription("REFILE");
+
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
         requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
@@ -62,6 +66,7 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestStatusId(4);
         requestItemEntity.setCreatedBy("test");
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
     }

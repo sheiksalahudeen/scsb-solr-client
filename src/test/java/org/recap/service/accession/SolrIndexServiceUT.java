@@ -1,8 +1,10 @@
 package org.recap.service.accession;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -11,9 +13,14 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Bib;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.service.accession.SolrIndexService;
+import org.recap.util.BibJSONUtil;
+import org.recap.util.ItemJSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,21 +49,68 @@ public class SolrIndexServiceUT extends BaseTestCase {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Mock
+    ProducerTemplate producerTemplate;
+
+    @Mock
+    SolrTemplate solrTemplate;
+
+    @Mock
+    BibliographicDetailsRepository mockedBibliographicDetailsRepository;
+
+    @Mock
+    HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Mock
+    BibJSONUtil bibJSONUtil;
+
+
+
+    public SolrIndexService getSolrIndexService() {
+        return solrIndexService;
+    }
+
+    public BibSolrCrudRepository getMockedBibSolrCrudRepository() {
+        return mockedBibSolrCrudRepository;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public ProducerTemplate getProducerTemplate() {
+        return producerTemplate;
+    }
+
+    public SolrTemplate getSolrTemplate() {
+        return solrTemplate;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return mockedBibliographicDetailsRepository;
+    }
+
+    public HoldingsDetailsRepository getHoldingsDetailsRepository() {
+        return holdingsDetailsRepository;
+    }
+
+
     @Test
     public void indexByBibliographicId() throws Exception {
         BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
-
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedBibliographicEntity);
         Integer bibliographicId = savedBibliographicEntity.getBibliographicId();
         assertNotNull(savedBibliographicEntity);
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
         assertNotNull(savedBibliographicEntity.getItemEntities());
-
-        solrIndexService.indexByBibliographicId(bibliographicId);
-        Mockito.when(mockedBibSolrCrudRepository.findByBibId(bibliographicId)).thenReturn(new Bib());
-        Bib bib = mockedBibSolrCrudRepository.findByBibId(bibliographicId);
-        assertNotNull(bib);
+        Mockito.when(solrIndexService.getBibJSONUtil()).thenReturn(bibJSONUtil);
+        Mockito.when(solrIndexService.getProducerTemplate()).thenReturn(producerTemplate);
+        Mockito.when(solrIndexService.getBibliographicDetailsRepository()).thenReturn(mockedBibliographicDetailsRepository);
+        Mockito.when(solrIndexService.getBibliographicDetailsRepository().findByBibliographicId(bibliographicId)).thenReturn(savedBibliographicEntity);
+        Mockito.when(solrIndexService.getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository())).thenReturn(new SolrInputDocument());
+        Mockito.when(solrIndexService.indexByBibliographicId(bibliographicId)).thenCallRealMethod();
+        SolrInputDocument solrInputDocument = solrIndexService.indexByBibliographicId(bibliographicId);
 
     }
 

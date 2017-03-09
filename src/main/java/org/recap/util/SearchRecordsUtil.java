@@ -31,6 +31,10 @@ public final class SearchRecordsUtil {
     @Autowired
     private DataDumpSolrDocumentRepository dataDumpSolrDocumentRepository;
 
+    public DataDumpSolrDocumentRepository getDataDumpSolrDocumentRepository() {
+        return dataDumpSolrDocumentRepository;
+    }
+
     public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) throws Exception{
 
         if (!isEmptySearch(searchRecordsRequest)) {
@@ -55,7 +59,7 @@ public final class SearchRecordsUtil {
 
     public List<DataDumpSearchResult> searchRecordsForDataDump(SearchRecordsRequest searchRecordsRequest) throws Exception{
         if (!isEmptySearch(searchRecordsRequest)) {
-            Map<String, Object> searchResponse = dataDumpSolrDocumentRepository.search(searchRecordsRequest);
+            Map<String, Object> searchResponse = getDataDumpSolrDocumentRepository().search(searchRecordsRequest);
             String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
             if(errorResponse != null) {
                 searchRecordsRequest.setErrorMessage(RecapConstants.SERVER_ERROR_MSG);
@@ -122,7 +126,7 @@ public final class SearchRecordsUtil {
         return searchResultRows;
     }
 
-    private List<DataDumpSearchResult> buildResultsForDataDump(List<BibItem> bibItems) {
+    public List<DataDumpSearchResult> buildResultsForDataDump(List<BibItem> bibItems) {
         List<DataDumpSearchResult> dataDumpSearchResults = new ArrayList<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
             for (BibItem bibItem : bibItems) {

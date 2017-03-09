@@ -54,6 +54,38 @@ public class MatchingAlgorithmController {
     @Autowired
     MatchingBibItemIndexExecutorService matchingBibItemIndexExecutorService;
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public MatchingAlgorithmHelperService getMatchingAlgorithmHelperService() {
+        return matchingAlgorithmHelperService;
+    }
+
+    public ReportGenerator getReportGenerator() {
+        return reportGenerator;
+    }
+
+    public void setReportGenerator(ReportGenerator reportGenerator) {
+        this.reportGenerator = reportGenerator;
+    }
+
+    public MatchingAlgorithmUpdateCGDService getMatchingAlgorithmUpdateCGDService() {
+        return matchingAlgorithmUpdateCGDService;
+    }
+
+    public MatchingBibInfoDetailService getMatchingBibInfoDetailService() {
+        return matchingBibInfoDetailService;
+    }
+
+    public String getMatchingAlgoBatchSize() {
+        return matchingAlgoBatchSize;
+    }
+
+    public MatchingBibItemIndexExecutorService getMatchingBibItemIndexExecutorService() {
+        return matchingBibItemIndexExecutorService;
+    }
+
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/full", method = RequestMethod.POST)
     public String matchingAlgorithmFull() {
@@ -247,11 +279,11 @@ public class MatchingAlgorithmController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
         String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
@@ -277,11 +309,11 @@ public class MatchingAlgorithmController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
         String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
@@ -307,11 +339,11 @@ public class MatchingAlgorithmController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
         String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
@@ -337,11 +369,11 @@ public class MatchingAlgorithmController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
         String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
@@ -367,11 +399,11 @@ public class MatchingAlgorithmController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         } else {
-            generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
         }
         String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
         stopWatch.stop();
