@@ -47,7 +47,7 @@ public class SearchRecordRestController {
             searchRecordsResponse.setShowTotalCount(searchRecordsRequest.isShowTotalCount());
             searchRecordsResponse.setErrorMessage(searchRecordsRequest.getErrorMessage());
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
+            logger.info(RecapConstants.LOG_ERROR,e);
             searchRecordsResponse.setErrorMessage(e.getMessage());
         }
         return searchRecordsResponse;
