@@ -178,9 +178,9 @@ public class RecapConstants {
     public static final String ONGOING_MATCHING_ALGORITHM = "OngoingMatchingAlgorithm";
 
     //Error Message
-    public static final String RECORD_NOT_AVAILABLE = "Database may be empty or Bib table does not contains this record";
-    public static final String SERVER_ERROR_MSG = "Server is down for Maintenance Please Try again Later.";
-    public static final String EMPTY_FACET_ERROR_MSG = "At least one Bib Facet Box and one Item Facet Box needs to be checked to get results.";
+    public static final String RECORD_NOT_AVAILABLE = "Database may be empty or bib table does not contain this record";
+    public static final String SERVER_ERROR_MSG = "Server is down for maintenance. Please try again later.";
+    public static final String EMPTY_FACET_ERROR_MSG = "Check facets. At least one Bib Facet and one Item Facet must be checked to get results.";
     public static final String ACCESS_RESTRICTED="User is not permitted to access this record";
 
     //Search Response Types
@@ -224,7 +224,7 @@ public class RecapConstants {
     public static final String DEACCESSION_SUCCESSFUL = "The item has been successfully deaccessioned.";
     public static final String DEACCESSION_FAILED = "Deaccessioning the item failed";
     public static final int BARCODE_LIMIT = 10;
-    public static final String ACCESSION_SUCCESS = "One or more record got accessioned";
+    public static final String ACCESSION_SUCCESS = "One or more records were successfully accessioned.";
     public static final String ACCESSION_DUMMY_RECORD = "Dummy record created";
 
     //Request
@@ -348,7 +348,7 @@ public class RecapConstants {
     public static final String ERROR = "error->";
     public static final String EXCEPTION = "exception->";
     public static final String ITEM_BARCODE_NOT_FOUND = "Item Barcode not found";
-    public static final String SERVICE_UNAVAILABLE =" Service is Unavailable.";
+    public static final String SERVICE_UNAVAILABLE =" Service is unavailable.";
     public static final String VERIFY_ONGOING_ACCESSION_REPORT_MSG = "Please verify ongoing accession report";
     public static final String DUMMY_BIB_CONTENT_XML = "dummybibcontent.xml";
     public static final String DUMMY_HOLDING_CONTENT_XML = "dummyholdingcontent.xml";
