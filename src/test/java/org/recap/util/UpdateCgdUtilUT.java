@@ -136,7 +136,8 @@ public class UpdateCgdUtilUT extends BaseTestCase {
 
     @Test
     public void updateCGDForItem() throws Exception {
-        long beforeCountForChangeLog = itemChangeLogDetailsRepository.count();
+        Mockito.when(mockedItemChangeLogDetailsRepository.count()).thenReturn(new Long(0));
+        long beforeCountForChangeLog = mockedItemChangeLogDetailsRepository.count();
 
         BibliographicEntity bibliographicEntity = getBibEntityWithHoldingsAndItem();
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
