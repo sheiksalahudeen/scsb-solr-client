@@ -6,9 +6,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.recap.RecapConstants;
 import org.recap.controller.BaseControllerUT;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
+import org.recap.model.solr.BibItem;
+import org.recap.model.solr.Item;
+import org.recap.repository.solr.main.DataDumpSolrDocumentRepository;
+import org.recap.util.SearchRecordsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -38,7 +40,14 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
     private SearchRecordRestController searchRecordRestController;
 
     @Mock
+    SearchRecordRestController mockedSearchRecordRestController;
+
+    @Mock
     SearchResultRow mockedSearchResultRow;
+
+    @Mock
+    private DataDumpSolrDocumentRepository dataDumpSolrDocumentRepository;
+
 
     @Before
     public void setUp() {
@@ -72,7 +81,7 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
                                                                                 .contentType(contentType)
                                                                                 .content(objectMapper.writeValueAsString(searchRecordsRequest))).andReturn();
         int status = mvcResult.getResponse().getStatus();
-
+        assertNotNull(mvcResult.getResponse());
         assertTrue(status == 200);
     }
 

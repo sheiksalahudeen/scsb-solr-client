@@ -27,6 +27,10 @@ public class SearchRecordRestController {
     @Autowired
     SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
 
+    public SearchRecordsUtil getSearchRecordsUtil() {
+        return searchRecordsUtil;
+    }
+
     @RequestMapping(value="/search", method = RequestMethod.POST)
     @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search", position = 0)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
@@ -56,7 +60,7 @@ public class SearchRecordRestController {
         List<DataDumpSearchResult> dataDumpSearchResults = null;
         Map responseMap = new HashMap();
         try {
-            dataDumpSearchResults = searchRecordsUtil.searchRecordsForDataDump(searchRecordsRequest);
+            dataDumpSearchResults = getSearchRecordsUtil().searchRecordsForDataDump(searchRecordsRequest);
             responseMap.put("totalPageCount", searchRecordsRequest.getTotalPageCount());
             responseMap.put("totalRecordsCount", searchRecordsRequest.getTotalRecordsCount());
             responseMap.put("dataDumpSearchResults", dataDumpSearchResults);

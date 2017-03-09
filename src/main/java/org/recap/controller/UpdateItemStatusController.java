@@ -30,13 +30,25 @@ public class UpdateItemStatusController {
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public UpdateCgdUtil getUpdateCgdUtil() {
+        return updateCgdUtil;
+    }
+
+    public ItemDetailsRepository getItemDetailsRepository() {
+        return itemDetailsRepository;
+    }
+
     @RequestMapping(value = "/updateItemAvailablityStatus", method = RequestMethod.GET)
     public String updateCgdForItem(@RequestParam String itemBarcode) {
         String statusMessage = null;
         List<ItemEntity> itemEntities = null;
         try {
-            itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
-            updateCgdUtil.updateCGDForItemInSolr(itemEntities);
+            itemEntities = getItemDetailsRepository().findByBarcode(itemBarcode);
+            getUpdateCgdUtil().updateCGDForItemInSolr(itemEntities);
             statusMessage = "Solr Indexing Successful";
         } catch (Exception e) {
             statusMessage = "Solr Indexing Failed";

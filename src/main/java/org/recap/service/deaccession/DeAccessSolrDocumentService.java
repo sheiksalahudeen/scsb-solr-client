@@ -40,15 +40,35 @@ public class DeAccessSolrDocumentService {
     @Autowired
     SolrTemplate solrTemplate;
 
+    public BibJSONUtil getBibJSONUtil(){
+        return new BibJSONUtil();
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public HoldingsDetailsRepository getHoldingDetailRepository() {
+        return holdingDetailRepository;
+    }
+
+    public ItemDetailsRepository getItemDetailsRepository() {
+        return itemDetailsRepository;
+    }
+
+    public SolrTemplate getSolrTemplate() {
+        return solrTemplate;
+    }
+
     public String updateIsDeletedBibByBibId(@RequestBody List<Integer> bibIds){
         try{
             for(Integer bibId : bibIds){
                 BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                BibliographicEntity bibEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
-                SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
+                BibliographicEntity bibEntity = getBibliographicDetailsRepository().findByBibliographicId(bibId);
+                SolrInputDocument bibSolrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingDetailRepository());
                 bibSolrInputDocument.setField(RecapConstants.IS_DELETED_BIB,true);
-                solrTemplate.saveDocument(bibSolrInputDocument);
-                solrTemplate.commit();
+                getSolrTemplate().saveDocument(bibSolrInputDocument);
+                getSolrTemplate().commit();
             }
             return "Bib documents updated successfully.";
         }catch(Exception ex){
@@ -61,19 +81,19 @@ public class DeAccessSolrDocumentService {
         try{
             for(Integer holdingsId : holdingsIds){
                 BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                HoldingsEntity holdingsEntity = holdingDetailRepository.findByHoldingsId(holdingsId);
+                HoldingsEntity holdingsEntity = getHoldingDetailRepository().findByHoldingsId(holdingsId);
                 if(holdingsEntity != null && CollectionUtils.isNotEmpty(holdingsEntity.getBibliographicEntities())) {
                     for(BibliographicEntity bibliographicEntity : holdingsEntity.getBibliographicEntities()) {
-                        SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
+                        SolrInputDocument bibSolrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingDetailRepository());
                         for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
                             if (holdingsId.equals(holdingsSolrInputDocument.get(RecapConstants.HOLDING_ID).getValue())) {
                                 holdingsSolrInputDocument.setField(RecapConstants.IS_DELETED_HOLDINGS, true);
                             }
                         }
-                        solrTemplate.saveDocument(bibSolrInputDocument);
+                        getSolrTemplate().saveDocument(bibSolrInputDocument);
                     }
                 }
-                solrTemplate.commit();
+                getSolrTemplate().commit();
             }
             return "Holdings documents updated successfully.";
         }catch(Exception ex){
@@ -86,10 +106,10 @@ public class DeAccessSolrDocumentService {
         try{
             for(Integer itemId : itemIds){
                 BibJSONUtil bibJSONUtil = new BibJSONUtil();
-                ItemEntity itemEntity = itemDetailsRepository.findByItemId(itemId);
+                ItemEntity itemEntity = getItemDetailsRepository().findByItemId(itemId);
                 if(itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
                     for(BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
-                        SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingDetailRepository);
+                        SolrInputDocument bibSolrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingDetailRepository());
                         for (SolrInputDocument holdingsSolrInputDocument : bibSolrInputDocument.getChildDocuments()) {
                             for (SolrInputDocument itemSolrInputDocument : holdingsSolrInputDocument.getChildDocuments()) {
                                 if (itemId.equals(itemSolrInputDocument.get(RecapConstants.ITEM_ID).getValue())) {
@@ -97,10 +117,10 @@ public class DeAccessSolrDocumentService {
                                 }
                             }
                         }
-                        solrTemplate.saveDocument(bibSolrInputDocument);
+                        getSolrTemplate().saveDocument(bibSolrInputDocument);
                     }
                 }
-                solrTemplate.commit();
+                getSolrTemplate().commit();
             }
             return "Item documents updated successfully.";
         }catch(Exception ex){

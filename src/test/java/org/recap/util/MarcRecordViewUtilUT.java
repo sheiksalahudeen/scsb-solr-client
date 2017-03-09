@@ -1,25 +1,21 @@
-package org.recap.controller;
+package org.recap.util;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.util.UpdateCgdUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.model.search.BibliographicMarcForm;
+import org.recap.model.userManagement.UserDetailsForm;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -29,38 +25,43 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Created by hemalathas on 25/1/17.
+ * Created by hemalathas on 24/2/17.
  */
-public class UpdateItemStatusControllerUT extends BaseTestCase{
+public class MarcRecordViewUtilUT extends BaseTestCase{
 
     @Mock
-    UpdateItemStatusController updateItemStatusController;
+    MarcRecordViewUtil marcRecordViewUtil;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Mock
-    ItemDetailsRepository itemDetailsRepository;
+    BibliographicDetailsRepository mockBibliographicDetailsRepository;
 
     @Mock
-    UpdateCgdUtil updateCgdUtil;
+    CustomerCodeDetailsRepository mockCustomerCodeDetailsRepository;
 
-    @Before
-    public void setup()throws Exception{
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
-    public void testUpdateCgdForItem() throws Exception {
+    public void testBuildBibliographicMarcForm() throws Exception {
+        Integer bibId = 123;
+        UserDetailsForm userDetailsForm = new UserDetailsForm();
+        userDetailsForm.setLoginInstitutionId(1);
+        userDetailsForm.setSuperAdmin(false);
+        userDetailsForm.setRecapUser(false);
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
-        String itemBarcode = bibliographicEntity.getItemEntities().get(0).getBarcode();
-        Mockito.when(updateItemStatusController.getItemDetailsRepository()).thenReturn(itemDetailsRepository);
-        Mockito.when(updateItemStatusController.getUpdateCgdUtil()).thenReturn(updateCgdUtil);
-        Mockito.when(updateItemStatusController.getItemDetailsRepository().findByBarcode(itemBarcode)).thenReturn(bibliographicEntity.getItemEntities());
-        Mockito.when(updateItemStatusController.updateCgdForItem(itemBarcode)).thenCallRealMethod();
-        String status = updateItemStatusController.updateCgdForItem(itemBarcode);
-        assertNotNull(status);
-        assertEquals(status,"Solr Indexing Successful");
+        Integer itemId = bibliographicEntity.getItemEntities().get(0).getItemId();
+        Mockito.when(marcRecordViewUtil.getBibliographicDetailsRepository()).thenReturn(mockBibliographicDetailsRepository);
+        Mockito.when(marcRecordViewUtil.getCustomerCodeDetailsRepository()).thenReturn(mockCustomerCodeDetailsRepository);
+        Mockito.when(marcRecordViewUtil.getBibliographicDetailsRepository().findByBibliographicIdAndIsDeletedFalse(bibId)).thenReturn(bibliographicEntity);
+        Mockito.when(marcRecordViewUtil.getBibliographicDetailsRepository().getNonDeletedItemEntities(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId())).thenReturn(bibliographicEntity.getItemEntities());
+        Mockito.when(marcRecordViewUtil.buildBibliographicMarcForm(bibId,itemId,userDetailsForm)).thenCallRealMethod();
+        BibliographicMarcForm bibliographicMarcForm = marcRecordViewUtil.buildBibliographicMarcForm(bibId,itemId,userDetailsForm);
+        assertNotNull(bibliographicMarcForm);
+        assertEquals(bibliographicMarcForm.getOwningInstitution(),"PUL");
+        assertEquals(bibliographicMarcForm.getAvailability(),"Available");
+        assertEquals(bibliographicMarcForm.getLeaderMaterialType(),"Monograph");
+
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
@@ -92,7 +93,7 @@ public class UpdateItemStatusControllerUT extends BaseTestCase{
         itemEntity.setOwningInstitutionId(1);
         itemEntity.setBarcode("123");
         itemEntity.setCallNumber("x.12321");
-        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCollectionGroupId(2);
         itemEntity.setCallNumberType("1");
         itemEntity.setCustomerCode("123");
         itemEntity.setCreatedDate(new Date());
@@ -120,6 +121,5 @@ public class UpdateItemStatusControllerUT extends BaseTestCase{
         URL resource = getClass().getResource("HoldingsContent.xml");
         return new File(resource.toURI());
     }
-
 
 }

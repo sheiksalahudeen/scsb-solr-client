@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
+import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
@@ -84,7 +85,7 @@ public class AccessionServiceUT extends BaseTestCase {
         String updatedHoldingMarcXML = new String(holdingsEntity.getContent(),StandardCharsets.UTF_8);
         List<Record> holdingRecordList = readMarcXml(updatedHoldingMarcXML);
         logger.info("updatedHoldingMarcXML-->"+updatedHoldingMarcXML);
-        TestCase.assertNotNull(holdingRecordList);
+        assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
         assertEquals("JFL 81-165", field852.getSubfield('h').getData());
         List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();

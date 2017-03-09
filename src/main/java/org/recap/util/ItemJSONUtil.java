@@ -120,7 +120,7 @@ public class ItemJSONUtil extends MarcUtil{
         }
 
         reportEntity.addAll(reportDataEntities);
-        producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
+        getProducerTemplate().sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
     public ProducerTemplate getProducerTemplate() {

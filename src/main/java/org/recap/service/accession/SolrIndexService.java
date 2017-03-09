@@ -36,14 +36,38 @@ public class SolrIndexService {
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public ProducerTemplate getProducerTemplate() {
+        return producerTemplate;
+    }
+
+    public SolrTemplate getSolrTemplate() {
+        return solrTemplate;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public HoldingsDetailsRepository getHoldingsDetailsRepository() {
+        return holdingsDetailsRepository;
+    }
+
+    public BibJSONUtil getBibJSONUtil(){
+        return new BibJSONUtil();
+    }
+
     public SolrInputDocument indexByBibliographicId(@RequestBody Integer bibliographicId) {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
-        bibJSONUtil.setProducerTemplate(producerTemplate);
-        BibliographicEntity bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibliographicId);
-        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
+        getBibJSONUtil().setProducerTemplate(getProducerTemplate());
+        BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicId(bibliographicId);
+        SolrInputDocument solrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository());
         if (solrInputDocument !=null) {
-            solrTemplate.saveDocument(solrInputDocument);
-            solrTemplate.commit();
+            getSolrTemplate().saveDocument(solrInputDocument);
+            getSolrTemplate().commit();
         }
         return solrInputDocument;
     }
