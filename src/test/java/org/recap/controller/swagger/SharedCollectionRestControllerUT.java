@@ -12,11 +12,11 @@ import org.recap.controller.SharedCollectionRestController;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
+import org.recap.model.accession.AccessionResponse;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
@@ -45,23 +45,20 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private ItemDetailsRepository itemDetailsRepository;
+    @Mock
+    private SolrIndexService solrIndexService;
 
     @Mock
-    SolrIndexService solrIndexService;
+    private BibSolrCrudRepository bibSolrCrudRepository;
 
     @Mock
-    BibSolrCrudRepository bibSolrCrudRepository;
+    private SharedCollectionRestController mockedSharedCollectionRestController;
 
     @Mock
-    SharedCollectionRestController mockedSharedCollectionRestController;
+    private AccessionService accessionService;
 
     @Mock
-    AccessionService accessionService;
-
-    @Mock
-    ItemAvailabilityService itemAvailabilityService;
+    private ItemAvailabilityService itemAvailabilityService;
 
     @Before
     public void setup()throws Exception{
@@ -99,13 +96,18 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         accessionRequest.setCustomerCode("PB");
         accessionRequest.setItemBarcode("32101062128309");
         accessionRequestList.add(accessionRequest);
+        List<AccessionResponse> accessionResponseList = new ArrayList<>();
+        AccessionResponse accessionResponse = new AccessionResponse();
+        accessionResponse.setItemBarcode("32101062128309");
+        accessionResponse.setMessage(RecapConstants.SUCCESS);
+        accessionResponseList.add(accessionResponse);
         Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
         Mockito.when(mockedSharedCollectionRestController.getInputLimit()).thenReturn(10);
-        Mockito.when(mockedSharedCollectionRestController.getAccessionService().processRequest(accessionRequestList)).thenReturn("Success");
+        Mockito.when(mockedSharedCollectionRestController.getAccessionService().processRequest(accessionRequestList)).thenReturn(accessionResponseList);
         Mockito.when(mockedSharedCollectionRestController.accession(accessionRequestList)).thenCallRealMethod();
         ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(),"Success");
+        assertEquals(responseEntity.getBody(),accessionResponseList);
     }
 
     private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {

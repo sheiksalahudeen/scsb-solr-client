@@ -1,12 +1,11 @@
 package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
+import org.recap.model.accession.AccessionResponse;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
 import org.slf4j.Logger;
@@ -19,7 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by chenchulakshmig on 6/10/16.
@@ -87,13 +88,25 @@ public class SharedCollectionRestController {
     @ResponseBody
     public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
         ResponseEntity responseEntity;
+        List<AccessionResponse> accessionResponsesList;
         if (accessionRequestList.size() > getInputLimit()) {
-            return new ResponseEntity(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE+inputLimit,getHttpHeaders(),HttpStatus.OK);
+            accessionResponsesList = getAccessionResponses();
+            return new ResponseEntity(accessionResponsesList,getHttpHeaders(),HttpStatus.OK);
         } else {
-            String response = getAccessionService().processRequest(accessionRequestList);
-            responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+            accessionResponsesList =  getAccessionService().processRequest(accessionRequestList);
+            responseEntity = new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;
+    }
+
+    private List<AccessionResponse> getAccessionResponses() {
+        List<AccessionResponse> accessionResponsesList;
+        accessionResponsesList = new ArrayList<>();
+        AccessionResponse accessionResponse = new AccessionResponse();
+        accessionResponse.setItemBarcode("");
+        accessionResponsesList.add(accessionResponse);
+        accessionResponse.setMessage(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE+inputLimit);
+        return accessionResponsesList;
     }
 
     private HttpHeaders getHttpHeaders() {

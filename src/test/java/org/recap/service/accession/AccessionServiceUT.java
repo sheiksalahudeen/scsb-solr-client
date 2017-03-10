@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
-import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.accession.AccessionResponse;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
@@ -131,9 +131,14 @@ public class AccessionServiceUT extends BaseTestCase {
         assertNotNull(itemEntities.get(0));
         assertEquals(1,itemEntities.get(0).getBibliographicEntities().size());
 
-        Mockito.when(accessionService.processRequest(accessionRequestList)).thenReturn("3210106212830"+RecapConstants.HYPHEN+RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG);
-        String respose = accessionService.processRequest(accessionRequestList);
-        assertEquals("3210106212830"+RecapConstants.HYPHEN+RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG,respose);
+        List<AccessionResponse> accessionResponseList = new ArrayList<>();
+        AccessionResponse accessionResponse = new AccessionResponse();
+        accessionResponse.setItemBarcode("3210106212830");
+        accessionResponse.setMessage(RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG);
+        accessionResponseList.add(accessionResponse);
+        Mockito.when(accessionService.processRequest(accessionRequestList)).thenReturn(accessionResponseList);
+        List<AccessionResponse> accessionResponses = accessionService.processRequest(accessionRequestList);
+        assertEquals(accessionResponses,accessionResponseList);
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities1 = mockedItemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities1);
