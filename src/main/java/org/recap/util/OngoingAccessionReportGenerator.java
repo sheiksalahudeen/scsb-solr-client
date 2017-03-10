@@ -55,7 +55,7 @@ public class OngoingAccessionReportGenerator {
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, OngoingAccessionReportRecord.class));
+            return propertyUtilsBean.getWriteMethod(new PropertyDescriptor(propertyName, OngoingAccessionReportRecord.class));
         } catch (IntrospectionException e) {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
