@@ -4,8 +4,8 @@ package org.recap.model.accession;
  * Created by chenchulakshmig on 19/10/16.
  */
 public class AccessionRequest {
-    String itemBarcode;
-    String customerCode;
+    private String itemBarcode;
+    private String customerCode;
 
     public String getItemBarcode() {
         return itemBarcode;
