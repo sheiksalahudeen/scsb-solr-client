@@ -66,22 +66,17 @@ public class SharedCollectionRestController {
 
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
     @ResponseBody
-    public List<ItemAvailabilityResponse> itemAvailabilityStatus(@RequestBody ItemAvailabityStatusRequest itemAvailabityStatusRequest) {
+    public ResponseEntity itemAvailabilityStatus(@RequestBody ItemAvailabityStatusRequest itemAvailabityStatusRequest) {
         List<ItemAvailabilityResponse> itemAvailabilityResponses = new ArrayList<>();
         ResponseEntity responseEntity;
         try {
             itemAvailabilityResponses=getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalseList(itemAvailabityStatusRequest.getBarcodes());
         } catch (Exception exception) {
             responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
-            return itemAvailabilityResponses;
+            return responseEntity;
         }
-        if (CollectionUtils.isEmpty(itemAvailabilityResponses)) {
-            responseEntity = new ResponseEntity(RecapConstants.ITEM_BARCDE_DOESNOT_EXIST, getHttpHeaders(), HttpStatus.OK);
-            return itemAvailabilityResponses;
-        } else {
-            responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
-            return itemAvailabilityResponses;
-        }
+        responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+        return responseEntity;
     }
 
     @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
