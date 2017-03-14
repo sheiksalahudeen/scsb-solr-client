@@ -9,11 +9,15 @@ import org.recap.model.jpa.ItemChangeLogEntity;
 import org.recap.model.reports.ReportsRequest;
 import org.recap.model.reports.ReportsResponse;
 import org.recap.model.search.DeaccessionItemResultsRow;
+import org.recap.model.search.IncompleteReportResultsRow;
+import org.recap.model.search.SearchRecordsRequest;
+import org.recap.model.search.SearchResultRow;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
+import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +52,13 @@ public class ReportsServiceUtil {
     ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     List<ItemValueResolver> itemValueResolvers;
+
+    @Autowired
+    BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
+
+    @Autowired
+    SearchRecordsUtil searchRecordsUtil;
+
 
     public ReportsResponse populateAccessionDeaccessionItemCounts(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -145,9 +156,48 @@ public class ReportsServiceUtil {
         return reportsResponse;
     }
 
+    public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
+        ReportsResponse reportsResponse = new ReportsResponse();
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName("ItemCatalogingStatus");
+        searchRecordsRequest.setFieldValue("Incomplete");
+        if(!reportsRequest.isExport()){
+            searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
+            searchRecordsRequest.setPageNumber(reportsRequest.getIncompletePageNumber());
+        }else{
+            searchRecordsRequest.setExport(reportsRequest.isExport());
+        }
+        searchRecordsRequest.setOwningInstitutions(Arrays.asList(reportsRequest.getIncompleteRequestingInstitution()));
+        List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+        List<IncompleteReportResultsRow> incompleteReportResultsRows = new ArrayList<>();
+        for (SearchResultRow searchResultRow : searchResultRows) {
+            IncompleteReportResultsRow incompleteReportResultsRow = new IncompleteReportResultsRow();
+            incompleteReportResultsRow.setTitle(searchResultRow.getTitle());
+            incompleteReportResultsRow.setOwningInstitution(searchResultRow.getOwningInstitution());
+            incompleteReportResultsRow.setAuthor(searchResultRow.getAuthorSearch());
+            incompleteReportResultsRow.setCreatedDate(getFormattedDates(searchResultRow.getBibCreatedDate()));
+            incompleteReportResultsRow.setCustomerCode(searchResultRow.getCustomerCode());
+            incompleteReportResultsRow.setBarcode(searchResultRow.getBarcode());
+            incompleteReportResultsRows.add(incompleteReportResultsRow);
+        }
+        reportsResponse.setIncompletePageNumber(searchRecordsRequest.getPageNumber());
+        reportsResponse.setIncompletePageSize(searchRecordsRequest.getPageSize());
+        reportsResponse.setIncompleteTotalPageCount(searchRecordsRequest.getTotalPageCount());
+        reportsResponse.setIncompleteTotalRecordsCount(searchRecordsRequest.getTotalItemRecordsCount());
+        reportsResponse.setIncompleteReportResultsRows(incompleteReportResultsRows);
+        return reportsResponse;
+    }
+
+    private String getFormattedDates(Date gotDate) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY");
+        String format = simpleDateFormat.format(gotDate);
+        return format;
+    }
+
+
+
     private void populateAccessionCounts(ReportsRequest reportsRequest, ReportsResponse reportsResponse, String solrFormattedDate) throws Exception {
-        for (String owningInstitution : reportsRequest.getOwningInstitutions()) {
-            for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
+        for (String owningInstitution : reportsRequest.getOwningInstitutions()) {for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
                 SolrQuery query = solrQueryBuilder.buildSolrQueryForAccessionReports(solrFormattedDate, owningInstitution, false, collectionGroupDesignation);
                 query.setRows(0);
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);

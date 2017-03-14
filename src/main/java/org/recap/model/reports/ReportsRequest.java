@@ -15,6 +15,11 @@ public class ReportsRequest {
     private Integer pageNumber = 0;
     private Integer pageSize = 10;
     private String deaccessionOwningInstitution;
+    //IncompleteRecordsReport
+    private String incompleteRequestingInstitution;
+    private Integer incompletePageNumber = 0;
+    private Integer incompletePageSize = 10;
+    private boolean export;
 
     public String getAccessionDeaccessionFromDate() {
         return accessionDeaccessionFromDate;
@@ -70,5 +75,37 @@ public class ReportsRequest {
 
     public void setDeaccessionOwningInstitution(String deaccessionOwningInstitution) {
         this.deaccessionOwningInstitution = deaccessionOwningInstitution;
+    }
+
+    public String getIncompleteRequestingInstitution() {
+        return incompleteRequestingInstitution;
+    }
+
+    public void setIncompleteRequestingInstitution(String incompleteRequestingInstitution) {
+        this.incompleteRequestingInstitution = incompleteRequestingInstitution;
+    }
+
+    public Integer getIncompletePageNumber() {
+        return incompletePageNumber;
+    }
+
+    public void setIncompletePageNumber(Integer incompletePageNumber) {
+        this.incompletePageNumber = incompletePageNumber;
+    }
+
+    public Integer getIncompletePageSize() {
+        return incompletePageSize;
+    }
+
+    public void setIncompletePageSize(Integer incompletePageSize) {
+        this.incompletePageSize = incompletePageSize;
+    }
+
+    public boolean isExport() {
+        return export;
+    }
+
+    public void setExport(boolean export) {
+        this.export = export;
     }
 }

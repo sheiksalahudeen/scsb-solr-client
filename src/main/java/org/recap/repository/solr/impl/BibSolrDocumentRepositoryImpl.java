@@ -91,12 +91,25 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     private List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
-        queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
-        queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
-        queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
-        QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
-        SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
-        if(CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
+        SolrDocumentList itemSolrDocumentList = null;
+        if (searchRecordsRequest.isExport()) {
+            QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
+            SolrDocumentList results = queryResponse.getResults();
+            long numFound = results.getNumFound();
+            SolrQuery queryForChildAndParentExportReport = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
+            queryForChildAndParentExportReport.setStart(0);
+            queryForChildAndParentExportReport.setRows((int) numFound);
+            queryForChildAndParentExportReport.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+            QueryResponse response = solrTemplate.getSolrClient().query(queryForChildAndParentExportReport);
+            itemSolrDocumentList = response.getResults();
+        } else {
+            queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+            queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
+            queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+            QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
+            itemSolrDocumentList = queryResponse.getResults();
+        }
+        if (CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
             setCountsByItem(searchRecordsRequest, itemSolrDocumentList);
             for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument itemSolrDocument = iterator.next();
@@ -202,7 +215,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private boolean isItemField(SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
+                && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER)
+            ||searchRecordsRequest.getFieldName().equalsIgnoreCase("ItemCatalogingStatus"))) {
             return true;
         }
         return false;
@@ -321,6 +335,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             bibValueResolvers.add(new TitleSearchValueResolver());
             bibValueResolvers.add(new TitleSortValueResolver());
             bibValueResolvers.add(new IsDeletedBibValueResolver());
+            bibValueResolvers.add(new BibCreatedDateValueResolver());
         }
         return bibValueResolvers;
     }
@@ -344,6 +359,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new ItemIdValueResolver());
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
             itemValueResolvers.add(new IsDeletedItemValueResolver());
+            itemValueResolvers.add(new ItemCreatedDateValueResolver());
         }
         return itemValueResolvers;
     }
