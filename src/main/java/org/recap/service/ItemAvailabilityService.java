@@ -1,6 +1,7 @@
 package org.recap.service;
 
 import org.recap.RecapConstants;
+import org.recap.controller.SharedCollectionRestController;
 import org.recap.model.BibItemAvailabityStatusRequest;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.jpa.BibliographicEntity;
@@ -9,6 +10,8 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,8 @@ import java.util.Map;
  */
 @Service
 public class ItemAvailabilityService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SharedCollectionRestController.class);
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
@@ -64,17 +69,30 @@ public class ItemAvailabilityService {
     public List<ItemAvailabilityResponse> getbibItemAvaiablityStatus(BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
         List<ItemAvailabilityResponse> itemAvailabilityResponses = new ArrayList<>();
         BibliographicEntity bibliographicEntity;
-        if (bibItemAvailabityStatusRequest.getInstitutionId().equalsIgnoreCase(RecapConstants.SCSB)) {
-            bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(Integer.parseInt(bibItemAvailabityStatusRequest.getBibliographicId()));
-        } else {
-            InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(bibItemAvailabityStatusRequest.getInstitutionId());
-            bibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionEntity.getInstitutionId(), bibItemAvailabityStatusRequest.getBibliographicId());
-        }
-        for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
-            ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
-            itemAvailabilityResponse.setItemBarcode(itemEntity.getBarcode());
-            itemAvailabilityResponse.setItemAvailabilityStatus(itemEntity.getItemStatusEntity().getStatusCode());
-            itemAvailabilityResponses.add(itemAvailabilityResponse);
+        try {
+            if (bibItemAvailabityStatusRequest.getInstitutionId().equalsIgnoreCase(RecapConstants.SCSB)) {
+                bibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(Integer.parseInt(bibItemAvailabityStatusRequest.getBibliographicId()));
+            } else {
+                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(bibItemAvailabityStatusRequest.getInstitutionId());
+                bibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(institutionEntity.getInstitutionId(), bibItemAvailabityStatusRequest.getBibliographicId());
+            }
+            if (bibliographicEntity != null) {
+                for (ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
+                    if(!itemEntity.isDeleted()) {
+                        ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
+                        itemAvailabilityResponse.setItemBarcode(itemEntity.getBarcode());
+                        itemAvailabilityResponse.setItemAvailabilityStatus(itemEntity.getItemStatusEntity().getStatusCode());
+                        itemAvailabilityResponses.add(itemAvailabilityResponse);
+                    }
+                }
+            }else{
+                ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
+                itemAvailabilityResponse.setItemBarcode("");
+                itemAvailabilityResponse.setErrorMessage(RecapConstants.BIB_ITEM_DOESNOT_EXIST);
+                itemAvailabilityResponses.add(itemAvailabilityResponse);
+            }
+        } catch (Exception e) {
+            logger.error(RecapConstants.EXCEPTION,e);
         }
         return itemAvailabilityResponses;
     }

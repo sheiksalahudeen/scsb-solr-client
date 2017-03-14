@@ -252,6 +252,7 @@ public final class RecapConstants {
     public static final String ERROR_DESCRIPTION = "ErrorDescription";
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
+    public static final String BIB_ITEM_DOESNOT_EXIST = "Bib Id doesn't exist in SCSB database.";
 
     public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
@@ -374,6 +375,7 @@ public final class RecapConstants {
 
     //Logger
     public static final String LOG_ERROR="error-->";
+    public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
 
     private RecapConstants(){}
 }
