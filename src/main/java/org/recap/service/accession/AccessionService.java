@@ -15,6 +15,7 @@ import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
+import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
@@ -74,6 +75,9 @@ public class AccessionService {
 
     @Autowired
     private PrincetonService princetonService;
+
+    @Autowired
+    private ColumbiaService columbiaService;
 
     @Autowired
     private NYPLService nyplService;
@@ -136,6 +140,14 @@ public class AccessionService {
         this.princetonService = princetonService;
     }
 
+    public ColumbiaService getColumbiaService() {
+        return columbiaService;
+    }
+
+    public void setColumbiaService(ColumbiaService columbiaService) {
+        this.columbiaService = columbiaService;
+    }
+
     public NYPLService getNyplService() {
         return nyplService;
     }
@@ -187,30 +199,14 @@ public class AccessionService {
                             bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
                             stopWatch.stop();
                             logger.info("Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
-                            stopWatch = new StopWatch();
+                            response = processAccessionForMarcXMl(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
+                        } else if(owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)){
+                            StopWatch stopWatch = new StopWatch();
                             stopWatch.start();
-                            List<Record> records = new ArrayList<>();
-                            if (StringUtils.isNotBlank(bibDataResponse)) {
-                                records = getMarcUtil().readMarcXml(bibDataResponse);
-                            }
-                            if (CollectionUtils.isNotEmpty(records)) {
-                                List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
-                                for (Record record : records) {
-                                    response = updateData(record, owningInstitution, responseMapList, solrInputDocumentList);
-                                    setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
-                                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
-                                }
-                                stopWatch.stop();
-                                logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
-                                stopWatch = new StopWatch();
-                                stopWatch.start();
-                                for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
-                                    SolrInputDocument solrInputDocument = iterator.next();
-                                    ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
-                                }
-                                stopWatch.stop();
-                                logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
-                            }
+                            bibDataResponse = getColumbiaService().getBibData(accessionRequest.getItemBarcode());
+                            stopWatch.stop();
+                            logger.info("Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
+                            response = processAccessionForMarcXMl(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
                         } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
                             StopWatch stopWatch = new StopWatch();
                             stopWatch.start();
@@ -222,7 +218,7 @@ public class AccessionService {
                             stopWatch = new StopWatch();
                             stopWatch.start();
                             for (BibRecord bibRecord : bibRecords.getBibRecords()) {
-                                response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList);
+                                response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList,accessionRequest);
                                 setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
                                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                             }
@@ -260,6 +256,36 @@ public class AccessionService {
         }
         saveReportEntity(owningInstitution, reportDataEntityList);
         return accessionResponsesList;
+    }
+
+    private String processAccessionForMarcXMl(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) {
+        StopWatch stopWatch;
+        String response = null;
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        List<Record> records = new ArrayList<>();
+        if (StringUtils.isNotBlank(bibDataResponse)) {
+            records = getMarcUtil().readMarcXml(bibDataResponse);
+        }
+        if (CollectionUtils.isNotEmpty(records)) {
+            List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
+            for (Record record : records) {
+                response = updateData(record, owningInstitution, responseMapList, solrInputDocumentList,accessionRequest);
+                setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+            }
+            stopWatch.stop();
+            logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
+            stopWatch = new StopWatch();
+            stopWatch.start();
+            for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrInputDocument solrInputDocument = iterator.next();
+                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+            }
+            stopWatch.stop();
+            logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+        }
+        return response;
     }
 
     private List<ItemEntity> getItemEntityList(AccessionRequest accessionRequest){
@@ -350,9 +376,9 @@ public class AccessionService {
         return response;
     }
 
-    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, List<SolrInputDocument> solrInputDocumentList){
+    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, List<SolrInputDocument> solrInputDocumentList,AccessionRequest accessionRequest){
         String response = null;
-        Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution);
+        Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution,accessionRequest.getCustomerCode());
         responseMapList.add(responseMap);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
         List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
@@ -685,7 +711,7 @@ public class AccessionService {
     }
 
     private XmlToBibEntityConverterInterface getConverter(String institutionId){
-        if(institutionId.equalsIgnoreCase(RecapConstants.PRINCETON)){
+        if(institutionId.equalsIgnoreCase(RecapConstants.PRINCETON) || institutionId.equalsIgnoreCase(RecapConstants.COLUMBIA)){
             return getMarcToBibEntityConverter();
         } else if(institutionId.equalsIgnoreCase(RecapConstants.NYPL)){
             return getScsbToBibEntityConverter();

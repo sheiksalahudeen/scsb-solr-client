@@ -155,7 +155,7 @@ public final class RecapConstants {
     public static final String FILE_SYSTEM = "FileSystem";
     public static final String FTP = "FTP";
 
-
+    public static final String NOT_AVAILABLE_CGD = "NA";
     public static final String SHARED_CGD = "Shared";
     public static final String OCLC_CRITERIA = "OCLC";
 
