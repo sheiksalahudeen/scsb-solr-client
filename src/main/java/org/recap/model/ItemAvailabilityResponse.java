@@ -6,6 +6,7 @@ package org.recap.model;
 public class ItemAvailabilityResponse {
     private String itemBarcode;
     private String itemAvailabilityStatus;
+    private String errorMessage;
 
     public String getItemBarcode() {
         return itemBarcode;
@@ -21,5 +22,13 @@ public class ItemAvailabilityResponse {
 
     public void setItemAvailabilityStatus(String itemAvailabilityStatus) {
         this.itemAvailabilityStatus = itemAvailabilityStatus;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

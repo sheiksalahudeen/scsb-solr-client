@@ -1,7 +1,7 @@
 package org.recap.controller;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
+import org.recap.model.BibItemAvailabityStatusRequest;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
@@ -44,38 +44,53 @@ public class SharedCollectionRestController {
         return itemAvailabilityService;
     }
 
-    public void setItemAvailabilityService(ItemAvailabilityService itemAvailabilityService) {
-        this.itemAvailabilityService = itemAvailabilityService;
-    }
-
     public AccessionService getAccessionService() {
         return accessionService;
-    }
-
-    public void setAccessionService(AccessionService accessionService) {
-        this.accessionService = accessionService;
     }
 
     public Integer getInputLimit() {
         return inputLimit;
     }
 
-    public void setInputLimit(Integer inputLimit) {
-        this.inputLimit = inputLimit;
-    }
-
-    @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
+    @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity itemAvailabilityStatus(@RequestBody ItemAvailabityStatusRequest itemAvailabityStatusRequest) {
         List<ItemAvailabilityResponse> itemAvailabilityResponses = new ArrayList<>();
         ResponseEntity responseEntity;
         try {
-            itemAvailabilityResponses=getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalseList(itemAvailabityStatusRequest.getBarcodes());
+            itemAvailabilityResponses = getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalseList(itemAvailabityStatusRequest.getBarcodes());
         } catch (Exception exception) {
-            responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            responseEntity = new ResponseEntity(RecapConstants.SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE, getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            logger.error(RecapConstants.EXCEPTION, exception);
             return responseEntity;
         }
         responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+        return responseEntity;
+    }
+
+    @RequestMapping(value = "/bibAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity bibAvailabilityStatus(@RequestBody BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
+        List<ItemAvailabilityResponse> itemAvailabilityResponses = null;
+        ResponseEntity responseEntity;
+        try {
+            itemAvailabilityResponses = getItemAvailabilityService().getbibItemAvaiablityStatus(bibItemAvailabityStatusRequest);
+            if (itemAvailabilityResponses.isEmpty()) {
+                ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
+                itemAvailabilityResponse.setErrorMessage(RecapConstants.BIB_ITEM_DOESNOT_EXIST);
+                itemAvailabilityResponses.add(itemAvailabilityResponse);
+                responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+            } else {
+                responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+            }
+        } catch (Exception exception) {
+            ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
+            itemAvailabilityResponse.setErrorMessage(RecapConstants.SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE);
+            itemAvailabilityResponses.add(itemAvailabilityResponse);
+            responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+            logger.error(RecapConstants.EXCEPTION, exception);
+            return responseEntity;
+        }
         return responseEntity;
     }
 
@@ -86,9 +101,9 @@ public class SharedCollectionRestController {
         List<AccessionResponse> accessionResponsesList;
         if (accessionRequestList.size() > getInputLimit()) {
             accessionResponsesList = getAccessionResponses();
-            return new ResponseEntity(accessionResponsesList,getHttpHeaders(),HttpStatus.OK);
+            return new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         } else {
-            accessionResponsesList =  getAccessionService().processRequest(accessionRequestList);
+            accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
             responseEntity = new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;
@@ -100,7 +115,7 @@ public class SharedCollectionRestController {
         AccessionResponse accessionResponse = new AccessionResponse();
         accessionResponse.setItemBarcode("");
         accessionResponsesList.add(accessionResponse);
-        accessionResponse.setMessage(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE+inputLimit);
+        accessionResponse.setMessage(RecapConstants.ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE + inputLimit);
         return accessionResponsesList;
     }
 
