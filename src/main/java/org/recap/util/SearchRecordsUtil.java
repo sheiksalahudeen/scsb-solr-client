@@ -84,6 +84,9 @@ public final class SearchRecordsUtil {
                 searchResultRow.setPublisherDate(bibItem.getPublicationDate());
                 searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
                 searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
+                searchResultRow.setBibCreatedDate(bibItem.getBibCreatedDate());
+                String authorSearch = CollectionUtils.isNotEmpty(bibItem.getAuthorSearch()) ? bibItem.getAuthorSearch().get(0) : " ";
+                searchResultRow.setAuthorSearch(authorSearch);
                 Holdings holdings = CollectionUtils.isEmpty(bibItem.getHoldingsList()) ? new Holdings() : bibItem.getHoldingsList().get(0);
                 if (null != bibItem.getItems() && bibItem.getItems().size() == 1 && !RecapConstants.SERIAL.equals(bibItem.getLeaderMaterialType())) {
                     Item item = bibItem.getItems().get(0);
