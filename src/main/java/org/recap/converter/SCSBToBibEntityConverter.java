@@ -53,7 +53,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private Map institutionEntityMap;
 
     @Override
-    public Map convert(Object scsbRecord, String institutionName) {
+    public Map convert(Object scsbRecord, String institutionName,String customerCode) {
         int failedItemCount = 0;
         int successItemCount = 0;
         String reasonForFailureItem = "";
@@ -108,7 +108,8 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 if (CollectionUtils.isNotEmpty(itemMarcRecordList)) {
                     for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
                         Record itemRecord = itemMarcRecord.getItemRecord();
-                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord, bibRecordObject,currentDate);
+                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId,
+                                holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, customerCode, bibRecord, bibRecordObject,currentDate);
                         if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
                             failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
                         }
@@ -294,12 +295,13 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
-    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, BibRecord bibRecord, Record bibRecordObject, Date currentDate) {
+    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, String customerCode, BibRecord bibRecord, Record bibRecordObject, Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
         int failedItemCount = 0;
         int successItemCount = 0;
+        boolean isComplete = true;
         String reasonForFailureItem = "";
         map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
         map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
@@ -311,13 +313,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         } else {
             errorMessage.append("Item Barcode cannot be null");
         }
-        String customerCode = marcUtil.getDataFieldValue(itemRecord, "900", 'b');
-        if (StringUtils.isNotBlank(customerCode)) {
-            itemEntity.setCustomerCode(customerCode);
-        } else {
-            errorMessage.append("\n");
-            errorMessage.append("Customer Code cannot be null");
-        }
+        itemEntity.setCustomerCode(customerCode);
         itemEntity.setCallNumber(holdingsCallNumber);
         itemEntity.setCallNumberType(String.valueOf(holdingsCallNumberType));
         itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get("Available"));//TODO need to change
@@ -335,17 +331,19 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         if (StringUtils.isNotBlank(collectionGroupCode) && getCollectionGroupMap().containsKey(collectionGroupCode)) {
             itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(collectionGroupCode));
         } else {
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get("Open"));
+            isComplete = false;
+            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.NOT_AVAILABLE_CGD));
         }
         itemEntity.setCreatedDate(currentDate);
         itemEntity.setCreatedBy(RecapConstants.ACCESSION);
         itemEntity.setLastUpdatedDate(currentDate);
         itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-        itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String useRestrictions = marcUtil.getDataFieldValue(itemRecord, "876", 'h');
         if (StringUtils.isNotBlank(useRestrictions) && ("In Library Use".equalsIgnoreCase(useRestrictions) || "Supervised Use".equalsIgnoreCase(useRestrictions))) {
             itemEntity.setUseRestrictions(useRestrictions);
+        } else if(null == useRestrictions){
+            isComplete = false;
         }
 
         itemEntity.setVolumePartYear(marcUtil.getDataFieldValue(itemRecord, "876", '3'));
@@ -357,6 +355,11 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append("Item Owning Institution Id cannot be null");
         }
 
+        if(isComplete){
+            itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
+        } else {
+            itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+        }
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
             if(map.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
