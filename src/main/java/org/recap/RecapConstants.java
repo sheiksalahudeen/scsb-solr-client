@@ -3,7 +3,7 @@ package org.recap;
 /**
  * Created by SheikS on 6/20/2016.
  */
-public class RecapConstants {
+public final class RecapConstants {
     public static final String PATH_SEPARATOR = "/";
     public static final String PROCESSSED_RECORDS = "processedRecords";
 
@@ -234,10 +234,13 @@ public class RecapConstants {
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
 
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
+
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
     public static final String UNKNOWN_INSTITUTION = "UN";
     public static final String NYPL = "NYPL";
+    public static final String SCSB = "SCSB";
+
     public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
     public static final String TITLE = "Title";
     public static final String OWNING_INSTITUTION_HOLDINGS_ID = "OwningInstitutionHoldingsId";
@@ -372,4 +375,5 @@ public class RecapConstants {
     //Logger
     public static final String LOG_ERROR="error-->";
 
+    private RecapConstants(){}
 }

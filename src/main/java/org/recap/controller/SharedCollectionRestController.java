@@ -1,7 +1,7 @@
 package org.recap.controller;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
+import org.recap.model.BibItemAvailabityStatusRequest;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
@@ -44,24 +44,12 @@ public class SharedCollectionRestController {
         return itemAvailabilityService;
     }
 
-    public void setItemAvailabilityService(ItemAvailabilityService itemAvailabilityService) {
-        this.itemAvailabilityService = itemAvailabilityService;
-    }
-
     public AccessionService getAccessionService() {
         return accessionService;
     }
 
-    public void setAccessionService(AccessionService accessionService) {
-        this.accessionService = accessionService;
-    }
-
     public Integer getInputLimit() {
         return inputLimit;
-    }
-
-    public void setInputLimit(Integer inputLimit) {
-        this.inputLimit = inputLimit;
     }
 
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
@@ -73,6 +61,23 @@ public class SharedCollectionRestController {
             itemAvailabilityResponses=getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalseList(itemAvailabityStatusRequest.getBarcodes());
         } catch (Exception exception) {
             responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            logger.error(RecapConstants.EXCEPTION, exception);
+            return responseEntity;
+        }
+        responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
+        return responseEntity;
+    }
+
+    @RequestMapping(value = "/bibAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
+    @ResponseBody
+    public ResponseEntity bibAvailabilityStatus(@RequestBody BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
+        List<ItemAvailabilityResponse> itemAvailabilityResponses;
+        ResponseEntity responseEntity;
+        try {
+            itemAvailabilityResponses=getItemAvailabilityService().getbibItemAvaiablityStatus(bibItemAvailabityStatusRequest);
+        } catch (Exception exception) {
+            responseEntity = new ResponseEntity("Scsb Persistence Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            logger.error(RecapConstants.EXCEPTION, exception);
             return responseEntity;
         }
         responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
