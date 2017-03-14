@@ -22,6 +22,7 @@ import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
 import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.persistence.EntityManager;
@@ -70,25 +71,18 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         String itemBarcode = "32101056185125";
         BibliographicEntity bibliographicEntity = saveBibEntityWithHoldingsAndItem(itemBarcode);
         ItemAvailabityStatusRequest itemAvailabityStatusRequest = new ItemAvailabityStatusRequest();
-        List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
         String barcode = null;
-        String status = null;
-        for (ItemEntity itemEntity : itemEntities) {
-            barcode  = itemEntity.getBarcode();
-            status = itemEntity.getItemStatusEntity().getStatusDescription();
-        }
         List<String>  barcodeList = new ArrayList<>();
         barcodeList.add(barcode);
         itemAvailabityStatusRequest.setBarcodes(barcodeList);
         Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService()).thenReturn(itemAvailabilityService);
         Mockito.when(mockedSharedCollectionRestController.getItemAvailabilityService().getItemStatusByBarcodeAndIsDeletedFalse(itemBarcode)).thenReturn(RecapConstants.AVAILABLE);
         Mockito.when(mockedSharedCollectionRestController.itemAvailabilityStatus(itemAvailabityStatusRequest)).thenCallRealMethod();
-        List<ItemAvailabilityResponse> itemAvailabilityResponses = mockedSharedCollectionRestController.itemAvailabilityStatus(itemAvailabityStatusRequest);
-        assertNotNull(itemAvailabilityResponses);
-        for (ItemAvailabilityResponse itemAvailabilityResponse : itemAvailabilityResponses) {
-            assertEquals(itemAvailabilityResponse.getItemAvailabilityStatus(),status);
-        }
+        ResponseEntity responseEntity = mockedSharedCollectionRestController.itemAvailabilityStatus(itemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
     }
+
     @Test
     public void accession() throws Exception {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
