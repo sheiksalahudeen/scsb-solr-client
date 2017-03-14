@@ -3,7 +3,7 @@ package org.recap;
 /**
  * Created by SheikS on 6/20/2016.
  */
-public class RecapConstants {
+public final class RecapConstants {
     public static final String PATH_SEPARATOR = "/";
     public static final String PROCESSSED_RECORDS = "processedRecords";
 
@@ -234,10 +234,13 @@ public class RecapConstants {
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
 
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
+
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
     public static final String UNKNOWN_INSTITUTION = "UN";
     public static final String NYPL = "NYPL";
+    public static final String SCSB = "SCSB";
+
     public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
     public static final String TITLE = "Title";
     public static final String OWNING_INSTITUTION_HOLDINGS_ID = "OwningInstitutionHoldingsId";
@@ -249,6 +252,7 @@ public class RecapConstants {
     public static final String ERROR_DESCRIPTION = "ErrorDescription";
     public static final String RESPONSE_DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
+    public static final String BIB_ITEM_DOESNOT_EXIST = "Bib Id doesn't exist in SCSB database.";
 
     public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
@@ -371,5 +375,7 @@ public class RecapConstants {
 
     //Logger
     public static final String LOG_ERROR="error-->";
+    public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
 
+    private RecapConstants(){}
 }

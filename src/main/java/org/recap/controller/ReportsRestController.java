@@ -60,4 +60,17 @@ public class ReportsRestController {
         }
         return reportsResponse;
     }
+
+    @RequestMapping(value="/incompleteRecords", method = RequestMethod.POST)
+    public ReportsResponse incompleteRecords(@RequestBody ReportsRequest reportsRequest) {
+        ReportsResponse reportsResponse = new ReportsResponse();
+        try {
+            reportsResponse = reportsServiceUtil.populateIncompleteRecordsReport(reportsRequest);
+        } catch (Exception e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
+            reportsResponse.setMessage(e.getMessage());
+        }
+        return reportsResponse;
+    }
+
 }

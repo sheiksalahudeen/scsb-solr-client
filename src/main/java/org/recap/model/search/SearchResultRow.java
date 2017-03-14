@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,6 +55,8 @@ public class SearchResultRow {
     private String deliveryLocation;
     private String requestType;
     private String requestNotes;
+    private Date bibCreatedDate;
+    private String authorSearch;
 
     public Integer getBibId() {
         return bibId;
@@ -237,5 +240,21 @@ public class SearchResultRow {
 
     public void setRequestNotes(String requestNotes) {
         this.requestNotes = requestNotes;
+    }
+
+    public Date getBibCreatedDate() {
+        return bibCreatedDate;
+    }
+
+    public void setBibCreatedDate(Date bibCreatedDate) {
+        this.bibCreatedDate = bibCreatedDate;
+    }
+
+    public String getAuthorSearch() {
+        return authorSearch;
+    }
+
+    public void setAuthorSearch(String authorSearch) {
+        this.authorSearch = authorSearch;
     }
 }

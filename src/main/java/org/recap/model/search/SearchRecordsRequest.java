@@ -77,6 +77,8 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "isDeleted", value= "Is Deleted",position = 21)
     private boolean isDeleted = false;
 
+    private boolean export;
+
     public SearchRecordsRequest() {
         this.setFieldName("");
         this.setFieldValue("");
@@ -303,5 +305,13 @@ public class SearchRecordsRequest implements Serializable {
         this.totalRecordsCount = String.valueOf(0);
         this.showTotalCount = false;
         this.errorMessage = null;
+    }
+
+    public boolean isExport() {
+        return export;
+    }
+
+    public void setExport(boolean export) {
+        this.export = export;
     }
 }
