@@ -159,8 +159,7 @@ public class ReportsServiceUtil {
     public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.setFieldName("ItemCatalogingStatus");
-        searchRecordsRequest.setFieldValue("Incomplete");
+        searchRecordsRequest.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
         if(!reportsRequest.isExport()){
             searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
             searchRecordsRequest.setPageNumber(reportsRequest.getIncompletePageNumber());
