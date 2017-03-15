@@ -31,7 +31,7 @@ public class MarcToBibEntityConverterUT extends BaseTestCase {
         assertNotNull(records);
         assertEquals(records.size(), 1);
 
-        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL");
+        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL","PA");
         assertNotNull(map);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         assertNotNull(bibliographicEntity);
