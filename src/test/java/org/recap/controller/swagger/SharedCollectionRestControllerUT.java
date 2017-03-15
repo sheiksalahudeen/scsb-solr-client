@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.recap.RecapConstants;
 import org.recap.controller.BaseControllerUT;
 import org.recap.controller.SharedCollectionRestController;
+import org.recap.model.BibItemAvailabityStatusRequest;
 import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
@@ -54,6 +55,9 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
 
     @Mock
     private SharedCollectionRestController mockedSharedCollectionRestController;
+
+    @Autowired
+    private SharedCollectionRestController sharedCollectionRestController;
 
     @Mock
     private AccessionService accessionService;
@@ -164,4 +168,32 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         return new File(resource.toURI());
     }
 
+    @Test
+    public void testBibAvailabilityStatus() throws Exception {
+        BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest = new BibItemAvailabityStatusRequest();
+        bibItemAvailabityStatusRequest.setBibliographicId("93540");
+        bibItemAvailabityStatusRequest.setInstitutionId("PUL");
+        ResponseEntity responseEntity = sharedCollectionRestController.bibAvailabilityStatus(bibItemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+
+        bibItemAvailabityStatusRequest.setBibliographicId("66056");
+        bibItemAvailabityStatusRequest.setInstitutionId("CUL");
+        responseEntity = sharedCollectionRestController.bibAvailabilityStatus(bibItemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+
+        bibItemAvailabityStatusRequest.setBibliographicId("59321");
+        bibItemAvailabityStatusRequest.setInstitutionId("SCSB");
+        responseEntity = sharedCollectionRestController.bibAvailabilityStatus(bibItemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+
+        bibItemAvailabityStatusRequest.setBibliographicId("0000");
+        bibItemAvailabityStatusRequest.setInstitutionId("PUL");
+        responseEntity = sharedCollectionRestController.bibAvailabilityStatus(bibItemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+
+        bibItemAvailabityStatusRequest.setBibliographicId("0000");
+        bibItemAvailabityStatusRequest.setInstitutionId("PU");
+        responseEntity = sharedCollectionRestController.bibAvailabilityStatus(bibItemAvailabityStatusRequest);
+        assertNotNull(responseEntity);
+    }
 }

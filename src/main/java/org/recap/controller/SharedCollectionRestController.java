@@ -71,25 +71,16 @@ public class SharedCollectionRestController {
     @RequestMapping(value = "/bibAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity bibAvailabilityStatus(@RequestBody BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
-        List<ItemAvailabilityResponse> itemAvailabilityResponses = null;
+        List<ItemAvailabilityResponse> itemAvailabilityResponses;
         ResponseEntity responseEntity;
-        try {
-            itemAvailabilityResponses = getItemAvailabilityService().getbibItemAvaiablityStatus(bibItemAvailabityStatusRequest);
-            if (itemAvailabilityResponses.isEmpty()) {
-                ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
-                itemAvailabilityResponse.setErrorMessage(RecapConstants.BIB_ITEM_DOESNOT_EXIST);
-                itemAvailabilityResponses.add(itemAvailabilityResponse);
-                responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
-            } else {
-                responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
-            }
-        } catch (Exception exception) {
+        itemAvailabilityResponses = getItemAvailabilityService().getbibItemAvaiablityStatus(bibItemAvailabityStatusRequest);
+        if (itemAvailabilityResponses.isEmpty()) {
             ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
-            itemAvailabilityResponse.setErrorMessage(RecapConstants.SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE);
+            itemAvailabilityResponse.setErrorMessage(RecapConstants.BIB_ITEM_DOESNOT_EXIST);
             itemAvailabilityResponses.add(itemAvailabilityResponse);
             responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
-            logger.error(RecapConstants.EXCEPTION, exception);
-            return responseEntity;
+        } else {
+            responseEntity = new ResponseEntity(itemAvailabilityResponses, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;
     }
