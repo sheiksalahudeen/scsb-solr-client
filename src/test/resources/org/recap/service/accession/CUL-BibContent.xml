@@ -1,0 +1,71 @@
+<collection>
+    <record>
+        <leader>00797cam a2200289 a 4500</leader>
+        <controlfield tag="001">5495636</controlfield>
+        <controlfield tag="003">NNC</controlfield>
+        <controlfield tag="005">20060117154948.0</controlfield>
+        <controlfield tag="008">050704s2005    enk           000 p eng  </controlfield>
+        <datafield ind1=" " ind2=" " tag="015">
+            <subfield code="a">GBA588985</subfield>
+            <subfield code="2">bnb</subfield>
+        </datafield>
+        <datafield ind1="7" ind2=" " tag="016">
+            <subfield code="a">013316313</subfield>
+            <subfield code="2">Uk</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">185224724X (hbk.)</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">1852246790 (pbk.)</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(OCoLC)ocm62133400</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(NNC)5495636</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="040">
+            <subfield code="a">UKM</subfield>
+            <subfield code="c">UKM</subfield>
+            <subfield code="d">BWKUK</subfield>
+            <subfield code="d">NNC</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="042">
+            <subfield code="a">ukscp</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="4" tag="050">
+            <subfield code="a">PR6068.E27</subfield>
+            <subfield code="b">M56 2005</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="4" tag="082">
+            <subfield code="a">821.914</subfield>
+            <subfield code="2">22</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="100">
+            <subfield code="a">Reading, Peter.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2="0" tag="245">
+            <subfield code="a">-273.15 /</subfield>
+            <subfield code="c">Peter Reading.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2="3" tag="246">
+            <subfield code="a">Absolute zero</subfield>
+        </datafield>
+        <datafield ind1="3" ind2=" " tag="246">
+            <subfield code="a">Minus two seven three point one five</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="260">
+            <subfield code="a">Tarset :</subfield>
+            <subfield code="b">Bloodaxe,</subfield>
+            <subfield code="c">2005.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="300">
+            <subfield code="a">1 v. (unpaged) ;</subfield>
+            <subfield code="c">22 cm.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="500">
+            <subfield code="a">Alternative title: Absolute zero.</subfield>
+        </datafield>
+    </record>
+</collection>
