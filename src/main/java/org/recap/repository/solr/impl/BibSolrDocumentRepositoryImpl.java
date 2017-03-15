@@ -114,7 +114,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             for (Iterator<SolrDocument> iterator = itemSolrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument itemSolrDocument = iterator.next();
                 Item item = getItem(itemSolrDocument);
-                bibItems.addAll(getBibItemsAndHoldings(item));
+                bibItems.addAll(getBibItemsAndHoldings(item, searchRecordsRequest.isDeleted(), searchRecordsRequest.getCatalogingStatus()));
             }
         }
         return bibItems;
@@ -134,14 +134,14 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 SolrDocument bibSolrDocument = iterator.next();
                 BibItem bibItem = new BibItem();
                 populateBibItem(bibSolrDocument, bibItem);
-                populateItemHoldingsInfo(bibItem);
+                populateItemHoldingsInfo(bibItem, searchRecordsRequest.isDeleted(), searchRecordsRequest.getCatalogingStatus());
                 bibItems.add(bibItem);
             }
         }
         return bibItems;
     }
 
-    private List<BibItem> getBibItemsAndHoldings(Item item) {
+    private List<BibItem> getBibItemsAndHoldings(Item item, boolean isDeleted, String catalogingStatus) {
         List<BibItem> bibItems = new ArrayList<>();
         SolrQuery solrQueryForBib = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + item.getRoot());
         QueryResponse queryResponse = null;
@@ -159,7 +159,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 BibItem bibItem = new BibItem();
                 if (docType.equalsIgnoreCase(RecapConstants.BIB)) {
                     boolean isDeletedBib = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_BIB);
-                    if(!isDeletedBib) {
+                    String bibCatalogingStatus = (String) solrDocument.getFieldValue(RecapConstants.BIB_CATALOGING_STATUS);
+                    if (isDeletedBib == isDeleted && catalogingStatus.equals(bibCatalogingStatus)) {
                         populateBibItem(solrDocument, bibItem);
                         bibItem.setItems(Arrays.asList(item));
                         bibItems.add(bibItem);
@@ -167,7 +168,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
                     boolean isDeletedHoldings = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_HOLDINGS);
-                    if(isDeletedHoldings) {
+                    if (isDeletedHoldings == isDeleted) {
                         Holdings holdings = getHoldings(solrDocument);
                         bibItem.addHoldings(holdings);
                     }
@@ -179,7 +180,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibItems;
     }
 
-    public void populateItemHoldingsInfo(BibItem bibItem) {
+    public void populateItemHoldingsInfo(BibItem bibItem, boolean isDeleted, String catalogingStatus) {
         SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot());
         QueryResponse queryResponse = null;
         try {
@@ -195,14 +196,15 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
                 if(docType.equalsIgnoreCase(RecapConstants.ITEM)) {
                     boolean isDeletedItem = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_ITEM);
-                    if(!isDeletedItem) {
+                    String itemCatalogingStatus = (String) solrDocument.getFieldValue(RecapConstants.ITEM_CATALOGING_STATUS);
+                    if (isDeletedItem == isDeleted && catalogingStatus.equals(itemCatalogingStatus)) {
                         Item item = getItem(solrDocument);
                         bibItem.addItem(item);
                     }
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
                     boolean isDeletedHoldings = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_HOLDINGS);
-                    if(!isDeletedHoldings) {
+                    if (isDeletedHoldings == isDeleted) {
                         Holdings holdings = getHoldings(solrDocument);
                         bibItem.addHoldings(holdings);
                     }
@@ -215,8 +217,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
     private boolean isItemField(SearchRecordsRequest searchRecordsRequest) {
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
-                && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER)
-            ||searchRecordsRequest.getFieldName().equalsIgnoreCase("ItemCatalogingStatus"))) {
+                && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE) || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER))) {
             return true;
         }
         return false;

@@ -2,6 +2,7 @@ package org.recap.model.search;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.recap.RecapConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -79,11 +80,16 @@ public class SearchRecordsRequest implements Serializable {
 
     private boolean export;
 
+    @ApiModelProperty(name= "catalogingStatus", value= "Cataloging Status",position = 22)
+    private String catalogingStatus;
+
+
     public SearchRecordsRequest() {
         this.setFieldName("");
         this.setFieldValue("");
         this.setSelectAllFacets(true);
         this.setDeleted(false);
+        this.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         this.getOwningInstitutions().add("NYPL");
         this.getOwningInstitutions().add("CUL");
@@ -297,6 +303,14 @@ public class SearchRecordsRequest implements Serializable {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public String getCatalogingStatus() {
+        return catalogingStatus;
+    }
+
+    public void setCatalogingStatus(String catalogingStatus) {
+        this.catalogingStatus = catalogingStatus;
     }
 
     public void reset() {
