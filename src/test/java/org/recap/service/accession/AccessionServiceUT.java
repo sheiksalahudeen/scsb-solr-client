@@ -76,7 +76,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setItemBarcode("32101062128309");
         accessionRequestList.add(accessionRequest);
         accessionService.processRequest(accessionRequestList);
-        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("32101062128309","PB","callnumber")));
+        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("32101062128309","PB","callnumber","PUL")));
         List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
         List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);
@@ -87,7 +87,7 @@ public class AccessionServiceUT extends BaseTestCase {
         logger.info("updatedHoldingMarcXML-->"+updatedHoldingMarcXML);
         assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
-        assertEquals("JFL 81-165", field852.getSubfield('h').getData());
+        assertEquals("K25 .xN5", field852.getSubfield('h').getData());
         List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
         assertEquals("32101062128309",itemEntityList.get(0).getBarcode());
 
@@ -106,7 +106,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setItemBarcode("3210106212830");
         accessionRequestList.add(accessionRequest);
         accessionService.processRequest(accessionRequestList);
-        List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber").getItemEntities();
+        List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber","PUL").getItemEntities();
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities = mockedItemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
@@ -123,7 +123,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setItemBarcode("3210106212830");
         accessionRequestList.add(accessionRequest);
         accessionService.processRequest(accessionRequestList);
-        List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber").getItemEntities();
+        List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber","PUL").getItemEntities();
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities = mockedItemDetailsRepository.findByBarcode("3210106212830");
         assertNotNull(itemEntities);
@@ -156,8 +156,8 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setItemBarcode("CU71437673");
         accessionRequestList.add(accessionRequest);
         accessionService.processRequest(accessionRequestList);
-        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("CU71437673","CU","callnumber")));
-        List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
+        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("5495636")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("CU71437673","CU","callnumber","CUL")));
+        List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("5495636");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
         List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);
         assertNotNull(bibRecordList);
@@ -167,7 +167,7 @@ public class AccessionServiceUT extends BaseTestCase {
         logger.info("updatedHoldingMarcXML-->"+updatedHoldingMarcXML);
         assertNotNull(holdingRecordList);
         DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
-        assertEquals("JFL 81-165", field852.getSubfield('h').getData());
+        assertEquals("PR6068.E27 M56 2005g", field852.getSubfield('h').getData());
         List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
         assertEquals("CU71437673",itemEntityList.get(0).getBarcode());
 
@@ -181,7 +181,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setItemBarcode("33433002031718");
         accessionRequestList.add(accessionRequest);
         accessionService.processRequest(accessionRequestList);
-        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("33433002031718","NA","callnumber")));
+        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("33433002031718","NA","callnumber","NYPL")));
         List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
         List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);
@@ -219,9 +219,9 @@ public class AccessionServiceUT extends BaseTestCase {
         assertTrue(owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON));
     }
 
-    public BibliographicEntity saveBibSingleHoldingsSingleItem(String itemBarcode,String customerCode, String callnumber) throws Exception {
-        File bibContentFile = getBibContentFile();
-        File holdingsContentFile = getHoldingsContentFile();
+    public BibliographicEntity saveBibSingleHoldingsSingleItem(String itemBarcode,String customerCode, String callnumber,String institution) throws Exception {
+        File bibContentFile = getBibContentFile(institution);
+        File holdingsContentFile = getHoldingsContentFile(institution);
         String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
         String sourceHoldingsContent = FileUtils.readFileToString(holdingsContentFile, "UTF-8");
 
@@ -274,13 +274,27 @@ public class AccessionServiceUT extends BaseTestCase {
         return itemEntity;
     }
 
-    private File getBibContentFile() throws URISyntaxException {
-        URL resource = getClass().getResource("BibContent.xml");
+    private File getBibContentFile(String institution) throws URISyntaxException {
+        URL resource = null;
+        if(institution.equals("PUL")){
+            resource = getClass().getResource("PUL-BibContent.xml");
+        } else if(institution.equals("CUL")){
+            resource = getClass().getResource("CUL-BibContent.xml");
+        } else if(institution.equals("NYPL")){
+            resource = getClass().getResource("NYPL-BibContent.xml");
+        }
         return new File(resource.toURI());
     }
 
-    private File getHoldingsContentFile() throws URISyntaxException {
-        URL resource = getClass().getResource("HoldingsContent.xml");
+    private File getHoldingsContentFile(String institution) throws URISyntaxException {
+        URL resource = null;
+        if(institution.equals("PUL")){
+            resource = getClass().getResource("PUL-HoldingsContent.xml");
+        } else if(institution.equals("CUL")){
+            resource = getClass().getResource("CUL-HoldingsContent.xml");
+        } else if(institution.equals("NYPL")){
+            resource = getClass().getResource("NYPL-HoldingsContent.xml");
+        }
         return new File(resource.toURI());
     }
 
