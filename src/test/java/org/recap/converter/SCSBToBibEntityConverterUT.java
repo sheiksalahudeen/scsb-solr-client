@@ -1,7 +1,6 @@
 package org.recap.converter;
 
 import org.junit.Test;
-import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -156,7 +154,7 @@ public class SCSBToBibEntityConverterUT extends BaseTestCase{
     @Test
     public void convert() throws Exception {
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(scsbXmlContent, BibRecords.class);
-        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecords().get(0), "NYPL");
+        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecords().get(0), "NYPL","NA");
         assertNotNull(map);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         assertNotNull(bibliographicEntity);

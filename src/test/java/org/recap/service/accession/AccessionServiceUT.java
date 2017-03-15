@@ -149,6 +149,31 @@ public class AccessionServiceUT extends BaseTestCase {
     }
 
     @Test
+    public void processForCUL() throws Exception {
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("CU");
+        accessionRequest.setItemBarcode("CU71437673");
+        accessionRequestList.add(accessionRequest);
+        accessionService.processRequest(accessionRequestList);
+        Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("CU71437673","CU","callnumber")));
+        List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
+        String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
+        List<Record> bibRecordList = readMarcXml(updatedBibMarcXML);
+        assertNotNull(bibRecordList);
+        HoldingsEntity holdingsEntity = fetchedBibliographicEntityList.get(0).getHoldingsEntities().get(0);
+        String updatedHoldingMarcXML = new String(holdingsEntity.getContent(),StandardCharsets.UTF_8);
+        List<Record> holdingRecordList = readMarcXml(updatedHoldingMarcXML);
+        logger.info("updatedHoldingMarcXML-->"+updatedHoldingMarcXML);
+        assertNotNull(holdingRecordList);
+        DataField field852 = (DataField)holdingRecordList.get(0).getVariableField("852");
+        assertEquals("JFL 81-165", field852.getSubfield('h').getData());
+        List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
+        assertEquals("CU71437673",itemEntityList.get(0).getBarcode());
+
+    }
+
+    @Test
     public void processForNYPL() throws Exception {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         AccessionRequest accessionRequest = new AccessionRequest();
