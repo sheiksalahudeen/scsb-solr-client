@@ -190,7 +190,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-        bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String bibXmlStringContent = marcUtil.writeMarcXml(bibRecord);
         if (StringUtils.isNotBlank(bibXmlStringContent)) {
@@ -356,8 +355,10 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         }
 
         if(isComplete){
+            bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
             itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
         } else {
+            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
             itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
         }
         List<ReportDataEntity> reportDataEntities = null;
