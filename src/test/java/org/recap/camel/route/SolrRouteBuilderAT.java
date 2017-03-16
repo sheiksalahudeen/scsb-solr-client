@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
 /**
  * Created by rajeshbabuk on 29/9/16.
  */
+@Ignore
 public class SolrRouteBuilderAT extends BaseTestCase {
 
     @Autowired

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by rajeshbabuk on 13/9/16.
  */
+@Ignore
 public class HoldingsAT extends BaseTestCase {
 
     @Before

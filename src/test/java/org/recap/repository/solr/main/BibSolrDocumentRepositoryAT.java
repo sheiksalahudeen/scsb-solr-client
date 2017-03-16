@@ -44,6 +44,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by rajeshbabuk on 14/7/16.
  */
+@Ignore
 public class BibSolrDocumentRepositoryAT extends BaseTestCase {
 
     @Autowired

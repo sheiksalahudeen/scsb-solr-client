@@ -1,5 +1,6 @@
 package org.recap.executors;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by angelind on 30/1/17.
  */
+@Ignore
 public class MatchingIndexExecutorServiceAT extends BaseTestCase{
 
     @Autowired
