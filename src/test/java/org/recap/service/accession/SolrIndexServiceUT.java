@@ -188,12 +188,12 @@ public class SolrIndexServiceUT extends BaseTestCase {
     }
 
     private File getBibContentFile() throws URISyntaxException {
-        URL resource = getClass().getResource("BibContent.xml");
+        URL resource = getClass().getResource("PUL-BibContent.xml");
         return new File(resource.toURI());
     }
 
     private File getHoldingsContentFile() throws URISyntaxException {
-        URL resource = getClass().getResource("HoldingsContent.xml");
+        URL resource = getClass().getResource("PUL-HoldingsContent.xml");
         return new File(resource.toURI());
     }
 }
