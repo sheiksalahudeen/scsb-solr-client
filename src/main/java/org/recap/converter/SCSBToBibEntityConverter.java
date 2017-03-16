@@ -190,7 +190,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-        //bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String bibXmlStringContent = marcUtil.writeMarcXml(bibRecord);
         if (StringUtils.isNotBlank(bibXmlStringContent)) {
