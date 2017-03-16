@@ -37,16 +37,16 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private DBReportUtil dbReportUtil;
 
     @Autowired
-    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
-    ItemStatusDetailsRepository itemStatusDetailsRepository;
+    private ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     private Map itemStatusMap;
     private Map collectionGroupMap;
@@ -183,7 +183,6 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-        bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String bibContent = marcUtil.writeMarcXml(bibRecord);
         if (StringUtils.isNotBlank(bibContent)) {
@@ -335,7 +334,6 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         itemEntity.setCreatedBy(RecapConstants.ACCESSION);
         itemEntity.setLastUpdatedDate(currentDate);
         itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-        itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
 
         String useRestrictions = marcUtil.getDataFieldValue(itemRecord, "876", 'h');
         if (StringUtils.isNotBlank(useRestrictions) && ("In Library Use".equalsIgnoreCase(useRestrictions) || "Supervised Use".equalsIgnoreCase(useRestrictions))) {
@@ -354,8 +352,10 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         }
 
         if(isComplete){
+            bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
             itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
         } else {
+            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
             itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
         }
         List<ReportDataEntity> reportDataEntities = null;
