@@ -3,6 +3,7 @@ package org.recap.matchingalgorithm;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by angelind on 18/10/16.
  */
+@Ignore
 public class MatchingSolrQueryAT extends BaseTestCase {
 
     @Resource

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by pvsubrah on 6/12/16.
  */
-
+@Ignore
 public class SolrAdminAT extends BaseTestCase {
 
     @Value("${solr.parent.core}")
