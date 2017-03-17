@@ -189,7 +189,7 @@ public class AccessionService {
             AccessionResponse accessionResponse = new AccessionResponse();
             if (!itemExists) {
                 if (owningInstitution == null) {
-                    setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,accessionRequest.getCustomerCode()+" "+RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
+                    setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, accessionRequest.getCustomerCode() + " " + RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
                     reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
                 } else {
                     try {
@@ -198,59 +198,41 @@ public class AccessionService {
                             stopWatch.start();
                             bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
                             stopWatch.stop();
-                            logger.info("Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
-                            response = processAccessionForMarcXMl(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
-                        } else if(owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)){
+                            logger.info("Time taken to get bib data from ils : {}" ,stopWatch.getTotalTimeSeconds());
+                            response = processAccessionForMarcXml(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
+                        } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
                             StopWatch stopWatch = new StopWatch();
                             stopWatch.start();
                             bibDataResponse = getColumbiaService().getBibData(accessionRequest.getItemBarcode());
                             stopWatch.stop();
-                            logger.info("Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
-                            response = processAccessionForMarcXMl(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
+                            logger.info("Time taken to get bib data from ils : {}", stopWatch.getTotalTimeSeconds());
+                            response = processAccessionForMarcXml(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
                         } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.NYPL)) {
-                            StopWatch stopWatch = new StopWatch();
-                            stopWatch.start();
+                            StopWatch stopWatch1 = new StopWatch();
+                            stopWatch1.start();
                             bibDataResponse = getNyplService().getBibData(accessionRequest.getItemBarcode(), accessionRequest.getCustomerCode());
-                            stopWatch.stop();
-                            logger.info("Total Time taken to get bib data from ils : " + stopWatch.getTotalTimeSeconds());
-                            BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
-                            List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
-                            stopWatch = new StopWatch();
-                            stopWatch.start();
-                            for (BibRecord bibRecord : bibRecords.getBibRecords()) {
-                                response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList,accessionRequest);
-                                setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
-                                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
-                            }
-                            stopWatch.stop();
-                            logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
-                            stopWatch = new StopWatch();
-                            stopWatch.start();
-                            for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
-                                SolrInputDocument solrInputDocument = iterator.next();
-                                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
-                            }
-                            stopWatch.stop();
-                            logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+                            stopWatch1.stop();
+                            logger.info("Total Time taken to get bib data from ils : {}", stopWatch1.getTotalTimeSeconds());
+                            response = processAccessionForSCSBXml(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
                         }
                     } catch (Exception ex) {
-                        logger.error(RecapConstants.LOG_ERROR,ex);
+                        logger.error(RecapConstants.LOG_ERROR, ex);
                         response = ex.getMessage();
-                        setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
+                        setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
                         reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
                     }
                     //Create dummy record
-                    createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest,accessionResponse,accessionResponsesList);
+                    createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
                     generateAccessionSummaryReport(responseMapList, owningInstitution);
                 }
-            } else if(isDeaccessionedItem) {
+            } else if (isDeaccessionedItem) {
                 response = reAccessionItem(itemEntityList);
                 if (response.equals(RecapConstants.SUCCESS)) {
                     response = indexReaccessionedItem(itemEntityList);
                 }
-                setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
-            }else {
-                setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,RecapConstants.ITEM_ALREADY_ACCESSIONED);
+                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
+            } else {
+                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_ALREADY_ACCESSIONED);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
             }
         }
@@ -258,7 +240,7 @@ public class AccessionService {
         return accessionResponsesList;
     }
 
-    private String processAccessionForMarcXMl(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) {
+    private String processAccessionForMarcXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) {
         StopWatch stopWatch;
         String response = null;
         stopWatch = new StopWatch();
@@ -275,7 +257,7 @@ public class AccessionService {
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
             }
             stopWatch.stop();
-            logger.info("Total time taken to save records for accession : " + stopWatch.getTotalTimeSeconds());
+            logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
             stopWatch = new StopWatch();
             stopWatch.start();
             for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
@@ -283,14 +265,37 @@ public class AccessionService {
                 ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
             }
             stopWatch.stop();
-            logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+            logger.info("Total Time taken to execute matching algorithm only : {}", stopWatch.getTotalTimeSeconds());
         }
         return response;
     }
 
+    private String processAccessionForSCSBXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) throws Exception {
+        String response = null;
+        BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
+        List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+            response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList, accessionRequest);
+            setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
+            reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+        }
+        stopWatch.stop();
+        logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
+            SolrInputDocument solrInputDocument = iterator.next();
+            ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+        }
+        stopWatch.stop();
+        logger.info("Total Time taken to execute matching algorithm only : {}", stopWatch.getTotalTimeSeconds());
+        return response;
+    }
+
     private List<ItemEntity> getItemEntityList(AccessionRequest accessionRequest){
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
-        return itemEntityList;
+        return itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
     }
 
     private boolean checkItemBarcodeAlreadyExist(List<ItemEntity> itemEntityList){
@@ -303,7 +308,7 @@ public class AccessionService {
 
     private boolean isItemDeaccessioned(List<ItemEntity> itemEntityList){
         boolean itemDeleted = false;
-        if (itemEntityList != null && itemEntityList.size()>0) {
+        if (itemEntityList != null && !itemEntityList.isEmpty()) {
             for(ItemEntity itemEntity : itemEntityList){
                 return itemEntity.isDeleted();
             }
@@ -311,19 +316,20 @@ public class AccessionService {
         return itemDeleted;
     }
 
-    private String createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest,AccessionResponse accessionResponse,List<AccessionResponse> accessionResponsesList) {
+    private void createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest,AccessionResponse accessionResponse) {
+        String responseString;
         if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
             BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(accessionRequest.getItemBarcode());
             if (fetchBibliographicEntity == null) {
                 String dummyRecordResponse = createDummyRecord(accessionRequest, owningInstitution);
-                accessionResponse.setMessage(response+", "+dummyRecordResponse);
-                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+                responseString = response+", "+dummyRecordResponse;
+                accessionResponse.setMessage(responseString);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, responseString));
             } else {
-                response = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
-                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+                responseString = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, responseString));
             }
         }
-        return response;
     }
 
     private void saveReportEntity(String owningInstitution, List<ReportDataEntity> reportDataEntityList) {
@@ -378,17 +384,20 @@ public class AccessionService {
 
     private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, List<SolrInputDocument> solrInputDocumentList,AccessionRequest accessionRequest){
         String response = null;
-        Map responseMap = getConverter(owningInstitution).convert(record, owningInstitution,accessionRequest.getCustomerCode());
-        responseMapList.add(responseMap);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
-        List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
-        if (CollectionUtils.isNotEmpty(reportEntityList)) {
-            reportDetailRepository.save(reportEntityList);
-        }
-        if (bibliographicEntity != null) {
-            BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
-            if (null != savedBibliographicEntity) {
-                response = indexBibliographicRecord(solrInputDocumentList, savedBibliographicEntity.getBibliographicId());
+        XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
+        if (null != xmlToBibEntityConverterInterface) {
+            Map responseMap = xmlToBibEntityConverterInterface.convert(record, owningInstitution,accessionRequest.getCustomerCode());
+            responseMapList.add(responseMap);
+            BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
+            List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
+            if (CollectionUtils.isNotEmpty(reportEntityList)) {
+                reportDetailRepository.save(reportEntityList);
+            }
+            if (bibliographicEntity != null) {
+                BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
+                if (null != savedBibliographicEntity) {
+                    response = indexBibliographicRecord(solrInputDocumentList, savedBibliographicEntity.getBibliographicId());
+                }
             }
         }
         return response;
@@ -466,7 +475,6 @@ public class AccessionService {
         int exitsBibCount = 0;
         String reasonForFailureBib = "";
         String reasonForFailureItem = "";
-        String itemBarcode = "";
 
         for(Map responseMap : responseMapList){
             successBibCount = successBibCount + (responseMap.get(RecapConstants.SUCCESS_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_BIB_COUNT) : 0);
@@ -480,16 +488,12 @@ public class AccessionService {
             }
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
 
-            if(null != responseMap.get(RecapConstants.ITEMBARCODE) && !StringUtils.isEmpty(responseMap.get(RecapConstants.ITEMBARCODE).toString())){
-                itemBarcode = responseMap.get(RecapConstants.ITEMBARCODE).toString();
-            }
             if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
                     reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
                 }
-            if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib)){
-                if(!reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
-                    reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," +reasonForFailureItem;
-                }
+            if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib) &&
+                    !reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) {
+                reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," + reasonForFailureItem;
             }
         }
 
@@ -571,8 +575,8 @@ public class AccessionService {
             List<HoldingsEntity> fetchHoldingsEntities =fetchBibliographicEntity.getHoldingsEntities();
             List<HoldingsEntity> holdingsEntities = bibliographicEntity.getHoldingsEntities();
 
-            logger.info("fetchHoldingsEntities = "+fetchHoldingsEntities.size());
-            logger.info("holdingsEntities = "+holdingsEntities.size());
+            logger.info("fetchHoldingsEntities = {}",fetchHoldingsEntities.size());
+            logger.info("holdingsEntities = {}",holdingsEntities.size());
 
             for (Iterator iholdings = holdingsEntities.iterator(); iholdings.hasNext();) {
                 HoldingsEntity holdingsEntity =(HoldingsEntity) iholdings.next();
@@ -598,14 +602,14 @@ public class AccessionService {
                 }
             }
             fetchHoldingsEntities.addAll(holdingsEntities);
-            logger.info("Holding Final Count = "+fetchHoldingsEntities.size());
+            logger.info("Holding Final Count = {}",fetchHoldingsEntities.size());
 
             // Item
             List<ItemEntity> fetchItemsEntities =fetchBibliographicEntity.getItemEntities();
             List<ItemEntity> itemsEntities = bibliographicEntity.getItemEntities();
 
-            logger.info("fetchHoldingsEntities = "+fetchItemsEntities.size());
-            logger.info("holdingsEntities = "+itemsEntities.size());
+            logger.info("fetchHoldingsEntities = {}",fetchItemsEntities.size());
+            logger.info("holdingsEntities = {}",itemsEntities.size());
 
             for (Iterator iItems=itemsEntities.iterator();iItems.hasNext();) {
                 ItemEntity itemEntity =(ItemEntity) iItems.next();
@@ -618,7 +622,7 @@ public class AccessionService {
                 }
             }
             fetchItemsEntities.addAll(itemsEntities);
-            logger.info("Item Final Count = "+fetchItemsEntities.size());
+            logger.info("Item Final Count = {}",fetchItemsEntities.size());
 
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
             fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
