@@ -159,15 +159,21 @@ public class ReportsServiceUtil {
     public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.setFieldName(RecapConstants.ITEM_CATALOGING_STATUS);
         searchRecordsRequest.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+        searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
         if(!reportsRequest.isExport()){
-            searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
             searchRecordsRequest.setPageNumber(reportsRequest.getIncompletePageNumber());
-        }else{
-            searchRecordsRequest.setExport(reportsRequest.isExport());
         }
         searchRecordsRequest.setOwningInstitutions(Arrays.asList(reportsRequest.getIncompleteRequestingInstitution()));
         List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+        if(reportsRequest.isExport()){
+            Integer totalRecordsCount = Integer.valueOf(searchRecordsRequest.getTotalRecordsCount());
+            if (totalRecordsCount > reportsRequest.getIncompletePageSize()) {
+                searchRecordsRequest.setPageSize(totalRecordsCount);
+                searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
+            }
+        }
         List<IncompleteReportResultsRow> incompleteReportResultsRows = new ArrayList<>();
         for (SearchResultRow searchResultRow : searchResultRows) {
             IncompleteReportResultsRow incompleteReportResultsRow = new IncompleteReportResultsRow();
@@ -189,14 +195,15 @@ public class ReportsServiceUtil {
 
     private String getFormattedDates(Date gotDate) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY");
-        String format = simpleDateFormat.format(gotDate);
-        return format;
+        return simpleDateFormat.format(gotDate);
+
     }
 
 
 
     private void populateAccessionCounts(ReportsRequest reportsRequest, ReportsResponse reportsResponse, String solrFormattedDate) throws Exception {
-        for (String owningInstitution : reportsRequest.getOwningInstitutions()) {for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
+        for (String owningInstitution : reportsRequest.getOwningInstitutions()) {
+            for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
                 SolrQuery query = solrQueryBuilder.buildSolrQueryForAccessionReports(solrFormattedDate, owningInstitution, false, collectionGroupDesignation);
                 query.setRows(0);
                 QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);

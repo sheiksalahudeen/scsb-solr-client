@@ -78,8 +78,6 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "isDeleted", value= "Is Deleted",position = 21)
     private boolean isDeleted = false;
 
-    private boolean export;
-
     @ApiModelProperty(name= "catalogingStatus", value= "Cataloging Status",position = 22)
     private String catalogingStatus;
 
@@ -321,11 +319,4 @@ public class SearchRecordsRequest implements Serializable {
         this.errorMessage = null;
     }
 
-    public boolean isExport() {
-        return export;
-    }
-
-    public void setExport(boolean export) {
-        this.export = export;
-    }
 }
