@@ -376,6 +376,7 @@ public final class RecapConstants {
     //Logger
     public static final String LOG_ERROR="error-->";
     public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
+    public static final String CGD_NA="NA";
 
     private RecapConstants(){}
 }
