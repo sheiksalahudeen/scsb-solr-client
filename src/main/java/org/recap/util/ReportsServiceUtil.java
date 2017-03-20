@@ -159,6 +159,7 @@ public class ReportsServiceUtil {
     public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        searchRecordsRequest.getCollectionGroupDesignations().add(RecapConstants.CGD_NA);
         searchRecordsRequest.setFieldName(RecapConstants.ITEM_CATALOGING_STATUS);
         searchRecordsRequest.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
         searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
