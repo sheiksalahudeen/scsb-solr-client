@@ -29,6 +29,10 @@ jQuery(document).ready(function ($) {
     $('#matchingAlgoDate').datepicker({
         format: "yyyy/mm/dd"
     });
+
+    $('#fromDate').datepicker({
+        format: "yyyy/mm/dd"
+    });
     
     showOrHideFields();
     showDateField();

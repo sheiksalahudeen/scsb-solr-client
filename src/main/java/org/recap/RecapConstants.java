@@ -248,6 +248,8 @@ public final class RecapConstants {
     public static final String ITEM_BARCODE = "ItemBarcode";
     public static final String CUSTOMER_CODE = "CustomerCode";
     public static final String CREATE_DATE_ITEM = "CreateDateItem";
+    public static final String BIB_CREATED_DATE = "BibCreatedDate";
+    public static final String BIB_LAST_UPDATED_DATE = "BibLastUpdatedDate";
     public static final String LAST_UPDATED_DATE_ITEM = "LastUpdatedDateItem";
     public static final String ERROR_DESCRIPTION = "ErrorDescription";
     public static final String RESPONSE_DATE = "Date";

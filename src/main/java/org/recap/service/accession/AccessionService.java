@@ -250,22 +250,13 @@ public class AccessionService {
             records = getMarcUtil().readMarcXml(bibDataResponse);
         }
         if (CollectionUtils.isNotEmpty(records)) {
-            List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
             for (Record record : records) {
-                response = updateData(record, owningInstitution, responseMapList, solrInputDocumentList,accessionRequest);
+                response = updateData(record, owningInstitution, responseMapList, accessionRequest);
                 setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
             }
             stopWatch.stop();
             logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
-            stopWatch = new StopWatch();
-            stopWatch.start();
-            for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
-                SolrInputDocument solrInputDocument = iterator.next();
-                ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
-            }
-            stopWatch.stop();
-            logger.info("Total Time taken to execute matching algorithm only : {}", stopWatch.getTotalTimeSeconds());
         }
         return response;
     }
@@ -273,24 +264,15 @@ public class AccessionService {
     private String processAccessionForSCSBXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) throws Exception {
         String response = null;
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
-        List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (BibRecord bibRecord : bibRecords.getBibRecords()) {
-            response = updateData(bibRecord, owningInstitution, responseMapList, solrInputDocumentList, accessionRequest);
+            response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest);
             setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
             reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
         }
         stopWatch.stop();
         logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
-        stopWatch = new StopWatch();
-        stopWatch.start();
-        for (Iterator<SolrInputDocument> iterator = solrInputDocumentList.iterator(); iterator.hasNext(); ) {
-            SolrInputDocument solrInputDocument = iterator.next();
-            ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
-        }
-        stopWatch.stop();
-        logger.info("Total Time taken to execute matching algorithm only : {}", stopWatch.getTotalTimeSeconds());
         return response;
     }
 
@@ -382,7 +364,7 @@ public class AccessionService {
         return response;
     }
 
-    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, List<SolrInputDocument> solrInputDocumentList,AccessionRequest accessionRequest){
+    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest){
         String response = null;
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
         if (null != xmlToBibEntityConverterInterface) {
@@ -396,18 +378,16 @@ public class AccessionService {
             if (bibliographicEntity != null) {
                 BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
                 if (null != savedBibliographicEntity) {
-                    response = indexBibliographicRecord(solrInputDocumentList, savedBibliographicEntity.getBibliographicId());
+                    response = indexBibliographicRecord(savedBibliographicEntity.getBibliographicId());
                 }
             }
         }
         return response;
     }
 
-    private String indexBibliographicRecord(List<SolrInputDocument> solrInputDocumentList, Integer bibliographicId) {
+    private String indexBibliographicRecord(Integer bibliographicId) {
         String response;
-        SolrInputDocument solrInputDocument = getSolrIndexService().indexByBibliographicId(bibliographicId);
-        if(solrInputDocument != null)
-            solrInputDocumentList.add(solrInputDocument);
+        getSolrIndexService().indexByBibliographicId(bibliographicId);
         response = RecapConstants.SUCCESS;
         return response;
     }
@@ -664,7 +644,7 @@ public class AccessionService {
                 itemEntity.getBibliographicEntities();
                 for (BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()) {
                     List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
-                    indexBibliographicRecord(solrInputDocumentList,bibliographicEntity.getBibliographicId());
+                    indexBibliographicRecord(bibliographicEntity.getBibliographicId());
                 }
             }
         } catch (Exception e) {
