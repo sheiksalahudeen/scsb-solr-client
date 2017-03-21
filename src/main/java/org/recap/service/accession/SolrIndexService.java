@@ -61,7 +61,6 @@ public class SolrIndexService {
     }
 
     public SolrInputDocument indexByBibliographicId(@RequestBody Integer bibliographicId) {
-        BibJSONUtil bibJSONUtil = new BibJSONUtil();
         getBibJSONUtil().setProducerTemplate(getProducerTemplate());
         BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicId(bibliographicId);
         SolrInputDocument solrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository());

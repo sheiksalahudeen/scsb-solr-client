@@ -8,8 +8,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.*;
@@ -24,6 +22,9 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -68,27 +69,42 @@ public class OngoingMatchingAlgorithmUtil {
     private Map collectionGroupMap;
     private Map institutionMap;
 
+    public SolrDocumentList fetchDataForOngoingMatchingBasedOnDate(String date) {
+        try {
+            String query = solrQueryBuilder.fetchCreatedOrUpdatedBibs(date);
+            SolrQuery solrQuery = new SolrQuery(query);
+            QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+            SolrDocumentList solrDocumentList = queryResponse.getResults();
+            return solrDocumentList;
+        } catch (SolrServerException e) {
+            logger.error("Exception : " + e.getMessage());
+        } catch (IOException e) {
+            logger.error("Exception : " + e.getMessage());
+        }
+        return null;
+    }
 
-    public void processMatchingForBib(SolrInputDocument solrInputDocument) {
+    public String processMatchingForBib(SolrDocument solrDocument) {
+        String status = "Success";
         logger.info("Ongoing Matching Started");
         Map<Integer, BibItem> bibItemMap = new HashMap<>();
         Map<Integer, BibItem> tempMap;
         Set<String> matchPointString = new HashSet<>();
         List<Integer> itemIds = new ArrayList<>();
 
-        tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.OCLC_NUMBER);
+        tempMap = findMatchingBibs(solrDocument, matchPointString, RecapConstants.OCLC_NUMBER);
         if(tempMap != null && tempMap.size() > 0)
             bibItemMap.putAll(tempMap);
 
-        tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.ISBN_CRITERIA);
+        tempMap = findMatchingBibs(solrDocument, matchPointString, RecapConstants.ISBN_CRITERIA);
         if(tempMap != null && tempMap.size() > 0)
             bibItemMap.putAll(tempMap);
 
-        tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.ISSN_CRITERIA);
+        tempMap = findMatchingBibs(solrDocument, matchPointString, RecapConstants.ISSN_CRITERIA);
         if(tempMap != null && tempMap.size() > 0)
             bibItemMap.putAll(tempMap);
 
-        tempMap = findMatchingBibs(solrInputDocument, matchPointString, RecapConstants.LCCN_CRITERIA);
+        tempMap = findMatchingBibs(solrDocument, matchPointString, RecapConstants.LCCN_CRITERIA);
         if(tempMap != null && tempMap.size() > 0)
             bibItemMap.putAll(tempMap);
 
@@ -100,6 +116,7 @@ public class OngoingMatchingAlgorithmUtil {
                     itemIds = saveReportAndUpdateCGDForMultiMatch(bibItemMap);
                 } catch (IOException | SolrServerException e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
+                    status = "Failed";
                 }
             } else if(matchPointString.size() == 1) {
                 // Single Match
@@ -108,6 +125,7 @@ public class OngoingMatchingAlgorithmUtil {
                     itemIds = saveReportAndUpdateCGDForSingleMatch(bibItemMap, matchPointString.iterator().next());
                 } catch (Exception e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
+                    status = "Failed";
                 }
             } else {
                 logger.info("No Match Found.");
@@ -119,6 +137,7 @@ public class OngoingMatchingAlgorithmUtil {
         } else {
             logger.info("No Match Found.");
         }
+        return status;
     }
 
     public void updateCGDForItemInSolr(List<Integer> itemIds) {
@@ -335,11 +354,10 @@ public class OngoingMatchingAlgorithmUtil {
     }
 
 
-    private Map<Integer, BibItem> findMatchingBibs(SolrInputDocument solrInputDocument, Set<String> matchPointString, String fieldName) {
+    private Map<Integer, BibItem> findMatchingBibs(SolrDocument solrDocument, Set<String> matchPointString, String fieldName) {
         Map<Integer, BibItem> bibItemMap = null;
-        SolrInputField solrInputField = solrInputDocument.get(fieldName);
-        if(solrInputField != null) {
-            Object value = solrInputField.getValue();
+        Object value = solrDocument.getFieldValue(fieldName);
+        if(value != null) {
             if(value instanceof String) {
                 String fieldValue = (String) value;
                 if(StringUtils.isNotBlank(fieldValue)) {
@@ -397,6 +415,21 @@ public class OngoingMatchingAlgorithmUtil {
             }
         }
         return bibItem;
+    }
+
+    public String getFormattedDateString(Date inputDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
+        String utcStr = null;
+        try {
+            String inputDateString = simpleDateFormat.format(inputDate);
+            Date date = simpleDateFormat.parse(inputDateString);
+            DateFormat format = new SimpleDateFormat(RecapConstants.UTC_DATE_FORMAT);
+            format.setTimeZone(TimeZone.getTimeZone(RecapConstants.UTC));
+            utcStr = format.format(date);
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+        return utcStr + RecapConstants.SOLR_DATE_RANGE_TO_NOW;
     }
 
     public List<BibValueResolver> getBibValueResolvers() {

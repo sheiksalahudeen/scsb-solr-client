@@ -444,6 +444,17 @@ public class SolrQueryBuilder {
         return query.toString();
     }
 
+    public String fetchCreatedOrUpdatedBibs(String date) {
+        StringBuilder query = new StringBuilder();
+        query.append("(").append(RecapConstants.BIB_CREATED_DATE).append(":").append("[").append(date).append("]")
+                .append(or).append(RecapConstants.BIB_LAST_UPDATED_DATE).append(":").append("[").append(date).append("]").append(")")
+                .append(and).append(RecapConstants.IS_DELETED_BIB).append(":false")
+                .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
+        query.append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
+                .append(":").append(RecapConstants.SHARED_CGD);
+        return query.toString();
+    }
+
     public SolrQuery buildSolrQueryForAccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
         query.append("DocType:Item").append(and);
