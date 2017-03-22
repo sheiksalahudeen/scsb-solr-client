@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,17 +17,14 @@ import static org.junit.Assert.*;
 public class OngoingMatchingAlgorithmUtilUT extends BaseTestCase{
 
     @Mock
-    SolrIndexService solrIndexService;
-
-    @Autowired
     OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
 
     @Test
     public void processMatchingForBibTest() {
-        Mockito.when(solrIndexService.indexByBibliographicId(1)).thenReturn(new SolrInputDocument());
-        SolrInputDocument solrInputDocument = solrIndexService.indexByBibliographicId(1);
-        assertNotNull(solrInputDocument);
-        ongoingMatchingAlgorithmUtil.processMatchingForBib(solrInputDocument);
+        SolrDocument solrDocument = new SolrDocument();
+        Mockito.when(ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument)).thenReturn("Success");
+        String status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument);
+        assertEquals("Success", status);
     }
 
 }
