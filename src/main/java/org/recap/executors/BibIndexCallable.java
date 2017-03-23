@@ -32,15 +32,13 @@ public class BibIndexCallable implements Callable {
     private final int pageNum;
     private final int docsPerPage;
     private String coreName;
-    private String solrURL;
     private Integer owningInstitutionId;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
 
-    public BibIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
+    public BibIndexCallable(String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.coreName = coreName;
-        this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;

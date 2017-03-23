@@ -1,4 +1,4 @@
-package org.recap.model.search.resolver.impl.Bib;
+package org.recap.model.search.resolver.impl.bib;
 
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;

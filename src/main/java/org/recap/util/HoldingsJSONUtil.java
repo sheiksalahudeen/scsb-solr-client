@@ -9,8 +9,6 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.solr.Holdings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,8 +18,6 @@ import java.util.List;
  * Created by rajeshbabuk on 13/9/16.
  */
 public class HoldingsJSONUtil extends MarcUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(HoldingsJSONUtil.class);
 
     private ProducerTemplate producerTemplate;
 

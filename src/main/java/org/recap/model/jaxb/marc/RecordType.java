@@ -39,8 +39,8 @@ import java.util.List;
 public class RecordType implements Serializable {
 
     protected LeaderFieldType leader;
-    protected List<ControlFieldType> controlfield;
-    protected List<DataFieldType> datafield;
+    private List<ControlFieldType> controlfield;
+    private List<DataFieldType> datafield;
     @XmlAttribute(name = "type")
     protected RecordTypeType type;
     @XmlAttribute(name = "id")

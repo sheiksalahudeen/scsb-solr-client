@@ -118,9 +118,12 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                                 if(StringUtils.isEmpty(reasonForFailureItem)){
                                     reasonForFailureItem = (String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
                                 }else{
-                                    reasonForFailureItem = (String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE)+","+reasonForFailureItem;
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    stringBuilder.append(itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
+                                    stringBuilder.append(",");
+                                    stringBuilder.append(reasonForFailureItem);
+                                    reasonForFailureItem=stringBuilder.toString();
                                 }
-
                             }
                         }
                         if(itemMap.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){

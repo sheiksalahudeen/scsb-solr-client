@@ -12,7 +12,7 @@ import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.*;
 import org.recap.model.search.resolver.BibValueResolver;
-import org.recap.model.search.resolver.impl.Bib.*;
+import org.recap.model.search.resolver.impl.bib.*;
 import org.recap.model.solr.BibItem;
 import org.recap.repository.jpa.*;
 import org.slf4j.Logger;
@@ -74,12 +74,10 @@ public class OngoingMatchingAlgorithmUtil {
             String query = solrQueryBuilder.fetchCreatedOrUpdatedBibs(date);
             SolrQuery solrQuery = new SolrQuery(query);
             QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
-            SolrDocumentList solrDocumentList = queryResponse.getResults();
-            return solrDocumentList;
-        } catch (SolrServerException e) {
-            logger.error("Exception : " + e.getMessage());
-        } catch (IOException e) {
-            logger.error("Exception : " + e.getMessage());
+            return queryResponse.getResults();
+
+        } catch (SolrServerException | IOException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
     }

@@ -45,7 +45,7 @@ public class CollectionType implements Serializable {
     private static final Logger LOG = Logger.getLogger(CollectionType.class);
 
     @XmlElement(nillable = true)
-    protected List<RecordType> record;
+    private List<RecordType> record;
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID

@@ -7,13 +7,13 @@ import java.util.List;
  */
 public class ItemAvailabityStatusRequest {
 
-    List<String> Barcodes;
+    List<String> barcodes;
 
     public List<String> getBarcodes() {
-        return Barcodes;
+        return barcodes;
     }
 
     public void setBarcodes(List<String> barcodes) {
-        Barcodes = barcodes;
+        this.barcodes = barcodes;
     }
 }

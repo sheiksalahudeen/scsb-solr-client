@@ -7,8 +7,6 @@ import org.recap.matchingalgorithm.MatchingAlgorithmCGDProcessor;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.repository.jpa.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -17,8 +15,6 @@ import java.util.concurrent.Callable;
  * Created by angelind on 6/1/17.
  */
 public class MatchingAlgorithmCGDCallable implements Callable {
-
-    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDCallable.class);
 
     private ReportDataDetailsRepository reportDataDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;

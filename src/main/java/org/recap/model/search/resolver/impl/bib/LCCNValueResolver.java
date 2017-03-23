@@ -1,4 +1,4 @@
-package org.recap.model.search.resolver.impl.Bib;
+package org.recap.model.search.resolver.impl.bib;
 
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.solr.BibItem;
@@ -6,14 +6,15 @@ import org.recap.model.solr.BibItem;
 /**
  * Created by peris on 9/29/16.
  */
-public class OwningInstitutionValueResolver implements BibValueResolver {
+public class LCCNValueResolver implements BibValueResolver {
     @Override
     public Boolean isInterested(String field) {
-        return "BibOwningInstitution".equalsIgnoreCase(field);
+        return "LCCN".equalsIgnoreCase(field);
     }
 
     @Override
     public void setValue(BibItem bibItem, Object value) {
-        bibItem.setOwningInstitution((String) value);
+        bibItem.setLccn((String)value);
     }
+
 }

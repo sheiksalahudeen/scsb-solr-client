@@ -380,5 +380,7 @@ public final class RecapConstants {
     public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
     public static final String CGD_NA="NA";
 
+    public static final String NUMBER_PATTERN="[^0-9]";
+
     private RecapConstants(){}
 }

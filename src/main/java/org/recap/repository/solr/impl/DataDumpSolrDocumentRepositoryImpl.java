@@ -12,7 +12,7 @@ import org.recap.RecapConstants;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
-import org.recap.model.search.resolver.impl.Bib.*;
+import org.recap.model.search.resolver.impl.bib.*;
 import org.recap.model.search.resolver.impl.item.IsDeletedItemValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemBibIdValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemIdValueResolver;

@@ -63,7 +63,6 @@ public class DeAccessSolrDocumentService {
     public String updateIsDeletedBibByBibId(@RequestBody List<Integer> bibIds){
         try{
             for(Integer bibId : bibIds){
-                BibJSONUtil bibJSONUtil = new BibJSONUtil();
                 BibliographicEntity bibEntity = getBibliographicDetailsRepository().findByBibliographicId(bibId);
                 SolrInputDocument bibSolrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingDetailRepository());
                 bibSolrInputDocument.setField(RecapConstants.IS_DELETED_BIB,true);
@@ -80,7 +79,6 @@ public class DeAccessSolrDocumentService {
     public String updateIsDeletedHoldingsByHoldingsId(@RequestBody  List<Integer> holdingsIds){
         try{
             for(Integer holdingsId : holdingsIds){
-                BibJSONUtil bibJSONUtil = new BibJSONUtil();
                 HoldingsEntity holdingsEntity = getHoldingDetailRepository().findByHoldingsId(holdingsId);
                 if(holdingsEntity != null && CollectionUtils.isNotEmpty(holdingsEntity.getBibliographicEntities())) {
                     for(BibliographicEntity bibliographicEntity : holdingsEntity.getBibliographicEntities()) {
@@ -105,7 +103,6 @@ public class DeAccessSolrDocumentService {
     public String updateIsDeletedItemByItemIds(@RequestBody  List<Integer> itemIds){
         try{
             for(Integer itemId : itemIds){
-                BibJSONUtil bibJSONUtil = new BibJSONUtil();
                 ItemEntity itemEntity = getItemDetailsRepository().findByItemId(itemId);
                 if(itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
                     for(BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {

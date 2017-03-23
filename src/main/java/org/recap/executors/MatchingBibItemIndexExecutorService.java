@@ -1,6 +1,5 @@
 package org.recap.executors;
 
-import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,6 @@ public class MatchingBibItemIndexExecutorService extends MatchingIndexExecutorSe
     HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    ProducerTemplate producerTemplate;
-
-    @Autowired
     SolrTemplate solrTemplate;
 
     @Override
@@ -34,7 +30,7 @@ public class MatchingBibItemIndexExecutorService extends MatchingIndexExecutorSe
 
     @Override
     protected Integer getTotalDocCount(String operationType) {
-        Long bibCountForChangedItems = 0L;
+        Long bibCountForChangedItems;
         bibCountForChangedItems = bibliographicDetailsRepository.getCountOfBibliographicEntitiesForChangedItems(operationType);
         return bibCountForChangedItems.intValue();
     }

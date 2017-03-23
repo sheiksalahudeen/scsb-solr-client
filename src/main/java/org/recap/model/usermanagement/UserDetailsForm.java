@@ -1,4 +1,4 @@
-package org.recap.model.userManagement;
+package org.recap.model.usermanagement;
 
 /**
  * Created by dharmendrag on 28/12/16.

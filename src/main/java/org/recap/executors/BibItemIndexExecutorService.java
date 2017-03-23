@@ -1,6 +1,5 @@
 package org.recap.executors;
 
-import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
 
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
-
-    @Autowired
-    ProducerTemplate producerTemplate;
 
     @Autowired
     SolrTemplate solrTemplate;

@@ -19,7 +19,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/searchService")
-@Api(value="search", description="Search Records", position = 1)
+@Api(value="search", description="Search Records")
 public class SearchRecordRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
@@ -32,7 +32,7 @@ public class SearchRecordRestController {
     }
 
     @RequestMapping(value="/search", method = RequestMethod.POST)
-    @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search", position = 0)
+    @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
     @ResponseBody
     public SearchRecordsResponse searchRecordsServiceGetParam(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestBody SearchRecordsRequest searchRecordsRequest) {
@@ -54,7 +54,7 @@ public class SearchRecordRestController {
     }
 
     @RequestMapping(value="/searchRecords", method = RequestMethod.POST)
-    @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", position = 0, consumes="application/json")
+    @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", consumes="application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
     public Map searchRecords(@ApiParam(value = "Paramerters for Searching Records" , required = true, name="requestJson") @RequestBody SearchRecordsRequest searchRecordsRequest) {
         List<DataDumpSearchResult> dataDumpSearchResults = null;
@@ -72,7 +72,7 @@ public class SearchRecordRestController {
 
 
     @RequestMapping(value="/searchByParam", method = RequestMethod.GET)
-    @ApiOperation(value = "searchParam",notes = "Search Books in ReCAP - Using Method GET, Request data as parameter", nickname = "search", position = 0)
+    @ApiOperation(value = "searchParam",notes = "Search Books in ReCAP - Using Method GET, Request data as parameter", nickname = "search")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
     public List<SearchResultRow> searchRecordsServiceGet(
             @RequestParam(name="fieldValue", required = false)  String fieldValue,

@@ -29,14 +29,12 @@ public class ItemIndexCallable implements Callable {
     private int pageNum;
     private int docsPerPage;
     private String coreName;
-    private String solrURL;
     private Integer owningInstitutionId;
     private ItemDetailsRepository itemDetailsRepository;
     private ProducerTemplate producerTemplate;
 
-    public ItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
+    public ItemIndexCallable(String coreName, int pageNum, int docsPerPage, ItemDetailsRepository itemDetailsRepository, Integer owningInstitutionId, ProducerTemplate producerTemplate) {
         this.coreName = coreName;
-        this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.itemDetailsRepository = itemDetailsRepository;
