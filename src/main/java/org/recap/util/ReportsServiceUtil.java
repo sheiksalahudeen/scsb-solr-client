@@ -19,8 +19,6 @@ import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
@@ -36,8 +34,6 @@ import java.util.*;
 
 @Service
 public class ReportsServiceUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(ReportsServiceUtil.class);
 
     @Autowired
     SolrTemplate solrTemplate;

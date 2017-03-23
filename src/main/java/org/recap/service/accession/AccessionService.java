@@ -266,7 +266,7 @@ public class AccessionService {
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+        for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
             response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest);
             setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
             reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));

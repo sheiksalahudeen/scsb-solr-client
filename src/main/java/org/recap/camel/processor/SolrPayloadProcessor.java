@@ -12,14 +12,12 @@ public class SolrPayloadProcessor implements Processor {
 
     private String solrUri;
     private String solrCore;
-    private String solrRouterURI;
     private ProducerTemplate producerTemplate;
     private CamelContext camelContext;
 
-    public SolrPayloadProcessor(String solrUri, String solrCore, String solrRouterURI, ProducerTemplate producerTemplate, CamelContext camelContext) {
+    public SolrPayloadProcessor(String solrUri, String solrCore,ProducerTemplate producerTemplate, CamelContext camelContext) {
         this.solrUri = solrUri;
         this.solrCore = solrCore;
-        this.solrRouterURI = solrRouterURI;
         this.producerTemplate = producerTemplate;
         this.camelContext = camelContext;
     }

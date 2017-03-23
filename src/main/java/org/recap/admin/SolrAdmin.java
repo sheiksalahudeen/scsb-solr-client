@@ -104,7 +104,7 @@ public class SolrAdmin {
         for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
             String coreName = iterator.next();
             try {
-                CoreAdminResponse adminResponse = getCoreAdminRequest().unloadCore(coreName, true, true, solrAdminClient);
+                getCoreAdminRequest().unloadCore(coreName, true, true, solrAdminClient);
             } catch (SolrServerException | IOException e) {
                 logger.error(RecapConstants.LOG_ERROR,e);
             }

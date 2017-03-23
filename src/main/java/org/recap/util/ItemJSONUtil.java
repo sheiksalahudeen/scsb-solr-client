@@ -5,8 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.model.solr.Item;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -17,8 +15,6 @@ import java.util.List;
  * Created by angelind on 16/6/16.
  */
 public class ItemJSONUtil extends MarcUtil{
-
-    private static final Logger logger = LoggerFactory.getLogger(ItemJSONUtil.class);
 
     private ProducerTemplate producerTemplate;
 

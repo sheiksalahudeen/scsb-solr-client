@@ -1,6 +1,5 @@
 package org.recap.executors;
 
-import org.apache.camel.ProducerTemplate;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +15,6 @@ public class HoldingsIndexExecutorService extends IndexExecutorService {
 
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
-
-    @Autowired
-    ProducerTemplate producerTemplate;
-
 
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId, Date fromDate) {

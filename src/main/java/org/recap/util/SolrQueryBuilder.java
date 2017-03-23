@@ -7,8 +7,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.SearchRecordsRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.text.CharacterIterator;
@@ -25,8 +23,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class SolrQueryBuilder {
-
-    private static final Logger logger = LoggerFactory.getLogger(SolrQueryBuilder.class);
 
     String and = " AND ";
 

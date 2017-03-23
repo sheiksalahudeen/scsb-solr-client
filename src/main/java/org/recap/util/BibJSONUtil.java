@@ -77,7 +77,7 @@ public class BibJSONUtil extends MarcUtil {
         List<String> oclcNumberList = getMultiDataFieldValues(record, "035", null, null, "a");
         for (String oclcNumber : oclcNumberList) {
             if (StringUtils.isNotBlank(oclcNumber) && oclcNumber.contains("OCoLC")) {
-                String modifiedOclc = oclcNumber.replaceAll("[^0-9]", "");
+                String modifiedOclc = oclcNumber.replaceAll(RecapConstants.NUMBER_PATTERN, "");
                 modifiedOclc = StringUtils.stripStart(modifiedOclc, "0");
                 oclcNumbers.add(modifiedOclc);
             }
@@ -99,7 +99,7 @@ public class BibJSONUtil extends MarcUtil {
         List<String> isbnNumbers = new ArrayList<>();
         List<String> isbnNumberList = getMultiDataFieldValues(record,"020", null, null, "a");
         for(String isbnNumber : isbnNumberList){
-            isbnNumbers.add(isbnNumber.replaceAll("[^0-9]", ""));
+            isbnNumbers.add(isbnNumber.replaceAll(RecapConstants.NUMBER_PATTERN, ""));
         }
         return isbnNumbers;
     }
@@ -108,7 +108,7 @@ public class BibJSONUtil extends MarcUtil {
         List<String> issnNumbers = new ArrayList<>();
         List<String> issnNumberList = getMultiDataFieldValues(record,"022", null, null, "a");
         for(String issnNumber : issnNumberList){
-            issnNumbers.add(issnNumber.replaceAll("[^0-9]", ""));
+            issnNumbers.add(issnNumber.replaceAll(RecapConstants.NUMBER_PATTERN, ""));
         }
         return issnNumbers;
     }

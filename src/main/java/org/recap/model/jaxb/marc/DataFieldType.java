@@ -39,7 +39,7 @@ import java.util.List;
 public class DataFieldType implements Serializable {
 
     @XmlElement(required = true)
-    protected List<SubfieldatafieldType> subfield;
+    private List<SubfieldatafieldType> subfield;
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID

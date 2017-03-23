@@ -282,11 +282,15 @@ public class MatchingAlgorithmUtil {
             int count = 0;
             for (int j = 0; j < titleArray.length; j++) {
                 String tempTitle = titleArray[j];
-                if (!(tempTitle.equalsIgnoreCase("a") || tempTitle.equalsIgnoreCase("an") || tempTitle.equalsIgnoreCase("the"))) {
+                if (!("a".equalsIgnoreCase(tempTitle) || "an".equalsIgnoreCase(tempTitle) || "the".equalsIgnoreCase(tempTitle))) {
                     if(count == 0) {
                         titleToMatch = tempTitle;
                     } else {
-                        titleToMatch = titleToMatch + " " + tempTitle;
+                        StringBuilder  stringBuilder = new StringBuilder();
+                        stringBuilder.append(titleToMatch);
+                        stringBuilder.append(" ");
+                        stringBuilder.append(tempTitle);
+                        titleToMatch = stringBuilder.toString();
                     }
                     count = count + 1;
                 } else {
@@ -294,7 +298,11 @@ public class MatchingAlgorithmUtil {
                         if(count == 0) {
                             titleToMatch = tempTitle;
                         } else {
-                            titleToMatch = titleToMatch + " " + tempTitle;
+                            StringBuilder  stringBuilder = new StringBuilder();
+                            stringBuilder.append(titleToMatch);
+                            stringBuilder.append(" ");
+                            stringBuilder.append(tempTitle);
+                            titleToMatch = stringBuilder.toString();
                         }
                         count = count + 1;
                     }
@@ -499,7 +507,7 @@ public class MatchingAlgorithmUtil {
         for (Iterator<String> stringIterator = matchingTitleHeaderSet.iterator(); stringIterator.hasNext(); ) {
             String titleHeader = stringIterator.next();
             for(int i=1; i < matchingTitleHeaderSet.size(); i++) {
-                if(titleHeader.equalsIgnoreCase("Title"+String.valueOf(i))) {
+                if(titleHeader.equalsIgnoreCase("Title"+ i )) {
                     if(bibIds != null) {
                         bibIdList.add(bibIds[i-1]);
                     }

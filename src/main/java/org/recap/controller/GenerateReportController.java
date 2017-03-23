@@ -50,17 +50,13 @@ public class GenerateReportController {
         String reportType = solrIndexRequest.getReportType();
         String generatedReportFileName;
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
-        String status = "";
-        String fileName = "";
+        String status;
+        String fileName;
         if(reportType.equalsIgnoreCase(RecapConstants.DEACCESSION_SUMMARY_REPORT)){
             fileName = RecapConstants.DEACCESSION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
+        }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT) || reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT) ){
             fileName = RecapConstants.ACCESSION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
-            fileName = RecapConstants.ACCESSION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
-            fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
             fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
         }else{
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;

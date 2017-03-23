@@ -160,10 +160,10 @@ public class MatchingAlgorithmController {
     public String updateCGDInSolr(@Valid @ModelAttribute("matchingAlgoDate") String matchingAlgoDate) {
         StringBuilder stringBuilder = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
-        Date lastUpdatedDate;
+
         if(StringUtils.isNotBlank(matchingAlgoDate)) {
             try {
-                lastUpdatedDate = sdf.parse(matchingAlgoDate);
+                 sdf.parse(matchingAlgoDate);
             } catch (ParseException e) {
                 logger.error("Exception while parsing Date : " + e.getMessage());
             }

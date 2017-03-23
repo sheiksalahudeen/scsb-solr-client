@@ -40,8 +40,8 @@ public class ItemController {
     }
 
     private List<String> splitStringAndGetList(String itemBarcodes){
-        itemBarcodes = itemBarcodes.replaceAll("\\[","").replaceAll("\\]","");
-        String[] splittedString = itemBarcodes.split(",");
+        String itemBarcodesString = itemBarcodes.replaceAll("\\[","").replaceAll("\\]","");
+        String[] splittedString = itemBarcodesString.split(",");
         List<String> stringList = new ArrayList<>();
         for(String barcode : splittedString){
             stringList.add(barcode.trim());

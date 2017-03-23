@@ -1,7 +1,5 @@
 package org.recap.model.search;
 
-import java.util.Date;
-
 /**
  * Created by akulak on 8/3/17.
  */

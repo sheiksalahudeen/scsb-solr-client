@@ -13,14 +13,14 @@ import java.util.List;
 @XmlRootElement
 public class BibRecords implements Serializable {
 
-    private List<BibRecord> bibRecords;
+    private List<BibRecord> bibRecordList;
 
     @XmlElement(name = "bibRecord")
-    public List<BibRecord> getBibRecords() {
-        return bibRecords;
+    public List<BibRecord> getBibRecordList() {
+        return bibRecordList;
     }
 
-    public void setBibRecords(List<BibRecord> bibRecords) {
-        this.bibRecords = bibRecords;
+    public void setBibRecordList(List<BibRecord> bibRecordList) {
+        this.bibRecordList = bibRecordList;
     }
 }

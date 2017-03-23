@@ -12,8 +12,6 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,8 +19,6 @@ import java.util.*;
  * Created by angelind on 6/1/17.
  */
 public class MatchingAlgorithmCGDProcessor {
-
-    private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmCGDProcessor.class);
 
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private ProducerTemplate producerTemplate;

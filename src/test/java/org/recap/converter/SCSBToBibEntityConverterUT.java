@@ -154,7 +154,7 @@ public class SCSBToBibEntityConverterUT extends BaseTestCase{
     @Test
     public void convert() throws Exception {
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(scsbXmlContent, BibRecords.class);
-        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecords().get(0), "NYPL","NA");
+        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecordList().get(0), "NYPL","NA");
         assertNotNull(map);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         assertNotNull(bibliographicEntity);

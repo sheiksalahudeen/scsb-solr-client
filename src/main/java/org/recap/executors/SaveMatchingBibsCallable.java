@@ -10,13 +10,11 @@ import org.apache.solr.common.SolrDocumentList;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.resolver.BibValueResolver;
-import org.recap.model.search.resolver.impl.Bib.*;
+import org.recap.model.search.resolver.impl.bib.*;
 import org.recap.model.solr.BibItem;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.SolrQueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import java.util.*;
@@ -26,8 +24,6 @@ import java.util.concurrent.Callable;
  * Created by angelind on 4/11/16.
  */
 public class SaveMatchingBibsCallable implements Callable {
-
-    private static final Logger logger = LoggerFactory.getLogger(SaveMatchingBibsCallable.class);
 
     private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
     private String matchCriteria;

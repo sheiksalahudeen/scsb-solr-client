@@ -75,7 +75,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(institutionName);
         Date currentDate = new Date();
         Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecordObject, owningInstitutionId, institutionName, owningInstitutionBibId,currentDate);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
         ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
         if (bibReportEntity != null) {
             reportEntities.add(bibReportEntity);
@@ -122,7 +122,11 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                                 if(StringUtils.isEmpty(reasonForFailureItem)){
                                     reasonForFailureItem = (String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
                                 }else{
-                                    reasonForFailureItem = ((String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))+","+reasonForFailureItem;
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    stringBuilder.append(itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
+                                    stringBuilder.append(",");
+                                    stringBuilder.append(reasonForFailureItem);
+                                    reasonForFailureItem = stringBuilder.toString();
                                 }
 
                             }
@@ -153,7 +157,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
             map.put("reportEntities", reportEntities);
         }
         if (processBib) {
-            map.put("bibliographicEntity", bibliographicEntity);
+            map.put(RecapConstants.BIBLIOGRAPHICENTITY, bibliographicEntity);
         }
         map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
         map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
@@ -242,7 +246,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         }
         map.put(RecapConstants.FAILED_BIB_COUNT , failedBibCount);
         map.put(RecapConstants.REASON_FOR_BIB_FAILURE , reasonForFailureBib);
-        map.put("bibliographicEntity", bibliographicEntity);
+        map.put(RecapConstants.BIBLIOGRAPHICENTITY, bibliographicEntity);
         map.put(RecapConstants.SUCCESS_BIB_COUNT,successBibCount);
         map.put(RecapConstants.EXIST_BIB_COUNT,exitsBibCount);
         return map;

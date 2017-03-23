@@ -98,10 +98,10 @@ public class BibItemIndexCallable implements Callable {
         executorService.shutdown();
 
         if (!CollectionUtils.isEmpty(solrInputDocumentsToIndex)) {
-            SolrTemplate solrTemplate = new SolrTemplate(new HttpSolrClient(solrURL + File.separator + coreName));
-            solrTemplate.setSolrCore(coreName);
-            solrTemplate.saveDocuments(solrInputDocumentsToIndex);
-            solrTemplate.commit();
+            SolrTemplate templateForSolr = new SolrTemplate(new HttpSolrClient(solrURL + File.separator + coreName));
+            templateForSolr.setSolrCore(coreName);
+            templateForSolr.saveDocuments(solrInputDocumentsToIndex);
+            templateForSolr.commit();
         }
         return solrInputDocumentsToIndex.size();
     }

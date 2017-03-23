@@ -51,8 +51,7 @@ public class OngoingMatchingAlgorithmJobController {
         cal.set(Calendar.SECOND, 0);
         String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(cal.getTime());
         SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
-        String status = processOngoingMatchingAlgorithm(solrDocumentList);
-        return status;
+        return processOngoingMatchingAlgorithm(solrDocumentList);
     }
 
     public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {
