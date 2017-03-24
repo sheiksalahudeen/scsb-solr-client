@@ -168,7 +168,6 @@ public class MatchingAlgorithmUtil {
         List<String> owningInstList = new ArrayList<>();
         List<String> materialTypeList = new ArrayList<>();
         Map<String,String> titleMap = new HashMap<>();
-        Set<String> unMatchingTitleHeaderSet = new HashSet<>();
         List<ReportEntity> reportEntitiesToSave = new ArrayList<>();
         List<String> owningInstBibIds = new ArrayList<>();
         Integer pulMatchingCount = 0;
@@ -187,7 +186,7 @@ public class MatchingAlgorithmUtil {
             materialTypeSet.add(matchingBibEntity.getMaterialType());
             index = index + 1;
             if(StringUtils.isNotBlank(matchingBibEntity.getTitle())) {
-                String titleHeader = "Title" + index;
+                String titleHeader = RecapConstants.TITLE + index;
                 getReportDataEntity(titleHeader, matchingBibEntity.getTitle(), reportDataEntities);
                 titleMap.put(titleHeader, matchingBibEntity.getTitle());
             }
@@ -199,34 +198,27 @@ public class MatchingAlgorithmUtil {
             reportEntity.setFileName(fileName);
             reportEntity.setInstitutionName(RecapConstants.ALL_INST);
             reportEntity.setCreatedDate(new Date());
-            if(materialTypeSet.size() == 1) {
-                Set<String> matchingTitleHeaderSet = getMatchingAndUnMatchingBibsOnTitleVerification(titleMap, unMatchingTitleHeaderSet);
-                if(CollectionUtils.isNotEmpty(matchingTitleHeaderSet) && CollectionUtils.isNotEmpty(unMatchingTitleHeaderSet) && matchingTitleHeaderSet.size() != titleMap.size()) {
-                    reportEntity.setType("TitleException");
+            Set<String> unMatchingTitleHeaderSet = getMatchingAndUnMatchingBibsOnTitleVerification(titleMap);
+            if(CollectionUtils.isNotEmpty(unMatchingTitleHeaderSet)) {
 
-                    Map<String, Integer> countsMap = processReportsForMatchingTitles(fileName, titleMap, StringUtils.join(bibIds).split(","),
-                            StringUtils.join(materialTypeList).split(","), StringUtils.join(owningInstSet).split(","), StringUtils.join(owningInstBibIds).split(","),
-                            criteriaValue, matchingTitleHeaderSet, reportEntitiesToSave);
-                    pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
-                    culMatchingCount = culMatchingCount + countsMap.get("culMatchingCount");
-                    nyplMatchingCount = nyplMatchingCount + countsMap.get("nyplMatchingCount");
+                reportEntitiesToSave.add(processReportsForUnMatchingTitles(fileName, titleMap, bibIds,
+                        materialTypeList, owningInstList, owningInstBibIds,
+                        criteriaValue, unMatchingTitleHeaderSet));
 
-                } else if(CollectionUtils.isEmpty(matchingTitleHeaderSet) && CollectionUtils.isNotEmpty(unMatchingTitleHeaderSet)) {
-                    reportEntity.setType("TitleException");
-                } else {
-                    reportEntity.setType("SingleMatch");
-                    for(String owningInst : owningInstList) {
-                        if(owningInst.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-                            pulMatchingCount++;
-                        } else if(owningInst.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
-                            culMatchingCount++;
-                        } else if(owningInst.equalsIgnoreCase(RecapConstants.NYPL)) {
-                            nyplMatchingCount++;
-                        }
+            }
+            if(materialTypeSet.size() != 1) {
+                reportEntity.setType("MaterialTypeException");
+            } else {
+                reportEntity.setType("SingleMatch");
+                for(String owningInst : owningInstList) {
+                    if(owningInst.equalsIgnoreCase(RecapConstants.PRINCETON)) {
+                        pulMatchingCount++;
+                    } else if(owningInst.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
+                        culMatchingCount++;
+                    } else if(owningInst.equalsIgnoreCase(RecapConstants.NYPL)) {
+                        nyplMatchingCount++;
                     }
                 }
-            } else {
-                reportEntity.setType("MaterialTypeException");
             }
 
             getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList, owningInstBibIds);
@@ -246,9 +238,9 @@ public class MatchingAlgorithmUtil {
         return countsMap;
     }
 
-    public Set<String> getMatchingAndUnMatchingBibsOnTitleVerification(Map<String, String> titleMap, Set<String> unMatchingTitleHeaderSet) {
+    public Set<String> getMatchingAndUnMatchingBibsOnTitleVerification(Map<String, String> titleMap) {
 
-        Set<String> matchingTitleHeaderSet = new HashSet<>();
+        Set<String> unMatchingTitleHeaderSet = new HashSet<>();
         if (titleMap != null) {
             List<String> titleHeaders = new ArrayList(titleMap.keySet());
             for(int i=0; i < titleMap.size(); i++) {
@@ -259,17 +251,14 @@ public class MatchingAlgorithmUtil {
                     String title2 = titleMap.get(titleHeader2);
                     title1 = getTitleToMatch(title1);
                     title2 = getTitleToMatch(title2);
-                    if(title1.equalsIgnoreCase(title2)) {
-                        matchingTitleHeaderSet.add(titleHeader1);
-                        matchingTitleHeaderSet.add(titleHeader2);
-                    } else {
+                    if(!(title1.equalsIgnoreCase(title2))) {
                         unMatchingTitleHeaderSet.add(titleHeader1);
                         unMatchingTitleHeaderSet.add(titleHeader2);
                     }
                 }
             }
         }
-        return matchingTitleHeaderSet;
+        return unMatchingTitleHeaderSet;
     }
 
     public String getTitleToMatch(String title) {
@@ -461,72 +450,52 @@ public class MatchingAlgorithmUtil {
         reportDataEntities.add(criteriaReportDataEntity);
     }
 
-    public Map<String, Integer> processReportsForMatchingTitles(String fileName, Map<String, String> titleMap, String[] bibIds, String[] materialTypes, String[] owningInstitutions,
-                                                                String[] owningInstBibIds, String matchPointValue, Set<String> matchingTitleHeaderSet, List<ReportEntity> reportEntitiesToSave) {
-        ReportEntity matchingReportEntity = new ReportEntity();
-        matchingReportEntity.setType("SingleMatch");
-        matchingReportEntity.setCreatedDate(new Date());
-        matchingReportEntity.setInstitutionName(RecapConstants.ALL_INST);
-        matchingReportEntity.setFileName(fileName);
+    public ReportEntity processReportsForUnMatchingTitles(String fileName, Map<String, String> titleMap, List<Integer> bibIds, List<String> materialTypes, List<String> owningInstitutions,
+                                                          List<String> owningInstBibIds, String matchPointValue, Set<String> unMatchingTitleHeaderSet) {
+        ReportEntity unMatchReportEntity = new ReportEntity();
+        unMatchReportEntity.setType("TitleException");
+        unMatchReportEntity.setCreatedDate(new Date());
+        unMatchReportEntity.setInstitutionName(RecapConstants.ALL_INST);
+        unMatchReportEntity.setFileName(fileName);
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         List<String> bibIdList = new ArrayList<>();
         List<String> materialTypeList = new ArrayList<>();
         List<String> owningInstitutionList = new ArrayList<>();
         List<String> owningInstBibIdList = new ArrayList<>();
-        Integer pulMatchingCount = 0;
-        Integer culMatchingCount = 0;
-        Integer nyplMatchingCount = 0;
 
-        prepareReportForMatchingTitles(titleMap, bibIds, materialTypes, owningInstitutions, owningInstBibIds, matchingTitleHeaderSet, reportDataEntityList, bibIdList, materialTypeList, owningInstitutionList, owningInstBibIdList);
-
-        for(String owningInst : owningInstitutionList) {
-            if(owningInst.equalsIgnoreCase(RecapConstants.PRINCETON)) {
-                pulMatchingCount++;
-            } else if(owningInst.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
-                culMatchingCount++;
-            } else if(owningInst.equalsIgnoreCase(RecapConstants.NYPL)) {
-                nyplMatchingCount++;
-            }
-        }
+        prepareReportForUnMatchingTitles(titleMap, bibIds, materialTypes, owningInstitutions, owningInstBibIds, unMatchingTitleHeaderSet, reportDataEntityList, bibIdList, materialTypeList, owningInstitutionList, owningInstBibIdList);
 
         getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList, owningInstBibIdList);
 
         if(StringUtils.isNotBlank(matchPointValue)) {
             getReportDataEntity(fileName, matchPointValue, reportDataEntityList);
         }
-        matchingReportEntity.addAll(reportDataEntityList);
-        reportEntitiesToSave.add(matchingReportEntity);
-        Map countsMap = new HashMap();
-        countsMap.put("pulMatchingCount", pulMatchingCount);
-        countsMap.put("culMatchingCount", culMatchingCount);
-        countsMap.put("nyplMatchingCount", nyplMatchingCount);
-        return countsMap;
+        unMatchReportEntity.addAll(reportDataEntityList);
+        return unMatchReportEntity;
     }
 
-    public void prepareReportForMatchingTitles(Map<String, String> titleMap, String[] bibIds, String[] materialTypes, String[] owningInstitutions, String[] owningInstBibIds, Set<String> matchingTitleHeaderSet, List<ReportDataEntity> reportDataEntityList, List<String> bibIdList, List<String> materialTypeList, List<String> owningInstitutionList, List<String> owningInstBibIdList) {
-        for (Iterator<String> stringIterator = matchingTitleHeaderSet.iterator(); stringIterator.hasNext(); ) {
+    public void prepareReportForUnMatchingTitles(Map<String, String> titleMap, List<Integer> bibIds, List<String> materialTypes, List<String> owningInstitutions, List<String> owningInstBibIds,
+                                                 Set<String> unMatchingTitleHeaderSet, List<ReportDataEntity> reportDataEntityList, List<String> bibIdList,
+                                                 List<String> materialTypeList, List<String> owningInstitutionList, List<String> owningInstBibIdList) {
+        for (Iterator<String> stringIterator = unMatchingTitleHeaderSet.iterator(); stringIterator.hasNext(); ) {
             String titleHeader = stringIterator.next();
-            for(int i=1; i < matchingTitleHeaderSet.size(); i++) {
-                if(titleHeader.equalsIgnoreCase("Title"+ i )) {
-                    if(bibIds != null) {
-                        bibIdList.add(bibIds[i-1]);
-                    }
-                    if(materialTypes != null) {
-                        materialTypeList.add(materialTypes[i-1]);
-                    }
-                    if(owningInstitutions != null) {
-                        owningInstitutionList.add(owningInstitutions[i-1]);
-                    }
-                    if(owningInstBibIds != null) {
-                        owningInstBibIdList.add(owningInstBibIds[i-1]);
-                    }
-                    ReportDataEntity titleReportDataEntity = new ReportDataEntity();
-                    titleReportDataEntity.setHeaderName(titleHeader);
-                    titleReportDataEntity.setHeaderValue(titleMap.get(titleHeader));
-                    reportDataEntityList.add(titleReportDataEntity);
-                    break;
-                }
+            int i = Integer.valueOf(titleHeader.replace(RecapConstants.TITLE, ""));
+            if(bibIds != null) {
+                bibIdList.add(String.valueOf(bibIds.get(i-1)));
             }
+            if(materialTypes != null) {
+                materialTypeList.add(materialTypes.get(i-1));
+            }
+            if(owningInstitutions != null) {
+                owningInstitutionList.add(owningInstitutions.get(i-1));
+            }
+            if(owningInstBibIds != null) {
+                owningInstBibIdList.add(owningInstBibIds.get(i-1));
+            }
+            ReportDataEntity titleReportDataEntity = new ReportDataEntity();
+            titleReportDataEntity.setHeaderName(titleHeader);
+            titleReportDataEntity.setHeaderValue(titleMap.get(titleHeader));
+            reportDataEntityList.add(titleReportDataEntity);
         }
     }
 

@@ -32,6 +32,9 @@ public class BibItem {
     @Field("Title_display")
     private String titleDisplay;
 
+    @Field("Title_subfield_a")
+    private String titleSubFieldA;
+
     @Field("Author_display")
     private String authorDisplay;
 
@@ -156,6 +159,14 @@ public class BibItem {
 
     public void setTitleDisplay(String titleDisplay) {
         this.titleDisplay = titleDisplay;
+    }
+
+    public String getTitleSubFieldA() {
+        return titleSubFieldA;
+    }
+
+    public void setTitleSubFieldA(String titleSubFieldA) {
+        this.titleSubFieldA = titleSubFieldA;
     }
 
     public String getAuthorDisplay() {

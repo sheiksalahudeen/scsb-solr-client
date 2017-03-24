@@ -10,6 +10,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.resolver.BibValueResolver;
+import org.recap.model.search.resolver.impl.Bib.TitleSubFieldAValueResolver;
 import org.recap.model.search.resolver.impl.bib.*;
 import org.recap.model.solr.BibItem;
 import org.recap.repository.jpa.MatchingMatchPointsDetailsRepository;
@@ -76,7 +77,7 @@ public class SaveMatchingBibsCallable implements Callable {
                     matchingBibEntity.setRoot(bibItem.getRoot());
                     matchingBibEntity.setOwningInstitution(bibItem.getOwningInstitution());
                     matchingBibEntity.setOwningInstBibId(bibItem.getOwningInstitutionBibId());
-                    matchingBibEntity.setTitle(bibItem.getTitleDisplay());
+                    matchingBibEntity.setTitle(bibItem.getTitleSubFieldA());
                     matchingBibEntity.setOclc(CollectionUtils.isNotEmpty(bibItem.getOclcNumber()) ? StringUtils.join(bibItem.getOclcNumber(), ",") : null);
                     matchingBibEntity.setIsbn(CollectionUtils.isNotEmpty(bibItem.getIsbn()) ? StringUtils.join(bibItem.getIsbn(), ",") : null);
                     matchingBibEntity.setIssn(CollectionUtils.isNotEmpty(bibItem.getIssn()) ? StringUtils.join(bibItem.getIssn(), ",") : null);
@@ -145,7 +146,7 @@ public class SaveMatchingBibsCallable implements Callable {
             bibValueResolvers.add(new OCLCValueResolver());
             bibValueResolvers.add(new OwningInstitutionBibIdValueResolver());
             bibValueResolvers.add(new OwningInstitutionValueResolver());
-            bibValueResolvers.add(new TitleDisplayValueResolver());
+            bibValueResolvers.add(new TitleSubFieldAValueResolver());
             bibValueResolvers.add(new IsDeletedBibValueResolver());
         }
         return bibValueResolvers;

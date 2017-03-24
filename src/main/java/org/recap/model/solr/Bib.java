@@ -37,6 +37,9 @@ public class Bib {
     @Field("TitleStartsWith")
     private String titleStartsWith;
 
+    @Field("Title_subfield_a")
+    private String titleSubFieldA;
+
     @Field("Author_display")
     private String authorDisplay;
 
@@ -175,6 +178,14 @@ public class Bib {
 
     public void setTitleStartsWith(String titleStartsWith) {
         this.titleStartsWith = titleStartsWith;
+    }
+
+    public String getTitleSubFieldA() {
+        return titleSubFieldA;
+    }
+
+    public void setTitleSubFieldA(String titleSubFieldA) {
+        this.titleSubFieldA = titleSubFieldA;
     }
 
     public String getAuthorDisplay() {
