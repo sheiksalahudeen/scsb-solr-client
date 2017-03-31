@@ -208,6 +208,7 @@ public class BibJSONUtil extends MarcUtil {
             bib.setTitleDisplay(getTitleDisplay(marcRecord));
             bib.setTitleStartsWith(getTitleStartsWith(marcRecord));
             bib.setTitleSort(getTitleSort(marcRecord, bib.getTitleDisplay()));
+            bib.setTitleSubFieldA(getDataFieldValue(marcRecord, "245", null, null, "a"));
             bib.setAuthorDisplay(getAuthorDisplayValue(marcRecord));
             bib.setAuthorSearch(getAuthorSearchValue(marcRecord));
             bib.setPublisher(getPublisherValue(marcRecord));
