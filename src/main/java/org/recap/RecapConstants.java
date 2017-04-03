@@ -74,6 +74,7 @@ public final class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionRejectionReportQ";
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionExceptionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionExceptionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionSummaryReportQ";
     public static final String FTP_ONGOING_ACCESSON_REPORT_Q = "scsbactivemq:queue:ftpOngoingAccessionReportQ";
     public static final String FS_ONGOING_ACCESSION_REPORT_Q = "scsbactivemq:queue:fsOngoingAccessionReportQ";
 
@@ -89,6 +90,7 @@ public final class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "ftpSubmitCollectionRejectionReport";
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "fsSubmitCollectionExceptionReport";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "ftpSubmitCollectionExceptionReport";
+    public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_ID = "ftpSubmitCollectionSummaryReport";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
     public static final String MATCHING_ALGO_OCLC_FILE_NAME = "Matching_Algo_OCLC";
@@ -297,6 +299,7 @@ public final class RecapConstants {
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
     public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
     public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
+    public static final String SUBMIT_COLLECTION_SUMMARY_REPORT = "Submit_Collection_Summary_Report";
     public static final String SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
     public static final String SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
     public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";
@@ -379,6 +382,7 @@ public final class RecapConstants {
     public static final String LOG_ERROR="error-->";
     public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
     public static final String CGD_NA="NA";
+    public static final String SUBMIT_COLLECTION_SUMMARY = "SubmitCollectionSummary";
 
     public static final String NUMBER_PATTERN="[^0-9]";
 

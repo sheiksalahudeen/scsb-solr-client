@@ -72,6 +72,9 @@ public class ReportGenerator {
     FTPSubmitCollectionExceptionReportGenerator ftpSubmitCollectionExceptionReportGenerator;
 
     @Autowired
+    FTPSubmitCollectionSummaryReportGenerator ftpSubmitCollectionSummaryReportGenerator;
+
+    @Autowired
     FSOngoingAccessionReportGenerator fsOngoingAccessionReportGenerator;
 
     @Autowired
@@ -82,7 +85,9 @@ public class ReportGenerator {
         stopWatch.start();
         List<ReportEntity> reportEntityList;
         if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST)) {
-            reportEntityList = reportDetailRepository.findByFileAndTypeAndDateRange(fileName, reportType, from, to);
+            reportEntityList = reportDetailRepository.findByFileLikeAndTypeAndDateRange(fileName, reportType, from, to);
+        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
+            reportEntityList = reportDetailRepository.findByFileName(fileName);
         } else {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         }
@@ -91,11 +96,12 @@ public class ReportGenerator {
             fileName = fileName+"-"+institutionName;
         } else if (reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
             fileName = RecapConstants.ONGOING_ACCESSION_REPORT+"-"+institutionName;
-        }
-        else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
             fileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
+        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
             fileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
+        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
+            fileName = fileName+"-"+institutionName;
         }
 
         stopWatch.stop();
@@ -106,7 +112,7 @@ public class ReportGenerator {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
                 String generatedFileName = reportGeneratorInterface.generateReport(fileName, reportEntityList);
-                logger.info("The Generated File Name is : " , generatedFileName);
+                logger.info("The Generated File Name is : {}" , generatedFileName);
                 return generatedFileName;
             }
         }
@@ -131,6 +137,7 @@ public class ReportGenerator {
             reportGenerators.add(ftpSubmitCollectionRejectionReportGenerator);
             reportGenerators.add(fsSubmitCollectionExceptionReportGenerator);
             reportGenerators.add(ftpSubmitCollectionExceptionReportGenerator);
+            reportGenerators.add(ftpSubmitCollectionSummaryReportGenerator);
             reportGenerators.add(fsOngoingAccessionReportGenerator);
             reportGenerators.add(ftpOngoingAccessionReportGenerator);
         }

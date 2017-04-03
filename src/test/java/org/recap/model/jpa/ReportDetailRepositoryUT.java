@@ -198,6 +198,28 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     }
 
     @Test
+    public void findByFileLikeAndTypeAndDateRange() throws Exception {
+        ReportEntity reportEntity = saveReportEntity();
+        Calendar cal = Calendar.getInstance();
+        Date from = reportEntity.getCreatedDate();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        from = cal.getTime();
+        Date to = reportEntity.getCreatedDate();
+        cal.setTime(to);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        to = cal.getTime();
+
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileLikeAndTypeAndDateRange("%Matching_Algo_%", reportEntity.getType(), from, to);
+        assertNotNull(reportEntities);
+        assertNotNull(reportEntities.get(0));
+    }
+
+    @Test
     public void testFindByFileNameAndInstitutionName() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
 

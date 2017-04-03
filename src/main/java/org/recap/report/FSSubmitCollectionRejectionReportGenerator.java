@@ -39,8 +39,8 @@ public class FSSubmitCollectionRejectionReportGenerator implements ReportGenerat
         List<SubmitCollectionReportRecord> submitCollectionReportRecordList = new ArrayList<>();
         SubmitCollectionReportGenerator submitCollectionReportGenerator = new SubmitCollectionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            SubmitCollectionReportRecord submitCollectionReportRecord = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
-            submitCollectionReportRecordList.add(submitCollectionReportRecord);
+            List<SubmitCollectionReportRecord> submitCollectionReportRecords = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
+            submitCollectionReportRecordList.addAll(submitCollectionReportRecords);
         }
         producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_REJECTION_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
 
