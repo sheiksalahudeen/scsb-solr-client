@@ -36,6 +36,9 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
     @Query(value = "select * from report_t where FILE_NAME=?1 and TYPE=?2 and CREATED_DATE >= ?3 and CREATED_DATE <= ?4", nativeQuery = true)
     List<ReportEntity> findByFileAndTypeAndDateRange(String fileName, String type, Date from, Date to);
 
+    @Query(value = "select * from report_t where FILE_NAME like ?1 and TYPE=?2 and CREATED_DATE >= ?3 and CREATED_DATE <= ?4", nativeQuery = true)
+    List<ReportEntity> findByFileLikeAndTypeAndDateRange(String fileName, String type, Date from, Date to);
+
     @Query(value = "select * from report_t where FILE_NAME=?1 and INSTITUTION_NAME=?2 and TYPE=?3 and CREATED_DATE >= ?4 and CREATED_DATE <= ?5", nativeQuery = true)
     List<ReportEntity> findByFileAndInstitutionAndTypeAndDateRange(String fileName, String institutionName, String type, Date from, Date to);
 

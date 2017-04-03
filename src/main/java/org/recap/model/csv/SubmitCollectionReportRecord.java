@@ -20,6 +20,9 @@ public class SubmitCollectionReportRecord implements Serializable {
     @DataField(pos = 3, columnName = "Owning Institution")
     private String owningInstitution;
 
+    @DataField(pos = 4, columnName = "Message")
+    private String message;
+
     public String getItemBarcode() {
         return itemBarcode;
     }
@@ -42,5 +45,13 @@ public class SubmitCollectionReportRecord implements Serializable {
 
     public void setOwningInstitution(String owningInstitution) {
         this.owningInstitution = owningInstitution;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

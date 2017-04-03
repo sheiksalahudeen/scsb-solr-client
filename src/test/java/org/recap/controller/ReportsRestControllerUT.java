@@ -2,10 +2,7 @@ package org.recap.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
-import org.recap.RecapConstants;
 import org.recap.model.reports.ReportsRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
@@ -72,4 +69,5 @@ public class ReportsRestControllerUT extends BaseControllerUT {
         String result = mvcResult.getResponse().getContentAsString();
         assertNotNull(result);
     }
+
 }

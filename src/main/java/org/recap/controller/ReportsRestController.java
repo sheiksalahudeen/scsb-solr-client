@@ -1,12 +1,15 @@
 package org.recap.controller;
 
 import org.recap.RecapConstants;
+import org.recap.model.reports.ReportDataRequest;
 import org.recap.model.reports.ReportsRequest;
 import org.recap.model.reports.ReportsResponse;
+import org.recap.report.ReportGenerator;
 import org.recap.util.ReportsServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +27,9 @@ public class ReportsRestController {
 
     @Autowired
     ReportsServiceUtil reportsServiceUtil;
+
+    @Autowired
+    private ReportGenerator reportGenerator;
 
     @RequestMapping(value="/accessionDeaccessionCounts", method = RequestMethod.POST)
     public ReportsResponse accessionDeaccessionCounts(@RequestBody ReportsRequest reportsRequest) {
@@ -71,6 +77,12 @@ public class ReportsRestController {
             reportsResponse.setMessage(e.getMessage());
         }
         return reportsResponse;
+    }
+
+    @RequestMapping(value="/generateCsvReport", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String generateCsvReports(@RequestBody ReportDataRequest reportDataRequest){
+        return reportGenerator.generateReport(reportDataRequest.getFileName(),reportDataRequest.getInstitutionCode(),reportDataRequest.getReportType(),
+                reportDataRequest.getTransmissionType(),null,null);
     }
 
 }

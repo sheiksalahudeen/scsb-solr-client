@@ -15,22 +15,22 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by hemalathas on 20/12/16.
+ * Created by hemalathas on 21/12/16.
  */
 @Component
-public class FSSubmitCollectionExceptionReportGenerator implements ReportGeneratorInterface {
+public class FTPSubmitCollectionSummaryReportGenerator implements ReportGeneratorInterface {
 
     @Autowired
     ProducerTemplate producerTemplate;
 
     @Override
     public boolean isInterested(String reportType) {
-        return reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT) ? true : false;
+        return reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY) ? true : false;
     }
 
     @Override
     public boolean isTransmitted(String transmissionType) {
-        return transmissionType.equalsIgnoreCase(RecapConstants.FILE_SYSTEM) ? true : false;
+        return transmissionType.equalsIgnoreCase(RecapConstants.FTP) ? true : false;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FSSubmitCollectionExceptionReportGenerator implements ReportGenerat
             List<SubmitCollectionReportRecord> submitCollectionReportRecords = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
             submitCollectionReportRecordList.addAll(submitCollectionReportRecords);
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
+        producerTemplate.sendBodyAndHeader(RecapConstants.FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
 
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
