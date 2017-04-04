@@ -426,7 +426,7 @@ public class AccessionService {
             itemEntity.setBarcode(itemBarcode);
             itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
             itemEntity.setOwningInstitutionId(owningInstitutionId);
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.SHARED_CGD));
+            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.NOT_AVAILABLE_CGD));
             itemEntity.setCustomerCode(customerCode);
             itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get(RecapConstants.NOT_AVAILABLE));
             itemEntity.setDeleted(false);
