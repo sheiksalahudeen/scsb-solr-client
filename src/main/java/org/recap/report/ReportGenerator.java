@@ -92,16 +92,17 @@ public class ReportGenerator {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         }
 
+        String actualFileName = null;
         if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
-            fileName = fileName+"-"+institutionName;
+            actualFileName = fileName+"-"+institutionName;
         } else if (reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
-            fileName = RecapConstants.ONGOING_ACCESSION_REPORT+"-"+institutionName;
+            actualFileName = RecapConstants.ONGOING_ACCESSION_REPORT+"-"+institutionName;
         } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
-            fileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
+            actualFileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
         } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
-            fileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
+            actualFileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
         } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
-            fileName = fileName+"-"+institutionName;
+            actualFileName = fileName+"-"+institutionName;
         }
 
         stopWatch.stop();
@@ -111,7 +112,7 @@ public class ReportGenerator {
         for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
             ReportGeneratorInterface reportGeneratorInterface = iterator.next();
             if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
-                String generatedFileName = reportGeneratorInterface.generateReport(fileName, reportEntityList);
+                String generatedFileName = reportGeneratorInterface.generateReport(actualFileName, reportEntityList);
                 logger.info("The Generated File Name is : {}" , generatedFileName);
                 return generatedFileName;
             }
