@@ -33,12 +33,12 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
                             .routeId(RecapConstants.FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_ID)
                             .marshal().bindy(BindyType.Csv, SubmitCollectionReportRecord.class)
                             .choice()
-                                .when(header("fileName").contains(RecapConstants.PRINCETON))
-                                    .to("sftp://" + ftpUserName + "@" + submitCollectionPULFtpLocation + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append")
-                                .when(header("fileName").contains(RecapConstants.COLUMBIA))
-                                    .to("sftp://" + ftpUserName + "@" + submitCollectionCULFtpLocation + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append")
-                                .when(header("fileName").contains(RecapConstants.NYPL))
-                                    .to("sftp://" + ftpUserName + "@" + submitCollectionCULFtpLocation + "?privateKeyFile=" + ftpPrivateKey + "&knownHostsFile=" + ftpKnownHost + "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append")
+                                .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.PRINCETON))
+                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionPULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
+                                .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.COLUMBIA))
+                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionCULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
+                                .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.NYPL))
+                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionCULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
                             ;
                 }
             });

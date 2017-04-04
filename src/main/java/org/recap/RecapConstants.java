@@ -386,5 +386,11 @@ public final class RecapConstants {
 
     public static final String NUMBER_PATTERN="[^0-9]";
 
+    public static final String SFTP = "sftp://";
+    public static final String AT = "@";
+    public static final String PRIVATE_KEY_FILE = "?privateKeyFile=";
+    public static final String KNOWN_HOST_FILE = "&knownHostsFile=";
+    public static final String FILE_NAME = "fileName";
+    public static final String SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS = "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append";
     private RecapConstants(){}
 }
