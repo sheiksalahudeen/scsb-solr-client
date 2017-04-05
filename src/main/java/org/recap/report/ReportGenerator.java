@@ -92,7 +92,7 @@ public class ReportGenerator {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         }
 
-        String actualFileName = null;
+        String actualFileName = fileName;
         if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
             actualFileName = fileName+"-"+institutionName;
         } else if (reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
