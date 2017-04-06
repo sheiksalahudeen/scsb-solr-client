@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -37,12 +38,13 @@ public class ItemChangeLogDetailsRepositoryUT extends BaseTestCase {
     @Test
     public void checkfindByRecordId() throws Exception{
         ItemChangeLogEntity itemChangeLogEntity = saveDeaccessionNotes();
-        ItemChangeLogEntity byRecordId = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(itemChangeLogEntity.getRecordId(),"Deaccession");
+        List<ItemChangeLogEntity> byRecordId = itemChangeLogDetailsRepository.findByRecordIdAndOperationTypeAndOrderByUpdatedDateDesc(itemChangeLogEntity.getRecordId(),"Deaccession");
         assertNotNull(byRecordId);
-        if (itemChangeLogEntity.getOperationType().equalsIgnoreCase("Deaccession")){
-            assertEquals("testing",byRecordId.getNotes());
+        for (ItemChangeLogEntity changeLogEntity : byRecordId) {
+            if (itemChangeLogEntity.getOperationType().equalsIgnoreCase("Deaccession")){
+                assertEquals("testing",changeLogEntity.getNotes());
+            }
         }
-
     }
 
     @Test

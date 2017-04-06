@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -20,6 +21,10 @@ import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
@@ -109,6 +114,7 @@ public class ReportsServiceUtil {
         SolrQuery query = solrQueryBuilder.buildSolrQueryForDeaccesionReportInformation(date, reportsRequest.getDeaccessionOwningInstitution(), true);
         query.setRows(reportsRequest.getPageSize());
         query.setStart(reportsRequest.getPageNumber() * reportsRequest.getPageSize());
+        query.setSort(RecapConstants.ITEM_LAST_UPDATED_DATE, SolrQuery.ORDER.desc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(query);
         SolrDocumentList solrDocuments = queryResponse.getResults();
         long numFound = solrDocuments.getNumFound();
@@ -141,10 +147,12 @@ public class ReportsServiceUtil {
             deaccessionItemResultsRow.setDeaccessionDate(deaccessionDate);
             deaccessionItemResultsRow.setDeaccessionOwnInst(item.getOwningInstitution());
             deaccessionItemResultsRow.setItemBarcode(item.getBarcode());
-            ItemChangeLogEntity itemChangeLogEntity = itemChangeLogDetailsRepository.findByRecordIdAndOperationType(item.getItemId(), RecapConstants.REPORTS_DEACCESSION);
-            if (null != itemChangeLogEntity) {
+            List<ItemChangeLogEntity> itemChangeLogEntityList = itemChangeLogDetailsRepository.findByRecordIdAndOperationTypeAndOrderByUpdatedDateDesc(item.getItemId(), RecapConstants.REPORTS_DEACCESSION);
+            if (CollectionUtils.isNotEmpty(itemChangeLogEntityList)) {
+                ItemChangeLogEntity itemChangeLogEntity = itemChangeLogEntityList.get(0);
                 deaccessionItemResultsRow.setDeaccessionNotes(itemChangeLogEntity.getNotes());
             }
+            deaccessionItemResultsRow.setDeaccessionCreatedBy(item.getItemLastUpdatedBy());
             deaccessionItemResultsRow.setCgd(item.getCollectionGroupDesignation());
             deaccessionItemResultsRowList.add(deaccessionItemResultsRow);
         }
@@ -342,6 +350,7 @@ public class ReportsServiceUtil {
             itemValueResolvers.add(new ItemIdValueResolver());
             itemValueResolvers.add(new ItemLastUpdatedDateValueResolver());
             itemValueResolvers.add(new ItemBibIdValueResolver());
+            itemValueResolvers.add(new ItemLastUpdatedByValueResolver());
         }
         return itemValueResolvers;
     }
