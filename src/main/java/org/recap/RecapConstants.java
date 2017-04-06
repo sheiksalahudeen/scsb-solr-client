@@ -392,5 +392,6 @@ public final class RecapConstants {
     public static final String KNOWN_HOST_FILE = "&knownHostsFile=";
     public static final String FILE_NAME = "fileName";
     public static final String SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS = "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append";
+    public static final String ITEM_LAST_UPDATED_DATE = "ItemLastUpdatedDate";
     private RecapConstants(){}
 }

@@ -12,6 +12,7 @@ public class DeaccessionItemResultsRow {
     private String itemBarcode;
     private String cgd;
     private String deaccessionNotes;
+    private String deaccessionCreatedBy;
 
     public Integer getItemId() {
         return itemId;
@@ -67,5 +68,13 @@ public class DeaccessionItemResultsRow {
 
     public void setDeaccessionNotes(String deaccessionNotes) {
         this.deaccessionNotes = deaccessionNotes;
+    }
+
+    public String getDeaccessionCreatedBy() {
+        return deaccessionCreatedBy;
+    }
+
+    public void setDeaccessionCreatedBy(String deaccessionCreatedBy) {
+        this.deaccessionCreatedBy = deaccessionCreatedBy;
     }
 }
