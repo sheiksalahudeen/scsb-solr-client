@@ -27,14 +27,14 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
     @Test
     public void getCountOfRecordNumForMatchingMonographTest() throws Exception {
         saveReportEntity();
-        long countOfRecordNumForMatchingMonograph = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph("BibId");
+        long countOfRecordNumForMatchingMonograph = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
         assertTrue(countOfRecordNumForMatchingMonograph > 0);
     }
 
     @Test
     public void getReportDataEntityForMatchingMonographsTest() throws Exception {
         saveReportEntity();
-        List<ReportDataEntity> reportDataEntities = reportDataDetailsRepository.getReportDataEntityForMatchingMonographs("BibId", 0, 100);
+        List<ReportDataEntity> reportDataEntities = reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, 0, 100);
         assertNotNull(reportDataEntities);
     }
 
@@ -44,11 +44,11 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("MultiMatch");
+        reportEntity.setType(RecapConstants.MULTI_MATCH);
         reportEntity.setInstitutionName(RecapConstants.ALL_INST);
 
         ReportDataEntity reportDataEntity1 = new ReportDataEntity();
-        reportDataEntity1.setHeaderName("BibId");
+        reportDataEntity1.setHeaderName(RecapConstants.BIB_ID);
         reportDataEntity1.setHeaderValue("1,2");
         reportDataEntities.add(reportDataEntity1);
 
@@ -66,9 +66,9 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
         List<String> recordNumList = new ArrayList<>();
         recordNumList.add("1");
         List<String> headerNameList = new ArrayList<>();
-        headerNameList.add("BibId");
-        headerNameList.add("OwningInstitution");
-        headerNameList.add("OwningInstitutionBibId");
+        headerNameList.add(RecapConstants.BIB_ID);
+        headerNameList.add(RecapConstants.OWNING_INSTITUTION);
+        headerNameList.add(RecapConstants.OWNING_INSTITUTION_BIB_ID);
         List<ReportDataEntity> reportDataEntityList = reportDataDetailsRepository.getRecordsForMatchingBibInfo(recordNumList,headerNameList);
         assertNotNull(reportDataEntityList);
     }

@@ -60,6 +60,12 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
     @Query(value = "SELECT COUNT(recordNumber) FROM ReportEntity WHERE TYPE IN (?1)")
     Integer getCountByType(List<String> typeList);
 
+    @Query(value = "SELECT COUNT(recordNumber) FROM ReportEntity WHERE type IN (?1) AND fileName = ?2 AND createdDate between ?3 and ?4")
+    Integer getCountByTypeAndFileNameAndDateRange(List<String> typeList, String fileName, Date from, Date to);
+
     @Query(value = "SELECT recordNumber FROM ReportEntity WHERE TYPE IN (?1)")
     Page<Integer> getRecordNumByType(Pageable pageable,List<String> typeList);
+
+    @Query(value = "SELECT recordNumber from ReportEntity WHERE type IN (?1) AND fileName = ?2 AND createdDate between ?3 and ?4")
+    Page<Integer> getRecordNumByTypeAndFileNameAndDateRange(Pageable pageable, List<String> typeList, String fileName, Date from, Date to);
 }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by peris on 9/30/16.
@@ -31,8 +30,6 @@ public class SolrQueryBuilder {
     String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
     String coreChildFilterQuery = "{!child of=\"ContentType:parent\"}";
-
-    private Pattern regexPattern = Pattern.compile("([&\\|\\!\\(\\}\\[\\]\\<\\>\\~\\*\\+\\?\\:])");
 
     public String getQueryStringForItemCriteriaForParent(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -130,7 +127,7 @@ public class SolrQueryBuilder {
         return stringBuilder.toString();
     }
 
-    public String getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate(SearchRecordsRequest searchRecordsRequest) {
+    public String getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(buildQueryForMatchChildReturnParent(RecapConstants.COLLECTION_GROUP_DESIGNATION, Arrays.asList(RecapConstants.PRIVATE)));
         return stringBuilder.toString();
@@ -143,7 +140,7 @@ public class SolrQueryBuilder {
             String value = iterator.next();
             stringBuilder.append(parentQuery).append(fieldName).append(":").append(value);
             if (iterator.hasNext()) {
-                stringBuilder.append(" OR ");
+                stringBuilder.append(or);
             }
         }
         return "(" + stringBuilder.toString() + ")";
@@ -176,7 +173,7 @@ public class SolrQueryBuilder {
             if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
                     || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
 
-                if(fieldName.contains("Date") && !fieldName.equalsIgnoreCase(RecapConstants.PUBLICATION_DATE)){
+                if(fieldName.contains(RecapConstants.DATE) && !fieldName.equalsIgnoreCase(RecapConstants.PUBLICATION_DATE)){
                     stringBuilder.append(fieldName).append(":").append("[");
                     stringBuilder.append(fieldValue).append("]").append(and);
                     return stringBuilder.toString();
@@ -297,7 +294,7 @@ public class SolrQueryBuilder {
         String queryStringForItemCriteria;
         SolrQuery solrQuery;
         if (isCGDChangedToPrivate) {
-            queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate(searchRecordsRequest);
+            queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate();
             solrQuery = new SolrQuery(queryStringForItemCriteria + and +"("+ ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_SHARED_TO_PRIVATE + "\"" +")")
                     + or + ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_OPEN_TO_PRIVATE +"\"" +")") +")"
                     + and + queryForFieldCriteria + queryForBibCriteria);//to include items that got changed from shared to private, open to private for deleted export
@@ -411,7 +408,7 @@ public class SolrQueryBuilder {
         if (CollectionUtils.isNotEmpty(matchCriteriaValues)) {
             query.append(buildQueryForMatchChildReturnParent(matchingCriteria, matchCriteriaValues));
         }
-        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false")
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
                 .append(and).append(coreParentFilterQuery)
                 .append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD);
@@ -423,7 +420,7 @@ public class SolrQueryBuilder {
     public String solrQueryForOngoingMatching(String fieldName, List<String> matchingPointValues) {
         StringBuilder query = new StringBuilder();
         query.append(buildQueryForMatchChildReturnParent(fieldName, matchingPointValues));
-        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false")
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
                 .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
                 .append(":").append(RecapConstants.SHARED_CGD);
@@ -432,8 +429,11 @@ public class SolrQueryBuilder {
 
     public String solrQueryForOngoingMatching(String fieldName, String matchingPointValue) {
         StringBuilder query = new StringBuilder();
-        query.append(fieldName).append(":").append(matchingPointValue);
-        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":false")
+        if(matchingPointValue.contains("\\")) {
+            matchingPointValue = matchingPointValue.replaceAll("\\\\", "\\\\\\\\");
+        }
+        query.append(fieldName).append(":").append("\"").append(matchingPointValue).append("\"");
+        query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
                 .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
                 .append(":").append(RecapConstants.SHARED_CGD);
@@ -444,7 +444,7 @@ public class SolrQueryBuilder {
         StringBuilder query = new StringBuilder();
         query.append("(").append(RecapConstants.BIB_CREATED_DATE).append(":").append("[").append(date).append("]")
                 .append(or).append(RecapConstants.BIB_LAST_UPDATED_DATE).append(":").append("[").append(date).append("]").append(")")
-                .append(and).append(RecapConstants.IS_DELETED_BIB).append(":false")
+                .append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         query.append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
                 .append(":").append(RecapConstants.SHARED_CGD);
@@ -453,45 +453,45 @@ public class SolrQueryBuilder {
 
     public SolrQuery buildSolrQueryForAccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
-        query.append("DocType:Item").append(and);
-        query.append("ItemCreatedDate:").append("[").append(date).append("]").append(and);
-        query.append("IsDeletedItem:").append(isDeleted).append(and);
-        query.append("ItemCatalogingStatus:").append(RecapConstants.COMPLETE_STATUS).append(and);
-        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
-        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
+        query.append(RecapConstants.ITEM_CREATED_DATE).append(":").append("[").append(date).append("]").append(and);
+        query.append(RecapConstants.IS_DELETED_ITEM).append(":").append(isDeleted).append(and);
+        query.append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS).append(and);
+        query.append(RecapConstants.ITEM_OWNING_INSTITUTION).append(":").append(owningInstitution).append(and);
+        query.append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(collectionGroupDesignation);
         return new SolrQuery(query.toString());
     }
 
     public SolrQuery buildSolrQueryForDeaccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
-        query.append("DocType:Item").append(and);
-        query.append("ItemLastUpdatedDate:").append("[").append(date).append("]").append(and);
-        query.append("IsDeletedItem:").append(isDeleted).append(and);
-        query.append("ItemCatalogingStatus:").append(RecapConstants.COMPLETE_STATUS).append(and);
-        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
-        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation);
+        query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
+        query.append(RecapConstants.ITEM_LASTUPDATED_DATE).append(":").append("[").append(date).append("]").append(and);
+        query.append(RecapConstants.IS_DELETED_ITEM).append(":").append(isDeleted).append(and);
+        query.append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS).append(and);
+        query.append(RecapConstants.ITEM_OWNING_INSTITUTION).append(":").append(owningInstitution).append(and);
+        query.append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(collectionGroupDesignation);
         return new SolrQuery(query.toString());
     }
 
 
     public SolrQuery buildSolrQueryForCGDReports(String owningInstitution , String collectionGroupDesignation){
         StringBuilder query = new StringBuilder();
-        query.append("DocType:Item").append(and);
-        query.append("ItemOwningInstitution:").append(owningInstitution).append(and);
-        query.append("CollectionGroupDesignation:").append(collectionGroupDesignation).append(and);
-        query.append("IsDeletedItem:false").append(and);
-        query.append("ItemCatalogingStatus:").append(RecapConstants.COMPLETE_STATUS);
+        query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
+        query.append(RecapConstants.ITEM_OWNING_INSTITUTION).append(":").append(owningInstitution).append(and);
+        query.append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(collectionGroupDesignation).append(and);
+        query.append(RecapConstants.IS_DELETED_ITEM).append(":").append(RecapConstants.FALSE).append(and);
+        query.append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         return new SolrQuery(query.toString());
     }
 
 
     public SolrQuery buildSolrQueryForDeaccesionReportInformation(String date, String owningInstitution, boolean isDeleted) {
         StringBuilder query = new StringBuilder();
-        query.append("DocType:Item").append(and);
-        query.append("ItemLastUpdatedDate:").append("[").append(date).append("]").append(and);
-        query.append("IsDeletedItem:").append(isDeleted).append(and);
-        query.append("ItemCatalogingStatus:").append(RecapConstants.COMPLETE_STATUS).append(and);
-        query.append("ItemOwningInstitution:").append(owningInstitution);
+        query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
+        query.append(RecapConstants.ITEM_LASTUPDATED_DATE).append(":").append("[").append(date).append("]").append(and);
+        query.append(RecapConstants.IS_DELETED_ITEM).append(":").append(isDeleted).append(and);
+        query.append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS).append(and);
+        query.append(RecapConstants.ITEM_OWNING_INSTITUTION).append(":").append(owningInstitution);
         return new SolrQuery(query.toString());
     }
 

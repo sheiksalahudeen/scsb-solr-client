@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 import static junit.framework.TestCase.assertNotNull;
 
 /**
@@ -18,5 +20,8 @@ public class MatchingBibInfoDetailServiceUT extends BaseTestCase {
     public void populateMatchingBibInfo(){
         String respone  = matchingBibInfoDetailService.populateMatchingBibInfo();
         assertNotNull(respone);
+
+        String response = matchingBibInfoDetailService.populateMatchingBibInfo(new Date(), new Date());
+        assertNotNull(response);
     }
 }

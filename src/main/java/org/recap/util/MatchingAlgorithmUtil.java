@@ -207,9 +207,9 @@ public class MatchingAlgorithmUtil {
 
             }
             if(materialTypeSet.size() != 1) {
-                reportEntity.setType("MaterialTypeException");
+                reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
             } else {
-                reportEntity.setType("SingleMatch");
+                reportEntity.setType(RecapConstants.SINGLE_MATCH);
                 for(String owningInst : owningInstList) {
                     if(owningInst.equalsIgnoreCase(RecapConstants.PRINCETON)) {
                         pulMatchingCount++;
@@ -306,12 +306,12 @@ public class MatchingAlgorithmUtil {
 
     public void getReportDataEntityList(List<ReportDataEntity> reportDataEntities, Collection owningInstSet, Collection bibIds, Collection materialTypes, List<String> owningInstBibIds) {
         if(CollectionUtils.isNotEmpty(bibIds)) {
-            ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, "BibId");
+            ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, RecapConstants.BIB_ID);
             reportDataEntities.add(bibIdReportDataEntity);
         }
 
         if(CollectionUtils.isNotEmpty(owningInstSet)) {
-            ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, "OwningInstitution");
+            ReportDataEntity owningInstReportDataEntity = getReportDataEntityForCollectionValues(owningInstSet, RecapConstants.OWNING_INSTITUTION);
             reportDataEntities.add(owningInstReportDataEntity);
         }
 
@@ -321,7 +321,7 @@ public class MatchingAlgorithmUtil {
         }
 
         if(CollectionUtils.isNotEmpty(owningInstBibIds)) {
-            ReportDataEntity owningInstBibIdReportDataEntity = getReportDataEntityForCollectionValues(owningInstBibIds, "OwningInstitutionBibId");
+            ReportDataEntity owningInstBibIdReportDataEntity = getReportDataEntityForCollectionValues(owningInstBibIds, RecapConstants.OWNING_INSTITUTION_BIB_ID);
             reportDataEntities.add(owningInstBibIdReportDataEntity);
         }
     }
@@ -408,9 +408,9 @@ public class MatchingAlgorithmUtil {
             owningInstBibIds.add(matchingBibEntity.getOwningInstBibId());
         }
         if(materialTypes.size() == 1) {
-            reportEntity.setType("MultiMatch");
+            reportEntity.setType(RecapConstants.MULTI_MATCH);
         } else {
-            reportEntity.setType("MaterialTypeException");
+            reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
         }
         if(owningInstSet.size() > 1) {
             getReportDataEntityList(reportDataEntities, owningInstList, bibIdList, materialTypeList, owningInstBibIds);
@@ -559,7 +559,7 @@ public class MatchingAlgorithmUtil {
             for(List<Integer> exceptionRecordNumberList : exceptionRecordNumbers) {
                 List<ReportEntity> reportEntities = reportDetailRepository.findByRecordNumberIn(exceptionRecordNumberList);
                 for(ReportEntity reportEntity : reportEntities) {
-                    reportEntity.setType("MaterialTypeException");
+                    reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
                 }
                 reportDetailRepository.save(reportEntities);
             }

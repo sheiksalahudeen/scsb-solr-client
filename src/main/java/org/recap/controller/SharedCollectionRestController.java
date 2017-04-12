@@ -112,7 +112,7 @@ public class SharedCollectionRestController {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(RecapConstants.RESPONSE_DATE, new Date().toString());
+        responseHeaders.add(RecapConstants.DATE, new Date().toString());
         return responseHeaders;
     }
 }

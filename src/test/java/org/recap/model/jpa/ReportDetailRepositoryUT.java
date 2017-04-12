@@ -75,13 +75,13 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setFileName(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME);
+        reportEntity.setFileName(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(RecapConstants.MATCHING_TYPE);
+        reportEntity.setType(RecapConstants.MULTI_MATCH);
         reportEntity.setInstitutionName(RecapConstants.ALL_INST);
 
         ReportDataEntity reportDataEntity1 = new ReportDataEntity();
-        reportDataEntity1.setHeaderName("BibId");
+        reportDataEntity1.setHeaderName(RecapConstants.BIB_ID);
         reportDataEntity1.setHeaderValue("1");
         reportDataEntities.add(reportDataEntity1);
 
@@ -123,19 +123,8 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void testFindByFileAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndDateRange(reportEntity.getFileName(), from, to);
         assertNotNull(reportEntities);
@@ -154,19 +143,8 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void testFindByTypeAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
 
@@ -178,19 +156,8 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void testFindByFileAndTypeAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndTypeAndDateRange(reportEntity.getFileName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
@@ -200,21 +167,10 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void findByFileLikeAndTypeAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
-        List<ReportEntity> reportEntities = reportDetailRepository.findByFileLikeAndTypeAndDateRange("%Matching_Algo_%", reportEntity.getType(), from, to);
+        List<ReportEntity> reportEntities = reportDetailRepository.findByFileLikeAndTypeAndDateRange("%Initial%", reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
         assertNotNull(reportEntities.get(0));
     }
@@ -240,19 +196,8 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void testFindByFileAndInstitutionAndTypeAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(reportEntity.getFileName(), reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
@@ -262,19 +207,8 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void testFindByInstitutionAndTypeAndDateRange() throws Exception {
         ReportEntity reportEntity = saveReportEntity();
-        Calendar cal = Calendar.getInstance();
-        Date from = reportEntity.getCreatedDate();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        from = cal.getTime();
-        Date to = reportEntity.getCreatedDate();
-        cal.setTime(to);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        to = cal.getTime();
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
 
         List<ReportEntity> reportEntities = reportDetailRepository.findByInstitutionAndTypeAndDateRange(reportEntity.getInstitutionName(), reportEntity.getType(), from, to);
         assertNotNull(reportEntities);
@@ -296,12 +230,12 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName("OCLC,ISBN");
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType("MultiMatch");
+        reportEntity.setType(RecapConstants.MULTI_MATCH);
         reportEntity.setInstitutionName(RecapConstants.ALL_INST);
         reportDetailRepository.saveAndFlush(reportEntity);
 
         List<String> typeList = new ArrayList<>();
-        typeList.add("MultiMatch");
+        typeList.add(RecapConstants.MULTI_MATCH);
         Integer matchingBibCount = reportDetailRepository.getCountByType(typeList);
         assertNotNull(matchingBibCount);
         assertEquals(new Integer(1), matchingBibCount);
@@ -310,10 +244,55 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
     @Test
     public void getRecordNumByType(){
         List<String> typeList = new ArrayList<>();
-        typeList.add("SingleMatch");
-        typeList.add("MultiMatch");
+        typeList.add(RecapConstants.SINGLE_MATCH);
+        typeList.add(RecapConstants.MULTI_MATCH);
         Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByType(new PageRequest(0, 10),typeList);
         List<Integer> recordNumList = recordNumbers.getContent();
         assertNotNull(recordNumList);
+    }
+
+    @Test
+    public void getCountByTypeAndFileNameAndDateRange() {
+        ReportEntity reportEntity = saveReportEntity();
+        List<String> typeList = new ArrayList<>();
+        typeList.add(RecapConstants.SINGLE_MATCH);
+        typeList.add(RecapConstants.MULTI_MATCH);
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
+        Integer countByTypeAndDateRange = reportDetailRepository.getCountByTypeAndFileNameAndDateRange(typeList, RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, from, to);
+        assertNotNull(countByTypeAndDateRange);
+        assertTrue(countByTypeAndDateRange > 0);
+    }
+
+    @Test
+    public void getRecordNumByTypeAndDateRange() {
+        ReportEntity reportEntity = saveReportEntity();
+        List<String> typeList = new ArrayList<>();
+        typeList.add(RecapConstants.SINGLE_MATCH);
+        typeList.add(RecapConstants.MULTI_MATCH);
+        Date from = getFromDate(reportEntity.getCreatedDate());
+        Date to = getToDate(reportEntity.getCreatedDate());
+        Page<Integer> recordNumByTypeAndDateRange = reportDetailRepository.getRecordNumByTypeAndFileNameAndDateRange(new PageRequest(0, 10), typeList, RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, from, to);
+        assertNotNull(recordNumByTypeAndDateRange);
+        assertNotNull(recordNumByTypeAndDateRange.getContent());
+        assertTrue(recordNumByTypeAndDateRange.getTotalElements() > 0);
+    }
+
+    public Date getFromDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return  cal.getTime();
+    }
+
+    public Date getToDate(Date createdDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createdDate);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        return cal.getTime();
     }
 }
