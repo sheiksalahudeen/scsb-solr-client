@@ -24,7 +24,7 @@ public class MatchingBibInfoDetail implements Serializable {
     @Column(name = "OWNING_INST")
     private String owningInstitution;
 
-    @Column(name = "RECORD_NUM")
+    @Column(name = "LATEST_RECORD_NUM")
     private Integer recordNum;
 
 

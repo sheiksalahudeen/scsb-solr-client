@@ -2,6 +2,8 @@ package org.recap.controller;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.recap.RecapConstants;
+import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
 import org.recap.util.SolrQueryBuilder;
@@ -35,6 +37,9 @@ public class OngoingMatchingAlgorithmJobController {
     @Autowired
     SolrQueryBuilder solrQueryBuilder;
 
+    @Autowired
+    MatchingBibInfoDetailService matchingBibInfoDetailService;
+
     @RequestMapping("/ongoingMatchingJob")
     private String matchingJob(Model model) {
         model.addAttribute("matchingJobFromDate", new Date());
@@ -44,14 +49,27 @@ public class OngoingMatchingAlgorithmJobController {
     @RequestMapping(value = "/ongoingMatchingJob", method = RequestMethod.POST)
     @ResponseBody
     private String startMatchingAlgorithmJob(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest) {
+        Date date = solrIndexRequest.getCreatedDate();
+        String jobType = solrIndexRequest.getProcessType();
+        String status = "";
         Calendar cal = Calendar.getInstance();
-        cal.setTime(solrIndexRequest.getCreatedDate());
+        cal.setTime(date);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(cal.getTime());
-        SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
-        return processOngoingMatchingAlgorithm(solrDocumentList);
+        Date fromDate = cal.getTime();
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date toDate = cal.getTime();
+        if(jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
+            String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(fromDate);
+            SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
+            status = processOngoingMatchingAlgorithm(solrDocumentList);
+        } else if(jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
+            status = matchingBibInfoDetailService.populateMatchingBibInfo(fromDate, toDate);
+        }
+        return status;
     }
 
     public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {

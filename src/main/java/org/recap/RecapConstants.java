@@ -38,6 +38,8 @@ public final class RecapConstants {
     public static final String OTHER = "Other";
     public static final String AND = "AND";
     public static final String OR = "OR";
+    public static final String FALSE = "false";
+    public static final String TRUE = "true";
     public static final String ALL_DIACRITICS = "all_diacritics";
     public static final String ALL_FIELDS = "_text_";
     public static final String IS_DELETED_BIB = "IsDeletedBib";
@@ -152,6 +154,8 @@ public final class RecapConstants {
     public static final String MATCHING_TYPE = "Matching";
     public static final String EXCEPTION_TYPE = "Exception";
     public static final String SUMMARY_TYPE = "Summary";
+    public static final String SINGLE_MATCH = "SingleMatch";
+    public static final String MULTI_MATCH = "MultiMatch";
 
     //Transmission Types
     public static final String FILE_SYSTEM = "FileSystem";
@@ -178,6 +182,7 @@ public final class RecapConstants {
     public static final String EXCEPTION_REPORT_ENTITY_MAP = "exceptionReportEntityMap";
 
     public static final String ONGOING_MATCHING_ALGORITHM = "OngoingMatchingAlgorithm";
+    public static final String MATERIAL_TYPE_EXCEPTION = "MaterialTypeException";
 
     //Error Message
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or bib table does not contain this record";
@@ -254,7 +259,7 @@ public final class RecapConstants {
     public static final String BIB_LAST_UPDATED_DATE = "BibLastUpdatedDate";
     public static final String LAST_UPDATED_DATE_ITEM = "LastUpdatedDateItem";
     public static final String ERROR_DESCRIPTION = "ErrorDescription";
-    public static final String RESPONSE_DATE = "Date";
+    public static final String DATE = "Date";
     public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
     public static final String BIB_ITEM_DOESNOT_EXIST = "Bib Id doesn't exist in SCSB database.";
 
@@ -311,6 +316,8 @@ public final class RecapConstants {
     public static final String BIBLIOGRAPHICENTITY = "bibliographicEntity";
     public static final String REPORTENTITIES = "reportEntities";
     public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
+    public static final String ONGOING_MATCHING_ALGORITHM_JOB = "ongoingMatchingAlgorithmJob";
+    public static final String POPULATE_DATA_FOR_DATA_DUMP_JOB = "populateDataForDataDumpJob";
 
     //solr
     public static final String DATE_FORMAT_YYYYMMDDHHMM = "yyyy-MM-dd HH:mm";
@@ -340,6 +347,7 @@ public final class RecapConstants {
 
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
+    public static final String  ITEM_CREATED_DATE = "ItemCreatedDate";
 
     public static final String EMAIL_Q = "scsbactivemq:queue:solrClientEmailQ";
     public static final String EMAIL_ROUTE_ID = "solrClientEmailQ";
@@ -374,7 +382,7 @@ public final class RecapConstants {
     public static final String GENERATED_REPORT_FILE_NAME="The Generated Report File Name : ";
     public static final String TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME="Total time taken to generate File : ";
     public static final String ACCESSION_FAILURE_REPORT="Accession_Failure_Report";
-    public static final String TOTAL_BIB_ID_PARTITION_LIST="Total Bib Id partition List : ";
+    public static final String TOTAL_BIB_ID_PARTITION_LIST="Total Bib Id partition List : {}";
     public static final String NON_MONOGRAPH_RECORD_NUMS="NonMonographRecordNums";
     public static final String EXCEPTION_RECORD_NUMS="ExceptionRecordNums";
 

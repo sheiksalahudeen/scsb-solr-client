@@ -172,8 +172,8 @@ public class OngoingMatchingAlgorithmUtil {
             owningInstList.add(bibItem.getOwningInstitution());
             owningInstBibIds.add(bibItem.getOwningInstitutionBibId());
             bibIds.add(bibId);
-            materialTypeList.add(bibItem.getMaterialType());
-            materialTypeSet.add(bibItem.getMaterialType());
+            materialTypeList.add(bibItem.getLeaderMaterialType());
+            materialTypeSet.add(bibItem.getLeaderMaterialType());
             if(matchPointString.equalsIgnoreCase(RecapConstants.OCLC_NUMBER)) {
                 criteriaValues.addAll(bibItem.getOclcNumber());
             } else if(matchPointString.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)) {
@@ -205,14 +205,14 @@ public class OngoingMatchingAlgorithmUtil {
                             materialTypeList, owningInstList, owningInstBibIds,
                             StringUtils.join(criteriaValues, ","), unMatchingTitleHeaderSet, matchPointString));
                 }
-                reportEntity.setType("SingleMatch");
+                reportEntity.setType(RecapConstants.SINGLE_MATCH);
                 try {
                     itemIds = checkForMonographAndUpdateCGD(reportEntity, bibIds, materialTypeList, materialTypeSet);
                 } catch (Exception e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
                 }
             } else {
-                reportEntity.setType("MaterialTypeException");
+                reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
             }
             matchingAlgorithmUtil.getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList, owningInstBibIds);
             matchingAlgorithmUtil.getReportDataEntity(StringUtils.join(criteriaValues, ","), matchPointString, reportDataEntities);
@@ -315,7 +315,7 @@ public class OngoingMatchingAlgorithmUtil {
     private List<Integer> checkForMonographAndUpdateCGD(ReportEntity reportEntity, List<Integer> bibIdList, List<String> materialTypeList, Set<String> materialTypes) throws IOException, SolrServerException {
         List<Integer> itemIds = new ArrayList<>();
         if(materialTypes.size() == 1) {
-            reportEntity.setType("MultiMatch");
+            reportEntity.setType(RecapConstants.MULTI_MATCH);
             matchingAlgorithmUtil.populateMatchingCounter();
             Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap = new HashMap<>();
             Map<Integer, ItemEntity> itemEntityMap = new HashMap<>();
@@ -327,9 +327,9 @@ public class OngoingMatchingAlgorithmUtil {
                 itemIds.addAll(itemEntityMap.keySet());
             } else {
                 if(materialTypes.size() > 1) {
-                    reportEntity.setType("MaterialTypeException");
+                    reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
                 } else if(materialTypes.size() == 1){
-                    reportEntity.setType("MultiMatch");
+                    reportEntity.setType(RecapConstants.MULTI_MATCH);
                     if(materialTypes.contains(RecapConstants.MONOGRAPHIC_SET)) {
                         int size = materialTypeList.size();
                         materialTypeList = new ArrayList<>();
@@ -340,7 +340,7 @@ public class OngoingMatchingAlgorithmUtil {
                 }
             }
         } else {
-            reportEntity.setType("MaterialTypeException");
+            reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
         }
         return itemIds;
     }

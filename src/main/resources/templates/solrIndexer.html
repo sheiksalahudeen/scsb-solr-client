@@ -24,7 +24,7 @@
     <ul class="nav nav-tabs nav-justified">
         <li class="active"><a data-toggle="tab" href="#solrIndex">Solr Index</a></li>
         <li><a data-toggle="tab" href="#matchingAlgorithmSaveReport">Matching Algorithm Save Reports</a></li>
-        <li><a data-toggle="tab" href="#ongoingMatchingJob">Ongoing Matching Algorithm Job</a></li>
+        <li><a data-toggle="tab" href="#ongoingMatchingJob">Ongoing Matching Job</a></li>
         <li><a data-toggle="tab" href="#generateReports"> Generate Reports</a></li>
     </ul>
 
@@ -233,6 +233,16 @@
                                                   action="#"
                                                   th:object="${solrIndexRequest}" method="post">
                                                 <fieldset>
+                                                    <div class="form-group">
+                                                        <label for="jobType" class="col-sm-4">Job Type</label>
+                                                        <div class="col-sm-4">
+                                                            <select id="jobType"
+                                                                    class="form-control" th:field="*{processType}">
+                                                                <option value="ongoingMatchingAlgorithmJob">Ongoing Matching Algorithm Job</option>
+                                                                <option value="populateDataForDataDumpJob">Populate Data For DataDump Job</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div class="form-group">
                                                         <label for="fromDate" class="col-sm-4">Date From</label>
 

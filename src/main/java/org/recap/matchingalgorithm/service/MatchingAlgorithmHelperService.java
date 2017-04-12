@@ -62,17 +62,6 @@ public class MatchingAlgorithmHelperService {
 
     private ExecutorService executorService;
 
-    public void clearExistingMatchingData() throws Exception {
-        matchingMatchPointsDetailsRepository.deleteAll();
-        matchingBibDetailsRepository.deleteAll();
-        clearMatchingReports();
-    }
-
-    public void clearMatchingReports() {
-        reportDetailRepository.deleteReportDataEntitiesByTypeAndFileName(Arrays.asList("SingleMatch", "MultiMatch"));
-        reportDetailRepository.deleteReportEntitiesByTypeAndFileName(Arrays.asList("SingleMatch", "MultiMatch"));
-    }
-
     public long findMatchingAndPopulateMatchPointsEntities() throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities;
         long count = 0;
@@ -125,7 +114,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> oclcAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISBN);
             if(org.apache.commons.collections.CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -173,7 +162,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> oclcAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_ISSN);
             if(org.apache.commons.collections.CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -220,7 +209,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> oclcAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_OCLC, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -267,7 +256,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> isbnAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_ISSN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -314,7 +303,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> isbnAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISBN, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -361,7 +350,7 @@ public class MatchingAlgorithmHelperService {
         Map<String, Set<Integer>> issnAndBibIdMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
 
-        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST + multipleMatchBibIds.size());
+        logger.info(RecapConstants.TOTAL_BIB_ID_PARTITION_LIST , multipleMatchBibIds.size());
         for(List<Integer> bibIds : multipleMatchBibIds) {
             List<MatchingBibEntity> bibEntitiesBasedOnBibIds = matchingBibDetailsRepository.getMultiMatchBibEntitiesBasedOnBibIds(bibIds, RecapConstants.MATCH_POINT_FIELD_ISSN, RecapConstants.MATCH_POINT_FIELD_LCCN);
             if(CollectionUtils.isNotEmpty(bibEntitiesBasedOnBibIds)) {
@@ -460,8 +449,8 @@ public class MatchingAlgorithmHelperService {
         long countBasedOnCriteria = matchingMatchPointsDetailsRepository.countBasedOnCriteria(matchCriteria);
         SaveMatchingBibsCallable saveMatchingBibsCallable = new SaveMatchingBibsCallable();
         saveMatchingBibsCallable.setBibIdList(new HashSet<>());
-        int totalPagesCount = (int) Math.ceil(countBasedOnCriteria / batchSize);
-        ExecutorService executorService = getExecutorService(50);
+        int totalPagesCount = (int) (countBasedOnCriteria / batchSize);
+        ExecutorService executor = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
         for (int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new SaveMatchingBibsCallable(matchingMatchPointsDetailsRepository, matchCriteria, solrTemplate,
@@ -469,36 +458,43 @@ public class MatchingAlgorithmHelperService {
             callables.add(callable);
         }
 
-        size = executeCallables(size, executorService, callables);
+        size = executeCallables(size, executor, callables);
         return size;
     }
 
     private Integer executeCallables(Integer size, ExecutorService executorService, List<Callable<Integer>> callables) {
         List<Future<Integer>> futures = null;
         try {
-            futures = executorService.invokeAll(callables);
-            futures
-                    .stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        } catch (Exception e) {
-                            throw new IllegalStateException(e);
-                        }
-                    });
+            futures = getFutures(executorService, callables, futures);
         } catch (Exception e) {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
 
-        for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
-            Future future = iterator.next();
-            try {
-                size += (Integer) future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error(RecapConstants.LOG_ERROR,e);
+        if(futures != null) {
+            for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                Future future = iterator.next();
+                try {
+                    size += (Integer) future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error(RecapConstants.LOG_ERROR,e);
+                }
             }
         }
         return size;
+    }
+
+    private List<Future<Integer>> getFutures(ExecutorService executorService, List<Callable<Integer>> callables, List<Future<Integer>> futures) throws InterruptedException {
+        futures = executorService.invokeAll(callables);
+        futures
+                .stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
+        return futures;
     }
 
     private ExecutorService getExecutorService(Integer numThreads) {
