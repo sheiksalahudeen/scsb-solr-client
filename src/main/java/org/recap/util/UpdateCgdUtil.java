@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,9 +84,12 @@ public class UpdateCgdUtil {
             for (ItemEntity itemEntity : itemEntities) {
                 if (itemEntity != null && CollectionUtils.isNotEmpty(itemEntity.getBibliographicEntities())) {
                     for (BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()) {
+                        StopWatch stopWatchIndexDocument = new StopWatch();
+                        stopWatchIndexDocument.start();
                         SolrInputDocument bibSolrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, solrTemplate, bibliographicDetailsRepository, holdingsDetailsRepository);
-                        solrTemplate.saveDocument(bibSolrInputDocument);
-                        solrTemplate.commit();
+                        solrTemplate.saveDocument(bibSolrInputDocument,1);
+                        stopWatchIndexDocument.stop();
+                        logger.info("Time taken to index the doc for updateCGDForItemInSolr--->{}sec",stopWatchIndexDocument.getTotalTimeSeconds());
                     }
                 }
             }

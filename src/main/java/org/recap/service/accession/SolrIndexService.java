@@ -1,6 +1,7 @@
 package org.recap.service.accession;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.recap.model.jpa.BibliographicEntity;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
@@ -35,6 +37,9 @@ public class SolrIndexService {
 
     @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
+
+    @Autowired
+    SolrClient solrClient;
 
     public Logger getLogger() {
         return logger;
@@ -65,8 +70,11 @@ public class SolrIndexService {
         BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicId(bibliographicId);
         SolrInputDocument solrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository());
         if (solrInputDocument !=null) {
-            getSolrTemplate().saveDocument(solrInputDocument);
-            getSolrTemplate().commit();
+            StopWatch stopWatchIndexDocument = new StopWatch();
+            stopWatchIndexDocument.start();
+            getSolrTemplate().saveDocument(solrInputDocument,1);
+            stopWatchIndexDocument.stop();
+            logger.info("Time taken to index the doc--->{}sec",stopWatchIndexDocument.getTotalTimeSeconds());
         }
         return solrInputDocument;
     }

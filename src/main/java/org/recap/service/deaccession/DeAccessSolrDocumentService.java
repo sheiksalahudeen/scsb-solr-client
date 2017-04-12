@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -66,8 +67,11 @@ public class DeAccessSolrDocumentService {
                 BibliographicEntity bibEntity = getBibliographicDetailsRepository().findByBibliographicId(bibId);
                 SolrInputDocument bibSolrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingDetailRepository());
                 bibSolrInputDocument.setField(RecapConstants.IS_DELETED_BIB,true);
-                getSolrTemplate().saveDocument(bibSolrInputDocument);
-                getSolrTemplate().commit();
+                StopWatch stopWatchIndexDocument = new StopWatch();
+                stopWatchIndexDocument.start();
+                getSolrTemplate().saveDocument(bibSolrInputDocument,1);
+                stopWatchIndexDocument.stop();
+                logger.info("Time taken to index the doc for updateIsDeletedBibByBibId--->{}sec",stopWatchIndexDocument.getTotalTimeSeconds());
             }
             return "Bib documents updated successfully.";
         }catch(Exception ex){
@@ -88,10 +92,13 @@ public class DeAccessSolrDocumentService {
                                 holdingsSolrInputDocument.setField(RecapConstants.IS_DELETED_HOLDINGS, true);
                             }
                         }
-                        getSolrTemplate().saveDocument(bibSolrInputDocument);
+                        StopWatch stopWatchIndexDocument = new StopWatch();
+                        stopWatchIndexDocument.start();
+                        getSolrTemplate().saveDocument(bibSolrInputDocument,1);
+                        stopWatchIndexDocument.stop();
+                        logger.info("Time taken to index the doc for updateIsDeletedHoldingsByHoldingsId--->{}sec",stopWatchIndexDocument.getTotalTimeSeconds());
                     }
                 }
-                getSolrTemplate().commit();
             }
             return "Holdings documents updated successfully.";
         }catch(Exception ex){
@@ -114,10 +121,13 @@ public class DeAccessSolrDocumentService {
                                 }
                             }
                         }
-                        getSolrTemplate().saveDocument(bibSolrInputDocument);
+                        StopWatch stopWatchIndexDocument = new StopWatch();
+                        stopWatchIndexDocument.start();
+                        getSolrTemplate().saveDocument(bibSolrInputDocument,1);
+                        stopWatchIndexDocument.stop();
+                        logger.info("Time taken to index the doc for updateIsDeletedItemByItemIds--->{}sec",stopWatchIndexDocument.getTotalTimeSeconds());
                     }
                 }
-                getSolrTemplate().commit();
             }
             return "Item documents updated successfully.";
         }catch(Exception ex){
