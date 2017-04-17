@@ -1,6 +1,8 @@
 package org.recap.util;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -15,16 +17,11 @@ import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.SearchResultRow;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
-import org.recap.model.solr.Bib;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.solr.impl.BibSolrDocumentRepositoryImpl;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
@@ -127,6 +124,7 @@ public class ReportsServiceUtil {
         }
         List<Item> itemList = new ArrayList<>();
         List<Integer> itemIdList = new ArrayList<>();
+        List<Integer> bibIdList = new ArrayList<>();
         for (Iterator<SolrDocument> solrDocumentIterator = solrDocuments.iterator(); solrDocumentIterator.hasNext(); ) {
             SolrDocument solrDocument = solrDocumentIterator.next();
             boolean isDeletedItem = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_ITEM);
@@ -134,7 +132,22 @@ public class ReportsServiceUtil {
                 Item item = getItem(solrDocument);
                 itemList.add(item);
                 itemIdList.add(item.getItemId());
+                bibIdList.add(item.getItemBibIdList().get(0));
             }
+        }
+        String bibIdJoin = StringUtils.join(bibIdList, ",");
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(RecapConstants.BIB_DOC_TYPE);
+        solrQuery.addFilterQuery(RecapConstants.SOLR_BIB_ID+StringEscapeUtils.escapeJava(bibIdJoin).replace(",","\" \""));
+        solrQuery.addFilterQuery(RecapConstants.IS_DELETED_BIB_TRUE);
+        solrQuery.setFields(RecapConstants.BIB_ID,RecapConstants.TITLE_DISPLAY);
+        solrQuery.setRows(reportsRequest.getPageSize());
+        QueryResponse response = solrTemplate.getSolrClient().query(solrQuery);
+        Map<Integer,String> map = new HashMap<>();
+        SolrDocumentList list = response.getResults();
+        for (Iterator<SolrDocument> iterator = list.iterator(); iterator.hasNext(); ) {
+            SolrDocument solrDocument = iterator.next();
+             map.put((Integer) solrDocument.getFieldValue(RecapConstants.BIB_ID),(String)solrDocument.getFieldValue(RecapConstants.TITLE_DISPLAY));
         }
         SimpleDateFormat simpleDateFormat = getSimpleDateFormatForReports();
         List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = new ArrayList<>();
@@ -142,8 +155,9 @@ public class ReportsServiceUtil {
             DeaccessionItemResultsRow deaccessionItemResultsRow = new DeaccessionItemResultsRow();
             deaccessionItemResultsRow.setItemId(item.getItemId());
             String deaccessionDate = simpleDateFormat.format(item.getItemLastUpdatedDate());
-            Bib bib = bibSolrCrudRepository.findByBibId(item.getItemBibIdList().get(0));
-            deaccessionItemResultsRow.setTitle(bib.getTitleDisplay());
+            if(map.containsKey(item.getItemBibIdList().get(0))){
+                deaccessionItemResultsRow.setTitle(map.get(item.getItemBibIdList().get(0)));
+            }
             deaccessionItemResultsRow.setDeaccessionDate(deaccessionDate);
             deaccessionItemResultsRow.setDeaccessionOwnInst(item.getOwningInstitution());
             deaccessionItemResultsRow.setItemBarcode(item.getBarcode());

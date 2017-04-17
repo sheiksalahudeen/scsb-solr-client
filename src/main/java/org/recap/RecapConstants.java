@@ -401,5 +401,12 @@ public final class RecapConstants {
     public static final String FILE_NAME = "fileName";
     public static final String SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS = "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append";
     public static final String ITEM_LAST_UPDATED_DATE = "ItemLastUpdatedDate";
+
+    //deaccession report
+    public static final String BIB_DOC_TYPE = "DocType:Bib";
+    public static final String SOLR_BIB_ID = "BibId:";
+    public static final String IS_DELETED_BIB_TRUE = "IsDeletedBib:true";
+    public static final String TITLE_DISPLAY = "Title_display";
+
     private RecapConstants(){}
 }
