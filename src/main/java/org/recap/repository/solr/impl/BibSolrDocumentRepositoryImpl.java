@@ -93,7 +93,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getQueryForChildAndParentCriteria(searchRecordsRequest);
         queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
-        queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+        if (searchRecordsRequest.isSortIncompleteRecords()){
+            queryForChildAndParentCriteria.setSort(RecapConstants.ITEM_CREATED_DATE, SolrQuery.ORDER.desc);
+        }
+        else {
+            queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
+        }
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
         SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
         if (CollectionUtils.isNotEmpty(itemSolrDocumentList)) {

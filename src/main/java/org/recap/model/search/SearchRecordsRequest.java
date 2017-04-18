@@ -81,6 +81,8 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "catalogingStatus", value= "Cataloging Status",position = 22)
     private String catalogingStatus;
 
+    private boolean sortIncompleteRecords = false;
+
 
     public SearchRecordsRequest() {
         this.setFieldName("");
@@ -319,4 +321,11 @@ public class SearchRecordsRequest implements Serializable {
         this.errorMessage = null;
     }
 
+    public boolean isSortIncompleteRecords() {
+        return sortIncompleteRecords;
+    }
+
+    public void setSortIncompleteRecords(boolean sortIncompleteRecords) {
+        this.sortIncompleteRecords = sortIncompleteRecords;
+    }
 }
