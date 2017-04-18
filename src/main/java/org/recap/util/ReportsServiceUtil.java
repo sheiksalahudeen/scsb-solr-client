@@ -181,6 +181,7 @@ public class ReportsServiceUtil {
         searchRecordsRequest.setFieldName(RecapConstants.ITEM_CATALOGING_STATUS);
         searchRecordsRequest.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
         searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
+        searchRecordsRequest.setSortIncompleteRecords(true);
         if(!reportsRequest.isExport()){
             searchRecordsRequest.setPageNumber(reportsRequest.getIncompletePageNumber());
         }
