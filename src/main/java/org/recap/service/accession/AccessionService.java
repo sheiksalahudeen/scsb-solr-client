@@ -14,6 +14,9 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
+import org.recap.model.marc.BibMarcRecord;
+import org.recap.model.marc.HoldingsMarcRecord;
+import org.recap.model.marc.ItemMarcRecord;
 import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
@@ -249,16 +252,75 @@ public class AccessionService {
         if (StringUtils.isNotBlank(bibDataResponse)) {
             records = getMarcUtil().readMarcXml(bibDataResponse);
         }
-        if (CollectionUtils.isNotEmpty(records)) {
-            for (Record record : records) {
-                response = updateData(record, owningInstitution, responseMapList, accessionRequest);
-                setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
-                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
-            }
-            stopWatch.stop();
-            logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
+        boolean isBoundWithItem = isBoundWithItemForMarcRecord(records);
+        boolean isValidBoundWithRecord = true;
+        if(isBoundWithItem) {
+            isValidBoundWithRecord = validateBoundWithMarcRecordFromIls(records);
         }
+        if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
+            if (CollectionUtils.isNotEmpty(records)) {
+                for (Record record : records) {
+                    response = updateData(record, owningInstitution, responseMapList, accessionRequest);
+                    setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
+                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+                }
+            }
+        } else {
+            response = RecapConstants.INVALID_BOUNDWITH_RECORD;
+            setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
+            reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+        }
+        stopWatch.stop();
+        logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
         return response;
+    }
+
+    private boolean validateBoundWithMarcRecordFromIls(List<Record> records){
+        List<String> holdingIdList = new ArrayList<>();
+        for(Record record : records){
+            String holdingId = marcUtil.getDataFieldValue(record,"876","","","0");
+            if(holdingIdList.isEmpty()){
+                holdingIdList.add(holdingId);
+            } else {
+                if(!holdingIdList.contains(holdingId)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean validateBoundWithScsbRecordFromIls(List<BibRecord> bibRecordList){
+        List<String> holdingIdList = new ArrayList<>();
+        for(BibRecord bibRecord : bibRecordList){
+            BibMarcRecord bibMarcRecord = marcUtil.buildBibMarcRecord(bibRecord);
+            List<HoldingsMarcRecord> holdingsMarcRecords = bibMarcRecord.getHoldingsMarcRecords();
+            List<ItemMarcRecord> itemMarcRecordList = holdingsMarcRecords.get(0).getItemMarcRecordList();
+            Record itemRecord = itemMarcRecordList.get(0).getItemRecord();
+            String holdingId = marcUtil.getDataFieldValue(itemRecord,"876","","","0");
+            if(holdingIdList.isEmpty()){
+                holdingIdList.add(holdingId);
+            } else {
+                if(!holdingIdList.contains(holdingId)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isBoundWithItemForMarcRecord(List<Record> recordList){
+        if(recordList.size() > 1){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isBoundWithItemForScsbRecord(List<BibRecord> bibRecordList){
+        if(bibRecordList.size() > 1){
+            return true;
+        }
+        return false;
     }
 
     private String processAccessionForSCSBXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) throws Exception {
@@ -266,9 +328,21 @@ public class AccessionService {
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
-            response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest);
-            setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
+
+        boolean isBoundWithItem = isBoundWithItemForScsbRecord(bibRecords.getBibRecordList());
+        boolean isValidBoundWithRecord = true;
+        if(isBoundWithItem) {
+            isValidBoundWithRecord = validateBoundWithScsbRecordFromIls(bibRecords.getBibRecordList());
+        }
+        if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
+            for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
+                response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest);
+                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
+            }
+        } else {
+            response = RecapConstants.INVALID_BOUNDWITH_RECORD;
+            setAccessionResponse(accessionResponsesList,accessionRequest,accessionResponse,response);
             reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, response));
         }
         stopWatch.stop();
