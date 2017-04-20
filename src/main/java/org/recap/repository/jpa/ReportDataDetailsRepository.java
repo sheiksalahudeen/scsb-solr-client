@@ -28,5 +28,17 @@ public interface ReportDataDetailsRepository extends JpaRepository<ReportDataEnt
 
     @Query(value = "SELECT RDE FROM ReportDataEntity RDE WHERE recordNum IN (?1) AND headerName IN (?2)")
     List<ReportDataEntity> getRecordsForMatchingBibInfo(List<String> recordNumList,List<String> headerNameList);
+
+    @Query(value = "select count(*) from report_data_t where " +
+            "record_num in (select distinct RECORD_NUM from report_data_t " +
+            "where HEADER_NAME = 'MaterialType' and HEADER_VALUE like 'Serial,%' " +
+            "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) and header_name=?1", nativeQuery = true)
+    long getCountOfRecordNumForMatchingSerial(String headerName);
+
+    @Query(value = "select * from report_data_t where record_num in (select distinct RECORD_NUM from report_data_t " +
+            "where HEADER_NAME = 'MaterialType' and HEADER_VALUE like 'Serial,%' " +
+            "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) " +
+            "and header_name=?1 order by record_num limit ?2,?3", nativeQuery = true)
+    List<ReportDataEntity> getReportDataEntityForMatchingSerials(String headerName, long from, long batchsize);
 }
 

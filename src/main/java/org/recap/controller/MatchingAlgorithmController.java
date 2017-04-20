@@ -3,19 +3,17 @@ package org.recap.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.executors.MatchingBibItemIndexExecutorService;
+import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.matchingalgorithm.service.MatchingAlgorithmHelperService;
 import org.recap.matchingalgorithm.service.MatchingAlgorithmUpdateCGDService;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
-import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -261,154 +259,24 @@ public class MatchingAlgorithmController {
         matchingAlgorithmHelperService.saveMatchingSummaryCount(pulMatchingCount, culMatchingCount, nyplMatchingCount);
     }
 
+    // Added to produce the Summary of serial Item count which came under Matching Algorithm
     @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/generateReports/full", method = RequestMethod.POST)
-    public String generateReportsForAll(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
-                            BindingResult result,
-                            Model model) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
-            createdDate = new Date();
-        }
-        Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null){
-            toDate = new Date();
-        }
-        String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName;
-        if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        }
-        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
-        stopWatch.stop();
-        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
-        return status;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/generateReports/oclc", method = RequestMethod.POST)
-    public String generateReportsForOclc(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
-                            BindingResult result,
-                            Model model) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
-            createdDate = new Date();
-        }
-        Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null){
-            toDate = new Date();
-        }
-        String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName;
-        if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_OCLC_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        }
-        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
-        stopWatch.stop();
-        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
-        return status;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/generateReports/isbn", method = RequestMethod.POST)
-    public String generateReportsForIsbn(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
-                            BindingResult result,
-                            Model model) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
-            createdDate = new Date();
-        }
-        Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null){
-            toDate = new Date();
-        }
-        String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName;
-        if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_ISBN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        }
-        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
-        stopWatch.stop();
-        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
-        return status;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/generateReports/issn", method = RequestMethod.POST)
-    public String generateReportsForIssn(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
-                            BindingResult result,
-                            Model model) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
-            createdDate = new Date();
-        }
-        Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null){
-            toDate = new Date();
-        }
-        String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName;
-        if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_ISSN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        }
-        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
-        stopWatch.stop();
-        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
-        return status;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/generateReports/lccn", method = RequestMethod.POST)
-    public String generateReportsForLccn(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
-                            BindingResult result,
-                            Model model) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
-            createdDate = new Date();
-        }
-        Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null){
-            toDate = new Date();
-        }
-        String reportType = solrIndexRequest.getReportType();
-        String generatedReportFileName;
-        if(RecapConstants.MATCHING_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.MATCHING_ALGO_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else if(RecapConstants.EXCEPTION_TYPE.equalsIgnoreCase(reportType)) {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.EXCEPTION_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        } else {
-            generatedReportFileName = getReportGenerator().generateReport(RecapConstants.SUMMARY_REPORT_LCCN_FILE_NAME, RecapConstants.ALL_INST, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
-        }
-        String status = RecapConstants.GENERATED_REPORT_FILE_NAME + generatedReportFileName;
-        stopWatch.stop();
-        logger.info(RecapConstants.TOTAL_TIME_TAKEN_TO_GENERATE_FILE_NAME + stopWatch.getTotalTimeSeconds());
-        return status;
+    @RequestMapping(value = "/matchingAlgorithm/itemsCountForSerials", method = RequestMethod.GET)
+    public String itemCountForSerials(){
+        StringBuilder response = new StringBuilder();
+        StopWatch stopwatch = new StopWatch();
+        stopwatch.start();
+        MatchingCounter.reset();
+        matchingAlgorithmUpdateCGDService.getItemsCountForSerialsMatching(Integer.valueOf(matchingAlgoBatchSize));
+        logger.info("Total PUL Shared Serial Items in Matching : " + MatchingCounter.getPulCGDUpdatedSharedCount());
+        logger.info("Total CUL Shared Serial Items in Matching : " + MatchingCounter.getCulCGDUpdatedSharedCount());
+        logger.info("Total NYPL Shared Serial Items in Matching : " + MatchingCounter.getNyplCGDUpdatedSharedCount());
+        response.append("PUL Shared Serial Items Count : ").append(MatchingCounter.getPulCGDUpdatedSharedCount()).append("\n");
+        response.append("CUL Shared Serial Items Count : ").append(MatchingCounter.getCulCGDUpdatedSharedCount()).append("\n");
+        response.append("NYPL Shared Serial Items Count : ").append(MatchingCounter.getNyplCGDUpdatedSharedCount());
+        stopwatch.stop();
+        logger.info("Total Time taken to get the serial items count : " + stopwatch.getTotalTimeSeconds() + " seconds");
+        return response.toString();
     }
 
     public Date getFromDate(Date createdDate) {
