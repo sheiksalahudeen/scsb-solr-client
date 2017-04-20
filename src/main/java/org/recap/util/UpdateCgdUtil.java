@@ -117,7 +117,7 @@ public class UpdateCgdUtil {
         emailPayLoad.setOldCgd(oldCollectionGroupDesignation);
         emailPayLoad.setNewCgd(newCollectionGroupDesignation);
         emailPayLoad.setNotes(cgdChangeNotes);
-        producerTemplate.sendBody(RecapConstants.EMAIL_Q, emailPayLoad);
+        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_FOR, RecapConstants.UPDATECGD);
     }
 
     private void setCGDChangeLogToItemEntity(String cgdChangeLog,List<ItemEntity> itemEntityList){
