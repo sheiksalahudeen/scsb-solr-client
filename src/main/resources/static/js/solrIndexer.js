@@ -33,8 +33,7 @@ jQuery(document).ready(function ($) {
     $('#fromDate').datepicker({
         format: "yyyy/mm/dd"
     });
-    
-    showOrHideFields();
+
     showDateField();
 });
 
@@ -142,17 +141,6 @@ function generateReport() {
         request.done(function (msg) {
             document.getElementById("reportStatus").value = msg;
         })
-    }
-}
-
-function showOrHideFields() {
-    var processType = $('#processType').val();
-    if(processType === 'MatchingAlgorithm') {
-        $('#matchingCriteriaDiv').show();
-        $('#reportInstitutionNameDiv').hide();
-    } else {
-        $('#matchingCriteriaDiv').hide();
-        $('#reportInstitutionNameDiv').show();
     }
 }
 
