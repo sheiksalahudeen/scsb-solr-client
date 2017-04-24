@@ -409,5 +409,10 @@ public final class RecapConstants {
     public static final String IS_DELETED_BIB_TRUE = "IsDeletedBib:true";
     public static final String TITLE_DISPLAY = "Title_display";
 
+    public static final String EMAIL_FOR = "emailFor";
+    public static final String UPDATECGD = "updateCgd";
+    public static final String BATCHJOB = "batchJob";
+    public static final String PURGE_EXCEPTION_REQUESTS = "PurgeExceptionRequests";
+
     private RecapConstants(){}
 }
