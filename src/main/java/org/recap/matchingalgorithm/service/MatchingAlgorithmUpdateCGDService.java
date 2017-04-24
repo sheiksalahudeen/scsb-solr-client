@@ -1,5 +1,6 @@
 package org.recap.matchingalgorithm.service;
 
+import com.google.common.collect.Lists;
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
@@ -8,8 +9,7 @@ import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
 import org.recap.executors.MatchingAlgorithmCGDCallable;
 import org.recap.matchingalgorithm.MatchingCounter;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.recap.util.MatchingAlgorithmUtil;
 import org.recap.util.UpdateCgdUtil;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by angelind on 11/1/17.
@@ -72,18 +73,18 @@ public class MatchingAlgorithmUpdateCGDService {
 
         matchingAlgorithmUtil.populateMatchingCounter();
 
-        ExecutorService executorService = getExecutorService(50);
+        ExecutorService executor = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
         long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
-        int totalPagesCount = (int) Math.ceil(countOfRecordNum / batchSize);
+        int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new MatchingAlgorithmCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
                     getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
             callables.add(callable);
         }
-        Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executorService, callables);
+        Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executor, callables);
 
         List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS);
         List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS);
@@ -104,7 +105,7 @@ public class MatchingAlgorithmUpdateCGDService {
             //Waiting for the updateItemQ messages finish processing
         }
 
-        executorService.shutdown();
+        executor.shutdown();
     }
 
     private Map<String, List<Integer>> executeCallables(ExecutorService executorService, List<Callable<Integer>> callables) {
@@ -113,25 +114,31 @@ public class MatchingAlgorithmUpdateCGDService {
         Map<String, List<Integer>> unProcessedRecordNumberMap = new HashMap<>();
         List<Future<Integer>> futures = getFutures(executorService, callables);
 
-        for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
-            Future future = iterator.next();
-            try {
-                Map<String, List<Integer>> recordNumberMap = (Map<String, List<Integer>>) future.get();
-                if(recordNumberMap != null) {
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS))) {
-                        nonMonographRecordNumbers.addAll(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS));
-                    }
-                    if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS))) {
-                        exceptionRecordNumbers.addAll(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS));
-                    }
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error(RecapConstants.LOG_ERROR,e);
+        if(futures != null) {
+            for (Iterator<Future<Integer>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                Future future = iterator.next();
+                fetchAndPopulateRecordNumbers(nonMonographRecordNumbers, exceptionRecordNumbers, future);
             }
         }
         unProcessedRecordNumberMap.put(RecapConstants.NON_MONOGRAPH_RECORD_NUMS, nonMonographRecordNumbers);
         unProcessedRecordNumberMap.put(RecapConstants.EXCEPTION_RECORD_NUMS, exceptionRecordNumbers);
         return unProcessedRecordNumberMap;
+    }
+
+    private void fetchAndPopulateRecordNumbers(List<Integer> nonMonographRecordNumbers, List<Integer> exceptionRecordNumbers, Future future) {
+        try {
+            Map<String, List<Integer>> recordNumberMap = (Map<String, List<Integer>>) future.get();
+            if(recordNumberMap != null) {
+                if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS))) {
+                    nonMonographRecordNumbers.addAll(recordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS));
+                }
+                if(CollectionUtils.isNotEmpty(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS))) {
+                    exceptionRecordNumbers.addAll(recordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS));
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
+        }
     }
 
     private List<Future<Integer>> getFutures(ExecutorService executorService, List<Callable<Integer>> callables) {
@@ -158,6 +165,38 @@ public class MatchingAlgorithmUpdateCGDService {
             executorService = Executors.newFixedThreadPool(numThreads);
         }
         return executorService;
+    }
+
+    public void getItemsCountForSerialsMatching(Integer batchSize) {
+        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID);
+        logger.info("Total Records : {}", countOfRecordNum);
+        int totalPagesCount = (int) (countOfRecordNum / batchSize);
+        logger.info("Total Pages : {}" , totalPagesCount);
+        for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
+            long from = pageNum * Long.valueOf(batchSize);
+            List<ReportDataEntity> reportDataEntities =  reportDataDetailsRepository.getReportDataEntityForMatchingSerials(RecapConstants.BIB_ID, from, batchSize);
+            List<List<ReportDataEntity>> reportDataEntityList = Lists.partition(reportDataEntities, 1000);
+            for(List<ReportDataEntity> dataEntityList : reportDataEntityList) {
+                updateMatchingCounter(pageNum, dataEntityList);
+            }
+        }
+    }
+
+    private void updateMatchingCounter(int pageNum, List<ReportDataEntity> dataEntityList) {
+        List<Integer> bibIds = new ArrayList<>();
+        for(ReportDataEntity reportDataEntity : dataEntityList) {
+            List<String> bibIdList = Arrays.asList(reportDataEntity.getHeaderValue().split(","));
+            bibIds.addAll(bibIdList.stream().map(Integer::parseInt).collect(Collectors.toList()));
+        }
+        logger.info("Bibs count in Page {} : {} " ,pageNum,bibIds.size());
+        List<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByBibliographicIdIn(bibIds);
+        for(BibliographicEntity bibliographicEntity : bibliographicEntities) {
+            for(ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
+                if(itemEntity.getCollectionGroupId().equals(getCollectionGroupMap().get(RecapConstants.SHARED_CGD))) {
+                    MatchingCounter.updateCounter(itemEntity.getOwningInstitutionId(), false);
+                }
+            }
+        }
     }
 
     public Map getCollectionGroupMap() {

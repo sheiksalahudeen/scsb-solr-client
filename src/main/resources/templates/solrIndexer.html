@@ -292,29 +292,12 @@
                                                     <div class="form-group">
                                                         <label for="processType" class="col-sm-4">Process Type</label>
                                                         <div class="col-sm-8">
-                                                            <select id="processType" class="form-control" style="width: 160px;" th:onchange="'javascript:showOrHideFields()'"
+                                                            <select id="processType" class="form-control" style="width: 160px;"
                                                                     th:field="*{processType}">
                                                                 <option value="SolrIndex">Solr Index</option>
                                                                 <option value="Accession">Accession</option>
                                                                 <option value="SolrIndex">DeAccession</option>
-                                                                <option value="MatchingAlgorithm">Matching Algorithm</option>
                                                                 <option value="SubmitCollection">Submit Collection</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div id="matchingCriteriaDiv" class="form-group">
-                                                        <label for="matchingCriteriaForReports" class="col-sm-4">Matching Criterias</label>
-                                                        <div class="col-sm-8">
-                                                            <select id="matchingCriteriaForReports"
-                                                                    class="form-control"
-                                                                    style="width: 160px;"
-                                                                    th:field="*{matchingCriteria}">
-                                                                <option value="ALL">ALL(OCLC,ISBN,ISSN,LCCN)</option>
-                                                                <option value="OCLC">OCLC</option>
-                                                                <option value="ISBN">ISBN</option>
-                                                                <option value="ISSN">ISSN</option>
-                                                                <option value="LCCN">LCCN</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -331,9 +314,6 @@
                                                                 <option value="DeAccession_Summary_Report">DeAccession Summary Report</option>
                                                                 <option value="Ongoing_Accession_Report">Ongoing Accession Report</option>
                                                                 <option value="Accession_Summary_Report">Accession Summary Report</option>
-                                                                <option value="Matching">Matching</option>
-                                                                <option value="Exception">Exception</option>
-                                                                <option value="Summary">Summary</option>
                                                                 <option value="Submit_Collection_Rejection_Report">Submit Collection Rejection Report</option>
                                                                 <option value="Submit_Collection_Exception_Report">Submit Collection Exception Report</option>
                                                             </select>
