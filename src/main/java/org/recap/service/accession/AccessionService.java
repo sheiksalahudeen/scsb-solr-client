@@ -2,7 +2,6 @@ package org.recap.service.accession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.common.SolrInputDocument;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
@@ -22,7 +21,6 @@ import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.MarcUtil;
-import org.recap.util.OngoingMatchingAlgorithmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +32,6 @@ import org.springframework.util.StopWatch;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -71,12 +65,6 @@ public class AccessionService {
     private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    private ItemStatusDetailsRepository itemStatusDetailsRepository;
-
-    @Autowired
-    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
-
-    @Autowired
     private PrincetonService princetonService;
 
     @Autowired
@@ -91,17 +79,17 @@ public class AccessionService {
     @Autowired
     private SolrIndexService solrIndexService;
 
+    @Autowired
+    private DummyDataService dummyDataService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    private OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+
 
     private Map<String,Integer> institutionEntityMap;
-
-    private Map<String,Integer> itemStatusMap;
-
-    private Map<String,Integer> collectionGroupMap;
 
     public MarcUtil getMarcUtil() {
         return marcUtil;
@@ -234,6 +222,8 @@ public class AccessionService {
                     response = indexReaccessionedItem(itemEntityList);
                 }
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
+                saveItemChangeLogEntity(RecapConstants.ACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
             } else {
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_ALREADY_ACCESSIONED);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
@@ -429,10 +419,24 @@ public class AccessionService {
         return reportDataEntityList;
     }
 
+    private void saveItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {
+        List<ItemChangeLogEntity> itemChangeLogEntityList = new ArrayList<>();
+        for (ItemEntity itemEntity:itemEntityList) {
+            ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
+            itemChangeLogEntity.setOperationType(RecapConstants.ACCESSION);
+            itemChangeLogEntity.setUpdatedBy(operationType);
+            itemChangeLogEntity.setUpdatedDate(new Date());
+            itemChangeLogEntity.setRecordId(itemEntity.getItemId());
+            itemChangeLogEntity.setNotes(message);
+            itemChangeLogEntityList.add(itemChangeLogEntity);
+        }
+        itemChangeLogDetailsRepository.save(itemChangeLogEntityList);
+    }
+
     private String createDummyRecord(AccessionRequest accessionRequest, String owningInstitution) {
         String response;
         Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(owningInstitution);
-        BibliographicEntity dummyBibliographicEntity = createDummyDataAsIncomplete(owningInstitutionId,accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
+        BibliographicEntity dummyBibliographicEntity = dummyDataService.createDummyDataAsIncomplete(owningInstitutionId,accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
         solrIndexService.indexByBibliographicId(dummyBibliographicEntity.getBibliographicId());
         response = RecapConstants.ACCESSION_DUMMY_RECORD;
         return response;
@@ -464,61 +468,6 @@ public class AccessionService {
         getSolrIndexService().indexByBibliographicId(bibliographicId);
         response = RecapConstants.SUCCESS;
         return response;
-    }
-
-    private BibliographicEntity createDummyDataAsIncomplete(Integer owningInstitutionId,String itemBarcode,String customerCode) {
-        Random random = new Random();
-        BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        Date currentDate = new Date();
-        try {
-            bibliographicEntity.setContent(getXmlContent(RecapConstants.DUMMY_BIB_CONTENT_XML).getBytes());
-            bibliographicEntity.setCreatedDate(currentDate);
-            bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
-            bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-            bibliographicEntity.setLastUpdatedDate(currentDate);
-            bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-            bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
-            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
-
-            HoldingsEntity holdingsEntity = new HoldingsEntity();
-            holdingsEntity.setContent(getXmlContent(RecapConstants.DUMMY_HOLDING_CONTENT_XML).getBytes());
-            holdingsEntity.setCreatedDate(currentDate);
-            holdingsEntity.setCreatedBy(RecapConstants.ACCESSION);
-            holdingsEntity.setLastUpdatedDate(currentDate);
-            holdingsEntity.setOwningInstitutionId(owningInstitutionId);
-            holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-
-            holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
-
-            ItemEntity itemEntity = new ItemEntity();
-            itemEntity.setCallNumberType(RecapConstants.DUMMY_CALL_NUMBER);
-            itemEntity.setCallNumber(RecapConstants.DUMMYCALLNUMBER);
-            itemEntity.setCreatedDate(currentDate);
-            itemEntity.setCreatedBy(RecapConstants.ACCESSION);
-            itemEntity.setLastUpdatedDate(currentDate);
-            itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-            itemEntity.setBarcode(itemBarcode);
-            itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
-            itemEntity.setOwningInstitutionId(owningInstitutionId);
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.NOT_AVAILABLE_CGD));
-            itemEntity.setCustomerCode(customerCode);
-            itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get(RecapConstants.NOT_AVAILABLE));
-            itemEntity.setDeleted(false);
-            itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-            itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
-            List<ItemEntity> itemEntityList = new ArrayList<>();
-            itemEntityList.add(itemEntity);
-            holdingsEntity.setItemEntities(itemEntityList);
-
-            bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-            bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
-        }
-
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        return savedBibliographicEntity;
     }
 
     private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
@@ -695,16 +644,21 @@ public class AccessionService {
         try {
             for(ItemEntity itemEntity:itemEntityList){
                 itemEntity.setDeleted(false);
+                itemEntity.setLastUpdatedDate(new Date());
+                itemEntity.setLastUpdatedBy(RecapConstants.REACCESSION);
                 for (HoldingsEntity holdingsEntity:itemEntity.getHoldingsEntities()) {
                     holdingsEntity.setDeleted(false);
+                    holdingsEntity.setLastUpdatedDate(new Date());
+                    holdingsEntity.setLastUpdatedBy(RecapConstants.REACCESSION);
                 }
-                for(BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()){
+                for(BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()) {
                     bibliographicEntity.setDeleted(false);
+                    bibliographicEntity.setLastUpdatedDate(new Date());
+                    bibliographicEntity.setLastUpdatedBy(RecapConstants.REACCESSION);
                 }
             }
             itemDetailsRepository.save(itemEntityList);
             itemDetailsRepository.flush();
-
         } catch (Exception e) {
             logger.error(RecapConstants.EXCEPTION,e);
             return RecapConstants.FAILURE;
@@ -717,7 +671,6 @@ public class AccessionService {
             for(ItemEntity itemEntity:itemEntityList){
                 itemEntity.getBibliographicEntities();
                 for (BibliographicEntity bibliographicEntity:itemEntity.getBibliographicEntities()) {
-                    List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();
                     indexBibliographicRecord(bibliographicEntity.getBibliographicId());
                 }
             }
@@ -793,55 +746,4 @@ public class AccessionService {
         return institutionEntityMap;
     }
 
-    private Map getItemStatusMap() {
-        if (null == itemStatusMap) {
-            itemStatusMap = new HashMap();
-            try {
-                Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
-                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
-                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapConstants.EXCEPTION,e);
-            }
-        }
-        return itemStatusMap;
-    }
-
-    private Map getCollectionGroupMap() {
-        if (null == collectionGroupMap) {
-            collectionGroupMap = new HashMap();
-            try {
-                Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
-                for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
-                    CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapConstants.EXCEPTION,e);
-            }
-        }
-        return collectionGroupMap;
-    }
-
-    private String getXmlContent(String filename) {
-        InputStream inputStream = getClass().getResourceAsStream(filename);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder out = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) {
-                    out.append("\n");
-                } else {
-                    out.append(line);
-                    out.append("\n");
-                }
-            }
-        } catch (IOException e) {
-            logger.error(RecapConstants.EXCEPTION,e);
-        }
-        return out.toString();
-    }
 }

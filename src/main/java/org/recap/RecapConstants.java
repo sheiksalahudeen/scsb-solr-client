@@ -310,12 +310,14 @@ public final class RecapConstants {
     public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";
     public static final String ITEM_BARCODE_ALREADY_ACCESSIONED_MSG = "Unavailable barcode from partner is already accessioned";
     public static final String ACCESSION = "accession";
+    public static final String REACCESSION = "re-accession";
+    public static final String ITEM_ISDELETED_TRUE_TO_FALSE = "Item isdeleted true to false";
     public static final String DUMMYCALLNUMBER = "dummycallnumber";
     public static final String COMPLETE_STATUS = "Complete";
     public static final String INCOMPLETE_STATUS = "Incomplete";
     public static final String BIBLIOGRAPHICENTITY = "bibliographicEntity";
     public static final String REPORTENTITIES = "reportEntities";
-    public static final String DUMMY_CALL_NUMBER = "dummycallnumbertype";
+    public static final String DUMMY_CALL_NUMBER_TYPE = "dummycallnumbertype";
     public static final String ONGOING_MATCHING_ALGORITHM_JOB = "ongoingMatchingAlgorithmJob";
     public static final String POPULATE_DATA_FOR_DATA_DUMP_JOB = "populateDataForDataDumpJob";
 
