@@ -223,7 +223,7 @@ public class AccessionService {
                 }
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
-                saveItemChangeLogEntity(RecapConstants.ACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
+                saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
             } else {
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_ALREADY_ACCESSIONED);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
