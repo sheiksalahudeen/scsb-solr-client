@@ -64,6 +64,10 @@ public class MatchingAlgorithmUpdateCGDService {
     @Autowired
     ItemDetailsRepository itemDetailsRepository;
 
+    public ReportDataDetailsRepository getReportDataDetailsRepository() {
+        return reportDataDetailsRepository;
+    }
+
     private ExecutorService executorService;
     private Map collectionGroupMap;
     private Map institutionMap;
@@ -168,13 +172,13 @@ public class MatchingAlgorithmUpdateCGDService {
     }
 
     public void getItemsCountForSerialsMatching(Integer batchSize) {
-        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID);
+        long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             long from = pageNum * Long.valueOf(batchSize);
-            List<ReportDataEntity> reportDataEntities =  reportDataDetailsRepository.getReportDataEntityForMatchingSerials(RecapConstants.BIB_ID, from, batchSize);
+            List<ReportDataEntity> reportDataEntities =  getReportDataDetailsRepository().getReportDataEntityForMatchingSerials(RecapConstants.BIB_ID, from, batchSize);
             List<List<ReportDataEntity>> reportDataEntityList = Lists.partition(reportDataEntities, 1000);
             for(List<ReportDataEntity> dataEntityList : reportDataEntityList) {
                 updateMatchingCounter(pageNum, dataEntityList);

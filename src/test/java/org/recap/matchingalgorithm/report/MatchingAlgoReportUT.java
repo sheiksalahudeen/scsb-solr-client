@@ -1,6 +1,8 @@
 package org.recap.matchingalgorithm.report;
 
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.MatchingCounter;
@@ -10,6 +12,7 @@ import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.solr.Item;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
+import org.recap.repository.jpa.ReportDataDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -37,8 +41,11 @@ public class MatchingAlgoReportUT extends BaseTestCase {
     @Autowired
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
-    @Autowired
+    @Mock
     MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
+
+    @Mock
+    ReportDataDetailsRepository reportDataDetailsRepository;
 
     private Integer batchSize=10000;
     private Map collectionGroupMap = new HashMap();
@@ -127,7 +134,7 @@ public class MatchingAlgoReportUT extends BaseTestCase {
     }
 
     @Test
-    public void verifyItemUpdatedInSolr() throws Exception {
+    public void isItemCgdInSolrSyncWithDB() throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Integer batchSize = 1000;
@@ -148,6 +155,7 @@ public class MatchingAlgoReportUT extends BaseTestCase {
         logger.info("Total Item Count not updated : " + count);
         stopWatch.stop();
         logger.info("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
+        assertEquals(Integer.valueOf(0), count);
     }
 
     @Test
@@ -155,6 +163,12 @@ public class MatchingAlgoReportUT extends BaseTestCase {
         StopWatch stopwatch = new StopWatch();
         stopwatch.start();
         MatchingCounter.reset();
+        Mockito.when(matchingAlgorithmUpdateCGDService.getReportDataDetailsRepository()).thenReturn(reportDataDetailsRepository);
+        Mockito.when(reportDataDetailsRepository.getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID)).thenReturn(new Long(0));
+        Mockito.doCallRealMethod().when(matchingAlgorithmUpdateCGDService).getItemsCountForSerialsMatching(batchSize);
+        MatchingCounter.updateCounter(1, false);
+        MatchingCounter.updateCounter(2, false);
+        MatchingCounter.updateCounter(3, false);
         matchingAlgorithmUpdateCGDService.getItemsCountForSerialsMatching(batchSize);
         assertTrue(MatchingCounter.getPulCGDUpdatedSharedCount() > 0);
         assertTrue(MatchingCounter.getCulCGDUpdatedSharedCount() > 0);

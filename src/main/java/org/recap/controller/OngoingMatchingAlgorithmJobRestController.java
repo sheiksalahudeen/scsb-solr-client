@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
@@ -66,9 +67,11 @@ public class OngoingMatchingAlgorithmJobRestController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String status = RecapConstants.SUCCESS;
-        for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
-            SolrDocument solrDocument = iterator.next();
-            status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument);
+        if(CollectionUtils.isNotEmpty(solrDocumentList)) {
+            for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument solrDocument = iterator.next();
+                status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument);
+            }
         }
         stopWatch.stop();
         logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
