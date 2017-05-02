@@ -211,7 +211,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         if (StringUtils.isNotBlank(searchRecordsRequest.getFieldName())
                 && (searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.BARCODE)
                 || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CALL_NUMBER)
-                || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ITEM_CATALOGING_STATUS))) {
+                || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.ITEM_CATALOGING_STATUS)
+                || searchRecordsRequest.getFieldName().equalsIgnoreCase(RecapConstants.CUSTOMER_CODE))) {
             return true;
         }
         return false;
