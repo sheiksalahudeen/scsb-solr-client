@@ -170,8 +170,8 @@ public class SolrQueryBuilder {
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
             //The following "if" condition is for exact match (i.e string data type fields in Solr)
             //Author, Title, Publisher, Publication Place, Publication date, Subjet & Notes.
-            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
-                    || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
+            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.CUSTOMER_CODE)
+                    || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA) || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
 
                 if(fieldName.contains(RecapConstants.DATE) && !fieldName.equalsIgnoreCase(RecapConstants.PUBLICATION_DATE)){
                     stringBuilder.append(fieldName).append(":").append("[");
@@ -222,8 +222,8 @@ public class SolrQueryBuilder {
         String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
         String fieldName = searchRecordsRequest.getFieldName();
         if (StringUtils.isNotBlank(fieldName) && StringUtils.isNotBlank(fieldValue)) {
-            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA)
-                    || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
+            if(!(fieldName.equalsIgnoreCase(RecapConstants.BARCODE) || fieldName.equalsIgnoreCase(RecapConstants.CALL_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.CUSTOMER_CODE)
+                    || fieldName.equalsIgnoreCase(RecapConstants.ISBN_CRITERIA) || fieldName.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) || fieldName.equalsIgnoreCase(RecapConstants.ISSN_CRITERIA))) {
                 String[] fieldValues = fieldValue.split("\\s+");
                 if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
                     stringBuilder.append(parentQuery).append(fieldName).append(":").append(fieldValues[0]);
