@@ -39,25 +39,38 @@ public class SolrQueryBuilder {
         List<String> useRestrictions = searchRecordsRequest.getUseRestrictions();
 
         if (CollectionUtils.isNotEmpty(availability)) {
-            stringBuilder.append(buildQueryForParentGivenChild(RecapConstants.AVAILABILITY, availability, coreParentFilterQuery));
+            stringBuilder.append(buildQueryForFilterGivenChild(RecapConstants.AVAILABILITY, availability));
         }
         if (StringUtils.isNotBlank(stringBuilder.toString()) && CollectionUtils.isNotEmpty(collectionGroupDesignations)) {
-            stringBuilder.append(and).append(buildQueryForParentGivenChild(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations, coreParentFilterQuery));
+            stringBuilder.append(and).append(buildQueryForFilterGivenChild(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations));
         } else if (CollectionUtils.isNotEmpty(collectionGroupDesignations)) {
-            stringBuilder.append(buildQueryForParentGivenChild(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations, coreParentFilterQuery));
+            stringBuilder.append(buildQueryForFilterGivenChild(RecapConstants.COLLECTION_GROUP_DESIGNATION, collectionGroupDesignations));
         }
         if (StringUtils.isNotBlank(stringBuilder.toString()) && CollectionUtils.isNotEmpty(useRestrictions)) {
-            stringBuilder.append(and).append(buildQueryForParentGivenChild(RecapConstants.USE_RESTRICTION, useRestrictions, coreParentFilterQuery));
+            stringBuilder.append(and).append(buildQueryForFilterGivenChild(RecapConstants.USE_RESTRICTION, useRestrictions));
         } else if (CollectionUtils.isNotEmpty(useRestrictions)) {
-            stringBuilder.append(buildQueryForParentGivenChild(RecapConstants.USE_RESTRICTION, useRestrictions, coreParentFilterQuery));
+            stringBuilder.append(buildQueryForFilterGivenChild(RecapConstants.USE_RESTRICTION, useRestrictions));
         }
         stringBuilder
-                .append(and).append(coreParentFilterQuery)
+                .append(and)
                 .append(RecapConstants.IS_DELETED_ITEM).append(":").append(searchRecordsRequest.isDeleted())
-                .append(and).append(coreParentFilterQuery)
+                .append(and)
                 .append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(searchRecordsRequest.getCatalogingStatus());
 
-        return stringBuilder.toString();
+        return coreParentFilterQuery + "(" + stringBuilder.toString() + ")";
+    }
+
+    private String buildQueryForFilterGivenChild(String fieldName, List<String> values) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Iterator<String> iterator = values.iterator(); iterator.hasNext(); ) {
+            String value = iterator.next();
+            stringBuilder.append(fieldName).append(":").append(value);
+            if (iterator.hasNext()) {
+                stringBuilder.append(or);
+            }
+        }
+        return "(" + stringBuilder.toString() + ")";
     }
 
     public String getQueryStringForParentCriteriaForChild(SearchRecordsRequest searchRecordsRequest) {
@@ -175,7 +188,7 @@ public class SolrQueryBuilder {
 
                 if(fieldName.contains(RecapConstants.DATE) && !fieldName.equalsIgnoreCase(RecapConstants.PUBLICATION_DATE)){
                     stringBuilder.append(fieldName).append(":").append("[");
-                    stringBuilder.append(fieldValue).append("]").append(and);
+                    stringBuilder.append(fieldValue).append("]");
                     return stringBuilder.toString();
                 }
 
@@ -183,16 +196,21 @@ public class SolrQueryBuilder {
 
                 if(fieldName.equalsIgnoreCase(RecapConstants.TITLE_STARTS_WITH)) {
                     stringBuilder.append(fieldName).append(":").append("(");
-                    stringBuilder.append("\"").append(fieldValues[0]).append("\"").append(")").append(and);
+                    stringBuilder.append("\"").append(fieldValues[0]).append("\"").append(")");
                 } else {
                     if(fieldValues.length > 1) {
-                        for(String value : fieldValues) {
+                        List<String> fieldValuesList = Arrays.asList(fieldValues);
+                        for (Iterator<String> iterator = fieldValuesList.iterator(); iterator.hasNext(); ) {
+                            String value = iterator.next();
                             stringBuilder.append(fieldName).append(":").append("(").append("\"");
-                            stringBuilder.append(value).append("\"").append(")").append(and);
+                            stringBuilder.append(value).append("\"").append(")");
+                            if (iterator.hasNext()) {
+                                stringBuilder.append(and);
+                            }
                         }
                     } else {
                         stringBuilder.append(fieldName).append(":").append("(");
-                        stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                        stringBuilder.append("\"").append(fieldValue).append("\"").append(")");
                     }
                 }
             } else {
@@ -203,13 +221,13 @@ public class SolrQueryBuilder {
                 if (fieldName.equalsIgnoreCase(RecapConstants.BARCODE)) {
                     String[] fieldValues = fieldValue.split(",");
                     if (ArrayUtils.isNotEmpty(fieldValues)) {
-                        stringBuilder.append(buildQueryForMatchChildReturnParent(fieldName, Arrays.asList(fieldValues))).append(and);
+                        stringBuilder.append(buildQueryForMatchChildReturnParent(fieldName, Arrays.asList(fieldValues)));
                     }
                 }
                 //Check for Bib fields.
                 else {
                     stringBuilder.append(fieldName).append(":").append("(");
-                    stringBuilder.append("\"").append(fieldValue).append("\"").append(")").append(and);
+                    stringBuilder.append("\"").append(fieldValue).append("\"").append(")");
                 }
             }
             return stringBuilder.toString();
@@ -263,19 +281,24 @@ public class SolrQueryBuilder {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-        return new SolrQuery(queryStringForBibCriteria
+        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria
                 + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted()
                 + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + searchRecordsRequest.getCatalogingStatus()
-                + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
+                + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : ""));
+        solrQuery.setFilterQueries(queryStringForItemCriteriaForParent);
+        return solrQuery;
     }
 
     public SolrQuery getQueryForParentAndChildCriteriaForDataDump(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
-        return new SolrQuery(queryStringForBibCriteria + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted() +
-                and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS
-                + and + queryForFieldCriteria + queryStringForItemCriteriaForParent);
+        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria
+                + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted()
+                + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS
+                + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : ""));
+        solrQuery.setFilterQueries(queryStringForItemCriteriaForParent);
+        return solrQuery;
     }
 
     public SolrQuery getQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
@@ -297,10 +320,13 @@ public class SolrQueryBuilder {
             queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate();
             solrQuery = new SolrQuery(queryStringForItemCriteria + and +"("+ ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_SHARED_TO_PRIVATE + "\"" +")")
                     + or + ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_OPEN_TO_PRIVATE +"\"" +")") +")"
-                    + and + queryForFieldCriteria + queryForBibCriteria);//to include items that got changed from shared to private, open to private for deleted export
+                    + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : "")
+                    + (StringUtils.isNotBlank(queryForBibCriteria) ? and + queryForBibCriteria : ""));//to include items that got changed from shared to private, open to private for deleted export
         } else{
             queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
-            solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + queryForFieldCriteria + queryForBibCriteria);
+            solrQuery = new SolrQuery(queryStringForItemCriteria + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted()
+                    + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : "")
+                    + (StringUtils.isNotBlank(queryForBibCriteria) ? and + queryForBibCriteria : ""));
         }
         return solrQuery;
     }
@@ -311,9 +337,8 @@ public class SolrQueryBuilder {
         String queryStringForItemCriteriaForParent = getQueryStringForItemCriteriaForParent(searchRecordsRequest);
         SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria
                 + and + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted()
-                + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + searchRecordsRequest.getCatalogingStatus()
-                + and + queryStringForItemCriteriaForParent);
-        solrQuery.setFilterQueries(countQueryForFieldCriteria);
+                + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + searchRecordsRequest.getCatalogingStatus());
+        solrQuery.setFilterQueries(queryStringForItemCriteriaForParent, countQueryForFieldCriteria);
         return solrQuery;
     }
 
