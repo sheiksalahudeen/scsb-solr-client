@@ -415,6 +415,9 @@ public final class RecapConstants {
     public static final String UPDATECGD = "updateCgd";
     public static final String BATCHJOB = "batchJob";
     public static final String PURGE_EXCEPTION_REQUESTS = "PurgeExceptionRequests";
+    public static final String PENDING = "pending";
+    public static final String ACCESSION_SAVE_SUCCESS_STATUS = "The accession request is successfully processed.";
+    public static final String ACCESSION_SAVE_FAILURE_STATUS = "Failed to process accession request.";
 
     private RecapConstants(){}
 }

@@ -1,5 +1,7 @@
 package org.recap.service.accession;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Record;
@@ -88,6 +90,9 @@ public class AccessionService {
     @Autowired
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
+    @Autowired
+    private AccessionDetailsRepository accessionDetailsRepository;
+
 
     private Map<String,Integer> institutionEntityMap;
 
@@ -162,6 +167,28 @@ public class AccessionService {
             logger.error(RecapConstants.EXCEPTION,e);
         }
         return owningInstitution;
+    }
+
+    /**
+     * This method saves the accession request in database and returns the status message.
+     * @param accessionRequestList
+     * @return
+     */
+    @Transactional
+    public String saveRequest(List<AccessionRequest> accessionRequestList) {
+        String status = null;
+        try {
+            AccessionEntity accessionEntity = new AccessionEntity();
+            accessionEntity.setAccessionRequest(convertJsonToString(accessionRequestList));
+            accessionEntity.setCreatedDate(new Date());
+            accessionEntity.setAccessionStatus(RecapConstants.PENDING);
+            accessionDetailsRepository.save(accessionEntity);
+            status = RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS;
+        } catch (Exception ex) {
+            logger.error(RecapConstants.LOG_ERROR, ex);
+            status = RecapConstants.ACCESSION_SAVE_FAILURE_STATUS + RecapConstants.EXCEPTION_MSG + " : " + ex.getMessage();
+        }
+        return status;
     }
 
     @Transactional
@@ -744,6 +771,22 @@ public class AccessionService {
             }
         }
         return institutionEntityMap;
+    }
+
+    /**
+     * This method converts the json object to string.
+     * @param objJson
+     * @return
+     */
+    private String convertJsonToString(Object objJson) {
+        String strJson = "";
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            strJson = objectMapper.writeValueAsString(objJson);
+        } catch (JsonProcessingException ex) {
+            logger.error(RecapConstants.LOG_ERROR, ex);
+        }
+        return strJson;
     }
 
 }
