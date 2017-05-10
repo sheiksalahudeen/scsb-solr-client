@@ -93,9 +93,9 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
-    @RequestMapping(value = "/accessionImmediate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity accessionImmediate(@RequestBody List<AccessionRequest> accessionRequestList) {
+    public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
         ResponseEntity responseEntity;
         List<AccessionResponse> accessionResponsesList;
         if (accessionRequestList.size() > getInputLimit()) {
