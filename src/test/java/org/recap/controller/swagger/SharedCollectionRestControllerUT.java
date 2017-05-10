@@ -88,7 +88,7 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     }
 
     @Test
-    public void accession() throws Exception {
+    public void accessionBatch() throws Exception {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         AccessionRequest accessionRequest = new AccessionRequest();
         accessionRequest.setCustomerCode("PB");
@@ -97,8 +97,8 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
         Mockito.when(mockedSharedCollectionRestController.getInputLimit()).thenReturn(10);
         Mockito.when(mockedSharedCollectionRestController.getAccessionService().saveRequest(accessionRequestList)).thenReturn(RecapConstants.SUCCESS);
-        Mockito.when(mockedSharedCollectionRestController.accession(accessionRequestList)).thenCallRealMethod();
-        ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
+        Mockito.when(mockedSharedCollectionRestController.accessionBatch(accessionRequestList)).thenCallRealMethod();
+        ResponseEntity responseEntity = mockedSharedCollectionRestController.accessionBatch(accessionRequestList);
         assertNotNull(responseEntity);
         assertEquals(responseEntity.getBody(),RecapConstants.SUCCESS);
     }

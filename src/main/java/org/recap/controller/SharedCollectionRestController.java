@@ -85,9 +85,9 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
-    @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/accessionBatch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
+    public ResponseEntity accessionBatch(@RequestBody List<AccessionRequest> accessionRequestList) {
         String responseMessage = getAccessionService().saveRequest(accessionRequestList);
         ResponseEntity responseEntity = new ResponseEntity(responseMessage, getHttpHeaders(), HttpStatus.OK);
         return responseEntity;
