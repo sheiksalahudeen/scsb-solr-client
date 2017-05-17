@@ -14,10 +14,7 @@ import org.recap.repository.solr.main.DataDumpSolrDocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sudhish on 14/10/16.
@@ -102,6 +99,7 @@ public final class SearchRecordsUtil {
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
                         List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
+                        Set<String> mixedStatus = new HashSet<>();
                         for (Item item : bibItem.getItems()) {
                             if (null != item) {
                                 SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
@@ -114,7 +112,13 @@ public final class SearchRecordsUtil {
                                 searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                                 searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
                                 searchItemResultRows.add(searchItemResultRow);
+                                mixedStatus.add(item.getAvailabilityDisplay());
                                 searchResultRow.setAvailability(item.getAvailabilityDisplay());
+                            }
+                        }
+                        for (String status:mixedStatus){
+                            if (RecapConstants.NOT_AVAILABLE.equals(status) && (mixedStatus.size()==2)){
+                                searchResultRow.setAvailability(RecapConstants.MIXED_STATUS);
                             }
                         }
                         searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
