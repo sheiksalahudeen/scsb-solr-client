@@ -419,5 +419,8 @@ public final class RecapConstants {
     public static final String ACCESSION_SAVE_SUCCESS_STATUS = "The accession request is successfully processed.";
     public static final String ACCESSION_SAVE_FAILURE_STATUS = "Failed to process accession request.";
 
+    public static final String MIXED_STATUS = "MixedStatus";
+
+
     private RecapConstants(){}
 }
