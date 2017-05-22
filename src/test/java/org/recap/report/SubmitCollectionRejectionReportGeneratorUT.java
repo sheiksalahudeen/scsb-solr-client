@@ -30,7 +30,7 @@ public class SubmitCollectionRejectionReportGeneratorUT extends BaseTestCase{
     DateUtil dateUtil;
 
     @Test
-    public void testFSSubmitCollectionExceptionReport() throws InterruptedException {
+    public void testFSSubmitCollectionRejectionReport() throws InterruptedException {
         List<ReportEntity> reportEntityList = saveSubmitCollectionRejectionReport();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
         String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT,RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
@@ -39,7 +39,7 @@ public class SubmitCollectionRejectionReportGeneratorUT extends BaseTestCase{
     }
 
     @Test
-    public void testFTPSubmitCollectionExceptionReport() throws InterruptedException {
+    public void testFTPSubmitCollectionRejectionReport() throws InterruptedException {
         List<ReportEntity> reportEntityList = saveSubmitCollectionRejectionReport();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
         String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT,RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
