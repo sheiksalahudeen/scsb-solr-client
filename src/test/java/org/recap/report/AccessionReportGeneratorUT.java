@@ -6,6 +6,7 @@ import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -25,11 +26,14 @@ public class AccessionReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    @Autowired
+    DateUtil dateUtil;
+
     @Test
     public void testAccessionSummaryReportForFileSystem() throws Exception{
         List<ReportEntity> reportEntityList = saveSummaryReportEntity();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileName);
     }
@@ -38,27 +42,9 @@ public class AccessionReportGeneratorUT extends BaseTestCase{
     public void testAccessionSummaryReportForFTP() throws Exception{
         List<ReportEntity> reportEntityList = saveSummaryReportEntity();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileName);
-    }
-
-    private Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return  cal.getTime();
-    }
-
-    private Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
     }
 
 

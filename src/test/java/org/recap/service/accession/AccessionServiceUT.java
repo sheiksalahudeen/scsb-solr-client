@@ -219,6 +219,27 @@ public class AccessionServiceUT extends BaseTestCase {
         assertTrue(owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON));
     }
 
+    @Test
+    public void saveAndGetAccessionEntity() throws Exception {
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        List<String> barcodes = Arrays.asList("3648483", "39384849", "9293849");
+        for(String barcode : barcodes) {
+            AccessionRequest accessionRequest = new AccessionRequest();
+            accessionRequest.setItemBarcode(barcode);
+            accessionRequest.setCustomerCode("NA");
+            accessionRequestList.add(accessionRequest);
+        }
+        Mockito.when(accessionService.saveRequest(accessionRequestList)).thenReturn(RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
+        String status = accessionService.saveRequest(accessionRequestList);
+        assertEquals(status, RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
+
+        Date accessionDate = new Date();
+        Mockito.when(accessionService.getAccessionRequestByDate(accessionDate)).thenReturn(accessionRequestList);
+        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequestByDate(accessionDate);
+        assertNotNull(accessionRequestByDate);
+        assertEquals(accessionRequestByDate.size(), barcodes.size());
+    }
+
     public BibliographicEntity saveBibSingleHoldingsSingleItem(String itemBarcode,String customerCode, String callnumber,String institution) throws Exception {
         File bibContentFile = getBibContentFile(institution);
         File holdingsContentFile = getHoldingsContentFile(institution);

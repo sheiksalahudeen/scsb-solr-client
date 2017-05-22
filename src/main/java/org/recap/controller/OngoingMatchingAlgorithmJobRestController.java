@@ -41,7 +41,6 @@ public class OngoingMatchingAlgorithmJobRestController {
     @ResponseBody
     private String startMatchingAlgorithmJob(@RequestBody SolrIndexRequest solrIndexRequest) {
         Date date = solrIndexRequest.getCreatedDate();
-        String jobType = solrIndexRequest.getProcessType();
         String status = "";
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -53,11 +52,10 @@ public class OngoingMatchingAlgorithmJobRestController {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         Date toDate = calendar.getTime();
-        if(jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
-            String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(fromDate);
-            SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
-            status = processOngoingMatchingAlgorithm(solrDocumentList);
-        } else if(jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
+        String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(fromDate);
+        SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
+        status = processOngoingMatchingAlgorithm(solrDocumentList);
+        if(RecapConstants.SUCCESS.equalsIgnoreCase(status)) {
             status = matchingBibInfoDetailService.populateMatchingBibInfo(fromDate, toDate);
         }
         return status;

@@ -84,7 +84,7 @@ public class OngoingMatchingAlgorithmUtil {
     }
 
     public String processMatchingForBib(SolrDocument solrDocument) {
-        String status = "Success";
+        String status = RecapConstants.SUCCESS;
         logger.info("Ongoing Matching Started");
         Map<Integer, BibItem> bibItemMap = new HashMap<>();
         List<Integer> itemIds = new ArrayList<>();
@@ -98,7 +98,7 @@ public class OngoingMatchingAlgorithmUtil {
                     itemIds = saveReportAndUpdateCGDForMultiMatch(bibItemMap);
                 } catch (IOException | SolrServerException e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
-                    status = "Failed";
+                    status = RecapConstants.FAILURE;
                 }
             } else if(matchPointString.size() == 1) {
                 // Single Match
@@ -107,7 +107,7 @@ public class OngoingMatchingAlgorithmUtil {
                     itemIds = saveReportAndUpdateCGDForSingleMatch(bibItemMap, matchPointString.iterator().next());
                 } catch (Exception e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
-                    status = "Failed";
+                    status = RecapConstants.FAILURE;
                 }
             } else {
                 logger.info("No Match Found.");

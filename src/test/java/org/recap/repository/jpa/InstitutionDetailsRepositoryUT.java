@@ -6,7 +6,11 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -36,6 +40,15 @@ public class InstitutionDetailsRepositoryUT extends BaseTestCase {
 
         InstitutionEntity byInstitutionName = institutionDetailsRepository.findByInstitutionName("test");
         assertNotNull(byInstitutionName);
+    }
+
+    @Test
+    public void findByInstitutionCodeNotIn() throws Exception {
+        List<InstitutionEntity> institutionEntities = institutionDetailsRepository.findByInstitutionCodeNotIn(Arrays.asList("PUL"));
+        assertNotNull(institutionEntities);
+        for(InstitutionEntity institutionEntity : institutionEntities) {
+            assertNotEquals(institutionEntity.getInstitutionCode(), "PUL");
+        }
     }
 
 }

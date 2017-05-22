@@ -5,11 +5,12 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -23,11 +24,17 @@ public class DeAccessionReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportGenerator reportGenerator;
 
+    @Autowired
+    ReportDetailRepository reportDetailRepository;
+
+    @Autowired
+    DateUtil dateUtil;
+
     @Test
     public void FSDeAccessionReportGenerator() throws InterruptedException {
         List<ReportEntity> reportEntities = getReportEntity();
         Date createdDate = reportEntities.get(0).getCreatedDate();
-        String generatedReportFileNameInFileSyatem = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileNameInFileSyatem = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileNameInFileSyatem);
     }
@@ -36,9 +43,9 @@ public class DeAccessionReportGeneratorUT extends BaseTestCase{
     public void FTPDeAccessionReportGenerator() throws InterruptedException {
         List<ReportEntity> reportEntities = getReportEntity();
         Date createdDate = reportEntities.get(0).getCreatedDate();
-        String generatedReportFileNameInFileSyatem = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileNameInFileSystem = reportGenerator.generateReport(RecapConstants.DEACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.DEACCESSION_SUMMARY_REPORT, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
-        assertNotNull(generatedReportFileNameInFileSyatem);
+        assertNotNull(generatedReportFileNameInFileSystem);
     }
 
     private List<ReportEntity> getReportEntity(){
@@ -48,6 +55,7 @@ public class DeAccessionReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(RecapConstants.DEACCESSION_REPORT);
         reportEntity.setType(RecapConstants.DEACCESSION_SUMMARY_REPORT);
+        reportEntity.setInstitutionName(RecapConstants.PRINCETON);
         reportEntity.setCreatedDate(new Date());
 
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
@@ -59,7 +67,7 @@ public class DeAccessionReportGeneratorUT extends BaseTestCase{
 
         ReportDataEntity owningInstitutionReportDataEntity = new ReportDataEntity();
         owningInstitutionReportDataEntity.setHeaderName(RecapConstants.OWNING_INSTITUTION);
-        owningInstitutionReportDataEntity.setHeaderValue("PUL");
+        owningInstitutionReportDataEntity.setHeaderValue(RecapConstants.PRINCETON);
         reportDataEntities.add(owningInstitutionReportDataEntity);
 
         ReportDataEntity barcodeReportDataEntity = new ReportDataEntity();
@@ -84,25 +92,7 @@ public class DeAccessionReportGeneratorUT extends BaseTestCase{
 
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntities.add(reportEntity);
-        return reportEntities;
-    }
-
-    private Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return  cal.getTime();
-    }
-
-    private Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
+        return reportDetailRepository.save(reportEntities);
     }
 
 }
