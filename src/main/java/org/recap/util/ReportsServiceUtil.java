@@ -57,6 +57,9 @@ public class ReportsServiceUtil {
     @Autowired
     SearchRecordsUtil searchRecordsUtil;
 
+    @Autowired
+    DateUtil dateUtil;
+
 
     public ReportsResponse populateAccessionDeaccessionItemCounts(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -299,8 +302,8 @@ public class ReportsServiceUtil {
         SimpleDateFormat simpleDateFormat = getSimpleDateFormatForReports();
         Date fromDate = simpleDateFormat.parse(requestedFromDate);
         Date toDate = simpleDateFormat.parse(requestedToDate);
-        Date fromDateTime = getFromDate(fromDate);
-        Date toDateTime = getToDate(toDate);
+        Date fromDateTime = dateUtil.getFromDate(fromDate);
+        Date toDateTime = dateUtil.getToDate(toDate);
         String formattedFromDate = getFormattedDateString(fromDateTime);
         String formattedToDate = getFormattedDateString(toDateTime);
         return formattedFromDate + " TO " + formattedToDate;
@@ -308,24 +311,6 @@ public class ReportsServiceUtil {
 
     private SimpleDateFormat getSimpleDateFormatForReports() {
         return new SimpleDateFormat(RecapConstants.SIMPLE_DATE_FORMAT_REPORTS);
-    }
-
-    public Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return cal.getTime();
-    }
-
-    public Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
     }
 
     private String getFormattedDateString(Date inputDate) throws ParseException {

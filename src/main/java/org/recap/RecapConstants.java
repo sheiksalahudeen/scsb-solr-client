@@ -345,6 +345,9 @@ public final class RecapConstants {
     public static final String RECALL = "RECALL";
     public static final String EDD = "EDD";
     public static final String BORROW_DIRECT = "BORROW DIRECT";
+    public static final String TRANSMISSION_TYPE = "TransmissionType";
+    public static final String REPORT_TYPE = "ReportType";
+    public static final String JOB_PARAM_DATA_FILE_NAME = "FileName";
 
 
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";

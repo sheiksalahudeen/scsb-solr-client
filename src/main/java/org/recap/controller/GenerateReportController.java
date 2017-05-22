@@ -4,6 +4,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.report.ReportGenerator;
+import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class GenerateReportController {
 
     @Autowired
     ReportGenerator reportGenerator;
+
+    @Autowired
+    DateUtil dateUtil;
 
     @ResponseBody
     @RequestMapping(value = "/reportGeneration/generateReports", method = RequestMethod.POST)
@@ -61,7 +65,7 @@ public class GenerateReportController {
         }else{
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
         }
-        generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), getFromDate(createdDate), getToDate(toDate));
+        generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), dateUtil.getFromDate(createdDate), dateUtil.getToDate(toDate));
         if(StringUtils.isEmpty(generatedReportFileName)) {
             status = "Report wasn't generated! Please contact help desk!";
         } else {
@@ -70,24 +74,6 @@ public class GenerateReportController {
         stopWatch.stop();
         logger.info("Total time taken to generate File : " + stopWatch.getTotalTimeSeconds());
         return status;
-    }
-
-    public Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return  cal.getTime();
-    }
-
-    public Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
     }
 
 }

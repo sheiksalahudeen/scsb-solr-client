@@ -6,10 +6,10 @@ import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -26,11 +26,14 @@ public class SubmitCollectionExceptionReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
+    @Autowired
+    DateUtil dateUtil;
+
     @Test
     public void testFSSubmitCollectionExceptionReport() throws InterruptedException {
         List<ReportEntity> reportEntityList = saveSubmitCollectionExceptionReport();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT,RecapConstants.FILE_SYSTEM,getFromDate(createdDate),getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT,RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileName);
     }
@@ -39,27 +42,9 @@ public class SubmitCollectionExceptionReportGeneratorUT extends BaseTestCase{
     public void testFTPSubmitCollectionExceptionReport() throws InterruptedException {
         List<ReportEntity> reportEntityList = saveSubmitCollectionExceptionReport();
         Date createdDate = reportEntityList.get(0).getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT,RecapConstants.FTP,getFromDate(createdDate),getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION_REPORT,"PUL", RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT,RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileName);
-    }
-
-    public Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return  cal.getTime();
-    }
-
-    public Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
     }
 
     private List<ReportEntity> saveSubmitCollectionExceptionReport(){

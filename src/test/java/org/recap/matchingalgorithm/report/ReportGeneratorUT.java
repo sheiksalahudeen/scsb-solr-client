@@ -7,13 +7,13 @@ import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.report.ReportGenerator;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +34,9 @@ public class ReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportGenerator reportGenerator;
 
+    @Autowired
+    DateUtil dateUtil;
+
     @Test
     public void testMatchingReportForFileSystem() throws Exception {
         ReportEntity reportEntity1 = saveMatchingReportEntity();
@@ -43,7 +46,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         Date createdDate = reportEntity1.getCreatedDate();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         stopWatch.stop();
         System.out.println("Total Time taken to generate matching report : " + stopWatch.getTotalTimeSeconds());
@@ -58,7 +61,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity2 = saveExceptionReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
@@ -73,7 +76,7 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity3 = saveMatchingReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
@@ -85,28 +88,10 @@ public class ReportGeneratorUT extends BaseTestCase{
         ReportEntity reportEntity2 = saveExceptionReportEntity();
 
         Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FTP, getFromDate(createdDate), getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
 
         assertNotNull(generatedReportFileName);
-    }
-
-    private Date getFromDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return  cal.getTime();
-    }
-
-    private Date getToDate(Date createdDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createdDate);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
     }
 
     private ReportEntity saveExceptionReportEntity() {

@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
 import org.recap.model.BibItemAvailabityStatusRequest;
 import org.recap.model.ItemAvailabilityResponse;
@@ -106,6 +107,23 @@ public class SharedCollectionRestController {
             responseEntity = new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;
+    }
+
+    @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String ongoingAccessionJob(@RequestBody Date accessionDate) {
+        String status;
+        List<AccessionResponse> accessionResponsesList = new ArrayList<>();
+        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequestByDate(accessionDate);
+        if(CollectionUtils.isNotEmpty(accessionRequestList)) {
+            accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
+        }
+        if(CollectionUtils.isNotEmpty(accessionResponsesList)) {
+            status = RecapConstants.SUCCESS;
+        } else {
+            status = RecapConstants.FAILURE;
+        }
+        return status;
     }
 
     private List<AccessionResponse> getAccessionResponses() {

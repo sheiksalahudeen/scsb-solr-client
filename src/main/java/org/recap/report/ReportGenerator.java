@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
@@ -84,6 +84,39 @@ public class ReportGenerator {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         List<ReportEntity> reportEntityList;
+        reportEntityList = getReportEntities(fileName, institutionName, reportType, from, to);
+
+        if(CollectionUtils.isNotEmpty(reportEntityList)) {
+            String actualFileName = fileName;
+            if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
+                actualFileName = fileName+"-"+institutionName;
+            } else if (reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
+                actualFileName = RecapConstants.ONGOING_ACCESSION_REPORT+"-"+institutionName;
+            } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+                actualFileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
+            } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
+                actualFileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
+            }
+
+            stopWatch.stop();
+            logger.info("Total Time taken to fetch Report Entities From DB : {} " , stopWatch.getTotalTimeSeconds());
+            logger.info("Total Num of Report Entities Fetched From DB : {} " , reportEntityList.size());
+
+            for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
+                ReportGeneratorInterface reportGeneratorInterface = iterator.next();
+                if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
+                    String generatedFileName = reportGeneratorInterface.generateReport(actualFileName, reportEntityList);
+                    logger.info("The Generated File Name is : {}" , generatedFileName);
+                    return generatedFileName;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<ReportEntity> getReportEntities(String fileName, String institutionName, String reportType, Date from, Date to) {
+        List<ReportEntity> reportEntityList;
         if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST)) {
             reportEntityList = reportDetailRepository.findByFileLikeAndTypeAndDateRange(fileName, reportType, from, to);
         } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
@@ -91,34 +124,7 @@ public class ReportGenerator {
         } else {
             reportEntityList = reportDetailRepository.findByFileAndInstitutionAndTypeAndDateRange(fileName, institutionName, reportType, from, to);
         }
-
-        String actualFileName = fileName;
-        if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT)){
-            actualFileName = fileName+"-"+institutionName;
-        } else if (reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)){
-            actualFileName = RecapConstants.ONGOING_ACCESSION_REPORT+"-"+institutionName;
-        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
-            actualFileName = RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT+"-"+institutionName;
-        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
-            actualFileName = RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT+"-"+institutionName;
-        } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
-            actualFileName = fileName+"-"+institutionName;
-        }
-
-        stopWatch.stop();
-        logger.info("Total Time taken to fetch Report Entities From DB : {} " , stopWatch.getTotalTimeSeconds());
-        logger.info("Total Num of Report Entities Fetched From DB : {} " , reportEntityList.size());
-
-        for (Iterator<ReportGeneratorInterface> iterator = getReportGenerators().iterator(); iterator.hasNext(); ) {
-            ReportGeneratorInterface reportGeneratorInterface = iterator.next();
-            if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
-                String generatedFileName = reportGeneratorInterface.generateReport(actualFileName, reportEntityList);
-                logger.info("The Generated File Name is : {}" , generatedFileName);
-                return generatedFileName;
-            }
-        }
-
-        return null;
+        return reportEntityList;
     }
 
     public List<ReportGeneratorInterface> getReportGenerators() {

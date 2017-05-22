@@ -88,7 +88,7 @@ public class ReportEntity implements Serializable{
 
     public void addAll(List<ReportDataEntity> reportDataEntities) {
         if(null == getReportDataEntities()){
-            reportDataEntities = new ArrayList<>();
+            this.reportDataEntities = new ArrayList<>();
         }
         this.reportDataEntities.addAll(reportDataEntities);
     }

@@ -1,6 +1,7 @@
 package org.recap.service.accession;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
+import org.recap.util.DateUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +95,8 @@ public class AccessionService {
     @Autowired
     private AccessionDetailsRepository accessionDetailsRepository;
 
+    @Autowired
+    DateUtil dateUtil;
 
     private Map<String,Integer> institutionEntityMap;
 
@@ -189,6 +193,20 @@ public class AccessionService {
             status = RecapConstants.ACCESSION_SAVE_FAILURE_STATUS + RecapConstants.EXCEPTION_MSG + " : " + ex.getMessage();
         }
         return status;
+    }
+
+    public List<AccessionRequest> getAccessionRequestByDate(Date accessionDate) {
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.getAccessionEntityByDate(dateUtil.getFromDate(accessionDate), dateUtil.getToDate(accessionDate));
+        try {
+            for(AccessionEntity accessionEntity : accessionEntityList) {
+                TypeReference<List<AccessionRequest>> typeReference = new TypeReference<List<AccessionRequest>>() {};
+                accessionRequestList.addAll(new ObjectMapper().readValue(accessionEntity.getAccessionRequest(), typeReference));
+            }
+        } catch(Exception e) {
+            logger.error(RecapConstants.LOG_ERROR, e);
+        }
+        return accessionRequestList;
     }
 
     @Transactional
@@ -788,5 +806,4 @@ public class AccessionService {
         }
         return strJson;
     }
-
 }
