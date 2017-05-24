@@ -195,18 +195,31 @@ public class AccessionService {
         return status;
     }
 
-    public List<AccessionRequest> getAccessionRequestByDate(Date accessionDate) {
+    public List<AccessionEntity> getAccessionEntities(Date accessionDate, String accessionStatus) {
+        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.getAccessionEntityByDateAndStatus(dateUtil.getFromDate(accessionDate), dateUtil.getToDate(accessionDate), accessionStatus);
+        return accessionEntityList;
+    }
+
+    public List<AccessionRequest> getAccessionRequestByDate(List<AccessionEntity> accessionEntityList) {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
-        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.getAccessionEntityByDate(dateUtil.getFromDate(accessionDate), dateUtil.getToDate(accessionDate));
-        try {
-            for(AccessionEntity accessionEntity : accessionEntityList) {
-                TypeReference<List<AccessionRequest>> typeReference = new TypeReference<List<AccessionRequest>>() {};
-                accessionRequestList.addAll(new ObjectMapper().readValue(accessionEntity.getAccessionRequest(), typeReference));
+        if(CollectionUtils.isNotEmpty(accessionEntityList)) {
+            try {
+                for(AccessionEntity accessionEntity : accessionEntityList) {
+                    TypeReference<List<AccessionRequest>> typeReference = new TypeReference<List<AccessionRequest>>() {};
+                    accessionRequestList.addAll(new ObjectMapper().readValue(accessionEntity.getAccessionRequest(), typeReference));
+                }
+            } catch(Exception e) {
+                logger.error(RecapConstants.LOG_ERROR, e);
             }
-        } catch(Exception e) {
-            logger.error(RecapConstants.LOG_ERROR, e);
         }
         return accessionRequestList;
+    }
+
+    public void updateStatusForAccessionEntities(List<AccessionEntity> accessionEntities, String status) {
+        for(AccessionEntity accessionEntity : accessionEntities) {
+            accessionEntity.setAccessionStatus(status);
+        }
+        accessionDetailsRepository.save(accessionEntities);
     }
 
     @Transactional
@@ -220,10 +233,14 @@ public class AccessionService {
         for (AccessionRequest accessionRequest : accessionRequestList) {
             owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
             List<ItemEntity> itemEntityList = getItemEntityList(accessionRequest);
+            boolean isItemBarcodeEmpty = isItemBarcodeEmpty(accessionRequest);
             boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
             boolean isDeaccessionedItem = isItemDeaccessioned(itemEntityList);
             AccessionResponse accessionResponse = new AccessionResponse();
-            if (!itemExists) {
+            if(isItemBarcodeEmpty) {
+                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_BARCODE_EMPTY);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_BARCODE_EMPTY));
+            }else if (!itemExists) {
                 if (owningInstitution == null) {
                     setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, accessionRequest.getCustomerCode() + " " + RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
                     reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
@@ -276,6 +293,13 @@ public class AccessionService {
         }
         saveReportEntity(owningInstitution, reportDataEntityList);
         return accessionResponsesList;
+    }
+
+    private boolean isItemBarcodeEmpty(AccessionRequest accessionRequest) {
+        if(StringUtils.isBlank(accessionRequest.getItemBarcode())) {
+            return true;
+        }
+        return false;
     }
 
     private String processAccessionForMarcXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) {
@@ -449,14 +473,18 @@ public class AccessionService {
 
     private List<ReportDataEntity> createReportDataEntityList(AccessionRequest accessionRequest,String response){
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
-        ReportDataEntity reportDataEntityCustomerCode = new ReportDataEntity();
-        reportDataEntityCustomerCode.setHeaderName(RecapConstants.CUSTOMER_CODE);
-        reportDataEntityCustomerCode.setHeaderValue(accessionRequest.getCustomerCode());
-        reportDataEntityList.add(reportDataEntityCustomerCode);
-        ReportDataEntity reportDataEntityItemBarcode = new ReportDataEntity();
-        reportDataEntityItemBarcode.setHeaderName(RecapConstants.ITEM_BARCODE);
-        reportDataEntityItemBarcode.setHeaderValue(accessionRequest.getItemBarcode());
-        reportDataEntityList.add(reportDataEntityItemBarcode);
+        if(StringUtils.isNotBlank(accessionRequest.getCustomerCode())) {
+            ReportDataEntity reportDataEntityCustomerCode = new ReportDataEntity();
+            reportDataEntityCustomerCode.setHeaderName(RecapConstants.CUSTOMER_CODE);
+            reportDataEntityCustomerCode.setHeaderValue(accessionRequest.getCustomerCode());
+            reportDataEntityList.add(reportDataEntityCustomerCode);
+        }
+        if(StringUtils.isNotBlank(accessionRequest.getItemBarcode())) {
+            ReportDataEntity reportDataEntityItemBarcode = new ReportDataEntity();
+            reportDataEntityItemBarcode.setHeaderName(RecapConstants.ITEM_BARCODE);
+            reportDataEntityItemBarcode.setHeaderValue(accessionRequest.getItemBarcode());
+            reportDataEntityList.add(reportDataEntityItemBarcode);
+        }
         ReportDataEntity reportDataEntityMessage = new ReportDataEntity();
         reportDataEntityMessage.setHeaderName(RecapConstants.MESSAGE);
         reportDataEntityMessage.setHeaderValue(response);
