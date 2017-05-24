@@ -7,6 +7,7 @@ import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
+import org.recap.model.jpa.AccessionEntity;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
 import org.slf4j.Logger;
@@ -114,7 +115,8 @@ public class SharedCollectionRestController {
     public String ongoingAccessionJob(@RequestBody Date accessionDate) {
         String status;
         List<AccessionResponse> accessionResponsesList = new ArrayList<>();
-        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequestByDate(accessionDate);
+        List<AccessionEntity> accessionEntities = getAccessionService().getAccessionEntities(accessionDate, RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequestByDate(accessionEntities);
         if(CollectionUtils.isNotEmpty(accessionRequestList)) {
             accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
         }
@@ -123,6 +125,7 @@ public class SharedCollectionRestController {
         } else {
             status = RecapConstants.FAILURE;
         }
+        getAccessionService().updateStatusForAccessionEntities(accessionEntities, RecapConstants.COMPLETE_STATUS);
         return status;
     }
 

@@ -4,10 +4,13 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.AccessionEntity;
+import org.recap.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -18,6 +21,9 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
     @Autowired
     AccessionDetailsRepository accessionDetailsRepository;
 
+    @Autowired
+    DateUtil dateUtil;
+
     @Test
     public void testSaveAccessionRequest() throws Exception {
         AccessionEntity accessionEntity = new AccessionEntity();
@@ -26,5 +32,13 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
         accessionEntity.setAccessionStatus(RecapConstants.PENDING);
         AccessionEntity savedAccessionEntity = accessionDetailsRepository.save(accessionEntity);
         assertNotNull(savedAccessionEntity);
+    }
+
+    @Test
+    public void getAccessionEntityByDateAndStatus() throws Exception {
+        testSaveAccessionRequest();
+        List<AccessionEntity> accessionEntities = accessionDetailsRepository.getAccessionEntityByDateAndStatus(dateUtil.getFromDate(new Date()), dateUtil.getToDate(new Date()), RecapConstants.PENDING);
+        assertNotNull(accessionEntities);
+        assertEquals(accessionEntities.size(), 1);
     }
 }

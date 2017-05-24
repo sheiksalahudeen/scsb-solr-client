@@ -241,6 +241,7 @@ public final class RecapConstants {
     public static final String SEARCH_RESULT_ERROR_INVALID_CHARACTERS="No search results found. Search conditions, has invalid characters (double quotes [\"],open parenthesis [(], backslash [\\], curly braces[{}] and caret [^). Please refine search conditions.";
 
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
+    public static final String ITEM_BARCODE_EMPTY = "Item Barcode is Blank.";
 
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
