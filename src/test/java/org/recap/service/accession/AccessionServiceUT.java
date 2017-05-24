@@ -15,6 +15,7 @@ import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
+import org.recap.model.jpa.AccessionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
@@ -229,13 +230,20 @@ public class AccessionServiceUT extends BaseTestCase {
             accessionRequest.setCustomerCode("NA");
             accessionRequestList.add(accessionRequest);
         }
+        Date accessionDate = new Date();
+        AccessionEntity accessionEntity = new AccessionEntity();
+        accessionEntity.setAccessionStatus("Pending");
+        accessionEntity.setAccessionRequest("Accession Request");
+        accessionEntity.setCreatedDate(accessionDate);
         Mockito.when(accessionService.saveRequest(accessionRequestList)).thenReturn(RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
         String status = accessionService.saveRequest(accessionRequestList);
         assertEquals(status, RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
 
-        Date accessionDate = new Date();
-        Mockito.when(accessionService.getAccessionRequestByDate(accessionDate)).thenReturn(accessionRequestList);
-        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequestByDate(accessionDate);
+        List<AccessionEntity> accessionEntities = Arrays.asList(accessionEntity);
+        Mockito.when(accessionService.getAccessionEntities(accessionDate, RecapConstants.PENDING)).thenReturn(accessionEntities);
+        Mockito.when(accessionService.getAccessionRequestByDate(accessionEntities)).thenReturn(accessionRequestList);
+        List<AccessionEntity> accessionEntityList = accessionService.getAccessionEntities(accessionDate, RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequestByDate(accessionEntityList);
         assertNotNull(accessionRequestByDate);
         assertEquals(accessionRequestByDate.size(), barcodes.size());
     }
