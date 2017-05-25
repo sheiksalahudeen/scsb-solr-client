@@ -2,6 +2,7 @@ package org.recap.util;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.recap.RecapConstants;
@@ -521,4 +522,23 @@ public class SolrQueryBuilder {
     }
 
 
+    public SolrQuery buildSolrQueryForIncompleteReports(String owningInstitution){
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(RecapConstants.DOC_TYPE_ITEM);
+        solrQuery.addFilterQuery(RecapConstants.ITEM_STATUS_INCOMPLETE);
+        solrQuery.addFilterQuery(RecapConstants.ITEM_OWNING_INSTITUTION+":"+owningInstitution);
+        solrQuery.addFilterQuery(RecapConstants.IS_DELETED_ITEM_FALSE);
+        solrQuery.setFields(RecapConstants.ITEM_ID,RecapConstants.BARCODE,RecapConstants.CUSTOMER_CODE,RecapConstants.ITEM_CREATED_DATE,RecapConstants.ITEM_CATALOGING_STATUS,RecapConstants.ITEM_BIB_ID,RecapConstants.ITEM_OWNING_INSTITUTION);
+        return solrQuery;
+    }
+
+    public SolrQuery buildSolrQueryToGetBibDetails(List<Integer> bibIdList,int rows){
+        String bibIds = StringUtils.join(bibIdList, ",");
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(RecapConstants.BIB_DOC_TYPE);
+        solrQuery.setRows(rows);
+        solrQuery.addFilterQuery(RecapConstants.SOLR_BIB_ID+StringEscapeUtils.escapeJava(bibIds).replace(",","\" \""));
+        solrQuery.setFields(RecapConstants.BIB_ID,RecapConstants.TITLE_DISPLAY,RecapConstants.AUTHOR_SEARCH,RecapConstants.AUTHOR_DISPLAY);
+        return solrQuery;
+    }
 }

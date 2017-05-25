@@ -4,17 +4,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
+import org.recap.model.IncompleteReportBibDetails;
 import org.recap.model.jpa.ItemChangeLogEntity;
 import org.recap.model.reports.ReportsRequest;
 import org.recap.model.reports.ReportsResponse;
 import org.recap.model.search.DeaccessionItemResultsRow;
 import org.recap.model.search.IncompleteReportResultsRow;
-import org.recap.model.search.SearchRecordsRequest;
-import org.recap.model.search.SearchResultRow;
 import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.Item;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -150,7 +152,7 @@ public class ReportsServiceUtil {
         SolrDocumentList list = response.getResults();
         for (Iterator<SolrDocument> iterator = list.iterator(); iterator.hasNext(); ) {
             SolrDocument solrDocument = iterator.next();
-             map.put((Integer) solrDocument.getFieldValue(RecapConstants.BIB_ID),(String)solrDocument.getFieldValue(RecapConstants.TITLE_DISPLAY));
+            map.put((Integer) solrDocument.getFieldValue(RecapConstants.BIB_ID),(String)solrDocument.getFieldValue(RecapConstants.TITLE_DISPLAY));
         }
         SimpleDateFormat simpleDateFormat = getSimpleDateFormatForReports();
         List<DeaccessionItemResultsRow> deaccessionItemResultsRowList = new ArrayList<>();
@@ -179,50 +181,80 @@ public class ReportsServiceUtil {
 
     public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
-        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
-        searchRecordsRequest.getCollectionGroupDesignations().add(RecapConstants.CGD_NA);
-        searchRecordsRequest.setFieldName(RecapConstants.ITEM_CATALOGING_STATUS);
-        searchRecordsRequest.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
-        searchRecordsRequest.setPageSize(reportsRequest.getIncompletePageSize());
-        searchRecordsRequest.setSortIncompleteRecords(true);
-        if(!reportsRequest.isExport()){
-            searchRecordsRequest.setPageNumber(reportsRequest.getIncompletePageNumber());
+        SolrQuery solrQuery;
+        QueryResponse queryResponse;
+        SolrDocumentList itemDocumentList;
+        solrQuery = solrQueryBuilder.buildSolrQueryForIncompleteReports(reportsRequest.getIncompleteRequestingInstitution());
+        if (!reportsRequest.isExport()){
+            solrQuery.setStart(reportsRequest.getIncompletePageSize() * reportsRequest.getIncompletePageNumber());
+            solrQuery.setRows(reportsRequest.getIncompletePageSize());
         }
-        searchRecordsRequest.setOwningInstitutions(Arrays.asList(reportsRequest.getIncompleteRequestingInstitution()));
-        List<SearchResultRow> searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
-        if(reportsRequest.isExport()){
-            Integer totalRecordsCount = Integer.valueOf(searchRecordsRequest.getTotalRecordsCount());
-            if (totalRecordsCount > reportsRequest.getIncompletePageSize()) {
-                searchRecordsRequest.setPageSize(totalRecordsCount);
-                searchResultRows = searchRecordsUtil.searchRecords(searchRecordsRequest);
-            }
+        solrQuery.setSort(RecapConstants.ITEM_CREATED_DATE, SolrQuery.ORDER.desc);
+        queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+        itemDocumentList = queryResponse.getResults();
+        long numFound = itemDocumentList.getNumFound();
+        if (reportsRequest.isExport()){
+            solrQuery = solrQueryBuilder.buildSolrQueryForIncompleteReports(reportsRequest.getIncompleteRequestingInstitution());
+            solrQuery.setStart(0);
+            solrQuery.setRows((int) numFound);
+            solrQuery.setSort(RecapConstants.ITEM_CREATED_DATE, SolrQuery.ORDER.desc);
+            queryResponse = solrTemplate.getSolrClient().query(solrQuery);
+            itemDocumentList= queryResponse.getResults();
         }
+        List<Integer> bibIdList = new ArrayList<>();
+        List<Item> itemList = new ArrayList<>();
+        for (SolrDocument itemDocument : itemDocumentList) {
+            Item item = getItem(itemDocument);
+            itemList.add(item);
+            bibIdList.add((Integer)item.getItemBibIdList().get(0));
+        }
+        Map<Integer, IncompleteReportBibDetails> bibDetailsMap = getBibDetailsIncompleteReport(bibIdList);
         List<IncompleteReportResultsRow> incompleteReportResultsRows = new ArrayList<>();
-        for (SearchResultRow searchResultRow : searchResultRows) {
+        for (Item item : itemList) {
             IncompleteReportResultsRow incompleteReportResultsRow = new IncompleteReportResultsRow();
-            incompleteReportResultsRow.setTitle(searchResultRow.getTitle());
-            incompleteReportResultsRow.setOwningInstitution(searchResultRow.getOwningInstitution());
-            incompleteReportResultsRow.setAuthor(searchResultRow.getAuthorSearch());
-            incompleteReportResultsRow.setCreatedDate(getFormattedDates(searchResultRow.getBibCreatedDate()));
-            incompleteReportResultsRow.setCustomerCode(searchResultRow.getCustomerCode());
-            incompleteReportResultsRow.setBarcode(searchResultRow.getBarcode());
+            incompleteReportResultsRow.setOwningInstitution(item.getOwningInstitution());
+            IncompleteReportBibDetails incompleteReportBibDetails = bibDetailsMap.get(item.getItemBibIdList().get(0));
+            if(incompleteReportBibDetails!=null){
+                incompleteReportResultsRow.setTitle(incompleteReportBibDetails.getTitle());
+                incompleteReportResultsRow.setAuthor(incompleteReportBibDetails.getAuthorDisplay());
+            }
+            incompleteReportResultsRow.setCreatedDate(getFormattedDates(item.getItemCreatedDate()));
+            incompleteReportResultsRow.setCustomerCode(item.getCustomerCode());
+            incompleteReportResultsRow.setBarcode(item.getBarcode());
             incompleteReportResultsRows.add(incompleteReportResultsRow);
         }
-        reportsResponse.setIncompletePageNumber(searchRecordsRequest.getPageNumber());
-        reportsResponse.setIncompletePageSize(searchRecordsRequest.getPageSize());
-        reportsResponse.setIncompleteTotalPageCount(searchRecordsRequest.getTotalPageCount());
-        reportsResponse.setIncompleteTotalRecordsCount(searchRecordsRequest.getTotalItemRecordsCount());
+        int totalPagesCount = (int) Math.ceil((double) numFound / (double) reportsRequest.getIncompletePageSize());
+        reportsResponse.setIncompleteTotalPageCount(totalPagesCount);
+        reportsResponse.setIncompleteTotalRecordsCount(String.valueOf(numFound));
         reportsResponse.setIncompleteReportResultsRows(incompleteReportResultsRows);
         return reportsResponse;
     }
 
+    private Map<Integer, IncompleteReportBibDetails> getBibDetailsIncompleteReport(List<Integer> bibIdList) throws SolrServerException, IOException {
+        SolrQuery bibDetailsQuery;
+        QueryResponse bibDetailsResponse;
+        bibDetailsQuery  = solrQueryBuilder.buildSolrQueryToGetBibDetails(bibIdList,bibIdList.size());
+        bibDetailsResponse = solrTemplate.getSolrClient().query(bibDetailsQuery, SolrRequest.METHOD.POST);
+        if(bibIdList.size() != bibDetailsResponse.getResults().getNumFound()){
+            bibDetailsQuery = solrQueryBuilder.buildSolrQueryToGetBibDetails(bibIdList, (int) bibDetailsResponse.getResults().getNumFound());
+            bibDetailsResponse = solrTemplate.getSolrClient().query(bibDetailsQuery, SolrRequest.METHOD.POST);
+        }
+        SolrDocumentList bibDocumentList = bibDetailsResponse.getResults();
+        Map<Integer,IncompleteReportBibDetails> bibDetailsMap = new HashMap<>();
+        for (SolrDocument bibDetail : bibDocumentList) {
+            IncompleteReportBibDetails incompleteReportBibDetails = new IncompleteReportBibDetails();
+            incompleteReportBibDetails.setTitle((String)bibDetail.getFieldValue(RecapConstants.TITLE_DISPLAY));
+            incompleteReportBibDetails.setAuthorDisplay((String)bibDetail.getFieldValue(RecapConstants.AUTHOR_DISPLAY));
+            bibDetailsMap.put((Integer)bibDetail.getFieldValue(RecapConstants.BIB_ID),incompleteReportBibDetails);
+        }
+        return bibDetailsMap;
+    }
+
     private String getFormattedDates(Date gotDate) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.SIMPLE_DATE_FORMAT_REPORTS);
         return simpleDateFormat.format(gotDate);
 
     }
-
-
 
     private void populateAccessionCounts(ReportsRequest reportsRequest, ReportsResponse reportsResponse, String solrFormattedDate) throws Exception {
         for (String owningInstitution : reportsRequest.getOwningInstitutions()) {
@@ -351,6 +383,8 @@ public class ReportsServiceUtil {
             itemValueResolvers.add(new ItemLastUpdatedDateValueResolver());
             itemValueResolvers.add(new ItemBibIdValueResolver());
             itemValueResolvers.add(new ItemLastUpdatedByValueResolver());
+            itemValueResolvers.add(new ItemCreatedDateValueResolver());
+            itemValueResolvers.add(new CustomerCodeValueResolver());
         }
         return itemValueResolvers;
     }
