@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -61,7 +60,7 @@ public class GenerateReportController {
         }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT) || reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT) ){
             fileName = RecapConstants.ACCESSION_REPORT;
         }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
-            fileName = "%"+RecapConstants.SUBMIT_COLLECTION_REPORT+"%";
+            fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
         }else{
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
         }
