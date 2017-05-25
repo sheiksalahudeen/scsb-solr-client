@@ -29,6 +29,9 @@
             <subfield code="a">Dummy</subfield>
             <subfield code="b">Dummy</subfield>
         </datafield>
+        <datafield tag="100" ind1="1" ind2=" ">
+            <subfield code="a">Dummy Author</subfield>
+        </datafield>
         <datafield ind1="0" ind2="0" tag="245">
             <subfield code="a">Dummy Title</subfield>
         </datafield>
@@ -61,7 +64,7 @@
             <subfield code="x">Dummy</subfield>
         </datafield>
         <datafield ind1="1" ind2=" " tag="700">
-            <subfield code="a">Dummy</subfield>
+            <subfield code="a">Dummy Author</subfield>
         </datafield>
         <datafield ind1="2" ind2=" " tag="710">
             <subfield code="a">Dummy</subfield>
