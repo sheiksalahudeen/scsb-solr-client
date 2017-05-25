@@ -425,6 +425,11 @@ public final class RecapConstants {
 
     public static final String MIXED_STATUS = "MixedStatus";
 
+    public static final String DOC_TYPE_ITEM = "DocType:Item";
+    public static final String ITEM_STATUS_INCOMPLETE = "ItemCatalogingStatus:Incomplete";
+    public static final String IS_DELETED_ITEM_FALSE = "IsDeletedItem:false";
+    public static final String ITEM_BIB_ID = "ItemBibId";
+    public static final String AUTHOR_DISPLAY = "Author_display";
 
     private RecapConstants(){}
 }
