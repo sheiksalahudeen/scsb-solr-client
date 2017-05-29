@@ -115,8 +115,8 @@ public class SharedCollectionRestController {
     public String ongoingAccessionJob(@RequestBody Date accessionDate) {
         String status;
         List<AccessionResponse> accessionResponsesList = new ArrayList<>();
-        List<AccessionEntity> accessionEntities = getAccessionService().getAccessionEntities(accessionDate, RecapConstants.PENDING);
-        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequestByDate(accessionEntities);
+        List<AccessionEntity> accessionEntities = getAccessionService().getAccessionEntities(RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequest(accessionEntities);
         if(CollectionUtils.isNotEmpty(accessionRequestList)) {
             accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
         }

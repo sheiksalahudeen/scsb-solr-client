@@ -240,10 +240,10 @@ public class AccessionServiceUT extends BaseTestCase {
         assertEquals(status, RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
 
         List<AccessionEntity> accessionEntities = Arrays.asList(accessionEntity);
-        Mockito.when(accessionService.getAccessionEntities(accessionDate, RecapConstants.PENDING)).thenReturn(accessionEntities);
-        Mockito.when(accessionService.getAccessionRequestByDate(accessionEntities)).thenReturn(accessionRequestList);
-        List<AccessionEntity> accessionEntityList = accessionService.getAccessionEntities(accessionDate, RecapConstants.PENDING);
-        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequestByDate(accessionEntityList);
+        Mockito.when(accessionService.getAccessionEntities(RecapConstants.PENDING)).thenReturn(accessionEntities);
+        Mockito.when(accessionService.getAccessionRequest(accessionEntities)).thenReturn(accessionRequestList);
+        List<AccessionEntity> accessionEntityList = accessionService.getAccessionEntities(RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequest(accessionEntityList);
         assertNotNull(accessionRequestByDate);
         assertEquals(accessionRequestByDate.size(), barcodes.size());
     }

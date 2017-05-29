@@ -14,4 +14,6 @@ public interface AccessionDetailsRepository extends JpaRepository<AccessionEntit
 
     @Query(value = "select * from accession_t where CREATED_DATE between ?1 and ?2 and ACCESSION_STATUS=?3", nativeQuery = true)
     List<AccessionEntity> getAccessionEntityByDateAndStatus(Date fromDate, Date toDate, String status);
+
+    List<AccessionEntity> findByAccessionStatus(String accessionStatus);
 }

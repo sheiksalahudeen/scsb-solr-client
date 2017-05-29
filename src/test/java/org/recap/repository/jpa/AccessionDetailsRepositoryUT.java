@@ -41,4 +41,11 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(accessionEntities);
         assertEquals(accessionEntities.size(), 1);
     }
+
+    @Test
+    public void getAccessionEntityByStatus() throws Exception {
+        testSaveAccessionRequest();
+        List<AccessionEntity> accessionEntities = accessionDetailsRepository.findByAccessionStatus(RecapConstants.PENDING);
+        assertNotNull(accessionEntities);
+    }
 }
