@@ -195,12 +195,12 @@ public class AccessionService {
         return status;
     }
 
-    public List<AccessionEntity> getAccessionEntities(Date accessionDate, String accessionStatus) {
-        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.getAccessionEntityByDateAndStatus(dateUtil.getFromDate(accessionDate), dateUtil.getToDate(accessionDate), accessionStatus);
+    public List<AccessionEntity> getAccessionEntities(String accessionStatus) {
+        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.findByAccessionStatus(accessionStatus);
         return accessionEntityList;
     }
 
-    public List<AccessionRequest> getAccessionRequestByDate(List<AccessionEntity> accessionEntityList) {
+    public List<AccessionRequest> getAccessionRequest(List<AccessionEntity> accessionEntityList) {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(accessionEntityList)) {
             try {

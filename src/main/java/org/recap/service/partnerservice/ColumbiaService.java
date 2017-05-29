@@ -16,7 +16,7 @@ import javax.net.ssl.HostnameVerifier;
 @Service
 public class ColumbiaService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PrincetonService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ColumbiaService.class);
 
     @Value("${ils.columbia.bibdata}")
     String ilsColumbiaBibData;
