@@ -19,14 +19,14 @@ import static org.junit.Assert.*;
 public class OngoingAccessionReportGeneratorUT extends BaseTestCase{
 
     @Test
-    public void testOngoingAccseeionReportGeneration(){
+    public void testOngoingAccessionReportGeneration(){
         OngoingAccessionReportGenerator ongoingAccessionReportGenerator = new OngoingAccessionReportGenerator();
         ReportEntity reportEntity = getReportEntity();
-        List<OngoingAccessionReportRecord> ongoingAccessionReportRecordList = ongoingAccessionReportGenerator.prepareOngoingAccessionReportRecord(reportEntity);
-        assertNotNull(ongoingAccessionReportRecordList);
-        assertEquals(ongoingAccessionReportRecordList.get(0).getCustomerCode(),"PB");
-        assertEquals(ongoingAccessionReportRecordList.get(0).getItemBarcode(),"123");
-        assertEquals(ongoingAccessionReportRecordList.get(0).getMessage(),"Test");
+        OngoingAccessionReportRecord ongoingAccessionReportRecord = ongoingAccessionReportGenerator.prepareOngoingAccessionReportRecord(reportEntity);
+        assertNotNull(ongoingAccessionReportRecord);
+        assertEquals(ongoingAccessionReportRecord.getCustomerCode(),"PB");
+        assertEquals(ongoingAccessionReportRecord.getItemBarcode(),"123");
+        assertEquals(ongoingAccessionReportRecord.getMessage(),"Test");
 
     }
 
