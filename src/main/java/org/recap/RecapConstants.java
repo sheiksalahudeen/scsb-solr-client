@@ -114,6 +114,7 @@ public final class RecapConstants {
 
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
+    public static final String DATE_FORMAT_FOR_REPORT_FILE_NAME = "ddMMMyyyyHHmmss";
 
     public static final String MATCHING_BIB_ID = "BibId";
     public static final String MATCHING_TITLE = "Title";

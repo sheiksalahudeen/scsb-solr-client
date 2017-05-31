@@ -3,6 +3,7 @@ package org.recap.service.accession;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Record;
@@ -97,6 +98,9 @@ public class AccessionService {
 
     @Autowired
     DateUtil dateUtil;
+
+    @Autowired
+    ProducerTemplate producerTemplate;
 
     private Map<String,Integer> institutionEntityMap;
 
@@ -228,10 +232,9 @@ public class AccessionService {
         List<AccessionResponse> accessionResponsesList = new ArrayList<>();
         String bibDataResponse;
         List<Map<String, String>> responseMapList = new ArrayList<>();
-        String owningInstitution = null;
-        List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         for (AccessionRequest accessionRequest : accessionRequestList) {
-            owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
+            List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
+            String owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
             List<ItemEntity> itemEntityList = getItemEntityList(accessionRequest);
             boolean isItemBarcodeEmpty = isItemBarcodeEmpty(accessionRequest);
             boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
@@ -290,8 +293,8 @@ public class AccessionService {
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_ALREADY_ACCESSIONED);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
             }
+            saveReportEntity(owningInstitution, reportDataEntityList);
         }
-        saveReportEntity(owningInstitution, reportDataEntityList);
         return accessionResponsesList;
     }
 
@@ -451,7 +454,7 @@ public class AccessionService {
         ReportEntity reportEntity;
         reportEntity = getReportEntity(owningInstitution!=null ? owningInstitution : RecapConstants.UNKNOWN_INSTITUTION);
         reportEntity.setReportDataEntities(reportDataEntityList);
-        reportDetailRepository.save(reportEntity);
+        producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
     private void setAccessionResponse(List<AccessionResponse> accessionResponseList,AccessionRequest accessionRequest,AccessionResponse accessionResponse, String message){

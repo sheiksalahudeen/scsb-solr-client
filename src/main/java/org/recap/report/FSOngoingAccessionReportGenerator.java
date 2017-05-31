@@ -1,6 +1,7 @@
 package org.recap.report;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
 import org.recap.model.csv.OngoingAccessionReportRecord;
 import org.recap.model.jpa.ReportEntity;
@@ -39,13 +40,15 @@ public class FSOngoingAccessionReportGenerator implements ReportGeneratorInterfa
         List<OngoingAccessionReportRecord> ongoingAccessionReportRecordList = new ArrayList<>();
         OngoingAccessionReportGenerator ongoingAccessionReportGenerator = new OngoingAccessionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            List<OngoingAccessionReportRecord> ongoingAccessionReportRecords = ongoingAccessionReportGenerator.prepareOngoingAccessionReportRecord(reportEntity);
-            ongoingAccessionReportRecordList.addAll(ongoingAccessionReportRecords);
+            ongoingAccessionReportRecordList.add(ongoingAccessionReportGenerator.prepareOngoingAccessionReportRecord(reportEntity));
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FS_ONGOING_ACCESSION_REPORT_Q, ongoingAccessionReportRecordList, "fileName", fileName);
+        if(CollectionUtils.isNotEmpty(ongoingAccessionReportRecordList)) {
+            producerTemplate.sendBodyAndHeader(RecapConstants.FS_ONGOING_ACCESSION_REPORT_Q, ongoingAccessionReportRecordList, "fileName", fileName);
 
-        DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
-        generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
-        return generatedFileName;
+            DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_REPORT_FILE_NAME);
+            generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
+            return generatedFileName;
+        }
+        return null;
     }
 }

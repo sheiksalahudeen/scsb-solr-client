@@ -17,12 +17,12 @@ import java.io.File;
  * Created by hemalathas on 20/12/16.
  */
 @Component
-public class FSOngoinAccessionReportRouteBuilder {
+public class FSOngoingAccessionReportRouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(FSOngoinAccessionReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FSOngoingAccessionReportRouteBuilder.class);
 
     @Autowired
-    public FSOngoinAccessionReportRouteBuilder(CamelContext context, @Value("${ongoing.accession.collection.report.directory}") String reportsDirectory) {
+    public FSOngoingAccessionReportRouteBuilder(CamelContext context, @Value("${ongoing.accession.collection.report.directory}") String reportsDirectory) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override

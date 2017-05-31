@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,17 +22,11 @@ public class OngoingAccessionReportGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OngoingAccessionReportGenerator.class);
 
-    public List<OngoingAccessionReportRecord> prepareOngoingAccessionReportRecord(ReportEntity reportEntity) {
+    public OngoingAccessionReportRecord prepareOngoingAccessionReportRecord(ReportEntity reportEntity) {
 
-        List<OngoingAccessionReportRecord> ongoingAccessionReportRecordList = new ArrayList<>();
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
-        OngoingAccessionReportRecord ongoingAccessionReportRecord = null;
+        OngoingAccessionReportRecord ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
-            if (ongoingAccessionReportRecordList.isEmpty() && ongoingAccessionReportRecord == null) {
-                ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
-            } else if(ongoingAccessionReportRecord.getCustomerCode()!=null && ongoingAccessionReportRecord.getItemBarcode()!=null && ongoingAccessionReportRecord.getMessage()!=null){
-                ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
-            }
             ReportDataEntity report =  iterator.next();
             String headerValue = report.getHeaderValue();
             String headerName = report.getHeaderName();
@@ -44,12 +37,9 @@ public class OngoingAccessionReportGenerator {
                 } catch (Exception e) {
                     logger.error(RecapConstants.EXCEPTION,e);
                 }
-                if(ongoingAccessionReportRecord.getCustomerCode()!=null && ongoingAccessionReportRecord.getItemBarcode()!=null && ongoingAccessionReportRecord.getMessage()!=null) {
-                    ongoingAccessionReportRecordList.add(ongoingAccessionReportRecord);
-                }
             }
         }
-        return ongoingAccessionReportRecordList;
+        return ongoingAccessionReportRecord;
     }
 
     public Method getSetterMethod(String propertyName) {
