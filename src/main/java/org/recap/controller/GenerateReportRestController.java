@@ -73,4 +73,10 @@ public class GenerateReportRestController {
         return status;
     }
 
+    @ResponseBody
+    @RequestMapping(value="/generateSubmitCollectionReport", method = RequestMethod.POST)
+    public String generateSubmitCollectionReport(@RequestBody List<Integer> reportRecordNumberList) {
+       return reportGenerator.generateReportBasedOnReportRecordNum(reportRecordNumberList,RecapConstants.SUBMIT_COLLECTION,RecapConstants.FTP);
+    }
+
 }

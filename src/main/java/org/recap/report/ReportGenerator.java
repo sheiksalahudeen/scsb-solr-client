@@ -1,5 +1,6 @@
 package org.recap.report;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -7,17 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-/**
- * Created by angelind on 23/8/16.
- */
 
 @Component
 public class ReportGenerator {
@@ -79,6 +75,9 @@ public class ReportGenerator {
 
     @Autowired
     FTPOngoingAccessionReportGenerator ftpOngoingAccessionReportGenerator;
+
+    @Autowired
+    FTPSubmitCollectionReportGenerator ftpSubmitCollectionReportGenerator;
 
     public String generateReport(String fileName, String institutionName, String reportType, String transmissionType, Date from, Date to) {
         StopWatch stopWatch = new StopWatch();
@@ -147,7 +146,31 @@ public class ReportGenerator {
             reportGenerators.add(ftpSubmitCollectionSummaryReportGenerator);
             reportGenerators.add(fsOngoingAccessionReportGenerator);
             reportGenerators.add(ftpOngoingAccessionReportGenerator);
+            reportGenerators.add(ftpSubmitCollectionReportGenerator);
         }
         return reportGenerators;
+    }
+
+    /**
+     * Generate report for submit collection in the FTP.
+     *
+     * @param reportRecordNumberList the report record number list
+     * @param reportType             the report type
+     * @param transmissionType       the transmission type
+     * @return the string
+     */
+    public String generateReportBasedOnReportRecordNum(List<Integer> reportRecordNumberList,String reportType,String transmissionType) {
+        String response = null;
+        List<ReportGeneratorInterface> reportGeneratorInterfaces = getReportGenerators();
+        for (ReportGeneratorInterface reportGeneratorInterface : reportGeneratorInterfaces) {
+            if(reportGeneratorInterface.isInterested(reportType) && reportGeneratorInterface.isTransmitted(transmissionType)){
+                 response = reportGeneratorInterface.generateReport(RecapConstants.SUBMIT_COLLECTION, getReportEntityList(reportRecordNumberList));
+            }
+        }
+        return response;
+    }
+
+    private List<ReportEntity> getReportEntityList(List<Integer> reportRecordNumberList) {
+        return reportDetailRepository.findByRecordNumberIn(reportRecordNumberList);
     }
 }
