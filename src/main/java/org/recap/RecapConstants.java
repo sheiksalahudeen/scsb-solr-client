@@ -432,5 +432,9 @@ public final class RecapConstants {
     public static final String ITEM_BIB_ID = "ItemBibId";
     public static final String AUTHOR_DISPLAY = "Author_display";
 
+    public static final String FTP_SUBMIT_COLLECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_REPORT_ID = "ftpSubmitCollectionReportRoute";
+    public static final String SUBMIT_COLLECTION = "SubmitCollectionReport";
+
     private RecapConstants(){}
 }
