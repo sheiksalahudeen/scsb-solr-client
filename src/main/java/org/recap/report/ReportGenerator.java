@@ -152,7 +152,7 @@ public class ReportGenerator {
     }
 
     /**
-     * Generate report for submit collection in the FTP.
+     * Generate submit collection  report to the FTP.
      *
      * @param reportRecordNumberList the report record number list
      * @param reportType             the report type
