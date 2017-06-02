@@ -378,7 +378,7 @@ public final class RecapConstants {
     public static final String DUMMY_HOLDING_CONTENT_XML = "dummyholdingcontent.xml";
     public static final String ONGOING_ACCESSION_LIMIT_EXCEED_MESSAGE = "Input limit exceeded, maximum allowed input limit is ";
     public static final String HYPHEN = " - ";
-    public static final String ITEM_ALREADY_ACCESSIONED = "Item already accessioned";
+    public static final String ITEM_ALREADY_ACCESSIONED = "Item already accessioned - Existing item details : ";
     public static final String INVALID_BOUNDWITH_RECORD = "Bound-with item having invalid data";
 
     public static final String STATUS_DONE="Status  : Done";
@@ -435,6 +435,9 @@ public final class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_REPORT_ID = "ftpSubmitCollectionReportRoute";
     public static final String SUBMIT_COLLECTION = "SubmitCollectionReport";
+    public static final String OWN_INST_BIB_ID = " OwningInstBibId-";
+    public static final String OWN_INST_HOLDING_ID = " OwningInstHoldingId-";
+    public static final String OWN_INST_ITEM_ID = " OwningInstItemId-";
 
     private RecapConstants(){}
 }

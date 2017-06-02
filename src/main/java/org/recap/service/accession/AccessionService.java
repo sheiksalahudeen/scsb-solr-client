@@ -290,8 +290,11 @@ public class AccessionService {
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
                 saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
             } else {
-                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_ALREADY_ACCESSIONED);
-                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_ALREADY_ACCESSIONED));
+                String itemAreadyAccessionedOwnInstBibId = itemEntityList.get(0).getBibliographicEntities() != null ? itemEntityList.get(0).getBibliographicEntities().get(0).getOwningInstitutionBibId() : " ";
+                String itemAreadyAccessionedOwnInstHoldingId = itemEntityList.get(0).getHoldingsEntities() != null ? itemEntityList.get(0).getHoldingsEntities().get(0).getOwningInstitutionHoldingsId() : " ";
+                String itemAreadyAccessionedMessage = RecapConstants.ITEM_ALREADY_ACCESSIONED+RecapConstants.OWN_INST_BIB_ID+itemAreadyAccessionedOwnInstBibId+RecapConstants.OWN_INST_HOLDING_ID+itemAreadyAccessionedOwnInstHoldingId+RecapConstants.OWN_INST_ITEM_ID+itemEntityList.get(0).getOwningInstitutionItemId();
+                setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, itemAreadyAccessionedMessage);
+                reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, itemAreadyAccessionedMessage));
             }
             saveReportEntity(owningInstitution, reportDataEntityList);
         }
