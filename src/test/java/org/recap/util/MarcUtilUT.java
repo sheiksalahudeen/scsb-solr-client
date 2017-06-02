@@ -269,6 +269,7 @@ public class MarcUtilUT {
         Record bibRecord = bibMarcRecord.getBibRecord();
         assertNotNull(bibRecord);
         assertFalse(marcUtil.isSubFieldExists(record, "852"));
+        assertFalse(marcUtil.isSubFieldExists(record, "866"));
         assertFalse(marcUtil.isSubFieldExists(record, "876"));
 
         List<HoldingsMarcRecord> holdingsMarcRecords = bibMarcRecord.getHoldingsMarcRecords();
@@ -279,6 +280,7 @@ public class MarcUtilUT {
         Record holdingsRecord = holdingsMarcRecord.getHoldingsRecord();
         assertNotNull(holdingsRecord);
         assertTrue(marcUtil.isSubFieldExists(holdingsRecord, "852"));
+        assertTrue(marcUtil.isSubFieldExists(holdingsRecord, "866"));
         assertFalse(marcUtil.isSubFieldExists(holdingsRecord, "245"));
         assertFalse(marcUtil.isSubFieldExists(holdingsRecord, "876"));
 

@@ -145,17 +145,16 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                 queryResponse = solrTemplate.getSolrClient().query(solrQueryForBib);
                 solrDocuments = queryResponse.getResults();
             }
+            BibItem bibItem = new BibItem();
             for (Iterator<SolrDocument> iterator = solrDocuments.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
                 String docType = (String) solrDocument.getFieldValue(RecapConstants.DOCTYPE);
-                BibItem bibItem = new BibItem();
                 if (docType.equalsIgnoreCase(RecapConstants.BIB)) {
                     boolean isDeletedBib = (boolean) solrDocument.getFieldValue(RecapConstants.IS_DELETED_BIB);
                     String bibCatalogingStatus = (String) solrDocument.getFieldValue(RecapConstants.BIB_CATALOGING_STATUS);
                     if (isDeletedBib == isDeleted && catalogingStatus.equals(bibCatalogingStatus)) {
                         populateBibItem(solrDocument, bibItem);
                         bibItem.setItems(Arrays.asList(item));
-                        bibItems.add(bibItem);
                     }
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.HOLDINGS)) {
@@ -166,6 +165,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
                     }
                 }
             }
+            bibItems.add(bibItem);
         } catch (IOException|SolrServerException e) {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
