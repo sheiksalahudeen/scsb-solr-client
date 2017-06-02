@@ -168,8 +168,14 @@
             <subfield code="b">rcppa</subfield>
             <subfield code="h">K236 .F38 2017</subfield>
         </datafield>
+        <datafield ind1="0" ind2=" " tag="866">
+            <subfield code="0">9734816</subfield>
+            <subfield code="8">0</subfield>
+            <subfield code="a">Vol1, Vol2</subfield>
+        </datafield>
         <datafield ind1="0" ind2="0" tag="876">
             <subfield code="0">9734816</subfield>
+            <subfield code="3">This is Chron and Enum</subfield>
             <subfield code="a">7453441</subfield>
             <subfield code="h"/>
             <subfield code="j">Not Charged</subfield>
