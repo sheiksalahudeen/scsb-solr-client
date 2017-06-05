@@ -16,9 +16,6 @@ buildscript {
 			url "https://plugins.gradle.org/m2/"
 		}
 	}
-	dependencies {
-		classpath "net.saliman:gradle-cobertura-plugin:2.3.2"
-	}
 }
 
 plugins {
@@ -28,7 +25,6 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
-apply plugin: 'net.saliman.cobertura'
 apply plugin: 'jacoco'
 
 sonarqube {
@@ -106,8 +102,17 @@ eclipse {
 	}
 }
 
-cobertura {
-	coverageFormats = [ 'xml', 'html' ]
+jacoco {
+	toolVersion = "0.7.9"
+	reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+test {
+	jacoco {
+		append = false
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		classDumpFile = file("$buildDir/jacoco/classpathdumps")
+	}
 }
 
 jacocoTestReport {
