@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bibRecords>
+    <bibRecord>
+        <bib>
+            <owningInstitutionId>CUL</owningInstitutionId>
+            <owningInstitutionBibId>12040230</owningInstitutionBibId>
+            <content>
+                <collection xmlns="http://www.loc.gov/MARC21/slim">
+                    <record>
+                        <leader>00319cam a2200109 a 4500</leader>
+                        <controlfield tag="001">12040230</controlfield>
+                        <controlfield tag="003">NNC</controlfield>
+                        <controlfield tag="005">20170502100045.0</controlfield>
+                        <controlfield tag="008">170502s2011    ie ab    b    001 0 eng d</controlfield>
+                        <datafield tag="100" ind1="1" ind2=" ">
+                            <subfield code="a">Lane, Zack.</subfield>
+                        </datafield>
+                        <datafield tag="245" ind1="1" ind2="0">
+                            <subfield code="a">Monographs and life /</subfield>
+                            <subfield code="c">by Zack Lane.</subfield>
+                        </datafield>
+                        <datafield tag="260" ind1=" " ind2=" ">
+                            <subfield code="a">Derry</subfield>
+                            <subfield code="b">Derry University Press,</subfield>
+                            <subfield code="c">2013.</subfield>
+                        </datafield>
+                        <datafield tag="300" ind1=" " ind2=" ">
+                            <subfield code="a">viii, 300 p. :</subfield>
+                            <subfield code="b">ill., ports. ;</subfield>
+                            <subfield code="c">24 cm.</subfield>
+                        </datafield>
+                    </record>
+                </collection>
+            </content>
+        </bib>
+        <holdings>
+            <holding>
+                <owningInstitutionHoldingsId>15064227</owningInstitutionHoldingsId>
+                <content>
+                    <collection xmlns="http://www.loc.gov/MARC21/slim">
+                        <record>
+                            <datafield tag="852" ind1="0" ind2="0">
+                                <subfield code="b">off,glx</subfield>
+                                <subfield code="h">CD98 .D32</subfield>
+                            </datafield>
+                        </record>
+                    </collection>
+                </content>
+                <items>
+                    <content>
+                        <collection xmlns="http://www.loc.gov/MARC21/slim">
+                            <record>
+                                <datafield tag="876" ind1="0" ind2="0">
+                                    <subfield code="a">8967952</subfield>
+                                    <subfield code="h"> </subfield>
+                                    <subfield code="p">CU24049476</subfield>
+                                    <subfield code="t">1</subfield>
+                                </datafield>
+                                <datafield tag="900" ind1="0" ind2="0">
+                                    <subfield code="a">Shared</subfield>
+                                </datafield>
+                            </record>
+                        </collection>
+                    </content>
+                </items>
+            </holding>
+        </holdings>
+    </bibRecord>
+    <bibRecord>
+        <bib>
+            <owningInstitutionId>CUL</owningInstitutionId>
+            <owningInstitutionBibId>12040231</owningInstitutionBibId>
+            <content>
+                <collection xmlns="http://www.loc.gov/MARC21/slim">
+                    <record>
+                        <leader>00331cam a2200109 a 4500</leader>
+                        <controlfield tag="001">12040231</controlfield>
+                        <controlfield tag="003">NNC</controlfield>
+                        <controlfield tag="005">20170502100143.0</controlfield>
+                        <controlfield tag="008">170502s2011    ie ab    b    001 0 eng d</controlfield>
+                        <datafield tag="100" ind1="1" ind2=" ">
+                            <subfield code="a">Lane, Zack.</subfield>
+                        </datafield>
+                        <datafield tag="245" ind1="1" ind2="0">
+                            <subfield code="a">Monographs and fate /</subfield>
+                            <subfield code="c">by Zack Lane.</subfield>
+                        </datafield>
+                        <datafield tag="260" ind1=" " ind2=" ">
+                            <subfield code="a">Londonderry</subfield>
+                            <subfield code="b">Londonderry University Press,</subfield>
+                            <subfield code="c">2014.</subfield>
+                        </datafield>
+                        <datafield tag="300" ind1=" " ind2=" ">
+                            <subfield code="a">viii, 300 p. :</subfield>
+                            <subfield code="b">ill., ports. ;</subfield>
+                            <subfield code="c">24 cm.</subfield>
+                        </datafield>
+                    </record>
+                </collection>
+            </content>
+        </bib>
+        <holdings>
+            <holding>
+                <owningInstitutionHoldingsId>15064228</owningInstitutionHoldingsId>
+                <content>
+                    <collection xmlns="http://www.loc.gov/MARC21/slim">
+                        <record>
+                            <datafield tag="852" ind1="0" ind2="0">
+                                <subfield code="b">off,glx</subfield>
+                                <subfield code="h">CD98 .D32</subfield>
+                            </datafield>
+                        </record>
+                    </collection>
+                </content>
+                <items>
+                    <content>
+                        <collection xmlns="http://www.loc.gov/MARC21/slim">
+                            <record>
+                                <datafield tag="876" ind1="0" ind2="0">
+                                    <subfield code="a">8967952</subfield>
+                                    <subfield code="h"> </subfield>
+                                    <subfield code="p">CU24049476</subfield>
+                                    <subfield code="t">1</subfield>
+                                </datafield>
+                                <datafield tag="900" ind1="0" ind2="0">
+                                    <subfield code="a">Shared</subfield>
+                                </datafield>
+                            </record>
+                        </collection>
+                    </content>
+                </items>
+            </holding>
+        </holdings>
+    </bibRecord>
+</bibRecords>

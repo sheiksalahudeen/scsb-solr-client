@@ -17,9 +17,6 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
-import org.recap.model.marc.BibMarcRecord;
-import org.recap.model.marc.HoldingsMarcRecord;
-import org.recap.model.marc.ItemMarcRecord;
 import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
@@ -97,10 +94,13 @@ public class AccessionService {
     private AccessionDetailsRepository accessionDetailsRepository;
 
     @Autowired
-    DateUtil dateUtil;
+    private DateUtil dateUtil;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
+
+    @Autowired
+    private AccessionValidationService accessionValidationService;
 
     private Map<String,Integer> institutionEntityMap;
 
@@ -320,7 +320,7 @@ public class AccessionService {
         boolean isBoundWithItem = isBoundWithItemForMarcRecord(records);
         boolean isValidBoundWithRecord = true;
         if(isBoundWithItem) {
-            isValidBoundWithRecord = validateBoundWithMarcRecordFromIls(records);
+            isValidBoundWithRecord = accessionValidationService.validateBoundWithMarcRecordFromIls(records);
         }
         if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
             if (CollectionUtils.isNotEmpty(records)) {
@@ -338,40 +338,6 @@ public class AccessionService {
         stopWatch.stop();
         logger.info("Total time taken to save records for accession : {}", stopWatch.getTotalTimeSeconds());
         return response;
-    }
-
-    private boolean validateBoundWithMarcRecordFromIls(List<Record> records){
-        List<String> holdingIdList = new ArrayList<>();
-        for(Record record : records){
-            String holdingId = marcUtil.getDataFieldValue(record,"876","","","0");
-            if(holdingIdList.isEmpty()){
-                holdingIdList.add(holdingId);
-            } else {
-                if(!holdingIdList.contains(holdingId)){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean validateBoundWithScsbRecordFromIls(List<BibRecord> bibRecordList){
-        List<String> holdingIdList = new ArrayList<>();
-        for(BibRecord bibRecord : bibRecordList){
-            BibMarcRecord bibMarcRecord = marcUtil.buildBibMarcRecord(bibRecord);
-            List<HoldingsMarcRecord> holdingsMarcRecords = bibMarcRecord.getHoldingsMarcRecords();
-            List<ItemMarcRecord> itemMarcRecordList = holdingsMarcRecords.get(0).getItemMarcRecordList();
-            Record itemRecord = itemMarcRecordList.get(0).getItemRecord();
-            String holdingId = marcUtil.getDataFieldValue(itemRecord,"876","","","0");
-            if(holdingIdList.isEmpty()){
-                holdingIdList.add(holdingId);
-            } else {
-                if(!holdingIdList.contains(holdingId)){
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private boolean isBoundWithItemForMarcRecord(List<Record> recordList){
@@ -397,7 +363,7 @@ public class AccessionService {
         boolean isBoundWithItem = isBoundWithItemForScsbRecord(bibRecords.getBibRecordList());
         boolean isValidBoundWithRecord = true;
         if(isBoundWithItem) {
-            isValidBoundWithRecord = validateBoundWithScsbRecordFromIls(bibRecords.getBibRecordList());
+            isValidBoundWithRecord = accessionValidationService.validateBoundWithScsbRecordFromIls(bibRecords.getBibRecordList());
         }
         if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
             for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
@@ -533,9 +499,15 @@ public class AccessionService {
                 reportDetailRepository.save(reportEntityList);
             }
             if (bibliographicEntity != null) {
-                BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
-                if (null != savedBibliographicEntity) {
-                    response = indexBibliographicRecord(savedBibliographicEntity.getBibliographicId());
+                StringBuilder errorMessage = new StringBuilder();
+                boolean isValidItem = accessionValidationService.validateItemRecord(bibliographicEntity,errorMessage);
+                if (isValidItem) {
+                    BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
+                    if (null != savedBibliographicEntity) {
+                        response = indexBibliographicRecord(savedBibliographicEntity.getBibliographicId());
+                    }
+                } else {
+                    response = errorMessage.toString();
                 }
             }
         }
