@@ -14,6 +14,12 @@ import java.io.File;
  */
 public class ItemCrudRepositoryMultiCoreSupport extends SimpleSolrRepository<Item, String> {
 
+    /**
+     * This method Instantiates a new item crud repository multi core support.
+     *
+     * @param coreName the core name
+     * @param solrUrl  the solr url
+     */
     public ItemCrudRepositoryMultiCoreSupport(String coreName, String solrUrl) {
 
         SolrTemplate solrTemplate = new SolrTemplate( new HttpSolrClient(solrUrl+ File.separator+coreName));

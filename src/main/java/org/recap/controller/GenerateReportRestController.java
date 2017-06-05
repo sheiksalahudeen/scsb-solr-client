@@ -27,13 +27,13 @@ public class GenerateReportRestController {
     private static final Logger logger = LoggerFactory.getLogger(GenerateReportRestController.class);
 
     @Autowired
-    ReportGenerator reportGenerator;
+    private ReportGenerator reportGenerator;
 
     @Autowired
-    JobParamDetailRepository jobParamDetailRepository;
+    private JobParamDetailRepository jobParamDetailRepository;
 
     @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
 
     @RequestMapping(value = "/generateReports", method = RequestMethod.POST,  consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

@@ -21,6 +21,12 @@ public class FSSubmitCollectionRejectionReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FSSubmitCollectionRejectionReportRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder for generating submit collection rejection report to the file system.
+     *
+     * @param context          the context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public FSSubmitCollectionRejectionReportRouteBuilder(CamelContext context, @Value("${submit.collection.report.directory}") String reportsDirectory) {
         try {

@@ -42,6 +42,13 @@ public class DummyDataService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * This method is used to create dummy record when item barcode is not found in ILS.
+     * @param owningInstitutionId the owning institution id
+     * @param itemBarcode         the item barcode
+     * @param customerCode        the customer code
+     * @return the bibliographic entity
+     */
     public BibliographicEntity createDummyDataAsIncomplete(Integer owningInstitutionId, String itemBarcode, String customerCode) {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();

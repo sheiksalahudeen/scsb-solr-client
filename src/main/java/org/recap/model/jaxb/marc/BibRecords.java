@@ -15,11 +15,21 @@ public class BibRecords implements Serializable {
 
     private List<BibRecord> bibRecordList;
 
+    /**
+     * Gets bib record list.
+     *
+     * @return the bib record list
+     */
     @XmlElement(name = "bibRecord")
     public List<BibRecord> getBibRecordList() {
         return bibRecordList;
     }
 
+    /**
+     * Sets bib record list.
+     *
+     * @param bibRecordList the bib record list
+     */
     public void setBibRecordList(List<BibRecord> bibRecordList) {
         this.bibRecordList = bibRecordList;
     }

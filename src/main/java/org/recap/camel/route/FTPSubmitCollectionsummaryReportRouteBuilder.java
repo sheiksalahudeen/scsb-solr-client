@@ -19,6 +19,18 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate submit collection summary report to the FTP.
+     *
+     * @param context                         the context
+     * @param ftpUserName                     the ftp user name
+     * @param submitCollectionPULFtpLocation  the submit collection pul ftp location
+     * @param submitCollectionCULFtpLocation  the submit collection cul ftp location
+     * @param submitCollectionNYPLFtpLocation the submit collection nypl ftp location
+     * @param culftpRemoteServer              the culftp remote server
+     * @param ftpKnownHost                    the ftp known host
+     * @param ftpPrivateKey                   the ftp private key
+     */
     @Autowired
     public FTPSubmitCollectionsummaryReportRouteBuilder(CamelContext context,
                                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.pul.report}") String submitCollectionPULFtpLocation,

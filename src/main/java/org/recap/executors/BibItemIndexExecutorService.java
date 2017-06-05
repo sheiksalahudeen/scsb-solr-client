@@ -16,19 +16,34 @@ import java.util.concurrent.Callable;
 public class BibItemIndexExecutorService extends IndexExecutorService {
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    HoldingsDetailsRepository holdingsDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
+    /**
+     * Gets the callable class for the thread to process.
+     * @param coreName
+     * @param pageNum
+     * @param docsPerPage
+     * @param owningInstitutionId
+     * @param fromDate
+     * @return
+     */
     @Override
     public Callable getCallable(String coreName, int pageNum, int docsPerPage, Integer owningInstitutionId, Date fromDate) {
         return new BibItemIndexCallable(solrServerProtocol + solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, owningInstitutionId, fromDate, producerTemplate, solrTemplate);
     }
 
+    /**
+     * Gets the total documents count from database by owning institution id or by using from date.
+     * @param owningInstitutionId
+     * @param fromDate
+     * @return
+     */
     @Override
     protected Integer getTotalDocCount(Integer owningInstitutionId, Date fromDate) {
         Long count = 0L;
@@ -44,6 +59,11 @@ public class BibItemIndexExecutorService extends IndexExecutorService {
         return count.intValue();
     }
 
+    /**
+     * This method sets bibliographic details repository.
+     *
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     */
     public void setBibliographicDetailsRepository(BibliographicDetailsRepository bibliographicDetailsRepository) {
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
     }

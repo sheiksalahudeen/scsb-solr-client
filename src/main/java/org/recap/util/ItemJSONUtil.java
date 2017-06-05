@@ -18,10 +18,19 @@ public class ItemJSONUtil extends MarcUtil{
 
     private ProducerTemplate producerTemplate;
 
+    /**
+     * This method instantiates a new item json util.
+     */
     public ItemJSONUtil() {
         //Do Nothing
     }
 
+    /**
+     * This method generates item document to index in solr.
+     *
+     * @param itemEntity the item entity
+     * @return the item
+     */
     public Item generateItemForIndex(ItemEntity itemEntity) {
         try {
             Item item = new Item();
@@ -119,10 +128,20 @@ public class ItemJSONUtil extends MarcUtil{
         getProducerTemplate().sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
+    /**
+     * This method gets producer template.
+     *
+     * @return the producer template
+     */
     public ProducerTemplate getProducerTemplate() {
         return producerTemplate;
     }
 
+    /**
+     * This method sets producer template.
+     *
+     * @param producerTemplate the producer template
+     */
     public void setProducerTemplate(ProducerTemplate producerTemplate) {
         this.producerTemplate = producerTemplate;
     }

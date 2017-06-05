@@ -21,6 +21,12 @@ public class CSVSolrExceptionRecordRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVSolrExceptionRecordRouteBuilder.class);
 
+    /**
+     * This route builder is used to generate solr exception csv report to the file system.
+     *
+     * @param context                  the context
+     * @param matchingReportsDirectory the matching reports directory
+     */
     @Autowired
     public CSVSolrExceptionRecordRouteBuilder(CamelContext context, @Value("${solr.report.directory}") String matchingReportsDirectory) {
         try {

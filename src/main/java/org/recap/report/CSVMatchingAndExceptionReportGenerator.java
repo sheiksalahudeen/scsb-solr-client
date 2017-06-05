@@ -25,20 +25,19 @@ import java.util.List;
 /**
  * Created by angelind on 23/8/16.
  */
-
 @Component
 public class CSVMatchingAndExceptionReportGenerator implements ReportGeneratorInterface{
 
     private static final Logger logger = LoggerFactory.getLogger(CSVMatchingAndExceptionReportGenerator.class);
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    ProducerTemplate producer;
+    private ProducerTemplate producer;
 
     @Autowired
-    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
+    private MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
     @Override
     public boolean isInterested(String reportType) {

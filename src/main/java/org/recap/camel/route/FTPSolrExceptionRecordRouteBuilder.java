@@ -14,12 +14,20 @@ import org.springframework.stereotype.Component;
 /**
  * Created by angelind on 30/9/16.
  */
-
 @Component
 public class FTPSolrExceptionRecordRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FTPSolrExceptionRecordRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate solr exception record to FTP.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FTPSolrExceptionRecordRouteBuilder(CamelContext context,
                                          @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.solr.remote.server}") String ftpRemoteServer,

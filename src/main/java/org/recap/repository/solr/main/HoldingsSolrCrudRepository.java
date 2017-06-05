@@ -13,9 +13,27 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "holdingsSolr", path = "holdingsSolr")
 public interface HoldingsSolrCrudRepository extends SolrCrudRepository<Holdings, String> {
 
+    /**
+     * Finds holdings based on the given holdings id in solr.
+     *
+     * @param holdingsId the holdings id
+     * @return the holdings
+     */
     Holdings findByHoldingsId(Integer holdingsId);
 
+    /**
+     * Deletes holdings based on the given holdings id in solr.
+     *
+     * @param holdingsId the holdings id
+     * @return the int
+     */
     int deleteByHoldingsId(@Param("holdingsId") Integer holdingsId);
 
+    /**
+     * Deletes holdings based on the given list of holdings id in solr.
+     *
+     * @param holdingsIds the holdings ids
+     * @return the int
+     */
     int deleteByHoldingsIdIn(@Param("holdingsIds") List<Integer> holdingsIds);
 }

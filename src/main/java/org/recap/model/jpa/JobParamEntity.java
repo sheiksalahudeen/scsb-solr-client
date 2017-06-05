@@ -24,30 +24,65 @@ public class JobParamEntity implements Serializable{
     @JoinColumn(name = "RECORD_NUM")
     private List<JobParamDataEntity> jobParamDataEntities = new ArrayList<>();
 
+    /**
+     * Gets record number.
+     *
+     * @return the record number
+     */
     public Integer getRecordNumber() {
         return recordNumber;
     }
 
+    /**
+     * Sets record number.
+     *
+     * @param recordNumber the record number
+     */
     public void setRecordNumber(Integer recordNumber) {
         this.recordNumber = recordNumber;
     }
 
+    /**
+     * Gets job name.
+     *
+     * @return the job name
+     */
     public String getJobName() {
         return jobName;
     }
 
+    /**
+     * Sets job name.
+     *
+     * @param jobName the job name
+     */
     public void setJobName(String jobName) {
         this.jobName = jobName;
     }
 
+    /**
+     * Gets job param data entities.
+     *
+     * @return the job param data entities
+     */
     public List<JobParamDataEntity> getJobParamDataEntities() {
         return jobParamDataEntities;
     }
 
+    /**
+     * Sets job param data entities.
+     *
+     * @param jobParamDataEntities the job param data entities
+     */
     public void setJobParamDataEntities(List<JobParamDataEntity> jobParamDataEntities) {
         this.jobParamDataEntities = jobParamDataEntities;
     }
 
+    /**
+     * Add all.
+     *
+     * @param jobParamDataEntities the job param data entities
+     */
     public void addAll(List<JobParamDataEntity> jobParamDataEntities) {
         if(null == getJobParamDataEntities()){
             this.jobParamDataEntities = new ArrayList<>();

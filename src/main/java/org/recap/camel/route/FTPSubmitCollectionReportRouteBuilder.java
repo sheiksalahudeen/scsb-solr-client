@@ -19,6 +19,15 @@ public class FTPSubmitCollectionReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new route builder for submit collection api to generate the file which contains the response for submit collection to the FTP.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FTPSubmitCollectionReportRouteBuilder(CamelContext context,
                                                  @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.report}") String ftpRemoteServer,

@@ -26,7 +26,6 @@ import java.util.concurrent.*;
 /**
  * Created by pvsubrah on 6/13/16.
  */
-
 public abstract class IndexExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexExecutorService.class);
@@ -55,6 +54,11 @@ public abstract class IndexExecutorService {
     @Value("${solr.router.uri.type}")
     String solrRouterURI;
 
+    /**
+     * This method initiates the solr indexing based on the selected owning institution.
+     * @param solrIndexRequest
+     * @return
+     */
     public Integer indexByOwningInstitutionId(SolrIndexRequest solrIndexRequest) {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
@@ -177,10 +181,20 @@ public abstract class IndexExecutorService {
         return totalBibsProcessed;
     }
 
+    /**
+     * This method initiates solr indexing.
+     * @param solrIndexRequest
+     * @return
+     */
     public Integer index(SolrIndexRequest solrIndexRequest) {
         return indexByOwningInstitutionId(solrIndexRequest);
     }
 
+    /**
+     * This method deletes the indexed data from the temporary cores after it is merged to main core.
+     * @param coreNames
+     * @param solrUrl
+     */
     private void deleteTempIndexes(List<String> coreNames, String solrUrl) {
         for (Iterator<String> iterator = coreNames.iterator(); iterator.hasNext(); ) {
             String coreName = iterator.next();
@@ -189,21 +203,54 @@ public abstract class IndexExecutorService {
         }
     }
 
+    /**
+     * To get the bib solr crud repository object based on the given core name for operations on that core.
+     * @param solrUrl
+     * @param coreName
+     * @return
+     */
     protected BibCrudRepositoryMultiCoreSupport getBibCrudRepositoryMultiCoreSupport(String solrUrl, String coreName) {
         return new BibCrudRepositoryMultiCoreSupport(coreName, solrUrl);
     }
 
+    /**
+     * To create names for temporary cores.
+     * @param numThreads
+     * @param coreNames
+     */
     private void setupCoreNames(Integer numThreads, List<String> coreNames) {
         for (int i = 0; i < numThreads; i++) {
             coreNames.add("temp" + i);
         }
     }
 
+    /**
+     * Sets solr admin.
+     *
+     * @param solrAdmin the solr admin
+     */
     public void setSolrAdmin(SolrAdmin solrAdmin) {
         this.solrAdmin = solrAdmin;
     }
 
+    /**
+     * This method gets the appropiate callable to be processed by the thread to generate solr input documents and index to solr.
+     *
+     * @param coreName            the core name
+     * @param pageNum             the page num
+     * @param docsPerpage         the docs perpage
+     * @param owningInstitutionId the owning institution id
+     * @param fromDate            the from date
+     * @return the callable
+     */
     public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, Integer owningInstitutionId, Date fromDate);
 
+    /**
+     * This method gets the total doc count.
+     *
+     * @param owningInstitutionId the owning institution id
+     * @param fromDate            the from date
+     * @return the total doc count
+     */
     protected abstract Integer getTotalDocCount(Integer owningInstitutionId, Date fromDate);
 }

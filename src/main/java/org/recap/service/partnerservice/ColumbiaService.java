@@ -19,8 +19,14 @@ public class ColumbiaService {
     private static final Logger logger = LoggerFactory.getLogger(ColumbiaService.class);
 
     @Value("${ils.columbia.bibdata}")
-    String ilsColumbiaBibData;
+    private String ilsColumbiaBibData;
 
+    /**
+     * This method gets bib data response (marc xml) based on the itemBarcode from ILS for Columbia.
+     *
+     * @param itemBarcode the item barcode
+     * @return the bib data
+     */
     public String getBibData(String itemBarcode) {
         RestTemplate restTemplate = new RestTemplate();
         HostnameVerifier verifier = new NullHostnameVerifier();

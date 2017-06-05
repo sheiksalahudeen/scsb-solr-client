@@ -12,6 +12,12 @@ import java.util.*;
  */
 public class AccessionSummaryRecordGenerator {
 
+    /**
+     * This method is used to prepare accession summary report.
+     *
+     * @param reportEntityList the report entity list
+     * @return the list
+     */
     public List<AccessionSummaryRecord> prepareAccessionSummaryReportRecord(List<ReportEntity> reportEntityList){
         Integer bibSuccessCount = 0;
         Integer itemSuccessCount = 0;

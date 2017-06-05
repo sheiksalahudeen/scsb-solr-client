@@ -21,7 +21,7 @@ import java.util.List;
 public class FSSubmitCollectionExceptionReportGenerator implements ReportGeneratorInterface {
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Override
     public boolean isInterested(String reportType) {

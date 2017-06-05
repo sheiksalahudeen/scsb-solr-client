@@ -37,10 +37,22 @@ public class ItemAvailabilityService {
     @Autowired
     private InstitutionDetailsRepository institutionDetailsRepository;
 
+    /**
+     * This method gets item status by item's barcode and isDeleted field which is false.
+     *
+     * @param barcode the barcode
+     * @return the item status by barcode and is deleted false
+     */
     public String getItemStatusByBarcodeAndIsDeletedFalse(String barcode) {
         return itemDetailsRepository.getItemStatusByBarcodeAndIsDeletedFalse(barcode);
     }
 
+    /**
+     * This method gets item status by item's barcode and isDeleted field which is false.
+     *
+     * @param barcodeList the barcode list
+     * @return the item status by barcode and is deleted false list
+     */
     public List<ItemAvailabilityResponse> getItemStatusByBarcodeAndIsDeletedFalseList(List<String> barcodeList) {
         List<String> barcodes = new ArrayList<>();
         for (String barcode : barcodeList) {
@@ -66,6 +78,12 @@ public class ItemAvailabilityService {
         return itemAvailabilityResponses;
     }
 
+    /**
+     * This method gets bibItem avaiablity status based on the bib item availabity status request.
+     *
+     * @param bibItemAvailabityStatusRequest the bib item availabity status request
+     * @return the item avaiablity status
+     */
     public List<ItemAvailabilityResponse> getbibItemAvaiablityStatus(BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
         List<ItemAvailabilityResponse> itemAvailabilityResponses = new ArrayList<>();
         BibliographicEntity bibliographicEntity;

@@ -16,12 +16,17 @@ import java.io.File;
 /**
  * Created by angelind on 31/8/16.
  */
-
 @Component
 public class CSVSummaryRecordRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVSummaryRecordRouteBuilder.class);
 
+    /**
+     * This route builder is used to generate matching algorithm summary report to the file system.
+     *
+     * @param context                  the context
+     * @param matchingReportsDirectory the matching reports directory
+     */
     @Autowired
     public CSVSummaryRecordRouteBuilder(CamelContext context, @Value("${matching.report.directory}") String matchingReportsDirectory) {
         try {

@@ -70,6 +70,8 @@ public class CollectionType implements Serializable {
      * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link RecordType }
+     *
+     * @return the record
      */
     public List<RecordType> getRecord() {
         if (record == null) {
@@ -78,6 +80,11 @@ public class CollectionType implements Serializable {
         return this.record;
     }
 
+    /**
+     * Sets record.
+     *
+     * @param record the record
+     */
     public void setRecord(List<RecordType> record) {
         this.record = record;
     }
@@ -85,8 +92,7 @@ public class CollectionType implements Serializable {
     /**
      * Gets the value of the id property.
      *
-     * @return possible object is
-     * {@link String }
+     * @return possible object is {@link String }
      */
     public String getId() {
         return id;
@@ -95,13 +101,18 @@ public class CollectionType implements Serializable {
     /**
      * Sets the value of the id property.
      *
-     * @param value allowed object is
-     *              {@link String }
+     * @param value allowed object is              {@link String }
      */
     public void setId(String value) {
         this.id = value;
     }
 
+    /**
+     * Serialize the given object.
+     *
+     * @param object the object
+     * @return the string
+     */
     public String serialize(Object object) {
         String result = null;
         CollectionType collectionType = (CollectionType) object;
@@ -118,6 +129,12 @@ public class CollectionType implements Serializable {
         return result;
     }
 
+    /**
+     * Deserialize the given object.
+     *
+     * @param collectionTypeXml the collection type xml
+     * @return the object
+     */
     public Object deserialize(String collectionTypeXml) {
         CollectionType collectionType = new CollectionType();
         try {

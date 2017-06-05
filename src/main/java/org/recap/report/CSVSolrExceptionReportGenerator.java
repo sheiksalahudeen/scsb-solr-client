@@ -22,17 +22,16 @@ import java.util.List;
 /**
  * Created by angelind on 30/9/16.
  */
-
 @Component
 public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface{
 
     private static final Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    ProducerTemplate producer;
+    private ProducerTemplate producer;
 
     @Override
     public boolean isInterested(String reportType) {

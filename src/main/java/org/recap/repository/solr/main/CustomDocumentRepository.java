@@ -9,7 +9,19 @@ import java.util.Map;
  */
 public interface CustomDocumentRepository {
 
+    /**
+     * This method is used to search records based on the given search records request.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the map
+     */
     Map<String,Object> search(SearchRecordsRequest searchRecordsRequest);
 
+    /**
+     * Gets page number on changing the page size in UI.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the page number on page size change
+     */
     Integer getPageNumberOnPageSizeChange(SearchRecordsRequest searchRecordsRequest);
 }

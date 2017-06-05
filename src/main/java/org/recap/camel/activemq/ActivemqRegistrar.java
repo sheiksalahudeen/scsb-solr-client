@@ -13,9 +13,15 @@ import javax.jms.JMSException;
 /**
  * Created by hemalathas on 17/10/16.
  */
-
 @Component
 public class ActivemqRegistrar {
+    /**
+     * Instantiates a new Activemq registrar to use Activemq instead of Camel's in-memory queue.
+     *
+     * @param camelContext     the camel context
+     * @param defaultBrokerURL the default broker url
+     * @throws JMSException the jms exception
+     */
     @Autowired
     public ActivemqRegistrar(CamelContext camelContext , @Value("${activemq.broker.url}") String defaultBrokerURL) throws JMSException {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(defaultBrokerURL);
