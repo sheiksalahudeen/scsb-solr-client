@@ -164,6 +164,11 @@ public class AccessionService {
         return entityManager;
     }
 
+    /**
+     * This method is used to find the owning institution code based on the customer code parameter value.
+     * @param customerCode
+     * @return
+     */
     public String getOwningInstitution(String customerCode) {
         String owningInstitution = null;
         try {
@@ -199,11 +204,21 @@ public class AccessionService {
         return status;
     }
 
+    /**
+     * This method is used to find the list of accession entity based on the accession status.
+     * @param accessionStatus
+     * @return
+     */
     public List<AccessionEntity> getAccessionEntities(String accessionStatus) {
         List<AccessionEntity> accessionEntityList = accessionDetailsRepository.findByAccessionStatus(accessionStatus);
         return accessionEntityList;
     }
 
+    /**
+     * This method is used to get the accession request for the given accession list.
+     * @param accessionEntityList
+     * @return
+     */
     public List<AccessionRequest> getAccessionRequest(List<AccessionEntity> accessionEntityList) {
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(accessionEntityList)) {
@@ -226,6 +241,12 @@ public class AccessionService {
         accessionDetailsRepository.save(accessionEntities);
     }
 
+    /**
+     * This method is used to process the accession request, where it calls the appropriate partners ils service
+     * and get the xml response which is used to insert record into scsb.
+     * @param accessionRequestList
+     * @return
+     */
     @Transactional
     public List<AccessionResponse> processRequest(List<AccessionRequest> accessionRequestList) {
         String response = null;
@@ -301,6 +322,11 @@ public class AccessionService {
         return accessionResponsesList;
     }
 
+    /**
+     * This method is used to check whether the AccessionRequest's itemBarcode is blank or not.
+     * @param accessionRequest
+     * @return
+     */
     private boolean isItemBarcodeEmpty(AccessionRequest accessionRequest) {
         if(StringUtils.isBlank(accessionRequest.getItemBarcode())) {
             return true;
@@ -308,6 +334,18 @@ public class AccessionService {
         return false;
     }
 
+    /**
+     *This method is used to process and save accession for MarcXML input
+     *
+     * @param accessionResponsesList
+     * @param bibDataResponse
+     * @param responseMapList
+     * @param owningInstitution
+     * @param reportDataEntityList
+     * @param accessionRequest
+     * @param accessionResponse
+     * @return
+     */
     private String processAccessionForMarcXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) {
         StopWatch stopWatch;
         String response = null;
@@ -354,6 +392,18 @@ public class AccessionService {
         return false;
     }
 
+    /**
+     * This method is used to process and save accession for scsb xml format.
+     * @param accessionResponsesList
+     * @param bibDataResponse
+     * @param responseMapList
+     * @param owningInstitution
+     * @param reportDataEntityList
+     * @param accessionRequest
+     * @param accessionResponse
+     * @return
+     * @throws Exception
+     */
     private String processAccessionForSCSBXml(List<AccessionResponse> accessionResponsesList, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest, AccessionResponse accessionResponse) throws Exception {
         String response = null;
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(bibDataResponse, BibRecords.class);
@@ -381,10 +431,20 @@ public class AccessionService {
         return response;
     }
 
+    /**
+     * This method is used to get the ItemEntity based on accessionRequest's barcode and customerCode.
+     * @param accessionRequest
+     * @return
+     */
     private List<ItemEntity> getItemEntityList(AccessionRequest accessionRequest){
         return itemDetailsRepository.findByBarcodeAndCustomerCode(accessionRequest.getItemBarcode(),accessionRequest.getCustomerCode());
     }
 
+    /**
+     * This method is used to check whether the items already exists or not.
+     * @param itemEntityList
+     * @return
+     */
     private boolean checkItemBarcodeAlreadyExist(List<ItemEntity> itemEntityList){
         boolean itemExists = false;
         if (itemEntityList != null && !itemEntityList.isEmpty()) {
@@ -393,6 +453,11 @@ public class AccessionService {
         return itemExists;
     }
 
+    /**
+     * This method is used to return itemEntity's isDeleted status.
+     * @param itemEntityList
+     * @return
+     */
     private boolean isItemDeaccessioned(List<ItemEntity> itemEntityList){
         boolean itemDeleted = false;
         if (itemEntityList != null && !itemEntityList.isEmpty()) {
@@ -403,6 +468,14 @@ public class AccessionService {
         return itemDeleted;
     }
 
+    /**
+     * This method is used to create dummy record if the item barcode is not found.
+     * @param response
+     * @param owningInstitution
+     * @param reportDataEntityList
+     * @param accessionRequest
+     * @param accessionResponse
+     */
     private void createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest,AccessionResponse accessionResponse) {
         String responseString;
         if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
@@ -419,6 +492,11 @@ public class AccessionService {
         }
     }
 
+    /**
+     * This method is used to save the ReportEntity in the database.
+     * @param owningInstitution
+     * @param reportDataEntityList
+     */
     private void saveReportEntity(String owningInstitution, List<ReportDataEntity> reportDataEntityList) {
         ReportEntity reportEntity;
         reportEntity = getReportEntity(owningInstitution!=null ? owningInstitution : RecapConstants.UNKNOWN_INSTITUTION);
@@ -426,6 +504,13 @@ public class AccessionService {
         producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
+    /**
+     * This method is used to set the Accession Response.
+     * @param accessionResponseList
+     * @param accessionRequest
+     * @param accessionResponse
+     * @param message
+     */
     private void setAccessionResponse(List<AccessionResponse> accessionResponseList,AccessionRequest accessionRequest,AccessionResponse accessionResponse, String message){
         if (!accessionResponseList.contains(accessionResponse)) {
             accessionResponse.setItemBarcode(accessionRequest.getItemBarcode());
@@ -443,6 +528,12 @@ public class AccessionService {
         return reportEntity;
     }
 
+    /**
+     * This method is used to create ReportDataEntity based on the accessionRequest.
+     * @param accessionRequest
+     * @param response
+     * @return
+     */
     private List<ReportDataEntity> createReportDataEntityList(AccessionRequest accessionRequest,String response){
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         if(StringUtils.isNotBlank(accessionRequest.getCustomerCode())) {
@@ -478,6 +569,12 @@ public class AccessionService {
         itemChangeLogDetailsRepository.save(itemChangeLogEntityList);
     }
 
+    /**
+     * This method is used to create dummy record for bib in the database and index them in Solr.
+     * @param accessionRequest
+     * @param owningInstitution
+     * @return
+     */
     private String createDummyRecord(AccessionRequest accessionRequest, String owningInstitution) {
         String response;
         Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(owningInstitution);
@@ -487,6 +584,15 @@ public class AccessionService {
         return response;
     }
 
+    /**
+     * This method is used to update the incoming data to the existing bib or create a new bib and save them in database,
+     * Once saved in database they are indexed in Solr.
+     * @param record
+     * @param owningInstitution
+     * @param responseMapList
+     * @param accessionRequest
+     * @return
+     */
     private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest){
         String response = null;
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
@@ -514,6 +620,11 @@ public class AccessionService {
         return response;
     }
 
+    /**
+     * This method is used to index Bibliographic Record in solr and return a response.
+     * @param bibliographicId
+     * @return
+     */
     private String indexBibliographicRecord(Integer bibliographicId) {
         String response;
         getSolrIndexService().indexByBibliographicId(bibliographicId);
@@ -521,6 +632,14 @@ public class AccessionService {
         return response;
     }
 
+    /**
+     * This method is used to generate AccessionSummary Report
+     *
+     * It saves the data in report_t and report_data_t
+     *
+     * @param responseMapList
+     * @param owningInstitution
+     */
     private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
         int successBibCount = 0;
         int successItemCount = 0;
@@ -609,6 +728,11 @@ public class AccessionService {
         getReportDetailRepository().save(reportEntityList);
     }
 
+    /**
+     *This method is used to update bibs if exists or create and save the bibs.
+     * @param bibliographicEntity
+     * @return
+     */
     public BibliographicEntity updateBibliographicEntity(BibliographicEntity bibliographicEntity) {
         BibliographicEntity savedBibliographicEntity=null;
         BibliographicEntity fetchBibliographicEntity = getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
@@ -691,6 +815,11 @@ public class AccessionService {
         return savedBibliographicEntity;
     }
 
+    /**
+     * This method is used to re-accession the item for the item which is de-accessioned.
+     * @param itemEntityList
+     * @return
+     */
     private String reAccessionItem(List<ItemEntity> itemEntityList){
         try {
             for(ItemEntity itemEntity:itemEntityList){
@@ -717,6 +846,11 @@ public class AccessionService {
         return RecapConstants.SUCCESS;
     }
 
+    /**
+     * This method is used to index the re-accessioned item in solr.
+     * @param itemEntityList
+     * @return
+     */
     private String indexReaccessionedItem(List<ItemEntity> itemEntityList){
         try {
             for(ItemEntity itemEntity:itemEntityList){
@@ -732,6 +866,11 @@ public class AccessionService {
         return RecapConstants.SUCCESS;
     }
 
+    /**
+     * This method is used to get the BibliographicEntity from ItemEntity list using item barcode.
+     * @param itemBarcode
+     * @return
+     */
     private BibliographicEntity getBibEntityUsingBarcodeForIncompleteRecord(String itemBarcode){
         List<String> itemBarcodeList = new ArrayList<>();
         itemBarcodeList.add(itemBarcode);

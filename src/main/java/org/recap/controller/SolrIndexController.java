@@ -5,12 +5,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.codehaus.plexus.util.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
-import org.recap.executors.BibIndexExecutorService;
 import org.recap.executors.BibItemIndexExecutorService;
-import org.recap.executors.HoldingsIndexExecutorService;
-import org.recap.executors.ItemIndexExecutorService;
-import org.recap.report.ReportGenerator;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.report.ReportGenerator;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
@@ -40,50 +37,47 @@ public class SolrIndexController {
     private static final Logger logger = LoggerFactory.getLogger(SolrIndexController.class);
 
     @Autowired
-    BibIndexExecutorService bibIndexExecutorService;
+    private BibItemIndexExecutorService bibItemIndexExecutorService;
 
     @Autowired
-    HoldingsIndexExecutorService holdingsIndexExecutorService;
+    private BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
-    ItemIndexExecutorService itemIndexExecutorService;
+    private ItemCrudRepository itemCrudRepository;
 
     @Autowired
-    BibItemIndexExecutorService bibItemIndexExecutorService;
-
-    @Autowired
-    BibSolrCrudRepository bibSolrCrudRepository;
-
-    @Autowired
-    ItemCrudRepository itemCrudRepository;
-
-    @Autowired
-    SolrAdmin solrAdmin;
+    private SolrAdmin solrAdmin;
 
     @Value("${commit.indexes.interval}")
-    public Integer commitIndexesInterval;
+    private Integer commitIndexesInterval;
 
     @Autowired
-    ReportGenerator reportGenerator;
+    private ReportGenerator reportGenerator;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    HoldingsDetailsRepository holdingsDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    SolrIndexService solrIndexService;
+    private SolrIndexService solrIndexService;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Value("${solr.parent.core}")
-    String solrCore;
+    private String solrCore;
 
+    /**
+     * To initialize solr indexing ui page.
+     *
+     * @param model the model
+     * @return the string
+     */
     @RequestMapping("/")
     public String solrIndexer(Model model){
         model.addAttribute("solrIndexRequest",new SolrIndexRequest());
@@ -91,6 +85,15 @@ public class SolrIndexController {
         return "solrIndexer";
     }
 
+    /**
+     * This method is used to perform full index and incremental indexing through ui.
+     *
+     * @param solrIndexRequest the solr index request
+     * @param result           the result
+     * @param model            the model
+     * @return the string
+     * @throws Exception the exception
+     */
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/fullIndex", method = RequestMethod.POST)
     public String fullIndex(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,
@@ -122,12 +125,24 @@ public class SolrIndexController {
         return report(status);
     }
 
+    /**
+     * This method is used to get the status of the report.
+     *
+     * @param status the status
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/report", method = RequestMethod.GET)
     public String report(String status) {
         return StringUtils.isBlank(status) ? "Index process initiated!" : status;
     }
 
+    /**
+     * This method is used to perform indexing by using bibliographic id.
+     *
+     * @param bibliographicIdList the bibliographic id list
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/indexByBibliographicId", method = RequestMethod.POST)
     public String indexByBibliographicId(@RequestBody List<Integer> bibliographicIdList) {
@@ -144,6 +159,12 @@ public class SolrIndexController {
         return response;
     }
 
+    /**
+     * This method is used to delete records by bib,holding and item id.
+     *
+     * @param idMapToRemoveIndex the id map to remove index
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/solrIndexer/deleteByBibHoldingItemId", method = RequestMethod.POST)
     public String deleteByBibHoldingItemId(@RequestBody Map<String,String> idMapToRemoveIndex) {
@@ -163,10 +184,20 @@ public class SolrIndexController {
         return response;
     }
 
+    /**
+     * This method gets solr index service.
+     *
+     * @return the solr index service
+     */
     public SolrIndexService getSolrIndexService() {
         return solrIndexService;
     }
 
+    /**
+     * This method sets solr index service.
+     *
+     * @param solrIndexService the solr index service
+     */
     public void setSolrIndexService(SolrIndexService solrIndexService) {
         this.solrIndexService = solrIndexService;
     }

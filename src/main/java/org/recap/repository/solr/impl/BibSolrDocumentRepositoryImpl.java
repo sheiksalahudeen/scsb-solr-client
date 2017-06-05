@@ -43,7 +43,7 @@ import java.util.*;
 @Repository
 public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
 
-    Logger logger = LoggerFactory.getLogger(BibSolrDocumentRepositoryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BibSolrDocumentRepositoryImpl.class);
 
     @Resource
     private SolrTemplate solrTemplate;
@@ -51,9 +51,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
     @Autowired
     private SolrQueryBuilder solrQueryBuilder;
 
-    List<BibValueResolver> bibValueResolvers;
-    List<ItemValueResolver> itemValueResolvers;
-    List<HoldingsValueResolver> holdingsValueResolvers;
+    private List<BibValueResolver> bibValueResolvers;
+
+    private List<ItemValueResolver> itemValueResolvers;
+
+    private List<HoldingsValueResolver> holdingsValueResolvers;
 
     @Override
     public Map<String,Object> search(SearchRecordsRequest searchRecordsRequest) {
@@ -172,6 +174,13 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibItems;
     }
 
+    /**
+     * Populate item holdings info based on isdeleted flag and item cataloging status.
+     *
+     * @param bibItem          the bib item
+     * @param isDeleted        the is deleted
+     * @param catalogingStatus the cataloging status
+     */
     public void populateItemHoldingsInfo(BibItem bibItem, boolean isDeleted, String catalogingStatus) {
         SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem("_root_:" + bibItem.getRoot());
         QueryResponse queryResponse = null;
@@ -256,6 +265,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return queryResponse.getResults().getNumFound();
     }
 
+    /**
+     * Gets item for the give item solr document.
+     *
+     * @param itemSolrDocument the item solr document
+     * @return the item
+     */
     public Item getItem(SolrDocument itemSolrDocument) {
         Item item = new Item();
         Collection<String> fieldNames = itemSolrDocument.getFieldNames();
@@ -273,6 +288,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return item;
     }
 
+    /**
+     * Gets holdings for the give holdings solr document.
+     *
+     * @param holdingsSolrDocument the holdings solr document
+     * @return the holdings
+     */
     public Holdings getHoldings(SolrDocument holdingsSolrDocument) {
         Holdings holdings = new Holdings();
         Collection<String> fieldNames = holdingsSolrDocument.getFieldNames();
@@ -290,6 +311,12 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return holdings;
     }
 
+    /**
+     * Populate bib item based on input solr document.
+     *
+     * @param solrDocument the solr document
+     * @param bibItem      the bib item
+     */
     public void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
@@ -304,6 +331,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         }
     }
 
+    /**
+     * Gets list of bib value resolvers which is used to set appropriated values in bib .
+     *
+     * @return the bib value resolvers
+     */
     public List<BibValueResolver> getBibValueResolvers() {
         if (null == bibValueResolvers) {
             bibValueResolvers = new ArrayList<>();
@@ -336,6 +368,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return bibValueResolvers;
     }
 
+    /**
+     * Gets list of item value resolvers which is used to set appropriated values in item.
+     *
+     * @return the item value resolvers
+     */
     public List<ItemValueResolver> getItemValueResolvers() {
         if (null == itemValueResolvers) {
             itemValueResolvers = new ArrayList<>();
@@ -360,6 +397,11 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
         return itemValueResolvers;
     }
 
+    /**
+     * Gets list of holdings value resolvers which is used to set appropriated values in holdings.
+     *
+     * @return the holdings value resolvers
+     */
     public List<HoldingsValueResolver> getHoldingsValueResolvers() {
         if(null == holdingsValueResolvers) {
             holdingsValueResolvers = new ArrayList<>();
