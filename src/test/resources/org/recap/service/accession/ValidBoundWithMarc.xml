@@ -1,0 +1,234 @@
+<collection xmlns="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+    <record>
+        <leader>01160cam a2200313 a 4500</leader>
+        <controlfield tag="001">6208904</controlfield>
+        <controlfield tag="005">20100902114410.0</controlfield>
+        <controlfield tag="008">100813s2010 gw b 001 0 ger c</controlfield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(OCoLC)ocn651892648</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(GyWOH)har105017685</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="040">
+            <subfield code="a">OHX</subfield>
+            <subfield code="c">OHX</subfield>
+            <subfield code="d">CGU</subfield>
+            <subfield code="d">HEBIS</subfield>
+            <subfield code="d">NjP</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">9783775218528 (cl.)</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">3775218521 (cl.)</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(OCoLC)651892648</subfield>
+        </datafield>
+        <datafield ind1="0" ind2=" " tag="041">
+            <subfield code="a">ger</subfield>
+            <subfield code="a">lat</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="042">
+            <subfield code="a">pcc</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="4" tag="050">
+            <subfield code="a">DG975.C173</subfield>
+            <subfield code="b">K357 2010</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="4" tag="245">
+            <subfield code="a">Die Kampanische Briefsammlung (Paris lat. 11867) /</subfield>
+            <subfield code="c">herausgegeben von Susanne Tuczek.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="260">
+            <subfield code="a">Hannover :</subfield>
+            <subfield code="b">Hahnsche Buchhandlung,</subfield>
+            <subfield code="c">2010.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="300">
+            <subfield code="a">vi, 351 p. ;</subfield>
+            <subfield code="c">27 cm.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="490">
+            <subfield code="a">
+                Monumenta Germaniae Historica. Briefe des späteren Mittelalters,
+            </subfield>
+            <subfield code="x">0948-9320 ;</subfield>
+            <subfield code="v">2</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="504">
+            <subfield code="a">Includes bibliographical references and indexes.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="651">
+            <subfield code="a">Campania (Italy)</subfield>
+            <subfield code="x">History</subfield>
+            <subfield code="v">Sources.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="651">
+            <subfield code="a">Italy</subfield>
+            <subfield code="x">History</subfield>
+            <subfield code="y">476-1268</subfield>
+            <subfield code="v">Sources.</subfield>
+        </datafield>
+        <datafield ind1="2" ind2="0" tag="610">
+            <subfield code="a">Bibliothèque nationale de France.</subfield>
+            <subfield code="k">Manuscript.</subfield>
+            <subfield code="n">Latin 11867.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="700">
+            <subfield code="a">Tuczek, Susanne.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="830">
+            <subfield code="a">Monumenta Germaniae historica.</subfield>
+            <subfield code="p">Briefe des späteren Mittelalters ;</subfield>
+            <subfield code="v">2.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="902">
+            <subfield code="a">lm</subfield>
+            <subfield code="b">l</subfield>
+            <subfield code="6">a</subfield>
+            <subfield code="7">m</subfield>
+            <subfield code="d">v</subfield>
+            <subfield code="f">1</subfield>
+            <subfield code="e">20100902</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="999">
+            <subfield code="a">6208904</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="866">
+            <subfield code="0">6224132</subfield>
+            <subfield code="x">RECAP TEST BW</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="959">
+            <subfield code="a">2010-09-02 11:45:13 -0400</subfield>
+        </datafield>
+        <datafield ind1="0" ind2=" " tag="852">
+            <subfield code="0">6224132</subfield>
+            <subfield code="b">rcppa</subfield>
+            <subfield code="h">DD3.M8 B74 Bd.1-2</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="0" tag="876">
+            <subfield code="0">6224132</subfield>
+            <subfield code="a">5847716</subfield>
+            <subfield code="h"/>
+            <subfield code="j">Not Charged</subfield>
+            <subfield code="p">32101075852200</subfield>
+            <subfield code="t">1</subfield>
+            <subfield code="x">Shared</subfield>
+            <subfield code="z">PA</subfield>
+        </datafield>
+    </record>
+    <record>
+        <leader>01031cam a2200301 a 4500</leader>
+        <controlfield tag="001">3239725</controlfield>
+        <controlfield tag="005">20130506155710.0</controlfield>
+        <controlfield tag="008">000524s2000 gw 001 0 ger d</controlfield>
+        <datafield ind1=" " ind2=" " tag="020">
+            <subfield code="a">3886120910</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(OCoLC)50503465</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(NBISU)notisAFX9455</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(CStRLIN)MIUGATB1843-B</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="035">
+            <subfield code="a">(CStRLIN)NYBGAFX9455-B</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="040">
+            <subfield code="a">EYM</subfield>
+            <subfield code="c">EYM</subfield>
+            <subfield code="d">NjP</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="043">
+            <subfield code="a">e-gx---</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="100">
+            <subfield code="a">Behaim, Albert,</subfield>
+            <subfield code="d">-1260.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2="4" tag="245">
+            <subfield code="a">Das Brief- und Memorialbuch des Albert Behaim /</subfield>
+            <subfield code="c">herausgegeben von Thomas Frenz und Peter Herde.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="260">
+            <subfield code="a">München :</subfield>
+            <subfield code="b">Monumenta Germaniae Historica,</subfield>
+            <subfield code="c">2000.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="300">
+            <subfield code="a">xvi, 655 p. :</subfield>
+            <subfield code="b">maps ;</subfield>
+            <subfield code="c">28 cm.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="440">
+            <subfield code="a">Monumenta Germaniae historica.</subfield>
+            <subfield code="p">Briefe des späteren Mittelalters ;</subfield>
+            <subfield code="v">1</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="504">
+            <subfield code="a">Includes bibliographical references and index.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2="0" tag="600">
+            <subfield code="a">Behaim, Albert,</subfield>
+            <subfield code="d">-1260.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="651">
+            <subfield code="a">Germany</subfield>
+            <subfield code="x">History</subfield>
+            <subfield code="y">843-1273</subfield>
+            <subfield code="x">Sources.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="700">
+            <subfield code="a">Frenz, Thomas.</subfield>
+        </datafield>
+        <datafield ind1="1" ind2=" " tag="700">
+            <subfield code="a">Herde, Peter.</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="998">
+            <subfield code="s">9115</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="902">
+            <subfield code="a">rph</subfield>
+            <subfield code="c">b</subfield>
+            <subfield code="d">v</subfield>
+            <subfield code="f">1</subfield>
+            <subfield code="s">m</subfield>
+            <subfield code="b">m</subfield>
+            <subfield code="e">20001013</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="904">
+            <subfield code="a">rph</subfield>
+            <subfield code="b">a</subfield>
+            <subfield code="h">m</subfield>
+            <subfield code="c">b</subfield>
+            <subfield code="e">20001013</subfield>
+        </datafield>
+        <datafield ind1=" " ind2="0" tag="866">
+            <subfield code="0">6224132</subfield>
+            <subfield code="x">RECAP TEST BW</subfield>
+        </datafield>
+        <datafield ind1=" " ind2=" " tag="959">
+            <subfield code="a">2010-09-02 11:45:13 -0400</subfield>
+        </datafield>
+        <datafield ind1="0" ind2=" " tag="852">
+            <subfield code="0">6224132</subfield>
+            <subfield code="b">rcppa</subfield>
+            <subfield code="h">DD3.M8 B74 Bd.1-2</subfield>
+        </datafield>
+        <datafield ind1="0" ind2="0" tag="876">
+            <subfield code="0">6224132</subfield>
+            <subfield code="a">5847716</subfield>
+            <subfield code="h"/>
+            <subfield code="j">Not Charged</subfield>
+            <subfield code="p">32101075852200</subfield>
+            <subfield code="t">1</subfield>
+            <subfield code="x">Shared</subfield>
+            <subfield code="z">PA</subfield>
+        </datafield>
+    </record>
+</collection>
