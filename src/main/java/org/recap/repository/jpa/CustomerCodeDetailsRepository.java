@@ -13,7 +13,19 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "customerCode", path = "customerCode")
 public interface CustomerCodeDetailsRepository extends JpaRepository<CustomerCodeEntity, Integer> {
 
+    /**
+     * Find the customer code entity by using the customer code.
+     *
+     * @param customerCode the customer code
+     * @return the customer code entity
+     */
     CustomerCodeEntity findByCustomerCode(@Param("customerCode")String customerCode);
 
+    /**
+     * Find a list of customer code entities by using a list of customer code.
+     *
+     * @param customerCodes the customer codes
+     * @return the list
+     */
     List<CustomerCodeEntity> findByCustomerCodeIn(List<String> customerCodes);
 }

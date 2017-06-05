@@ -17,14 +17,19 @@ import java.util.List;
 /**
  * Created by rajeshbabuk on 15/2/17.
  */
-
 @RestController
 @RequestMapping("/deaccessionInSolrService")
 public class DeaccessionSolrController {
 
     @Autowired
-    DeAccessSolrDocumentService deAccessSolrDocumentService;
+    private DeAccessSolrDocumentService deAccessSolrDocumentService;
 
+    /**
+     * This method is used to update deaccessioned record in solr.
+     *
+     * @param deAccessionSolrRequest the de accession solr request
+     * @return the response entity
+     */
     @RequestMapping(value="/deaccessionInSolr", method = RequestMethod.POST)
     public ResponseEntity deaccessionInSolr(@RequestBody DeAccessionSolrRequest deAccessionSolrRequest) {
         List<Integer> bibIds = deAccessionSolrRequest.getBibIds();

@@ -21,6 +21,12 @@ public class HoldingsJSONUtil extends MarcUtil {
 
     private ProducerTemplate producerTemplate;
 
+    /**
+     * This method is used to generate holdings document to index in solr.
+     *
+     * @param holdingsEntity the holdings entity
+     * @return the holdings
+     */
     public Holdings generateHoldingsForIndex(HoldingsEntity holdingsEntity) {
         try {
             Holdings holdings = new Holdings();
@@ -83,10 +89,20 @@ public class HoldingsJSONUtil extends MarcUtil {
         producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
+    /**
+     * This method gets producer template.
+     *
+     * @return the producer template
+     */
     public ProducerTemplate getProducerTemplate() {
         return producerTemplate;
     }
 
+    /**
+     * This method sets producer template.
+     *
+     * @param producerTemplate the producer template
+     */
     public void setProducerTemplate(ProducerTemplate producerTemplate) {
         this.producerTemplate = producerTemplate;
     }

@@ -42,6 +42,20 @@ public class BibItemIndexCallable implements Callable {
     private ProducerTemplate producerTemplate;
     private SolrTemplate solrTemplate;
 
+    /**
+     * This method instantiates a new bib item index callable.
+     *
+     * @param solrURL                        the solr url
+     * @param coreName                       the core name
+     * @param pageNum                        the page num
+     * @param docsPerPage                    the docs per page
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @param holdingsDetailsRepository      the holdings details repository
+     * @param owningInstitutionId            the owning institution id
+     * @param fromDate                       the from date
+     * @param producerTemplate               the producer template
+     * @param solrTemplate                   the solr template
+     */
     public BibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository, HoldingsDetailsRepository holdingsDetailsRepository, Integer owningInstitutionId, Date fromDate, ProducerTemplate producerTemplate, SolrTemplate solrTemplate) {
         this.coreName = coreName;
         this.solrURL = solrURL;
@@ -55,6 +69,11 @@ public class BibItemIndexCallable implements Callable {
         this.solrTemplate = solrTemplate;
     }
 
+    /**
+     * This method is processed by thread to generate solr input documents and index to solr.
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object call() throws Exception {
 

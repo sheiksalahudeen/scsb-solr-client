@@ -18,10 +18,20 @@ public class Items implements Serializable {
     @XmlElement(required = true, nillable = true)
     protected ContentType content;
 
+    /**
+     * Gets content.
+     *
+     * @return the content
+     */
     public ContentType getContent() {
         return content;
     }
 
+    /**
+     * Sets content.
+     *
+     * @param content the content
+     */
     public void setContent(ContentType content) {
         this.content = content;
     }

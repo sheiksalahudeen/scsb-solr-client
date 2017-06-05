@@ -23,44 +23,74 @@ import java.util.List;
 /**
  * Created by angelind on 10/11/16.
  */
-
 @Component
 public class DeAccessSolrDocumentService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeAccessSolrDocumentService.class);
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    HoldingsDetailsRepository holdingDetailRepository;
+    private HoldingsDetailsRepository holdingDetailRepository;
 
     @Autowired
-    ItemDetailsRepository itemDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
+    /**
+     * Gets bib json util.
+     *
+     * @return the bib json util
+     */
     public BibJSONUtil getBibJSONUtil(){
         return new BibJSONUtil();
     }
 
+    /**
+     * Gets bibliographic details repository.
+     *
+     * @return the bibliographic details repository
+     */
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
         return bibliographicDetailsRepository;
     }
 
+    /**
+     * Gets holding detail repository.
+     *
+     * @return the holding detail repository
+     */
     public HoldingsDetailsRepository getHoldingDetailRepository() {
         return holdingDetailRepository;
     }
 
+    /**
+     * Gets item details repository.
+     *
+     * @return the item details repository
+     */
     public ItemDetailsRepository getItemDetailsRepository() {
         return itemDetailsRepository;
     }
 
+    /**
+     * Gets solr template.
+     *
+     * @return the solr template
+     */
     public SolrTemplate getSolrTemplate() {
         return solrTemplate;
     }
 
+    /**
+     * This method is used to update the documents for IsDeletedBib by using bib id in solr.
+     *
+     * @param bibIds the bib ids
+     * @return the string
+     */
     public String updateIsDeletedBibByBibId(@RequestBody List<Integer> bibIds){
         try{
             for(Integer bibId : bibIds){
@@ -80,6 +110,12 @@ public class DeAccessSolrDocumentService {
         }
     }
 
+    /**
+     * This method is used to update IsDeletedHoldings using holdings id in the solr.
+     *
+     * @param holdingsIds the holdings ids
+     * @return the string
+     */
     public String updateIsDeletedHoldingsByHoldingsId(@RequestBody  List<Integer> holdingsIds){
         try{
             for(Integer holdingsId : holdingsIds){
@@ -107,6 +143,12 @@ public class DeAccessSolrDocumentService {
         }
     }
 
+    /**
+     * This method is used to update IsDeletedItem by using item id in the solr.
+     *
+     * @param itemIds the item ids
+     * @return the string
+     */
     public String updateIsDeletedItemByItemIds(@RequestBody  List<Integer> itemIds){
         try{
             for(Integer itemId : itemIds){

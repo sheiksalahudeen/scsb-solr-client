@@ -21,6 +21,12 @@ public class FSDeAccessionSummaryReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FSDeAccessionSummaryReportRouteBuilder .class);
 
+    /**
+     * This method instantiates a new route builder to generate deaccession summary report to the file system.
+     *
+     * @param context          the context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public FSDeAccessionSummaryReportRouteBuilder(CamelContext context, @Value("${scsb.collection.report.directory}") String reportsDirectory) {
         try {

@@ -19,6 +19,15 @@ public class FTPSummaryRecordRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FTPSummaryRecordRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate summary record for matching algorithm to the FTP.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FTPSummaryRecordRouteBuilder(CamelContext context,
                                          @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.matchingAlgorithm.remote.server}") String ftpRemoteServer,

@@ -14,12 +14,20 @@ import org.springframework.stereotype.Component;
 /**
  * Created by angelind on 23/8/16.
  */
-
 @Component
 public class FTPMatchingRecordRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FTPMatchingRecordRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate matching records from the matching algorithm to the FTP.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FTPMatchingRecordRouteBuilder(CamelContext context,
                                           @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.matchingAlgorithm.remote.server}") String ftpRemoteServer,

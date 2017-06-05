@@ -21,6 +21,12 @@ public class FSAccessionSummaryReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FSAccessionSummaryReportRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate accession summary report to the file system.
+     *
+     * @param context          the context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public FSAccessionSummaryReportRouteBuilder (CamelContext context, @Value("${scsb.collection.report.directory}") String reportsDirectory){
         try {

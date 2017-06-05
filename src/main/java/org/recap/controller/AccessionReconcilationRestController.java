@@ -22,14 +22,21 @@ import java.util.Set;
 /**
  * Created by akulak on 16/5/17.
  */
-
 @RestController
 @RequestMapping("/accessionReconcilationService")
 public class AccessionReconcilationRestController {
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
+    /**
+     * This method is used to start accession reconcilation to find the missing barcodes in scsb.
+     *
+     * @param barcodes the barcodes
+     * @return the set
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     @RequestMapping(method = RequestMethod.POST,value = "/startAccessionReconcilation")
     public Set<String> startAccessionReconcilation(@RequestBody String barcodes) throws IOException, SolrServerException {
         Set<String> missingBarcodes = new HashSet<>();
@@ -44,12 +51,25 @@ public class AccessionReconcilationRestController {
         return missingBarcodes;
     }
 
+    /**
+     * This method is used to find the missing barcodes in scsb.
+     *
+     * @param lasBarcodes
+     * @param queryResponse
+     * @return
+     */
     private Set<String> getDifference(Set<String> lasBarcodes, QueryResponse queryResponse) {
         Set<String> temp = new HashSet<>(lasBarcodes);
         temp.removeAll(queryResponse.getFieldStatsInfo().get(RecapConstants.BARCODE).getDistinctValues());
         return temp;
     }
 
+    /**
+     * This method is used to build the solr query for the given barcode.
+     * @param barcode
+     * @param rows
+     * @return
+     */
     private SolrQuery getSolrQuery(String barcode,int rows) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(RecapConstants.DOC_TYPE_ITEM);

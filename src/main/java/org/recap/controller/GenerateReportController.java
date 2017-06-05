@@ -29,11 +29,19 @@ public class GenerateReportController {
     private static final Logger logger = LoggerFactory.getLogger(GenerateReportController.class);
 
     @Autowired
-    ReportGenerator reportGenerator;
+    private ReportGenerator reportGenerator;
 
     @Autowired
-    DateUtil dateUtil;
+    private DateUtil dateUtil;
 
+    /**
+     * This method is used to generate reports appropriately depending on the report type selected in UI.
+     *
+     * @param solrIndexRequest the solr index request
+     * @param result           the result
+     * @param model            the model
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/reportGeneration/generateReports", method = RequestMethod.POST)
     public String generateReports(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest,

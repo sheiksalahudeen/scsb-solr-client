@@ -26,6 +26,19 @@ public class EmailRouteBuilder {
     private String emailBodyForBatchJob;
     private String emailPassword;
 
+    /**
+     * This method instantiates a new route builder to send email.
+     *
+     * @param context           the context
+     * @param username          the username
+     * @param passwordDirectory the password directory
+     * @param from              the from
+     * @param upadteCgdTo       the update cgd to
+     * @param batchJobTo        the batch job to
+     * @param updateCgdSubject  the update cgd subject
+     * @param batchJobSubject   the batch job subject
+     * @param smtpServer        the smtp server
+     */
     @Autowired
     public EmailRouteBuilder(CamelContext context, @Value("${scsb.email.username}") String username, @Value("${scsb.email.password.file}") String passwordDirectory,
                              @Value("${scsb.email.from}") String from, @Value("${scsb.updateCgd.email.to}") String upadteCgdTo, @Value("${scsb.batch.job.email.to}") String batchJobTo,

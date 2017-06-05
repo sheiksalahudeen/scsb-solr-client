@@ -21,6 +21,12 @@ public class FSOngoingAccessionReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FSOngoingAccessionReportRouteBuilder.class);
 
+    /**
+     * Instantiates a new route builder to generate ongoing accession report to the file system.
+     *
+     * @param context          the context
+     * @param reportsDirectory the reports directory
+     */
     @Autowired
     public FSOngoingAccessionReportRouteBuilder(CamelContext context, @Value("${ongoing.accession.collection.report.directory}") String reportsDirectory) {
         try {

@@ -19,6 +19,15 @@ public class FTPSubmitCollectionExceptionReportRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to generate submit collection exception report to the FTP.
+     *
+     * @param context         the context
+     * @param ftpUserName     the ftp user name
+     * @param ftpRemoteServer the ftp remote server
+     * @param ftpKnownHost    the ftp known host
+     * @param ftpPrivateKey   the ftp private key
+     */
     @Autowired
     public FTPSubmitCollectionExceptionReportRouteBuilder(CamelContext context,
                                                           @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.report}") String ftpRemoteServer,

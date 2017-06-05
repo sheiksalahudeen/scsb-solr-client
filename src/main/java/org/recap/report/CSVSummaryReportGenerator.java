@@ -28,10 +28,10 @@ public class CSVSummaryReportGenerator implements ReportGeneratorInterface{
     private static final Logger logger = LoggerFactory.getLogger(CSVSummaryReportGenerator.class);
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    ProducerTemplate producer;
+    private ProducerTemplate producer;
 
     @Override
     public boolean isInterested(String reportType) {

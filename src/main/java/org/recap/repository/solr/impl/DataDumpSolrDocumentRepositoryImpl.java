@@ -39,8 +39,9 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
 
     private static final Logger logger = LoggerFactory.getLogger(DataDumpSolrDocumentRepositoryImpl.class);
 
-    String and = " AND ";
-    String or = " OR ";
+    private String and = " AND ";
+
+    private String or = " OR ";
 
     @Resource
     private SolrTemplate solrTemplate;
@@ -48,8 +49,9 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
     @Autowired
     private SolrQueryBuilder solrQueryBuilder;
 
-    List<BibValueResolver> bibValueResolvers;
-    List<ItemValueResolver> itemValueResolvers;
+    private List<BibValueResolver> bibValueResolvers;
+
+    private List<ItemValueResolver> itemValueResolvers;
 
     @Override
     public Map<String, Object> search(SearchRecordsRequest searchRecordsRequest) {
@@ -102,6 +104,14 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
+    /**
+     * Search by item for deleted list.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the list
+     * @throws SolrServerException the solr server exception
+     * @throws IOException         the io exception
+     */
     public List<BibItem> searchByItemForDeleted(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
         List<BibItem> onlyDeletedList = searchByItem(searchRecordsRequest,false);
@@ -115,6 +125,15 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
+    /**
+     * Search by items based on the given search request and return bib items.
+     *
+     * @param searchRecordsRequest  the search records request
+     * @param isCGDChangedToPrivate the is cgd changed to private
+     * @return the list
+     * @throws SolrServerException the solr server exception
+     * @throws IOException         the io exception
+     */
     public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest,isCGDChangedToPrivate);
@@ -143,6 +162,12 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibItems;
     }
 
+    /**
+     * Populate item info for the given search request.
+     *
+     * @param bibItems             the bib items
+     * @param searchRecordsRequest the search records request
+     */
     public void populateItemInfo(List<BibItem> bibItems, SearchRecordsRequest searchRecordsRequest) {
 
         String queryStringForMatchParentReturnChild = solrQueryBuilder.getQueryStringForMatchParentReturnChild(searchRecordsRequest);
@@ -224,6 +249,12 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         }
     }
 
+    /**
+     * Populate bib based on the given solr document and bib item.
+     *
+     * @param solrDocument the solr document
+     * @param bibItem      the bib item
+     */
     public void populateBib(SolrDocument solrDocument, BibItem bibItem) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
@@ -259,6 +290,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return null;
     }
 
+    /**
+     * Gets bib value resolvers for data dump.
+     *
+     * @return the bib value resolvers for data dump
+     */
     public List<BibValueResolver> getBibValueResolversForDataDump() {
         if (null == bibValueResolvers) {
             bibValueResolvers = new ArrayList<>();
@@ -271,6 +307,11 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         return bibValueResolvers;
     }
 
+    /**
+     * Gets item value resolvers for data dump.
+     *
+     * @return the item value resolvers for data dump
+     */
     public List<ItemValueResolver> getItemValueResolversForDataDump() {
         if (null == itemValueResolvers) {
             itemValueResolvers = new ArrayList<>();

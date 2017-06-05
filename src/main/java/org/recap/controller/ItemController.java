@@ -19,11 +19,22 @@ import java.util.*;
 public class ItemController {
     private final ItemDetailsRepository itemDetailsRepository;
 
+    /**
+     * This method instantiates a new item controller.
+     *
+     * @param itemDetailsRepository the item details repository
+     */
     @Autowired
     public ItemController(ItemDetailsRepository itemDetailsRepository) {
         this.itemDetailsRepository = itemDetailsRepository;
     }
 
+    /**
+     * This method is used to find a list of items by passing barcodes as parameter.
+     *
+     * @param barcodes the barcodes
+     * @return the list
+     */
     @RequestMapping(method = RequestMethod.GET, value ="/findByBarcodeIn")
     public List<ItemEntity> findByBarcodeIn(String barcodes){
 

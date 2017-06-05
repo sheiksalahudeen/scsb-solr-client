@@ -21,6 +21,12 @@ public class DeAccessionSummaryRecordGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(DeAccessionSummaryRecordGenerator.class);
 
+    /**
+     * Prepare deaccession summary report record.
+     *
+     * @param reportEntity the report entity
+     * @return the de accession summary record
+     */
     public DeAccessionSummaryRecord prepareDeAccessionSummaryReportRecord(ReportEntity reportEntity) {
 
         DeAccessionSummaryRecord deAccessionSummaryRecord = new DeAccessionSummaryRecord();
@@ -41,6 +47,12 @@ public class DeAccessionSummaryRecordGenerator {
         return deAccessionSummaryRecord;
     }
 
+    /**
+     * Gets setter method for report object property.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -51,6 +63,12 @@ public class DeAccessionSummaryRecordGenerator {
         return null;
     }
 
+    /**
+     * Gets getter method for report object property.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

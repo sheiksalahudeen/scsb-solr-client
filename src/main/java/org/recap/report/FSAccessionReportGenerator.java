@@ -19,7 +19,7 @@ import java.util.*;
 public class FSAccessionReportGenerator implements ReportGeneratorInterface{
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Override
     public boolean isInterested(String reportType) {

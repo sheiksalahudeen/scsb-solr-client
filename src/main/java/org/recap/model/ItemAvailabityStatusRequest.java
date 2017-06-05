@@ -7,12 +7,22 @@ import java.util.List;
  */
 public class ItemAvailabityStatusRequest {
 
-    List<String> barcodes;
+    private List<String> barcodes;
 
+    /**
+     * Gets barcodes.
+     *
+     * @return the barcodes
+     */
     public List<String> getBarcodes() {
         return barcodes;
     }
 
+    /**
+     * Sets barcodes.
+     *
+     * @param barcodes the barcodes
+     */
     public void setBarcodes(List<String> barcodes) {
         this.barcodes = barcodes;
     }
