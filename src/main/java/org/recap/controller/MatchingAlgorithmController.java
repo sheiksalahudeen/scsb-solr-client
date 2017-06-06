@@ -35,55 +35,103 @@ public class MatchingAlgorithmController {
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmController.class);
 
     @Autowired
-    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
+    private MatchingAlgorithmHelperService matchingAlgorithmHelperService;
 
     @Autowired
-    ReportGenerator reportGenerator;
+    private ReportGenerator reportGenerator;
 
     @Autowired
-    MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
+    private MatchingAlgorithmUpdateCGDService matchingAlgorithmUpdateCGDService;
 
     @Autowired
-    MatchingBibInfoDetailService matchingBibInfoDetailService;
+    private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @Value("${matching.algorithm.batchSize}")
-    public String matchingAlgoBatchSize;
+    private String matchingAlgoBatchSize;
 
     @Autowired
-    MatchingBibItemIndexExecutorService matchingBibItemIndexExecutorService;
+    private MatchingBibItemIndexExecutorService matchingBibItemIndexExecutorService;
 
+    /**
+     * Gets logger.
+     *
+     * @return the logger
+     */
     public Logger getLogger() {
         return logger;
     }
 
+    /**
+     * Gets matching algorithm helper service.
+     *
+     * @return the matching algorithm helper service
+     */
     public MatchingAlgorithmHelperService getMatchingAlgorithmHelperService() {
         return matchingAlgorithmHelperService;
     }
 
+    /**
+     * Gets report generator.
+     *
+     * @return the report generator
+     */
     public ReportGenerator getReportGenerator() {
         return reportGenerator;
     }
 
+    /**
+     * Sets report generator.
+     *
+     * @param reportGenerator the report generator
+     */
     public void setReportGenerator(ReportGenerator reportGenerator) {
         this.reportGenerator = reportGenerator;
     }
 
+    /**
+     * Gets matching algorithm update cgd service.
+     *
+     * @return the matching algorithm update cgd service
+     */
     public MatchingAlgorithmUpdateCGDService getMatchingAlgorithmUpdateCGDService() {
         return matchingAlgorithmUpdateCGDService;
     }
 
+    /**
+     * Gets matching bib info detail service.
+     *
+     * @return the matching bib info detail service
+     */
     public MatchingBibInfoDetailService getMatchingBibInfoDetailService() {
         return matchingBibInfoDetailService;
     }
 
+    /**
+     * Gets matching algo batch size.
+     *
+     * @return the matching algo batch size
+     */
     public String getMatchingAlgoBatchSize() {
         return matchingAlgoBatchSize;
     }
 
+    /**
+     * Gets matching bib item index executor service.
+     *
+     * @return the matching bib item index executor service
+     */
     public MatchingBibItemIndexExecutorService getMatchingBibItemIndexExecutorService() {
         return matchingBibItemIndexExecutorService;
     }
 
+    /**
+     * Matching algorithm.
+     * First it finds the matching records and updates them in the database (matching_matchpoints_t)
+     * Second it gets the matching records details and saves them in database
+     * Then it generates reports for single match and multiple-match(based on criterias) accordingly
+     *
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/full", method = RequestMethod.POST)
     public String matchingAlgorithmFull() {
@@ -115,6 +163,11 @@ public class MatchingAlgorithmController {
         return stringBuilder.toString();
     }
 
+    /**
+     * This method is used for processing reports from the matching bib details .
+     *
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/reports", method = RequestMethod.POST)
     public String matchingAlgorithmOnlyReports() {
@@ -134,6 +187,11 @@ public class MatchingAlgorithmController {
         return stringBuilder.toString();
     }
 
+    /**
+     * This method is used to update cgd in database.
+     *
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/updateCGDInDB", method = RequestMethod.POST)
     public String updateCGDInDB() {
@@ -153,6 +211,12 @@ public class MatchingAlgorithmController {
         return stringBuilder.toString();
     }
 
+    /**
+     * This mehtod is used to update cgd in solr.
+     *
+     * @param matchingAlgoDate the matching algo date
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/updateCGDInSolr", method = RequestMethod.POST)
     public String updateCGDInSolr(@Valid @ModelAttribute("matchingAlgoDate") String matchingAlgoDate) {
@@ -183,6 +247,11 @@ public class MatchingAlgorithmController {
         return stringBuilder.toString();
     }
 
+    /**
+     * This method is used to populate matching institution bibid information for data dump.
+     *
+     * @return the string
+     */
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/populateDataForDataDump", method = RequestMethod.POST)
     public String populateDataForDataDump(){
@@ -259,7 +328,12 @@ public class MatchingAlgorithmController {
         matchingAlgorithmHelperService.saveMatchingSummaryCount(pulMatchingCount, culMatchingCount, nyplMatchingCount);
     }
 
-    // Added to produce the Summary of serial Item count which came under Matching Algorithm
+    /**
+     * This method is used to count items for serials.
+     *
+     * @return the string
+     */
+// Added to produce the Summary of serial Item count which came under Matching Algorithm
     @ResponseBody
     @RequestMapping(value = "/matchingAlgorithm/itemsCountForSerials", method = RequestMethod.GET)
     public String itemCountForSerials(){

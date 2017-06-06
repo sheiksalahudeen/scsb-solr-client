@@ -27,6 +27,20 @@ public class MatchingAlgorithmCGDCallable implements Callable {
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private ItemDetailsRepository itemDetailsRepository;
 
+    /**
+     * This method instantiates a new matching algorithm cgd callable.
+     *
+     * @param reportDataDetailsRepository      the report data details repository
+     * @param bibliographicDetailsRepository   the bibliographic details repository
+     * @param pageNum                          the page num
+     * @param batchSize                        the batch size
+     * @param producerTemplate                 the producer template
+     * @param collectionGroupMap               the collection group map
+     * @param institutionMap                   the institution map
+     * @param itemChangeLogDetailsRepository   the item change log details repository
+     * @param collectionGroupDetailsRepository the collection group details repository
+     * @param itemDetailsRepository            the item details repository
+     */
     public MatchingAlgorithmCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
                                         int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
                                         ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
@@ -43,6 +57,11 @@ public class MatchingAlgorithmCGDCallable implements Callable {
         this.itemDetailsRepository = itemDetailsRepository;
     }
 
+    /**
+     * This method is used to check for monograph status of bib and updates the CGD .
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object call() throws Exception {
 

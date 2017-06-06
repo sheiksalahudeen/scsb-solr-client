@@ -11,10 +11,28 @@ import java.util.List;
  */
 public interface MatchingBibInfoDetailRepository extends JpaRepository<MatchingBibInfoDetail, Integer> {
 
+    /**
+     * Finds MatchingBibInfoDetail by using bib id.
+     *
+     * @param bibId the bib id
+     * @return the list
+     */
     List<MatchingBibInfoDetail> findByBibId(String bibId);
 
+    /**
+     * Finds a list of last record num by using a list bib ids.
+     *
+     * @param bibIds the bib ids
+     * @return the list
+     */
     @Query(value = "select distinct LATEST_RECORD_NUM from matching_bib_info_detail_t where BIB_ID in ?1", nativeQuery = true)
     List<Integer> findRecordNumByBibIds(List<String> bibIds);
 
+    /**
+     * Finds a list of MatchingBibInfoDetail by using a list of record nums.
+     *
+     * @param recordNums the record nums
+     * @return the list
+     */
     List<MatchingBibInfoDetail> findByRecordNumIn(List<Integer> recordNums);
 }

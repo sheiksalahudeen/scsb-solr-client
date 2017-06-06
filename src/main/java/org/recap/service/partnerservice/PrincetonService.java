@@ -19,8 +19,14 @@ public class PrincetonService {
     private static final Logger logger = LoggerFactory.getLogger(PrincetonService.class);
 
     @Value("${ils.princeton.bibdata}")
-    String ilsprincetonBibData;
+    private String ilsprincetonBibData;
 
+    /**
+     * This method gets bib data response(marc xml) based on the itemBarcode from ILS for Princeton.
+     *
+     * @param itemBarcode the item barcode
+     * @return the bib data
+     */
     public String getBibData(String itemBarcode) {
         RestTemplate restTemplate = new RestTemplate();
         HostnameVerifier verifier = new NullHostnameVerifier();

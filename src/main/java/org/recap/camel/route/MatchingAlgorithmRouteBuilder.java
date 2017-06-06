@@ -12,12 +12,16 @@ import org.springframework.stereotype.Component;
 /**
  * Created by angelind on 31/10/16.
  */
-
 @Component
 public class MatchingAlgorithmRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmRouteBuilder.class);
 
+    /**
+     * This method instantiates a new route builder to save matching reports in database.
+     *
+     * @param camelContext the camel context
+     */
     @Autowired
     public MatchingAlgorithmRouteBuilder(CamelContext camelContext) {
         try {

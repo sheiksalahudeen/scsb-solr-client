@@ -22,6 +22,12 @@ public class OngoingAccessionReportGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OngoingAccessionReportGenerator.class);
 
+    /**
+     * This method prepares ongoing accession report record.
+     *
+     * @param reportEntity the report entity
+     * @return the list
+     */
     public OngoingAccessionReportRecord prepareOngoingAccessionReportRecord(ReportEntity reportEntity) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -42,6 +48,12 @@ public class OngoingAccessionReportGenerator {
         return ongoingAccessionReportRecord;
     }
 
+    /**
+     * This method gets setter method.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -52,6 +64,12 @@ public class OngoingAccessionReportGenerator {
         return null;
     }
 
+    /**
+     * This method gets getter method.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

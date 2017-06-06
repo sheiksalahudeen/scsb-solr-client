@@ -28,6 +28,12 @@ public class JmxHelper {
     private String serviceUrl;
     private MBeanServerConnection connection;
 
+    /**
+     * This method is used to get detailed information about the queue.
+     *
+     * @param queueName the queue name
+     * @return the bean for queue name
+     */
     public DestinationViewMBean getBeanForQueueName(String queueName) {
         try {
             ObjectName nameConsumers = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,destinationType=Queue,destinationName="+ queueName);
@@ -38,6 +44,11 @@ public class JmxHelper {
         return null;
     }
 
+    /**
+     * Gets message bean server connection.
+     *
+     * @return the connection
+     */
     public MBeanServerConnection getConnection() {
         if (null == connection) {
             JMXConnector connector = null;

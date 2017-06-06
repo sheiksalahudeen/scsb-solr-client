@@ -10,19 +10,24 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Created by rajeshbabuk on 9/12/16.
  */
-
 @Service
 public class NyplOauthTokenApiService {
 
     @Value("${ils.nypl.oauth.token.api}")
-    public String nyplOauthTokenApiUrl;
+    private String nyplOauthTokenApiUrl;
 
     @Value("${ils.nypl.operator.user.id}")
-    public String nyplOperatorUserId;
+    private String nyplOperatorUserId;
 
     @Value("${ils.nypl.operator.password}")
-    public String nyplOperatorPassword;
+    private String nyplOperatorPassword;
 
+    /**
+     * This method is used to generate token to access the NYPL SIERRA api using the NYPL operator credentials if they are authorized.
+     *
+     * @return the string
+     * @throws Exception the exception
+     */
     public String generateAccessTokenForNyplApi() throws Exception {
         String authorization = "Basic " + new String(Base64Utils.encode((nyplOperatorUserId + ":" + nyplOperatorPassword).getBytes()));
         HttpHeaders headers = new HttpHeaders();

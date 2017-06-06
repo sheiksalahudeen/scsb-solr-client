@@ -24,14 +24,21 @@ public class NYPLService {
     private static final Logger logger = LoggerFactory.getLogger(NYPLService.class);
 
     @Value("${ils.nypl.bibdata}")
-    String ilsNYPLBibData;
+    private String ilsNYPLBibData;
 
     @Value("${ils.nypl.bibdata.parameter}")
-    String ilsNYPLBibDataParameter;
+    private String ilsNYPLBibDataParameter;
 
     @Autowired
-    NyplOauthTokenApiService nyplOauthTokenApiService;
+    private NyplOauthTokenApiService nyplOauthTokenApiService;
 
+    /**
+     * This method gets bib data response(scsb xml) based on the itemBarcode and customer code from ILS for NYPL.
+     *
+     * @param itemBarcode  the item barcode
+     * @param customerCode the customer code
+     * @return the bib data
+     */
     public String getBibData(String itemBarcode, String customerCode) {
         RestTemplate restTemplate = new RestTemplate();
         String bibDataResponse = null;

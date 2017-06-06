@@ -38,6 +38,19 @@ public class MatchingBibItemIndexCallable implements Callable {
     private SolrTemplate solrTemplate;
     private String operationType;
 
+    /**
+     * This method instantiates a new matching bib item index callable.
+     *
+     * @param solrURL                        the solr url
+     * @param coreName                       the core name
+     * @param pageNum                        the page num
+     * @param docsPerPage                    the docs per page
+     * @param bibliographicDetailsRepository the bibliographic details repository
+     * @param holdingsDetailsRepository      the holdings details repository
+     * @param producerTemplate               the producer template
+     * @param solrTemplate                   the solr template
+     * @param operationType                  the operation type
+     */
     public MatchingBibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository,
                                         HoldingsDetailsRepository holdingsDetailsRepository, ProducerTemplate producerTemplate, SolrTemplate solrTemplate, String operationType) {
         this.coreName = coreName;
@@ -51,6 +64,11 @@ public class MatchingBibItemIndexCallable implements Callable {
         this.operationType = operationType;
     }
 
+    /**
+     * This method is processed by thread to generate solr input documents and index to solr.
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object call() throws Exception {
 

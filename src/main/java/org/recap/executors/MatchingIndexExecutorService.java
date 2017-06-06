@@ -56,6 +56,13 @@ public abstract class MatchingIndexExecutorService {
     @Value("${matching.algorithm.commit.interval}")
     Integer commitInterval;
 
+    /**
+     * This method is used for indexing the records during the matching algorithm process.
+     *
+     * @param operationType the operation type
+     * @return the integer
+     * @throws InterruptedException the interrupted exception
+     */
     public Integer indexingForMatchingAlgorithm(String operationType) throws InterruptedException {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
@@ -149,7 +156,22 @@ public abstract class MatchingIndexExecutorService {
         return totalBibsProcessed;
     }
 
+    /**
+     * This method gets the appropriate callabe which is to be processed by thread to generate solr input documents and index to solr
+     *
+     * @param coreName      the core name
+     * @param pageNum       the page num
+     * @param docsPerpage   the docs perpage
+     * @param operationType the operation type
+     * @return the callable
+     */
     public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, String operationType);
 
+    /**
+     * This method gets total doc count based on the operation type.
+     *
+     * @param operationType the operation type
+     * @return the total doc count
+     */
     protected abstract Integer getTotalDocCount(String operationType);
 }

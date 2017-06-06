@@ -51,6 +51,15 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private Map institutionEntityMap;
+
+    /**
+     * This method uses the marc record and builds the bibliographic entity. For exceptions, adds them to report entities. Also adds failed record counts.
+     *
+     * @param marcRecord
+     * @param institutionName the institution name
+     * @param customerCode    the customer code
+     * @return
+     */
     @Override
     public Map convert(Object marcRecord, String institutionName,String customerCode) {
             int failedItemCount = 0;
@@ -161,6 +170,14 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all necessary bibRecord fields
+     * @param bibRecord
+     * @param owningInstitutionId
+     * @param institutionName
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName,Date currentDate) {
         int failedBibCount = 0;
         int successBibCount = 0;
@@ -246,6 +263,15 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all the fields in holding content.
+     * @param bibliographicEntity
+     * @param institutionName
+     * @param holdingsRecord
+     * @param bibRecord
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, Record holdingsRecord, Record bibRecord, Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
@@ -292,6 +318,20 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all the fields in item.
+     * @param bibliographicEntity
+     * @param holdingsEntity
+     * @param owningInstitutionId
+     * @param customerCode
+     * @param holdingsCallNumber
+     * @param holdingsCallNumberType
+     * @param itemRecord
+     * @param institutionName
+     * @param bibRecord
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId,String customerCode, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, Record bibRecord,
                                                              Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
@@ -396,6 +436,11 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * Gets all itemstatus and put it in a map.
+     *
+     * @return the item status map
+     */
     public Map getItemStatusMap() {
         if (null == itemStatusMap) {
             itemStatusMap = new HashMap();
@@ -412,6 +457,11 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return itemStatusMap;
     }
 
+    /**
+     * Gets all collection group and put it in a map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
@@ -428,6 +478,11 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return collectionGroupMap;
     }
 
+    /**
+     * Gets all institution entity and puts them in a map.
+     *
+     * @return the institution entity map
+     */
     public Map getInstitutionEntityMap() {
         if (null == institutionEntityMap) {
             institutionEntityMap = new HashMap();
@@ -444,10 +499,20 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return institutionEntityMap;
     }
 
+    /**
+     * Gets db report util.
+     *
+     * @return the db report util
+     */
     public DBReportUtil getDbReportUtil() {
         return dbReportUtil;
     }
 
+    /**
+     * Sets db report util.
+     *
+     * @param dbReportUtil the db report util
+     */
     public void setDbReportUtil(DBReportUtil dbReportUtil) {
         this.dbReportUtil = dbReportUtil;
     }

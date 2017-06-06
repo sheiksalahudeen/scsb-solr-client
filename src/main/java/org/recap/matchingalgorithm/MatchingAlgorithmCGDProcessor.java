@@ -29,6 +29,18 @@ public class MatchingAlgorithmCGDProcessor {
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private ItemDetailsRepository itemDetailsRepository;
 
+    /**
+     * This method instantiates a new matching algorithm cgd processor.
+     *
+     * @param bibliographicDetailsRepository   the bibliographic details repository
+     * @param producerTemplate                 the producer template
+     * @param collectionGroupMap               the collection group map
+     * @param institutionMap                   the institution map
+     * @param itemChangeLogDetailsRepository   the item change log details repository
+     * @param matchingType                     the matching type
+     * @param collectionGroupDetailsRepository the collection group details repository
+     * @param itemDetailsRepository            the item details repository
+     */
     public MatchingAlgorithmCGDProcessor(BibliographicDetailsRepository bibliographicDetailsRepository, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
                                          ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, String matchingType, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
                                          ItemDetailsRepository itemDetailsRepository) {
@@ -42,6 +54,12 @@ public class MatchingAlgorithmCGDProcessor {
         this.itemDetailsRepository = itemDetailsRepository;
     }
 
+    /**
+     * This method updates cgd based on the counter values of use restriction for each institution and saves them in the database.
+     *
+     * @param useRestrictionMap the use restriction map
+     * @param itemEntityMap     the item entity map
+     */
     public void updateCGDProcess(Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, Map<Integer, ItemEntity> itemEntityMap) {
         if(useRestrictionMap.size() > 1) {
             // Multiple Use Restriction
@@ -102,6 +120,15 @@ public class MatchingAlgorithmCGDProcessor {
         return itemChangeLogEntity;
     }
 
+    /**
+     * This method checks whether the item is monograph or monographic set and populates value for monograph item.
+     *
+     * @param materialTypeSet   the material type set
+     * @param useRestrictionMap the use restriction map
+     * @param itemEntityMap     the item entity map
+     * @param bibIdList         the bib id list
+     * @return the boolean
+     */
     public boolean checkForMonographAndPopulateValues(Set<String> materialTypeSet, Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, Map<Integer, ItemEntity> itemEntityMap, List<Integer> bibIdList) {
         boolean isMonograph = true;
         List<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByBibliographicIdIn(bibIdList);
@@ -150,6 +177,13 @@ public class MatchingAlgorithmCGDProcessor {
         return isMonograph;
     }
 
+    /**
+     * This method is used to populate values for the monograph based on the given materialTypeSet, useRestrictionMap, itemEntityMap and itemEntity.
+     * @param materialTypeSet
+     * @param useRestrictionMap
+     * @param itemEntityMap
+     * @param itemEntity
+     */
     private void populateValues(Set<String> materialTypeSet, Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, Map<Integer, ItemEntity> itemEntityMap, ItemEntity itemEntity) {
         itemEntityMap.put(itemEntity.getItemId(), itemEntity);
         Integer owningInstitutionId = itemEntity.getOwningInstitutionId();
@@ -158,6 +192,14 @@ public class MatchingAlgorithmCGDProcessor {
         materialTypeSet.add(RecapConstants.MONOGRAPH);
     }
 
+    /**
+     * This method populates use restriction and puts it in a map.
+     *
+     * @param useRestrictionMap   the use restriction map
+     * @param itemEntity          the item entity
+     * @param owningInstitutionId the owning institution id
+     * @param useRestriction      the use restriction
+     */
     public void populateUseRestrictionMap(Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, ItemEntity itemEntity, Integer owningInstitutionId, Integer useRestriction) {
         if(useRestrictionMap.containsKey(useRestriction)) {
             Map<Integer, List<ItemEntity>> institutionMap = new HashMap<>();

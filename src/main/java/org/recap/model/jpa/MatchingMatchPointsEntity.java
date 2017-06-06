@@ -24,34 +24,74 @@ public class MatchingMatchPointsEntity implements Serializable {
     @Column(name = "CRITERIA_VALUE_COUNT")
     private Integer criteriaValueCount;
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Gets match criteria.
+     *
+     * @return the match criteria
+     */
     public String getMatchCriteria() {
         return matchCriteria;
     }
 
+    /**
+     * Sets match criteria.
+     *
+     * @param matchCriteria the match criteria
+     */
     public void setMatchCriteria(String matchCriteria) {
         this.matchCriteria = matchCriteria;
     }
 
+    /**
+     * Gets criteria value.
+     *
+     * @return the criteria value
+     */
     public String getCriteriaValue() {
         return criteriaValue;
     }
 
+    /**
+     * Sets criteria value.
+     *
+     * @param criteriaValue the criteria value
+     */
     public void setCriteriaValue(String criteriaValue) {
         this.criteriaValue = criteriaValue;
     }
 
+    /**
+     * Gets criteria value count.
+     *
+     * @return the criteria value count
+     */
     public Integer getCriteriaValueCount() {
         return criteriaValueCount;
     }
 
+    /**
+     * Sets criteria value count.
+     *
+     * @param criteriaValueCount the criteria value count
+     */
     public void setCriteriaValueCount(Integer criteriaValueCount) {
         this.criteriaValueCount = criteriaValueCount;
     }

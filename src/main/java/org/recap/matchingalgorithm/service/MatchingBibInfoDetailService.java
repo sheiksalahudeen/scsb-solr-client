@@ -36,8 +36,15 @@ public class MatchingBibInfoDetailService {
     private ReportDataDetailsRepository reportDataDetailsRepository;
 
     @Value("${matching.algorithm.bibinfo.batchsize}")
-    Integer batchSize;
+    private Integer batchSize;
 
+    /**
+     * This method is used to populate matching bib info and save it to MATCHING_BIB_INFO_DETAIL_T for the given from and to date.
+     *
+     * @param fromDate the from date
+     * @param toDate   the to date
+     * @return the string
+     */
     public String populateMatchingBibInfo(Date fromDate, Date toDate) {
         List<String> typeList = new ArrayList<>();
         typeList.add(RecapConstants.SINGLE_MATCH);
@@ -74,6 +81,11 @@ public class MatchingBibInfoDetailService {
         return "Success";
     }
 
+    /**
+     * This method is used to populate matching bib info and save it to MATCHING_BIB_INFO_DETAIL_T
+     *
+     * @return the string
+     */
     public String populateMatchingBibInfo(){
         List<String> typeList = new ArrayList<>();
         typeList.add(RecapConstants.SINGLE_MATCH);
@@ -109,6 +121,13 @@ public class MatchingBibInfoDetailService {
         return "Success";
     }
 
+    /**
+     * This method gets page count.
+     *
+     * @param totalRecordCount the total record count
+     * @param batchSize        the batch size
+     * @return the int
+     */
     public int getPageCount(int totalRecordCount,int batchSize){
         int quotient = totalRecordCount / batchSize;
         int remainder = Integer.valueOf(Long.toString(totalRecordCount)) % (batchSize);
@@ -156,6 +175,11 @@ public class MatchingBibInfoDetailService {
         return matchingBibInfoDetailList;
     }
 
+    /**
+     * This method is used to find and populate the matching bib information which is to be saved in database.
+     * @param reportDataEntityMap
+     * @return
+     */
     private List<MatchingBibInfoDetail> findAndPopulateMatchingBibInfoDetail(Map<String,List<ReportDataEntity>> reportDataEntityMap){
         List<MatchingBibInfoDetail> matchingBibInfoDetailList = new ArrayList<>();
         for(Map.Entry<String,List<ReportDataEntity>> entry:reportDataEntityMap.entrySet()){
