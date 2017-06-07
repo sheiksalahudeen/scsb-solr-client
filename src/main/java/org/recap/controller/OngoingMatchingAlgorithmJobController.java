@@ -33,13 +33,13 @@ public class OngoingMatchingAlgorithmJobController {
     private static final Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmJobController.class);
 
     @Autowired
-    OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
+    private OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    MatchingBibInfoDetailService matchingBibInfoDetailService;
+    private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @RequestMapping("/ongoingMatchingJob")
     private String matchingJob(Model model) {
@@ -73,6 +73,12 @@ public class OngoingMatchingAlgorithmJobController {
         return status;
     }
 
+    /**
+     * This method is called from the solr admin ui which is used to process ongoing matching algorithm for the given bibs from the solrDocumentList.
+     *
+     * @param solrDocumentList the solr document list
+     * @return the string
+     */
     public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();

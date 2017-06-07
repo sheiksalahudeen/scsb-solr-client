@@ -32,38 +32,43 @@ public class MatchingAlgorithmUpdateCGDService {
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUpdateCGDService.class);
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Autowired
-    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
-    ReportDataDetailsRepository reportDataDetailsRepository;
+    private ReportDataDetailsRepository reportDataDetailsRepository;
 
     @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired
-    JmxHelper jmxHelper;
+    private JmxHelper jmxHelper;
 
     @Autowired
-    MatchingAlgorithmUtil matchingAlgorithmUtil;
+    private MatchingAlgorithmUtil matchingAlgorithmUtil;
 
     @Autowired
-    UpdateCgdUtil updateCgdUtil;
+    private UpdateCgdUtil updateCgdUtil;
 
     @Autowired
-    HoldingsDetailsRepository holdingsDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    ItemDetailsRepository itemDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
+    /**
+     * Gets report data details repository.
+     *
+     * @return the report data details repository
+     */
     public ReportDataDetailsRepository getReportDataDetailsRepository() {
         return reportDataDetailsRepository;
     }
@@ -72,6 +77,13 @@ public class MatchingAlgorithmUpdateCGDService {
     private Map collectionGroupMap;
     private Map institutionMap;
 
+    /**
+     * This method is used to update cgd process for monographs.
+     *
+     * @param batchSize the batch size
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public void updateCGDProcessForMonographs(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start");
 
@@ -171,6 +183,11 @@ public class MatchingAlgorithmUpdateCGDService {
         return executorService;
     }
 
+    /**
+     * This method gets items count for serials matching.
+     *
+     * @param batchSize the batch size
+     */
     public void getItemsCountForSerialsMatching(Integer batchSize) {
         long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
@@ -203,6 +220,11 @@ public class MatchingAlgorithmUpdateCGDService {
         }
     }
 
+    /**
+     * This method gets all collection group and puts it in a map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
@@ -215,6 +237,11 @@ public class MatchingAlgorithmUpdateCGDService {
         return collectionGroupMap;
     }
 
+    /**
+     * This method gets all institution entity and puts it in a map.
+     *
+     * @return the institution entity map
+     */
     public Map getInstitutionEntityMap() {
         if (null == institutionMap) {
             institutionMap = new HashMap();

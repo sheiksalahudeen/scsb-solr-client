@@ -29,13 +29,13 @@ public class OngoingMatchingAlgorithmJobRestController {
     private static final Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmJobRestController.class);
 
     @Autowired
-    OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
+    private OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    MatchingBibInfoDetailService matchingBibInfoDetailService;
+    private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @RequestMapping(value = "/ongoingMatchingAlgorithmJob", method = RequestMethod.POST,  consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -61,6 +61,12 @@ public class OngoingMatchingAlgorithmJobRestController {
         return status;
     }
 
+    /**
+     * This method is used to process ongoing matching algorithm based on the given bibs in solrDocumentList and updates the CGD and generates report in solr and database.
+     * This method is called for batch job.
+     * @param solrDocumentList the solr document list
+     * @return the string
+     */
     public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();

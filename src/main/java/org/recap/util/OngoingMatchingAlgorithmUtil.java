@@ -37,39 +37,45 @@ public class OngoingMatchingAlgorithmUtil {
     private static final Logger logger = LoggerFactory.getLogger(OngoingMatchingAlgorithmUtil.class);
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    ItemDetailsRepository itemDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Autowired
-    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
+    private InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
-    MatchingAlgorithmUtil matchingAlgorithmUtil;
+    private MatchingAlgorithmUtil matchingAlgorithmUtil;
 
     @Autowired
-    UpdateCgdUtil updateCgdUtil;
+    private UpdateCgdUtil updateCgdUtil;
 
     private List<BibValueResolver> bibValueResolvers;
     private Map collectionGroupMap;
     private Map institutionMap;
 
+    /**
+     * This method fetches data for ongoing matching based on date.
+     *
+     * @param date the date
+     * @return the solr document list
+     */
     public SolrDocumentList fetchDataForOngoingMatchingBasedOnDate(String date) {
         try {
             String query = solrQueryBuilder.fetchCreatedOrUpdatedBibs(date);
@@ -83,6 +89,12 @@ public class OngoingMatchingAlgorithmUtil {
         return null;
     }
 
+    /**
+     * This method processes matching for multiple match scenario and single match scenario.
+     *
+     * @param solrDocument the solr document
+     * @return the string
+     */
     public String processMatchingForBib(SolrDocument solrDocument) {
         String status = RecapConstants.SUCCESS;
         logger.info("Ongoing Matching Started");
@@ -122,6 +134,12 @@ public class OngoingMatchingAlgorithmUtil {
         return status;
     }
 
+    /**
+     * This method is used to find the matching points.
+     * @param solrDocument
+     * @param bibItemMap
+     * @return
+     */
     private Set<String> getMatchingBibsAndMatchPoints(SolrDocument solrDocument, Map<Integer, BibItem> bibItemMap) {
         Map<Integer, BibItem> tempMap;
         Set<String> matchPointString = new HashSet<>();
@@ -144,6 +162,11 @@ public class OngoingMatchingAlgorithmUtil {
         return matchPointString;
     }
 
+    /**
+     * This method updates cgd for item in solr.
+     *
+     * @param itemIds the item ids
+     */
     public void updateCGDForItemInSolr(List<Integer> itemIds) {
         if (CollectionUtils.isNotEmpty(itemIds)) {
             List<ItemEntity> itemEntities = itemDetailsRepository.findByItemIdIn(itemIds);
@@ -223,6 +246,20 @@ public class OngoingMatchingAlgorithmUtil {
         return itemIds;
     }
 
+    /**
+     * This method processes cgd and reports for un matching titles report entity.
+     *
+     * @param fileName                 the file name
+     * @param titleMap                 the title map
+     * @param bibIds                   the bib ids
+     * @param materialTypes            the material types
+     * @param owningInstitutions       the owning institutions
+     * @param owningInstBibIds         the owning inst bib ids
+     * @param matchPointValue          the match point value
+     * @param unMatchingTitleHeaderSet the un matching title header set
+     * @param matchPointString         the match point string
+     * @return the report entity
+     */
     public ReportEntity processCGDAndReportsForUnMatchingTitles(String fileName, Map<String, String> titleMap, List<Integer> bibIds, List<String> materialTypes, List<String> owningInstitutions,
                                                                 List<String> owningInstBibIds, String matchPointValue, Set<String> unMatchingTitleHeaderSet, String matchPointString) {
         ReportEntity unMatchReportEntity = new ReportEntity();
@@ -249,6 +286,13 @@ public class OngoingMatchingAlgorithmUtil {
         return unMatchReportEntity;
     }
 
+    /**
+     * This method is used to generate reports and update CGD for multiple match scenario
+     * @param bibItemMap
+     * @return
+     * @throws IOException
+     * @throws SolrServerException
+     */
     private List<Integer> saveReportAndUpdateCGDForMultiMatch(Map<Integer, BibItem> bibItemMap) throws IOException, SolrServerException {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(RecapConstants.ONGOING_MATCHING_ALGORITHM);
@@ -312,6 +356,16 @@ public class OngoingMatchingAlgorithmUtil {
         return itemIds;
     }
 
+    /**
+     * This method checks for monograph and updates the CGD
+     * @param reportEntity
+     * @param bibIdList
+     * @param materialTypeList
+     * @param materialTypes
+     * @return
+     * @throws IOException
+     * @throws SolrServerException
+     */
     private List<Integer> checkForMonographAndUpdateCGD(ReportEntity reportEntity, List<Integer> bibIdList, List<String> materialTypeList, Set<String> materialTypes) throws IOException, SolrServerException {
         List<Integer> itemIds = new ArrayList<>();
         if(materialTypes.size() == 1) {
@@ -345,7 +399,13 @@ public class OngoingMatchingAlgorithmUtil {
         return itemIds;
     }
 
-
+    /**
+     * This method is used to find the matching bibs
+     * @param solrDocument
+     * @param matchPointString
+     * @param fieldName
+     * @return
+     */
     private Map<Integer, BibItem> findMatchingBibs(SolrDocument solrDocument, Set<String> matchPointString, String fieldName) {
         Map<Integer, BibItem> bibItemMap = null;
         Object value = solrDocument.getFieldValue(fieldName);
@@ -367,6 +427,13 @@ public class OngoingMatchingAlgorithmUtil {
         return bibItemMap;
     }
 
+    /**
+     * This method is used to get bibs from the solr
+     * @param matchPointString
+     * @param fieldName
+     * @param query
+     * @return
+     */
     private Map<Integer, BibItem> getBibsFromSolr(Set<String> matchPointString, String fieldName, String query) {
         Map<Integer, BibItem> bibItemMap = new HashMap<>();
         SolrQuery solrQuery = new SolrQuery(query);
@@ -393,6 +460,12 @@ public class OngoingMatchingAlgorithmUtil {
         return bibItemMap;
     }
 
+    /**
+     * This method populates bib item.
+     *
+     * @param solrDocument the solr document
+     * @return the bib item
+     */
     public BibItem populateBibItem(SolrDocument solrDocument) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         BibItem bibItem = new BibItem();
@@ -409,6 +482,12 @@ public class OngoingMatchingAlgorithmUtil {
         return bibItem;
     }
 
+    /**
+     * This method gets formatted date.
+     *
+     * @param inputDate the input date
+     * @return the formatted date string
+     */
     public String getFormattedDateString(Date inputDate) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT_YYYYMMDDHHMM);
         String utcStr = null;
@@ -424,6 +503,11 @@ public class OngoingMatchingAlgorithmUtil {
         return utcStr + RecapConstants.SOLR_DATE_RANGE_TO_NOW;
     }
 
+    /**
+     * This method gets bib value resolvers.
+     *
+     * @return the bib value resolvers
+     */
     public List<BibValueResolver> getBibValueResolvers() {
         if (null == bibValueResolvers) {
             bibValueResolvers = new ArrayList<>();
@@ -442,6 +526,11 @@ public class OngoingMatchingAlgorithmUtil {
         return bibValueResolvers;
     }
 
+    /**
+     * This method gets collection group map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
@@ -454,6 +543,11 @@ public class OngoingMatchingAlgorithmUtil {
         return collectionGroupMap;
     }
 
+    /**
+     * This method gets institution entity map.
+     *
+     * @return the institution entity map
+     */
     public Map getInstitutionEntityMap() {
         if (null == institutionMap) {
             institutionMap = new HashMap();

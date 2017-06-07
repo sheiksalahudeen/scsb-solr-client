@@ -37,31 +37,37 @@ public class MatchingAlgorithmHelperService {
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmHelperService.class);
 
     @Autowired
-    MatchingBibDetailsRepository matchingBibDetailsRepository;
+    private MatchingBibDetailsRepository matchingBibDetailsRepository;
 
     @Autowired
-    MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
+    private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
 
     @Autowired
-    MatchingAlgorithmUtil matchingAlgorithmUtil;
+    private MatchingAlgorithmUtil matchingAlgorithmUtil;
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    JmxHelper jmxHelper;
+    private JmxHelper jmxHelper;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     private ExecutorService executorService;
 
+    /**
+     * This method finds the matching records based on the match point field(OCLC,ISBN,ISSN,LCCN).
+     *
+     * @return the long
+     * @throws Exception the exception
+     */
     public long findMatchingAndPopulateMatchPointsEntities() throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities;
         long count = 0;
@@ -92,6 +98,13 @@ public class MatchingAlgorithmHelperService {
         return count;
     }
 
+    /**
+     * This method is used to populate matching bib records in the database.
+     *
+     * @return the long
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public long populateMatchingBibEntities() throws IOException, SolrServerException {
         Integer count = 0;
         count = count + fetchAndSaveMatchingBibs(RecapConstants.MATCH_POINT_FIELD_OCLC);
@@ -105,6 +118,12 @@ public class MatchingAlgorithmHelperService {
         return count;
     }
 
+    /**
+     * This method is used to populate reports for oclc and isbn matching combination based on the given batch size.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForOCLCandISBN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -153,6 +172,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for oclc and issn combination.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForOCLCAndISSN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -200,6 +225,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for oclc and lccn combination.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForOCLCAndLCCN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -247,6 +278,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for isbn and issn combination.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForISBNAndISSN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -294,6 +331,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for isbn and lccn combination.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForISBNAndLCCN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -341,6 +384,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for issn and lccn combination.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForISSNAndLCCN(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -388,6 +437,12 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to populate reports for single match.
+     *
+     * @param batchSize the batch size
+     * @return the map
+     */
     public Map<String,Integer> populateReportsForSingleMatch(Integer batchSize) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
@@ -416,6 +471,13 @@ public class MatchingAlgorithmHelperService {
         return countsMap;
     }
 
+    /**
+     * This method is used to save matching summary count.
+     *
+     * @param pulMatchingCount  the pul matching count
+     * @param culMatchingCount  the cul matching count
+     * @param nyplMatchingCount the nypl matching count
+     */
     public void saveMatchingSummaryCount(Integer pulMatchingCount, Integer culMatchingCount, Integer nyplMatchingCount) {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setType("MatchingCount");
@@ -443,6 +505,14 @@ public class MatchingAlgorithmHelperService {
         producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", Arrays.asList(reportEntity));
     }
 
+    /**
+     * This method is used to fetch and save matching bibs.
+     *
+     * @param matchCriteria the match criteria
+     * @return the integer
+     * @throws SolrServerException the solr server exception
+     * @throws IOException         the io exception
+     */
     public Integer fetchAndSaveMatchingBibs(String matchCriteria) throws SolrServerException, IOException {
         long batchSize = 300;
         Integer size = 0;

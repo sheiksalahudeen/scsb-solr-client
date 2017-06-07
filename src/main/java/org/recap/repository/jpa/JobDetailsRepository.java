@@ -8,5 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface JobDetailsRepository extends JpaRepository<JobEntity, Integer> {
 
+    /**
+     * Finds job entity by using job name.
+     *
+     * @param jobName the job name
+     * @return the job entity
+     */
     JobEntity findByJobName(String jobName);
 }

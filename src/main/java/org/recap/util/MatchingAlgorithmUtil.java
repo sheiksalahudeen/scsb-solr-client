@@ -39,30 +39,38 @@ public class MatchingAlgorithmUtil {
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgorithmUtil.class);
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Autowired
-    MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
+    private MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository;
 
     @Autowired
-    MatchingBibDetailsRepository matchingBibDetailsRepository;
+    private MatchingBibDetailsRepository matchingBibDetailsRepository;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    ReportDataDetailsRepository reportDataDetailsRepository;
+    private ReportDataDetailsRepository reportDataDetailsRepository;
 
-    String and = " AND ";
-    String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
+    private String and = " AND ";
+
+    private String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
 
+    /**
+     * This method populates and save the reports for single match bibs.
+     *
+     * @param batchSize the batch size
+     * @param matching  the matching
+     * @return the single match bibs and save report
+     */
     public Map<String,Integer> getSingleMatchBibsAndSaveReport(Integer batchSize, String matching) {
         Map<String, Set<Integer>> criteriaMap = new HashMap<>();
         Map<Integer, MatchingBibEntity> bibEntityMap = new HashMap<>();
@@ -127,6 +135,18 @@ public class MatchingAlgorithmUtil {
         return countsMap;
     }
 
+    /**
+     * This method gets bib ids for the given criteria values.
+     *
+     * @param criteriaMap       the criteria map
+     * @param criteriaValueSet  the criteria value set
+     * @param criteriaValue     the criteria value
+     * @param matching          the matching
+     * @param criteriaValueList the criteria value list
+     * @param bibEntityMap      the bib entity map
+     * @param matchPointValue   the match point value
+     * @return the bib ids for criteria value
+     */
     public Set<Integer> getBibIdsForCriteriaValue(Map<String, Set<Integer>> criteriaMap, Set<String> criteriaValueSet, String criteriaValue,
                                                    String matching, String[] criteriaValueList, Map<Integer, MatchingBibEntity> bibEntityMap, StringBuilder matchPointValue) {
         Set<Integer> tempBibIdSet = new HashSet<>();
@@ -153,6 +173,12 @@ public class MatchingAlgorithmUtil {
         return tempBibIdSet;
     }
 
+    /**
+     * This method replaces diacritics(~= accents) characters by replacing them to normal characters in title.
+     *
+     * @param title the title
+     * @return the string
+     */
     public String normalizeDiacriticsInTitle(String title) {
         String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD);
         normalizedTitle = normalizedTitle.replaceAll("[^\\p{ASCII}]", "");
@@ -160,6 +186,15 @@ public class MatchingAlgorithmUtil {
         return normalizedTitle;
     }
 
+    /**
+     * This method saves report for single match based on the criteria values (oclc,isbn,issn and lccn).
+     *
+     * @param criteriaValue        the criteria value
+     * @param bibIdList            the bib id list
+     * @param criteria             the criteria
+     * @param matchingBibEntityMap the matching bib entity map
+     * @return the map
+     */
     public Map<String, Integer> saveReportForSingleMatch(String criteriaValue, List<Integer> bibIdList, String criteria, Map<Integer, MatchingBibEntity> matchingBibEntityMap) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         Set<String> owningInstSet = new HashSet<>();
@@ -238,6 +273,12 @@ public class MatchingAlgorithmUtil {
         return countsMap;
     }
 
+    /**
+     * This method gets set of matched and un-matched bibs on title verification.
+     *
+     * @param titleMap the title map
+     * @return the matched and un matched bibs on title verification
+     */
     public Set<String> getMatchingAndUnMatchingBibsOnTitleVerification(Map<String, String> titleMap) {
 
         Set<String> unMatchingTitleHeaderSet = new HashSet<>();
@@ -261,6 +302,12 @@ public class MatchingAlgorithmUtil {
         return unMatchingTitleHeaderSet;
     }
 
+    /**
+     * This method gets matched title for  the given title.
+     *
+     * @param title the title
+     * @return the title to match
+     */
     public String getTitleToMatch(String title) {
         title = normalizeDiacriticsInTitle(title.trim());
         title = title.replaceAll("[^\\w\\s]", "").trim();
@@ -304,6 +351,15 @@ public class MatchingAlgorithmUtil {
         return titleToMatch.replaceAll("\\s", "");
     }
 
+    /**
+     * This method gets a list of report data entities for matching algorithm reports.
+     *
+     * @param reportDataEntities the report data entities
+     * @param owningInstSet      the owning inst set
+     * @param bibIds             the bib ids
+     * @param materialTypes      the material types
+     * @param owningInstBibIds   the owning inst bib ids
+     */
     public void getReportDataEntityList(List<ReportDataEntity> reportDataEntities, Collection owningInstSet, Collection bibIds, Collection materialTypes, List<String> owningInstBibIds) {
         if(CollectionUtils.isNotEmpty(bibIds)) {
             ReportDataEntity bibIdReportDataEntity = getReportDataEntityForCollectionValues(bibIds, RecapConstants.BIB_ID);
@@ -326,6 +382,13 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method gets report data entity for collection values.
+     *
+     * @param headerValues the header values
+     * @param headerName   the header name
+     * @return the report data entity for collection values
+     */
     public ReportDataEntity getReportDataEntityForCollectionValues(Collection headerValues, String headerName) {
         ReportDataEntity bibIdReportDataEntity = new ReportDataEntity();
         bibIdReportDataEntity.setHeaderName(headerName);
@@ -333,6 +396,14 @@ public class MatchingAlgorithmUtil {
         return bibIdReportDataEntity;
     }
 
+    /**
+     * This method populates bib id with matching criteria values.
+     *
+     * @param criteria1Map        the criteria 1 map
+     * @param matchingBibEntities the matching bib entities
+     * @param matchCriteria1      the match criteria 1
+     * @param bibEntityMap        the bib entity map
+     */
     public void populateBibIdWithMatchingCriteriaValue(Map<String, Set<Integer>> criteria1Map, List<MatchingBibEntity> matchingBibEntities, String matchCriteria1, Map<Integer, MatchingBibEntity> bibEntityMap) {
         for (Iterator<MatchingBibEntity> iterator = matchingBibEntities.iterator(); iterator.hasNext(); ) {
             MatchingBibEntity matchingBibEntity = iterator.next();
@@ -348,6 +419,13 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method populates the bib ids for matching match point values.
+     *
+     * @param criteriaMap the criteria map
+     * @param bibId       the bib id
+     * @param value       the value
+     */
     public void populateCriteriaMap(Map<String, Set<Integer>> criteriaMap, Integer bibId, String value) {
 
         String[] criteriaValues = value.split(",");
@@ -368,6 +446,13 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method gets match point criteria value.
+     *
+     * @param matchCriteria     the match criteria
+     * @param matchingBibEntity the matching bib entity
+     * @return the match criteria value
+     */
     public String getMatchCriteriaValue(String matchCriteria, MatchingBibEntity matchingBibEntity) {
         if(matchCriteria.equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
             return matchingBibEntity.getOclc();
@@ -381,6 +466,17 @@ public class MatchingAlgorithmUtil {
         return "";
     }
 
+    /**
+     * This method populates and save report entity for multi match scenario in matching algorithm.
+     *
+     * @param bibIds       the bib ids
+     * @param bibEntityMap the bib entity map
+     * @param header1      the header 1
+     * @param header2      the header 2
+     * @param oclcNumbers  the oclc numbers
+     * @param isbns        the isbns
+     * @return the map
+     */
     public Map<String,Integer> populateAndSaveReportEntity(Set<Integer> bibIds, Map<Integer, MatchingBibEntity> bibEntityMap, String header1, String header2, String oclcNumbers, String isbns) {
         ReportEntity reportEntity = new ReportEntity();
         Set<String> owningInstSet = new HashSet<>();
@@ -443,6 +539,13 @@ public class MatchingAlgorithmUtil {
         return countsMap;
     }
 
+    /**
+     * This method gets report data entity.
+     *
+     * @param header1            the header 1
+     * @param headerValues       the header values
+     * @param reportDataEntities the report data entities
+     */
     public void getReportDataEntity(String header1, String headerValues, List<ReportDataEntity> reportDataEntities) {
         ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
         criteriaReportDataEntity.setHeaderName(header1);
@@ -450,6 +553,19 @@ public class MatchingAlgorithmUtil {
         reportDataEntities.add(criteriaReportDataEntity);
     }
 
+    /**
+     * This method process reports for the bibs which came into matching algorithm but differs in title.
+     *
+     * @param fileName                 the file name
+     * @param titleMap                 the title map
+     * @param bibIds                   the bib ids
+     * @param materialTypes            the material types
+     * @param owningInstitutions       the owning institutions
+     * @param owningInstBibIds         the owning inst bib ids
+     * @param matchPointValue          the match point value
+     * @param unMatchingTitleHeaderSet the un matching title header set
+     * @return the report entity
+     */
     public ReportEntity processReportsForUnMatchingTitles(String fileName, Map<String, String> titleMap, List<Integer> bibIds, List<String> materialTypes, List<String> owningInstitutions,
                                                           List<String> owningInstBibIds, String matchPointValue, Set<String> unMatchingTitleHeaderSet) {
         ReportEntity unMatchReportEntity = new ReportEntity();
@@ -474,6 +590,21 @@ public class MatchingAlgorithmUtil {
         return unMatchReportEntity;
     }
 
+    /**
+     * This method prepares reports for the bibs which came into matching algorithm but differs in title
+     *
+     * @param titleMap                 the title map
+     * @param bibIds                   the bib ids
+     * @param materialTypes            the material types
+     * @param owningInstitutions       the owning institutions
+     * @param owningInstBibIds         the owning inst bib ids
+     * @param unMatchingTitleHeaderSet the un matching title header set
+     * @param reportDataEntityList     the report data entity list
+     * @param bibIdList                the bib id list
+     * @param materialTypeList         the material type list
+     * @param owningInstitutionList    the owning institution list
+     * @param owningInstBibIdList      the owning inst bib id list
+     */
     public void prepareReportForUnMatchingTitles(Map<String, String> titleMap, List<Integer> bibIds, List<String> materialTypes, List<String> owningInstitutions, List<String> owningInstBibIds,
                                                  Set<String> unMatchingTitleHeaderSet, List<ReportDataEntity> reportDataEntityList, List<String> bibIdList,
                                                  List<String> materialTypeList, List<String> owningInstitutionList, List<String> owningInstBibIdList) {
@@ -499,6 +630,13 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method gets matching match points based on the field name.
+     *
+     * @param fieldName the field name
+     * @return the matching match points entity
+     * @throws Exception the exception
+     */
     public List<MatchingMatchPointsEntity> getMatchingMatchPointsEntity(String fieldName) throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities = new ArrayList<>();
         String query = RecapConstants.DOCTYPE + ":" + RecapConstants.BIB + and + RecapConstants.IS_DELETED_BIB + ":false" + and + coreParentFilterQuery + RecapConstants.COLLECTION_GROUP_DESIGNATION
@@ -532,6 +670,11 @@ public class MatchingAlgorithmUtil {
         return matchingMatchPointsEntities;
     }
 
+    /**
+     * This method saves matching match point entities by using activemq.
+     *
+     * @param matchingMatchPointsEntities the matching match points entities
+     */
     public void saveMatchingMatchPointEntities(List<MatchingMatchPointsEntity> matchingMatchPointsEntities) {
         int batchSize = 1000;
         int size = 0;
@@ -545,6 +688,14 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method gets cgd count based on institution from solr.
+     *
+     * @param owningInstitution the owning institution
+     * @return the cgd count based on inst
+     * @throws SolrServerException the solr server exception
+     * @throws IOException         the io exception
+     */
     public Integer getCGDCountBasedOnInst(String owningInstitution) throws SolrServerException, IOException {
         SolrQuery solrQuery = solrQueryBuilder.buildSolrQueryForCGDReports(owningInstitution, RecapConstants.SHARED_CGD);
         solrQuery.setRows(0);
@@ -553,6 +704,12 @@ public class MatchingAlgorithmUtil {
         return Math.toIntExact(results.getNumFound());
     }
 
+    /**
+     * This method updates the reports which was found as an exception due to the different material types.
+     *
+     * @param exceptionRecordNums the exception record nums
+     * @param batchSize           the batch size
+     */
     public void updateExceptionRecords(List<Integer> exceptionRecordNums, Integer batchSize) {
         if(CollectionUtils.isNotEmpty(exceptionRecordNums)) {
             List<List<Integer>> exceptionRecordNumbers = Lists.partition(exceptionRecordNums, batchSize);
@@ -566,6 +723,12 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method updates reports which are found to be a monographic set record in database.
+     *
+     * @param nonMonographRecordNums the non monograph record nums
+     * @param batchSize              the batch size
+     */
     public void updateMonographicSetRecords(List<Integer> nonMonographRecordNums, Integer batchSize) {
         if(CollectionUtils.isNotEmpty(nonMonographRecordNums)) {
             List<List<Integer>> monographicSetRecordNumbers = Lists.partition(nonMonographRecordNums, batchSize);
@@ -587,6 +750,9 @@ public class MatchingAlgorithmUtil {
         }
     }
 
+    /**
+     * This method saves the summary report for the counts of the CGD in each institutions.
+     */
     public void saveCGDUpdatedSummaryReport() {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setType("MatchingCGDSummary");
@@ -604,6 +770,12 @@ public class MatchingAlgorithmUtil {
         reportDetailRepository.save(reportEntity);
     }
 
+    /**
+     * This method populates matching counter to process the CGD update in the matching algorithm.
+     *
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public void populateMatchingCounter() throws IOException, SolrServerException {
         MatchingCounter.reset();
 
