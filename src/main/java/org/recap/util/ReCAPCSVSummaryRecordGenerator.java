@@ -21,6 +21,13 @@ public class ReCAPCSVSummaryRecordGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVSummaryRecordGenerator.class);
 
+    /**
+     * This method prepares SummaryReportReCAPCSVRecord which is used to generate csv report based on the given report entity
+     *
+     * @param reportEntity                the report entity
+     * @param summaryReportReCAPCSVRecord the summary report re capcsv record
+     * @return the summary report re capcsv record
+     */
     public SummaryReportReCAPCSVRecord prepareSummaryReportReCAPCSVRecord(ReportEntity reportEntity, SummaryReportReCAPCSVRecord summaryReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -41,6 +48,12 @@ public class ReCAPCSVSummaryRecordGenerator {
         return summaryReportReCAPCSVRecord;
     }
 
+    /**
+     * This method is used to get the setter method for the given one of the instance variable name in SummaryReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -51,6 +64,12 @@ public class ReCAPCSVSummaryRecordGenerator {
         return null;
     }
 
+    /**
+     * This method is used to get the getter method for the given one of the instance variable name in SummaryReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

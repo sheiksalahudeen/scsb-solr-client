@@ -35,13 +35,28 @@ public class SaveMatchingBibsCallable implements Callable {
     private int pageNum;
     private MatchingAlgorithmUtil matchingAlgorithmUtil;
 
-    List<BibValueResolver> bibValueResolvers;
+    private List<BibValueResolver> bibValueResolvers;
     private static Set<Integer> bibIdList;
 
+    /**
+     * This method instantiates a new save matching bibs callable.
+     */
     public SaveMatchingBibsCallable() {
         //Do nothing
     }
 
+    /**
+     * This method instantiates a new save matching bibs callable with input arguments.
+     *
+     * @param matchingMatchPointsDetailsRepository the matching match points details repository
+     * @param matchCriteria                        the match criteria
+     * @param solrTemplate                         the solr template
+     * @param producer                             the producer
+     * @param solrQueryBuilder                     the solr query builder
+     * @param batchSize                            the batch size
+     * @param pageNum                              the page num
+     * @param matchingAlgorithmUtil                the matching algorithm util
+     */
     public SaveMatchingBibsCallable(MatchingMatchPointsDetailsRepository matchingMatchPointsDetailsRepository, String matchCriteria,
                                     SolrTemplate solrTemplate,
                                     ProducerTemplate producer, SolrQueryBuilder solrQueryBuilder, long batchSize, int pageNum, MatchingAlgorithmUtil matchingAlgorithmUtil) {
@@ -55,6 +70,11 @@ public class SaveMatchingBibsCallable implements Callable {
         this.matchingAlgorithmUtil = matchingAlgorithmUtil;
     }
 
+    /**
+     * This method is used to get the matching bibs from the solr and saves them in the database using ActiveMQ.
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object call() throws Exception {
         Integer size = 0;
@@ -97,6 +117,12 @@ public class SaveMatchingBibsCallable implements Callable {
         return size;
     }
 
+    /**
+     * This method populates bibItem for the given solr document.
+     *
+     * @param solrDocument the solr document
+     * @param bibItem      the bib item
+     */
     public void populateBibItem(SolrDocument solrDocument, BibItem bibItem) {
         Collection<String> fieldNames = solrDocument.getFieldNames();
         for (Iterator<String> stringIterator = fieldNames.iterator(); stringIterator.hasNext(); ) {
@@ -111,10 +137,21 @@ public class SaveMatchingBibsCallable implements Callable {
         }
     }
 
+    /**
+     * To add bib id in the bib id list .
+     *
+     * @param bibId the bib id
+     * @return the boolean
+     */
     public static synchronized boolean addBibIdToList(Integer bibId) {
         return getBibIdList().add(bibId);
     }
 
+    /**
+     * Gets bib id list.
+     *
+     * @return the bib id list
+     */
     public static synchronized Set<Integer> getBibIdList() {
         if(bibIdList == null) {
             bibIdList = new HashSet<>();
@@ -122,6 +159,12 @@ public class SaveMatchingBibsCallable implements Callable {
         return bibIdList;
     }
 
+    /**
+     * Checks whether the bib id is duplicate.
+     *
+     * @param bibId the bib id
+     * @return the boolean
+     */
     public static synchronized boolean isBibIdDuplicate(Integer bibId) {
         if(getBibIdList().contains(bibId)) {
             return true;
@@ -129,10 +172,20 @@ public class SaveMatchingBibsCallable implements Callable {
         return false;
     }
 
+    /**
+     * This method sets bib id list.
+     *
+     * @param bibIdList the bib id list
+     */
     public static void setBibIdList(Set<Integer> bibIdList) {
         SaveMatchingBibsCallable.bibIdList = bibIdList;
     }
 
+    /**
+     * This method gets bib value resolvers which is used to build the values for Bib fields.
+     *
+     * @return the bib value resolvers
+     */
     public List<BibValueResolver> getBibValueResolvers() {
         if (null == bibValueResolvers) {
             bibValueResolvers = new ArrayList<>();

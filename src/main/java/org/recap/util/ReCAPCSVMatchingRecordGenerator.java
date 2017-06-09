@@ -22,6 +22,13 @@ public class ReCAPCSVMatchingRecordGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(ReCAPCSVMatchingRecordGenerator.class);
 
+    /**
+     * This method prepares MatchingReportReCAPCSVRecord which is used to generate csv report based on the given report entity.
+     *
+     * @param reportEntity                 the report entity
+     * @param matchingReportReCAPCSVRecord the matchingReportReCAPCSVRecord
+     * @return the matchingReportReCAPCSVRecord
+     */
     public MatchingReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, MatchingReportReCAPCSVRecord matchingReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -42,6 +49,12 @@ public class ReCAPCSVMatchingRecordGenerator {
         return matchingReportReCAPCSVRecord;
     }
 
+    /**
+     * This method is used to get the setter method for the given one of the instance variable name in MatchingReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -51,6 +64,12 @@ public class ReCAPCSVMatchingRecordGenerator {
         return null;
     }
 
+    /**
+     * This method is used to get the getter method for the given one of the instance variable name in MatchingReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

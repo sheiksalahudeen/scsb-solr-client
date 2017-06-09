@@ -16,6 +16,12 @@ import org.springframework.stereotype.Component;
 public class ReportsRouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ReportsRouteBuilder.class);
 
+    /**
+     * This method instantiates a new reports route builder to save in database.
+     *
+     * @param camelContext    the camel context
+     * @param reportProcessor the report processor
+     */
     @Autowired
     public ReportsRouteBuilder(CamelContext camelContext, ReportProcessor reportProcessor) {
         try {

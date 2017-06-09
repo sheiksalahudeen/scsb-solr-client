@@ -15,7 +15,7 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import java.io.File;
 
 /**
- * The type Main.
+ * The Main class is used to lanuch the spring boot application.
  */
 @SpringBootApplication
 @EnableSolrRepositories(value = "org.recap.repository.solr.main", multicoreSupport = true)

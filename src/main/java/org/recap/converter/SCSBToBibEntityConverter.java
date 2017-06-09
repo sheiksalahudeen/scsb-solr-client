@@ -47,11 +47,19 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private MarcUtil marcUtil;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
+
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private Map institutionEntityMap;
 
+    /**
+     * This method is used to convert scsb record into bib entity
+     * @param scsbRecord
+     * @param institutionName the institution name
+     * @param customerCode    the customer code
+     * @return
+     */
     @Override
     public Map convert(Object scsbRecord, String institutionName,String customerCode) {
         int failedItemCount = 0;
@@ -166,6 +174,15 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all necessary bib record fields
+     * @param bibRecord
+     * @param owningInstitutionId
+     * @param institutionName
+     * @param owningInstitutionBibId
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName,String owningInstitutionBibId,
                                                                       Date currentDate) {
         int failedBibCount = 0;
@@ -252,6 +269,16 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all necessary holdings fields required in the bib record.
+     * @param bibliographicEntity
+     * @param institutionName
+     * @param holdingsRecord
+     * @param bibRecord
+     * @param bibRecordObject
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, Record holdingsRecord, BibRecord bibRecord , Record bibRecordObject, Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
@@ -298,6 +325,22 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method is used to validate all necessary fields required for item.
+     *
+     * @param bibliographicEntity
+     * @param holdingsEntity
+     * @param owningInstitutionId
+     * @param holdingsCallNumber
+     * @param holdingsCallNumberType
+     * @param itemRecord
+     * @param institutionName
+     * @param customerCode
+     * @param bibRecord
+     * @param bibRecordObject
+     * @param currentDate
+     * @return
+     */
     private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, String customerCode, BibRecord bibRecord, Record bibRecordObject, Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
@@ -400,6 +443,11 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return map;
     }
 
+    /**
+     * This method gets all item status and puts it in a map.
+     *
+     * @return the item status map
+     */
     public Map getItemStatusMap() {
         if (null == itemStatusMap) {
             itemStatusMap = new HashMap();
@@ -416,6 +464,11 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return itemStatusMap;
     }
 
+    /**
+     * This method gets all collection group and puts it in a map.
+     *
+     * @return the collection group map
+     */
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
@@ -432,6 +485,11 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return collectionGroupMap;
     }
 
+    /**
+     * This method gets all institution entity and puts it in a map.
+     *
+     * @return the institution entity map
+     */
     public Map getInstitutionEntityMap() {
         if (null == institutionEntityMap) {
             institutionEntityMap = new HashMap();
@@ -448,10 +506,20 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         return institutionEntityMap;
     }
 
+    /**
+     * This method gets db report util.
+     *
+     * @return the db report util
+     */
     public DBReportUtil getDbReportUtil() {
         return dbReportUtil;
     }
 
+    /**
+     * This method sets db report util.
+     *
+     * @param dbReportUtil the db report util
+     */
     public void setDbReportUtil(DBReportUtil dbReportUtil) {
         this.dbReportUtil = dbReportUtil;
     }

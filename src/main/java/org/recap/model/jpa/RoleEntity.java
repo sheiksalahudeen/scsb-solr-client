@@ -34,42 +34,92 @@ public class RoleEntity {
     inverseJoinColumns = {@JoinColumn(name="user_id",referencedColumnName = "user_id")})
     private Set<UsersEntity> users;
 
+    /**
+     * Gets users.
+     *
+     * @return the users
+     */
     public Set<UsersEntity> getUsers() {
         return users;
     }
 
+    /**
+     * Sets users.
+     *
+     * @param users the users
+     */
     public void setUsers(Set<UsersEntity> users) {
         this.users = users;
     }
 
+    /**
+     * Gets role id.
+     *
+     * @return the role id
+     */
     public int getRoleId() {
         return roleId;
     }
 
+    /**
+     * Sets role id.
+     *
+     * @param roleId the role id
+     */
     public void setRoleId(int roleId) {
         this.roleId = roleId;
     }
 
+    /**
+     * Gets role name.
+     *
+     * @return the role name
+     */
     public String getRoleName() {
         return roleName;
     }
 
+    /**
+     * Sets role name.
+     *
+     * @param roleName the role name
+     */
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
 
+    /**
+     * Gets role description.
+     *
+     * @return the role description
+     */
     public String getRoleDescription() {
         return roleDescription;
     }
 
+    /**
+     * Sets role description.
+     *
+     * @param roleDescription the role description
+     */
     public void setRoleDescription(String roleDescription) {
         this.roleDescription = roleDescription;
     }
 
+    /**
+     * Gets permissions.
+     *
+     * @return the permissions
+     */
     public Set<PermissionEntity> getPermissions() {
         return permissions;
     }
 
+    /**
+     * Sets permissions.
+     *
+     * @param permissions the permissions
+     */
     public void setPermissions(Set<PermissionEntity> permissions) {
         this.permissions = permissions;
     }

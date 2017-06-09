@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by rajeshbabuk on 13/1/17.
  */
-
 @RestController
 @RequestMapping("/reportsService")
 public class ReportsRestController {
@@ -26,11 +25,17 @@ public class ReportsRestController {
     private static final Logger logger = LoggerFactory.getLogger(ReportsRestController.class);
 
     @Autowired
-    ReportsServiceUtil reportsServiceUtil;
+    private ReportsServiceUtil reportsServiceUtil;
 
     @Autowired
     private ReportGenerator reportGenerator;
 
+    /**
+     * This method is to get accession and deaccession counts from solr and set those values in ReportResponse Entity.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     */
     @RequestMapping(value="/accessionDeaccessionCounts", method = RequestMethod.POST)
     public ReportsResponse accessionDeaccessionCounts(@RequestBody ReportsRequest reportsRequest) {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -43,6 +48,12 @@ public class ReportsRestController {
         return reportsResponse;
     }
 
+    /**
+     * This method is used to get CGD counts from solr.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     */
     @RequestMapping(value="/cgdItemCounts", method = RequestMethod.POST)
     public ReportsResponse cgdItemCounts(@RequestBody ReportsRequest reportsRequest) {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -55,6 +66,12 @@ public class ReportsRestController {
         return reportsResponse;
     }
 
+    /**
+     * This method is used to get detail about deaccession from solr.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     */
     @RequestMapping(value="/deaccessionResults", method = RequestMethod.POST)
     public ReportsResponse deaccessionResults(@RequestBody ReportsRequest reportsRequest) {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -67,6 +84,12 @@ public class ReportsRestController {
         return reportsResponse;
     }
 
+    /**
+     * This method is used to get incomplete records .
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     */
     @RequestMapping(value="/incompleteRecords", method = RequestMethod.POST)
     public ReportsResponse incompleteRecords(@RequestBody ReportsRequest reportsRequest) {
         ReportsResponse reportsResponse = new ReportsResponse();
@@ -79,6 +102,12 @@ public class ReportsRestController {
         return reportsResponse;
     }
 
+    /**
+     * This method is used to generate csv reports.
+     *
+     * @param reportDataRequest the report data request
+     * @return the string
+     */
     @RequestMapping(value="/generateCsvReport", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String generateCsvReports(@RequestBody ReportDataRequest reportDataRequest){
         return reportGenerator.generateReport(reportDataRequest.getFileName(),reportDataRequest.getInstitutionCode(),reportDataRequest.getReportType(),

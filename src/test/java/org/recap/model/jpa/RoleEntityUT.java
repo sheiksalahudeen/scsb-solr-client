@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by hemalathas on 25/1/17.
- */
 public class RoleEntityUT extends BaseTestCase{
 
     @Autowired

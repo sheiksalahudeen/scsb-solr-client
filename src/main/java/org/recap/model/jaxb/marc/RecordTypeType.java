@@ -30,12 +30,16 @@ public enum RecordTypeType implements Serializable {
 
     @XmlEnumValue("Bibliographic")
     BIBLIOGRAPHIC("Bibliographic"),
+
     @XmlEnumValue("Authority")
     AUTHORITY("Authority"),
+
     @XmlEnumValue("Holdings")
     HOLDINGS("Holdings"),
+
     @XmlEnumValue("Classification")
     CLASSIFICATION("Classification"),
+   
     @XmlEnumValue("Community")
     COMMUNITY("Community");
     private final String value;
@@ -44,10 +48,21 @@ public enum RecordTypeType implements Serializable {
         value = v;
     }
 
+    /**
+     * Value string.
+     *
+     * @return the string
+     */
     public String value() {
         return value;
     }
 
+    /**
+     * From value record type type.
+     *
+     * @param v the v
+     * @return the record type type
+     */
     public static RecordTypeType fromValue(String v) {
         for (RecordTypeType c : RecordTypeType.values()) {
             if (c.value.equals(v)) {

@@ -35,34 +35,40 @@ import java.util.*;
 /**
  * Created by rajeshbabuk on 13/1/17.
  */
-
 @Service
 public class ReportsServiceUtil {
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
-    BibSolrCrudRepository bibSolrCrudRepository;
+    private BibSolrCrudRepository bibSolrCrudRepository;
 
     @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
-    List<ItemValueResolver> itemValueResolvers;
-
-    @Autowired
-    BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
+    private List<ItemValueResolver> itemValueResolvers;
 
     @Autowired
-    SearchRecordsUtil searchRecordsUtil;
+    private BibSolrDocumentRepositoryImpl bibSolrDocumentRepository;
 
     @Autowired
-    DateUtil dateUtil;
+    private SearchRecordsUtil searchRecordsUtil;
+
+    @Autowired
+    private DateUtil dateUtil;
 
 
+    /**
+     * This method populates accession and deaccession item counts from solr for report screen in UI.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     * @throws Exception the exception
+     */
     public ReportsResponse populateAccessionDeaccessionItemCounts(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         String solrFormattedDate = getSolrFormattedDates(reportsRequest.getAccessionDeaccessionFromDate(), reportsRequest.getAccessionDeaccessionToDate());
@@ -71,6 +77,13 @@ public class ReportsServiceUtil {
         return reportsResponse;
     }
 
+    /**
+     * This method populates cgd item counts from solr for report screen in UI.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     * @throws Exception the exception
+     */
     public ReportsResponse populateCgdItemCounts(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         for (String owningInstitution : reportsRequest.getOwningInstitutions()) {
@@ -110,6 +123,13 @@ public class ReportsServiceUtil {
         return reportsResponse;
     }
 
+    /**
+     * This method gets deaccession information results from solr and populate them in report screen (UI).
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     * @throws Exception the exception
+     */
     public ReportsResponse populateDeaccessionResults(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         String date = getSolrFormattedDates(reportsRequest.getAccessionDeaccessionFromDate(), reportsRequest.getAccessionDeaccessionToDate());
@@ -179,6 +199,13 @@ public class ReportsServiceUtil {
         return reportsResponse;
     }
 
+    /**
+     * This method is used to populate incomplete records report.
+     *
+     * @param reportsRequest the reports request
+     * @return the reports response
+     * @throws Exception the exception
+     */
     public ReportsResponse populateIncompleteRecordsReport(ReportsRequest reportsRequest) throws Exception {
         ReportsResponse reportsResponse = new ReportsResponse();
         SolrQuery solrQuery;
@@ -256,6 +283,14 @@ public class ReportsServiceUtil {
 
     }
 
+
+    /**
+     * This method gets the accession count from solr
+     * @param reportsRequest
+     * @param reportsResponse
+     * @param solrFormattedDate
+     * @throws Exception
+     */
     private void populateAccessionCounts(ReportsRequest reportsRequest, ReportsResponse reportsResponse, String solrFormattedDate) throws Exception {
         for (String owningInstitution : reportsRequest.getOwningInstitutions()) {
             for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
@@ -293,6 +328,13 @@ public class ReportsServiceUtil {
         }
     }
 
+    /**
+     * This method gets the deaccession count from the solr
+     * @param reportsRequest
+     * @param reportsResponse
+     * @param solrFormattedDate
+     * @throws Exception
+     */
     private void populateDeaccessionCounts(ReportsRequest reportsRequest, ReportsResponse reportsResponse, String solrFormattedDate) throws Exception {
         for (String ownInstitution : reportsRequest.getOwningInstitutions()) {
             for (String collectionGroupDesignation : reportsRequest.getCollectionGroupDesignations()) {
@@ -356,6 +398,12 @@ public class ReportsServiceUtil {
         return utcStr;
     }
 
+    /**
+     * This method gets item for the given item solr document.
+     *
+     * @param itemSolrDocument the item solr document
+     * @return the item
+     */
     public Item getItem(SolrDocument itemSolrDocument) {
         Item item = new Item();
         Collection<String> fieldNames = itemSolrDocument.getFieldNames();
@@ -373,6 +421,11 @@ public class ReportsServiceUtil {
         return item;
     }
 
+    /**
+     * This method gets item value resolvers.
+     *
+     * @return the item value resolvers
+     */
     public List<ItemValueResolver> getItemValueResolvers() {
         if (null == itemValueResolvers) {
             itemValueResolvers = new ArrayList<>();
