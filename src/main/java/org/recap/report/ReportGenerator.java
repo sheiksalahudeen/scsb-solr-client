@@ -21,64 +21,75 @@ public class ReportGenerator {
     private static final Logger logger = LoggerFactory.getLogger(ReportGenerator.class);
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     List<ReportGeneratorInterface> reportGenerators;
 
     @Autowired
-    CSVMatchingAndExceptionReportGenerator csvMatchingAndExceptionReportGenerator;
+    private CSVMatchingAndExceptionReportGenerator csvMatchingAndExceptionReportGenerator;
 
     @Autowired
-    FTPMatchingAndExceptionReportGenerator ftpMatchingAndExceptionReportGenerator;
+    private FTPMatchingAndExceptionReportGenerator ftpMatchingAndExceptionReportGenerator;
 
     @Autowired
-    CSVSummaryReportGenerator csvSummaryReportGenerator;
+    private CSVSummaryReportGenerator csvSummaryReportGenerator;
 
     @Autowired
-    FTPSummaryReportGenerator ftpSummaryReportGenerator;
+    private FTPSummaryReportGenerator ftpSummaryReportGenerator;
 
     @Autowired
-    CSVSolrExceptionReportGenerator csvSolrExceptionReportGenerator;
+    private CSVSolrExceptionReportGenerator csvSolrExceptionReportGenerator;
 
     @Autowired
-    FTPSolrExceptionReportGenerator ftpSolrExceptionReportGenerator;
+    private FTPSolrExceptionReportGenerator ftpSolrExceptionReportGenerator;
 
     @Autowired
-    FSDeAccessionReportGenerator fsDeAccessionReportGenerator;
+    private FSDeAccessionReportGenerator fsDeAccessionReportGenerator;
 
     @Autowired
-    FTPDeAccessionReportGenerator ftpDeAccessionReportGenerator;
+    private FTPDeAccessionReportGenerator ftpDeAccessionReportGenerator;
 
     @Autowired
-    FSAccessionReportGenerator fsAccessionReportGenerator;
+    private FSAccessionReportGenerator fsAccessionReportGenerator;
 
     @Autowired
-    FTPAccessionReportGenerator ftpAccessionReportGenerator;
+    private FTPAccessionReportGenerator ftpAccessionReportGenerator;
 
     @Autowired
-    FSSubmitCollectionRejectionReportGenerator fsSubmitCollectionRejectionReportGenerator;
+    private FSSubmitCollectionRejectionReportGenerator fsSubmitCollectionRejectionReportGenerator;
 
     @Autowired
-    FTPSubmitCollectionRejectionReportGenerator ftpSubmitCollectionRejectionReportGenerator;
+    private FTPSubmitCollectionRejectionReportGenerator ftpSubmitCollectionRejectionReportGenerator;
 
     @Autowired
-    FSSubmitCollectionExceptionReportGenerator fsSubmitCollectionExceptionReportGenerator;
+    private FSSubmitCollectionExceptionReportGenerator fsSubmitCollectionExceptionReportGenerator;
 
     @Autowired
-    FTPSubmitCollectionExceptionReportGenerator ftpSubmitCollectionExceptionReportGenerator;
+    private FTPSubmitCollectionExceptionReportGenerator ftpSubmitCollectionExceptionReportGenerator;
 
     @Autowired
-    FTPSubmitCollectionSummaryReportGenerator ftpSubmitCollectionSummaryReportGenerator;
+    private FTPSubmitCollectionSummaryReportGenerator ftpSubmitCollectionSummaryReportGenerator;
 
     @Autowired
-    FSOngoingAccessionReportGenerator fsOngoingAccessionReportGenerator;
+    private FSOngoingAccessionReportGenerator fsOngoingAccessionReportGenerator;
 
     @Autowired
-    FTPOngoingAccessionReportGenerator ftpOngoingAccessionReportGenerator;
+    private FTPOngoingAccessionReportGenerator ftpOngoingAccessionReportGenerator;
 
     @Autowired
-    FTPSubmitCollectionReportGenerator ftpSubmitCollectionReportGenerator;
+    private FTPSubmitCollectionReportGenerator ftpSubmitCollectionReportGenerator;
 
+    /**
+     * This method is used to generate report based on the reportType.
+     *
+     * @param fileName         the file name
+     * @param institutionName  the institution name
+     * @param reportType       the report type
+     * @param transmissionType the transmission type
+     * @param from             the from
+     * @param to               the to
+     * @return the string
+     */
     public String generateReport(String fileName, String institutionName, String reportType, String transmissionType, Date from, Date to) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -126,6 +137,11 @@ public class ReportGenerator {
         return reportEntityList;
     }
 
+    /**
+     * Gets report generators.
+     *
+     * @return the report generators
+     */
     public List<ReportGeneratorInterface> getReportGenerators() {
         if(CollectionUtils.isEmpty(reportGenerators)) {
             reportGenerators = new ArrayList<>();

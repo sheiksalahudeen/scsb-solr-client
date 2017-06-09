@@ -13,11 +13,31 @@ import org.springframework.data.repository.query.Param;
  */
 public interface RolesDetailsRepositorty extends JpaRepository<RoleEntity, Integer> {
 
+    /**
+     * Finds pageable list of RoleEntity based on the given role name.
+     *
+     * @param roleName the role name
+     * @param pageable the pageable
+     * @return the page
+     */
     Page<RoleEntity> findByRoleName(String roleName, Pageable pageable);
 
 
+    /**
+     * Finds RoleEntity based on the given role name.
+     *
+     * @param roleName the role name
+     * @return the role entity
+     */
     RoleEntity findByRoleName(String roleName);
 
+    /**
+     * Finds pagable list of RoleEntity based on the given role name.
+     *
+     * @param pageable the pageable
+     * @param roleName the role name
+     * @return the page
+     */
     @Query(value = "select roles from RoleEntity roles where roles.roleName = :roleName")
     Page<RoleEntity> findByRoleName(Pageable pageable, @Param("roleName") String roleName);
 

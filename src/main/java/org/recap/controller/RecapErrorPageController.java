@@ -12,6 +12,11 @@ public class RecapErrorPageController implements ErrorController {
 
     private static final String PATH = "/error";
 
+    /**
+     * This method is used to display the error page.
+     *
+     * @return the string
+     */
     @RequestMapping(value = PATH)
     public String recapErrorPage() {
         return "error";

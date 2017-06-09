@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class ReportProcessor implements Processor {
 
     @Autowired
-    ReportDetailRepository reportDetailRepository;
+    private ReportDetailRepository reportDetailRepository;
 
     @Override
     public void process(Exchange exchange) throws Exception {

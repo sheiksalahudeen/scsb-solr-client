@@ -13,6 +13,11 @@ import java.net.HttpURLConnection;
 public class SCSBSimpleClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
     private final HostnameVerifier verifier;
 
+    /**
+     * Instantiates a new scsb simple client http request factory, which is used to handle the ssl.
+     *
+     * @param verifier the verifier
+     */
     public SCSBSimpleClientHttpRequestFactory(HostnameVerifier verifier) {
         this.verifier = verifier;
     }

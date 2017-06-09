@@ -21,6 +21,13 @@ public class ReCAPCSVSolrExceptionRecordGenerator {
 
     private static final Logger logger= LoggerFactory.getLogger(ReCAPCSVSolrExceptionRecordGenerator.class);
 
+    /**
+     * This method prepares SolrExceptionReportReCAPCSVRecord which is used to generate csv report based on the given report entity
+     *
+     * @param reportEntity                      the report entity
+     * @param solrExceptionReportReCAPCSVRecord the solr exception report re capcsv record
+     * @return the solr exception report re capcsv record
+     */
     public SolrExceptionReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
@@ -41,6 +48,12 @@ public class ReCAPCSVSolrExceptionRecordGenerator {
         return solrExceptionReportReCAPCSVRecord;
     }
 
+    /**
+     * This method is used to get the setter method for the given one of the instance variable name in SolrExceptionReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -51,6 +64,12 @@ public class ReCAPCSVSolrExceptionRecordGenerator {
         return null;
     }
 
+    /**
+     * This method is used to get the getter method for the given one of the instance variable name in SolrExceptionReportReCAPCSVRecord class.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
