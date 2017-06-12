@@ -18,6 +18,13 @@ public class SolrRouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(SolrRouteBuilder.class);
 
+    /**
+     * This method instantiates a new solr route builder to index in solr.
+     *
+     * @param camelContext the camel context
+     * @param solrUri      the solr uri
+     * @param solrCore     the solr core
+     */
     @Autowired
     public SolrRouteBuilder(CamelContext camelContext,
                             @Value("${solr.url}") String solrUri,

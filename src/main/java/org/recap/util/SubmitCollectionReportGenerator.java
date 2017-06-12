@@ -22,6 +22,12 @@ public class SubmitCollectionReportGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(SubmitCollectionReportGenerator.class);
 
+    /**
+     * This method prepares submit collection rejection report based on the given report entity.
+     *
+     * @param reportEntity the report entity
+     * @return the SubmitCollectionReportRecord list
+     */
     public List<SubmitCollectionReportRecord> prepareSubmitCollectionRejectionRecord(ReportEntity reportEntity) {
 
         List<SubmitCollectionReportRecord> submitCollectionReportRecordList = new ArrayList<>();
@@ -59,6 +65,13 @@ public class SubmitCollectionReportGenerator {
         newReportObject &= (null != submitCollectionReportRecord.getMessage());
         return newReportObject;
     }
+
+    /**
+     * This method is used to get the setter method for the given one of the instance variable name in SubmitCollectionReportRecord class.
+     *
+     * @param propertyName the property name
+     * @return the setter method
+     */
     public Method getSetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -69,6 +82,12 @@ public class SubmitCollectionReportGenerator {
         return null;
     }
 
+    /**
+     * This method is used to get the getter method for the given one of the instance variable name in SubmitCollectionReportRecord class.
+     *
+     * @param propertyName the property name
+     * @return the getter method
+     */
     public Method getGetterMethod(String propertyName) {
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

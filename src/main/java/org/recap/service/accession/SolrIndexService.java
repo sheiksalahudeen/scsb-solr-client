@@ -27,44 +27,80 @@ public class SolrIndexService {
     private static final Logger logger = LoggerFactory.getLogger(SolrIndexService.class);
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    HoldingsDetailsRepository holdingsDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    SolrClient solrClient;
+    private SolrClient solrClient;
 
+    /**
+     * Gets logger.
+     *
+     * @return the logger
+     */
     public Logger getLogger() {
         return logger;
     }
 
+    /**
+     * Gets ProducerTemplate object.
+     *
+     * @return the ProducerTemplate object.
+     */
     public ProducerTemplate getProducerTemplate() {
         return producerTemplate;
     }
 
+    /**
+     * Gets SolrTemplate object.
+     *
+     * @return the SolrTemplate object.
+     */
     public SolrTemplate getSolrTemplate() {
         return solrTemplate;
     }
 
+    /**
+     * Gets BibliographicDetailsRepository object.
+     *
+     * @return the BibliographicDetailsRepository object.
+     */
     public BibliographicDetailsRepository getBibliographicDetailsRepository() {
         return bibliographicDetailsRepository;
     }
 
+    /**
+     * Gets HoldingsDetailsRepository object.
+     *
+     * @return the HoldingsDetailsRepository object.
+     */
     public HoldingsDetailsRepository getHoldingsDetailsRepository() {
         return holdingsDetailsRepository;
     }
 
+    /**
+     * Gets BibJSONUtil object.
+     *
+     * @return the BibJSONUtil object.
+     */
     public BibJSONUtil getBibJSONUtil(){
         return new BibJSONUtil();
     }
 
+    /**
+     * This method is used to index by bibliographic id in solr.
+     *
+     * @param bibliographicId the bibliographic id
+     * @return the solr input document
+     */
     public SolrInputDocument indexByBibliographicId(@RequestBody Integer bibliographicId) {
         getBibJSONUtil().setProducerTemplate(getProducerTemplate());
         BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicId(bibliographicId);
@@ -79,6 +115,14 @@ public class SolrIndexService {
         return solrInputDocument;
     }
 
+    /**
+     * This method is used to delete by doc id in solr.
+     *
+     * @param docIdParam the doc id param
+     * @param docIdValue the doc id value
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
         solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
         solrTemplate.commit();

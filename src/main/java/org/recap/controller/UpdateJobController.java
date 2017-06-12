@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by rajeshbabuk on 12/4/17.
  */
-
 @RestController
 @RequestMapping("/updateJobService")
 public class UpdateJobController {
@@ -24,6 +23,12 @@ public class UpdateJobController {
     @Autowired
     private JobDetailsRepository jobDetailsRepository;
 
+    /**
+     * This method is used to update the job entity.
+     *
+     * @param jobEntity the job entity
+     * @return the string
+     */
     @RequestMapping(value="/updateJob", method = RequestMethod.POST)
     public String updateJob(@RequestBody JobEntity jobEntity) {
         jobDetailsRepository.save(jobEntity);

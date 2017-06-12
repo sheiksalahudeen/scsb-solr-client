@@ -11,26 +11,56 @@ public class UserDetailsForm {
 
     private boolean recapUser;
 
+    /**
+     * Gets login institution id.
+     *
+     * @return the login institution id
+     */
     public Integer getLoginInstitutionId() {
         return loginInstitutionId;
     }
 
+    /**
+     * Sets login institution id.
+     *
+     * @param loginInstitutionId the login institution id
+     */
     public void setLoginInstitutionId(Integer loginInstitutionId) {
         this.loginInstitutionId = loginInstitutionId;
     }
 
+    /**
+     * Is super admin boolean.
+     *
+     * @return the boolean
+     */
     public boolean isSuperAdmin() {
         return superAdmin;
     }
 
+    /**
+     * Sets super admin.
+     *
+     * @param superAdmin the super admin
+     */
     public void setSuperAdmin(boolean superAdmin) {
         this.superAdmin = superAdmin;
     }
 
+    /**
+     * Is recap user boolean.
+     *
+     * @return the boolean
+     */
     public boolean isRecapUser() {
         return recapUser;
     }
 
+    /**
+     * Sets recap user.
+     *
+     * @param recapUser the recap user
+     */
     public void setRecapUser(boolean recapUser) {
         this.recapUser = recapUser;
     }
