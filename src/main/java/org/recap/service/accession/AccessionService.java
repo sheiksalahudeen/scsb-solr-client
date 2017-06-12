@@ -189,10 +189,11 @@ public class AccessionService {
      */
     @Transactional
     public String saveRequest(List<AccessionRequest> accessionRequestList) {
+        List<AccessionRequest> trimmedAccessionRequests = getTrimmedAccessionRequests(accessionRequestList);
         String status = null;
         try {
             AccessionEntity accessionEntity = new AccessionEntity();
-            accessionEntity.setAccessionRequest(convertJsonToString(accessionRequestList));
+            accessionEntity.setAccessionRequest(convertJsonToString(trimmedAccessionRequests));
             accessionEntity.setCreatedDate(new Date());
             accessionEntity.setAccessionStatus(RecapConstants.PENDING);
             accessionDetailsRepository.save(accessionEntity);
@@ -250,10 +251,11 @@ public class AccessionService {
     @Transactional
     public List<AccessionResponse> processRequest(List<AccessionRequest> accessionRequestList) {
         String response = null;
+        List<AccessionRequest> trimmedAccessionRequests = getTrimmedAccessionRequests(accessionRequestList);
         List<AccessionResponse> accessionResponsesList = new ArrayList<>();
         String bibDataResponse;
         List<Map<String, String>> responseMapList = new ArrayList<>();
-        for (AccessionRequest accessionRequest : accessionRequestList) {
+        for (AccessionRequest accessionRequest : trimmedAccessionRequests) {
             List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
             String owningInstitution = getOwningInstitution(accessionRequest.getCustomerCode());
             List<ItemEntity> itemEntityList = getItemEntityList(accessionRequest);
@@ -950,5 +952,16 @@ public class AccessionService {
             logger.error(RecapConstants.LOG_ERROR, ex);
         }
         return strJson;
+    }
+
+    private List<AccessionRequest> getTrimmedAccessionRequests(List<AccessionRequest> accessionRequestList) {
+        List<AccessionRequest> trimmedAccessionRequests = new ArrayList<>();
+        for (AccessionRequest accessionRequest : accessionRequestList) {
+            AccessionRequest request = new AccessionRequest();
+            request.setItemBarcode(accessionRequest.getItemBarcode().trim());
+            request.setCustomerCode(accessionRequest.getCustomerCode().trim());
+            trimmedAccessionRequests.add(request);
+        }
+        return trimmedAccessionRequests;
     }
 }
