@@ -22,7 +22,16 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
 
+    /**
+     * The constant DEFAULT_INCLUDE_PATTERNS.
+     */
     protected static final List<String> DEFAULT_INCLUDE_PATTERNS = Arrays.asList("/.*");
+
+    /**
+     * Documentation docket.
+     *
+     * @return the docket
+     */
     @Bean
     public Docket documentation() {
         return new Docket(DocumentationType.SWAGGER_2)

@@ -14,6 +14,14 @@ import java.util.Date;
 @Component
 public class SwaggerInterceptor implements HandlerInterceptor {
 
+    /**
+     * The method is used for authenticating key for accessing the api.
+     * @param request
+     * @param response
+     * @param handler
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {

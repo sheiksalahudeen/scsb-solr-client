@@ -25,23 +25,44 @@ public class UpdateItemStatusController {
     private static final Logger logger = LoggerFactory.getLogger(UpdateCgdRestController.class);
 
     @Autowired
-    UpdateCgdUtil updateCgdUtil;
+    private UpdateCgdUtil updateCgdUtil;
 
     @Autowired
-    ItemDetailsRepository itemDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
+    /**
+     * Gets logger.
+     *
+     * @return the logger
+     */
     public Logger getLogger() {
         return logger;
     }
 
+    /**
+     * Gets UpdateCgdUtil object.
+     *
+     * @return the UpdateCgdUtil object
+     */
     public UpdateCgdUtil getUpdateCgdUtil() {
         return updateCgdUtil;
     }
 
+    /**
+     * Gets ItemDetailsRepository object.
+     *
+     * @return the ItemDetailsRepository object.
+     */
     public ItemDetailsRepository getItemDetailsRepository() {
         return itemDetailsRepository;
     }
 
+    /**
+     * This method is used to update the item availability status in solr for the given itemBarcode.
+     *
+     * @param itemBarcode the item barcode
+     * @return the string statusMessage
+     */
     @RequestMapping(value = "/updateItemAvailablityStatus", method = RequestMethod.GET)
     public String updateCgdForItem(@RequestParam String itemBarcode) {
         String statusMessage = null;

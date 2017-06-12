@@ -28,10 +28,22 @@ public final class SearchRecordsUtil {
     @Autowired
     private DataDumpSolrDocumentRepository dataDumpSolrDocumentRepository;
 
+    /**
+     * Gets DataDumpSolrDocumentRepository object.
+     *
+     * @return the DataDumpSolrDocumentRepository object.
+     */
     public DataDumpSolrDocumentRepository getDataDumpSolrDocumentRepository() {
         return dataDumpSolrDocumentRepository;
     }
 
+    /**
+     * This method searches records in solr based on the given search records request and returns a list of SearchResultRow.
+     *
+     * @param searchRecordsRequest the SearchResultRow
+     * @return the SearchResultRow list
+     * @throws Exception the exception
+     */
     public List<SearchResultRow> searchRecords(SearchRecordsRequest searchRecordsRequest) throws Exception{
 
         if (!isEmptySearch(searchRecordsRequest)) {
@@ -41,6 +53,14 @@ public final class SearchRecordsUtil {
         return new ArrayList<>();
     }
 
+    /**
+     * This method is used to search BibItems from the solr based on the given searchRecordsRequest and sets the reponse to SearchResultRow
+     * and returns a list of SearchResultRow.
+     *
+     * @param searchRecordsRequest the SearchResultRow
+     * @return the SearchResultRow list
+     * @throws Exception the exception
+     */
     public List<SearchResultRow> searchAndBuildResults(SearchRecordsRequest searchRecordsRequest) throws Exception{
         Map<String, Object> searchResponse = bibSolrDocumentRepository.search(searchRecordsRequest);
         String errorResponse = (String) searchResponse.get(RecapConstants.SEARCH_ERROR_RESPONSE);
@@ -54,6 +74,13 @@ public final class SearchRecordsUtil {
         return new ArrayList<>();
     }
 
+    /**
+     * Search records for data dump in solr based on the given search records request and returns a list of DataDumpSearchResult.
+     *
+     * @param searchRecordsRequest the SearchResultRow
+     * @return the DataDumpSearchResult list
+     * @throws Exception the exception
+     */
     public List<DataDumpSearchResult> searchRecordsForDataDump(SearchRecordsRequest searchRecordsRequest) throws Exception{
         if (!isEmptySearch(searchRecordsRequest)) {
             Map<String, Object> searchResponse = getDataDumpSolrDocumentRepository().search(searchRecordsRequest);
@@ -133,6 +160,12 @@ public final class SearchRecordsUtil {
         return searchResultRows;
     }
 
+    /**
+     * This method builds search results for data dump for the given list of bib items and returns a list of DataDumpSearchResult.
+     *
+     * @param bibItems the bibItems
+     * @return the DataDumpSearchResult list
+     */
     public List<DataDumpSearchResult> buildResultsForDataDump(List<BibItem> bibItems) {
         List<DataDumpSearchResult> dataDumpSearchResults = new ArrayList<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
