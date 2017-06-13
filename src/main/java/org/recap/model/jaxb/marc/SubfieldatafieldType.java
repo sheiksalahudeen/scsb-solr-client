@@ -31,18 +31,19 @@ public class SubfieldatafieldType implements Serializable {
 
     @XmlValue
     protected String value;
+
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     protected String id;
+    
     @XmlAttribute(name = "code", required = true)
     protected String code;
 
     /**
      * Gets the value of the value property.
      *
-     * @return possible object is
-     * {@link String }
+     * @return possible object is {@link String }
      */
     public String getValue() {
         return value;
@@ -51,8 +52,7 @@ public class SubfieldatafieldType implements Serializable {
     /**
      * Sets the value of the value property.
      *
-     * @param value allowed object is
-     *              {@link String }
+     * @param value allowed object is              {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -61,8 +61,7 @@ public class SubfieldatafieldType implements Serializable {
     /**
      * Gets the value of the id property.
      *
-     * @return possible object is
-     * {@link String }
+     * @return possible object is {@link String }
      */
     public String getId() {
         return id;
@@ -71,8 +70,7 @@ public class SubfieldatafieldType implements Serializable {
     /**
      * Sets the value of the id property.
      *
-     * @param value allowed object is
-     *              {@link String }
+     * @param value allowed object is              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -81,8 +79,7 @@ public class SubfieldatafieldType implements Serializable {
     /**
      * Gets the value of the code property.
      *
-     * @return possible object is
-     * {@link String }
+     * @return possible object is {@link String }
      */
     public String getCode() {
         return code;
@@ -91,8 +88,7 @@ public class SubfieldatafieldType implements Serializable {
     /**
      * Sets the value of the code property.
      *
-     * @param value allowed object is
-     *              {@link String }
+     * @param value allowed object is              {@link String }
      */
     public void setCode(String value) {
         this.code = value;

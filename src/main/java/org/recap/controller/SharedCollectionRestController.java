@@ -37,23 +37,44 @@ public class SharedCollectionRestController {
     private ItemAvailabilityService itemAvailabilityService;
 
     @Autowired
-    AccessionService accessionService;
+    private AccessionService accessionService;
 
     @Value("${ongoing.accession.input.limit}")
     private Integer inputLimit;
 
+    /**
+     * Gets ItemAvailabilityService object..
+     *
+     * @return the ItemAvailabilityService object.
+     */
     public ItemAvailabilityService getItemAvailabilityService() {
         return itemAvailabilityService;
     }
 
+    /**
+     * Gets AccessionService object..
+     *
+     * @return the AccessionService object.
+     */
     public AccessionService getAccessionService() {
         return accessionService;
     }
 
+    /**
+     * Gets input limit.
+     *
+     * @return the input limit
+     */
     public Integer getInputLimit() {
         return inputLimit;
     }
 
+    /**
+     * This method is used to get the item availability status.
+     *
+     * @param itemAvailabityStatusRequest the item availabity status request
+     * @return the response entity
+     */
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity itemAvailabilityStatus(@RequestBody ItemAvailabityStatusRequest itemAvailabityStatusRequest) {
@@ -70,6 +91,12 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
+    /**
+     * This method is used to get the bib availability status.
+     *
+     * @param bibItemAvailabityStatusRequest the bib item availability status request
+     * @return the response entity
+     */
     @RequestMapping(value = "/bibAvailabilityStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity bibAvailabilityStatus(@RequestBody BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest) {
@@ -87,6 +114,12 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
+    /**
+     * This method is used to save the accession and send the response.
+     *
+     * @param accessionRequestList the accession request list
+     * @return the response entity
+     */
     @RequestMapping(value = "/accessionBatch", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity accessionBatch(@RequestBody List<AccessionRequest> accessionRequestList) {
@@ -95,6 +128,12 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
+    /**
+     * This method is used to perform accession for the given list of accessionRequests.
+     *
+     * @param accessionRequestList the accession request list
+     * @return the response entity
+     */
     @RequestMapping(value = "/accession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity accession(@RequestBody List<AccessionRequest> accessionRequestList) {
@@ -110,6 +149,12 @@ public class SharedCollectionRestController {
         return responseEntity;
     }
 
+    /**
+     * This method performs ongoing accession job.
+     *
+     * @param accessionDate the accession date
+     * @return the string
+     */
     @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String ongoingAccessionJob(@RequestBody Date accessionDate) {

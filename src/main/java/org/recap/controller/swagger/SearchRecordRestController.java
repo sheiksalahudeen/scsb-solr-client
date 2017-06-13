@@ -25,12 +25,23 @@ public class SearchRecordRestController {
     private static final Logger logger = LoggerFactory.getLogger(SearchRecordRestController.class);
 
     @Autowired
-    SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
+    private SearchRecordsUtil searchRecordsUtil=new SearchRecordsUtil();
 
+    /**
+     * Gets SearchRecordsUtil object.
+     *
+     * @return the SearchRecordsUtil object.
+     */
     public SearchRecordsUtil getSearchRecordsUtil() {
         return searchRecordsUtil;
     }
 
+    /**
+     * This method searches books based on the given search records request parameter and returns a list of search result row.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the SearchRecordsResponse.
+     */
     @RequestMapping(value="/search", method = RequestMethod.POST)
     @ApiOperation(value = "search",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "search")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
@@ -53,6 +64,12 @@ public class SearchRecordRestController {
         return searchRecordsResponse;
     }
 
+    /**
+     * This method searches books based on the given search records request parameter and returns a list of DataDumpSearchResult which contains only bib ids and their corresponding item ids.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the responseMap.
+     */
     @RequestMapping(value="/searchRecords", method = RequestMethod.POST)
     @ApiOperation(value = "searchRecords",notes = "Search Books in ReCAP - Using Method Post, Request data is String", nickname = "searchRecords", consumes="application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})
@@ -71,6 +88,19 @@ public class SearchRecordRestController {
     }
 
 
+    /**
+     * This method searches books based on the given search parameters and returns a list of search result row.
+     *
+     * @param fieldValue                  the field value
+     * @param fieldName                   the field name
+     * @param owningInstitutions          the owning institutions
+     * @param collectionGroupDesignations the collection group designations
+     * @param availability                the availability
+     * @param materialTypes               the material types
+     * @param useRestrictions             the use restrictions
+     * @param pageSize                    the page size
+     * @return the SearchResultRow list.
+     */
     @RequestMapping(value="/searchByParam", method = RequestMethod.GET)
     @ApiOperation(value = "searchParam",notes = "Search Books in ReCAP - Using Method GET, Request data as parameter", nickname = "search")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Search")})

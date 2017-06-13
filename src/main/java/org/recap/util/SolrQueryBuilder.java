@@ -20,18 +20,23 @@ import java.util.List;
 /**
  * Created by peris on 9/30/16.
  */
-
 @Component
 public class SolrQueryBuilder {
 
-    String and = " AND ";
+    private String and = " AND ";
 
-    String or = " OR ";
+    private String or = " OR ";
 
-    String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
+    private String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
-    String coreChildFilterQuery = "{!child of=\"ContentType:parent\"}";
+    private String coreChildFilterQuery = "{!child of=\"ContentType:parent\"}";
 
+    /**
+     * Gets query string for item criteria for parent.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query string for item criteria for parent
+     */
     public String getQueryStringForItemCriteriaForParent(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -74,6 +79,12 @@ public class SolrQueryBuilder {
         return "(" + stringBuilder.toString() + ")";
     }
 
+    /**
+     * Gets query string for parent criteria for child.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query string for parent criteria for child
+     */
     public String getQueryStringForParentCriteriaForChild(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -102,6 +113,12 @@ public class SolrQueryBuilder {
         return stringBuilder.toString();
     }
 
+    /**
+     * Gets query string for match child return parent.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query string for match child return parent
+     */
     public String getQueryStringForMatchChildReturnParent(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> owningInstitutions = searchRecordsRequest.getOwningInstitutions();
@@ -118,6 +135,12 @@ public class SolrQueryBuilder {
         return stringBuilder.toString();
     }
 
+    /**
+     * Gets query string for match parent return child.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query string for match parent return child
+     */
     public String getQueryStringForMatchParentReturnChild(SearchRecordsRequest searchRecordsRequest) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> availability = searchRecordsRequest.getAvailability();
@@ -141,12 +164,24 @@ public class SolrQueryBuilder {
         return stringBuilder.toString();
     }
 
+    /**
+     * Gets query string for match parent return child for deleted data dump cgd to private.
+     *
+     * @return the query string for match parent return child for deleted data dump cgd to private
+     */
     public String getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(buildQueryForMatchChildReturnParent(RecapConstants.COLLECTION_GROUP_DESIGNATION, Arrays.asList(RecapConstants.PRIVATE)));
         return stringBuilder.toString();
     }
 
+    /**
+     * This method is used to build query for parent using the given field name,list of values and child query.
+     * @param fieldName
+     * @param values
+     * @param parentQuery
+     * @return
+     */
     private String buildQueryForParentGivenChild(String fieldName, List<String> values, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -160,6 +195,12 @@ public class SolrQueryBuilder {
         return "(" + stringBuilder.toString() + ")";
     }
 
+    /**
+     * This method is used to build query for the given fieldName and list of values.
+     * @param fieldName
+     * @param values
+     * @return
+     */
     private String buildQueryForMatchChildReturnParent(String fieldName, List<String> values) {
         List<String> modifiedValues = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(values)) {
@@ -174,6 +215,8 @@ public class SolrQueryBuilder {
      * IF the getQueryForFieldCriteria() is called with Item field/value combination, the query would still return
      * only Bib Criteria. You will need to call getItemSolrQueryForCriteria()
      *
+     * @param searchRecordsRequest the search records request
+     * @return the query for field criteria
      * @throws Exception
      */
     public String getQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest) {
@@ -236,6 +279,13 @@ public class SolrQueryBuilder {
         return "";
     }
 
+    /**
+     * Gets count query for field criteria.
+     *
+     * @param searchRecordsRequest the search records request
+     * @param parentQuery          the parent query
+     * @return the count query for field criteria
+     */
     public String getCountQueryForFieldCriteria(SearchRecordsRequest searchRecordsRequest, String parentQuery) {
         StringBuilder stringBuilder = new StringBuilder();
         String fieldValue = parseSearchRequest(searchRecordsRequest.getFieldValue().trim());
@@ -272,12 +322,24 @@ public class SolrQueryBuilder {
         return "";
     }
 
+    /**
+     * Gets solr query for bib item.
+     *
+     * @param parentQueryString the parent query string
+     * @return the solr query for bib item
+     */
     public SolrQuery getSolrQueryForBibItem(String parentQueryString) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(parentQueryString);
         return new SolrQuery(stringBuilder.toString());
     }
 
+    /**
+     * Gets query for parent and child criteria.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query for parent and child criteria
+     */
     public SolrQuery getQueryForParentAndChildCriteria(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
@@ -290,6 +352,12 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    /**
+     * Gets query for parent and child criteria for data dump.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query for parent and child criteria for data dump
+     */
     public SolrQuery getQueryForParentAndChildCriteriaForDataDump(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
@@ -302,6 +370,12 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    /**
+     * Gets query for child and parent criteria.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the query for child and parent criteria
+     */
     public SolrQuery getQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
@@ -312,6 +386,13 @@ public class SolrQueryBuilder {
                 + and + queryForFieldCriteria + queryStringForParentCriteriaForChild);
     }
 
+    /**
+     * Gets deleted query for data dump.
+     *
+     * @param searchRecordsRequest  the search records request
+     * @param isCGDChangedToPrivate the is cgd changed to private
+     * @return the deleted query for data dump
+     */
     public SolrQuery getDeletedQueryForDataDump(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) {
         String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
         String queryForBibCriteria = buildQueryForBibFacetCriteria(searchRecordsRequest);
@@ -332,6 +413,12 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    /**
+     * Gets count query for parent and child criteria.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the count query for parent and child criteria
+     */
     public SolrQuery getCountQueryForParentAndChildCriteria(SearchRecordsRequest searchRecordsRequest) {
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreParentFilterQuery);
         String queryStringForBibCriteria = getQueryStringForMatchChildReturnParent(searchRecordsRequest);
@@ -343,6 +430,12 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    /**
+     * Gets count query for child and parent criteria.
+     *
+     * @param searchRecordsRequest the search records request
+     * @return the count query for child and parent criteria
+     */
     public SolrQuery getCountQueryForChildAndParentCriteria(SearchRecordsRequest searchRecordsRequest) {
         String countQueryForFieldCriteria = getCountQueryForFieldCriteria(searchRecordsRequest, coreChildFilterQuery);
         String queryStringForItemCriteria = getQueryStringForMatchParentReturnChild(searchRecordsRequest);
@@ -357,8 +450,9 @@ public class SolrQueryBuilder {
 
     /**
      * This method escapes the special characters.
-     * @param searchText
-     * @return
+     *
+     * @param searchText the search text
+     * @return string
      */
     public String parseSearchRequest(String searchText) {
         StringBuilder modifiedText = new StringBuilder();
@@ -420,6 +514,14 @@ public class SolrQueryBuilder {
         return modifiedText.toString();
     }
 
+    /**
+     * Solr query to fetch bib details.
+     *
+     * @param matchingMatchPointsEntities the matching match points entities
+     * @param matchCriteriaValues         the match criteria values
+     * @param matchingCriteria            the matching criteria
+     * @return the solr query
+     */
     public SolrQuery solrQueryToFetchBibDetails(List<MatchingMatchPointsEntity> matchingMatchPointsEntities, List<String> matchCriteriaValues, String matchingCriteria) {
         Integer rows = 0;
         for (MatchingMatchPointsEntity matchingMatchPointsEntity : matchingMatchPointsEntities) {
@@ -443,6 +545,13 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    /**
+     * Solr query for ongoing matching.
+     *
+     * @param fieldName           the field name
+     * @param matchingPointValues the matching point values
+     * @return the string
+     */
     public String solrQueryForOngoingMatching(String fieldName, List<String> matchingPointValues) {
         StringBuilder query = new StringBuilder();
         query.append(buildQueryForMatchChildReturnParent(fieldName, matchingPointValues));
@@ -453,6 +562,13 @@ public class SolrQueryBuilder {
         return query.toString();
     }
 
+    /**
+     * Solr query for ongoing matching.
+     *
+     * @param fieldName          the field name
+     * @param matchingPointValue the matching point value
+     * @return the string
+     */
     public String solrQueryForOngoingMatching(String fieldName, String matchingPointValue) {
         StringBuilder query = new StringBuilder();
         if(matchingPointValue.contains("\\")) {
@@ -466,6 +582,12 @@ public class SolrQueryBuilder {
         return query.toString();
     }
 
+    /**
+     * This query is used to Fetch created or updated bibs based on the date.
+     *
+     * @param date the date
+     * @return the string
+     */
     public String fetchCreatedOrUpdatedBibs(String date) {
         StringBuilder query = new StringBuilder();
         query.append("(").append(RecapConstants.BIB_CREATED_DATE).append(":").append("[").append(date).append("]")
@@ -477,6 +599,15 @@ public class SolrQueryBuilder {
         return query.toString();
     }
 
+    /**
+     * Build solr query for accession reports.
+     *
+     * @param date                       the date
+     * @param owningInstitution          the owning institution
+     * @param isDeleted                  the is deleted
+     * @param collectionGroupDesignation the collection group designation
+     * @return the solr query
+     */
     public SolrQuery buildSolrQueryForAccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
         query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
@@ -488,6 +619,15 @@ public class SolrQueryBuilder {
         return new SolrQuery(query.toString());
     }
 
+    /**
+     * Build solr query for deaccession reports.
+     *
+     * @param date                       the date
+     * @param owningInstitution          the owning institution
+     * @param isDeleted                  the is deleted
+     * @param collectionGroupDesignation the collection group designation
+     * @return the solr query
+     */
     public SolrQuery buildSolrQueryForDeaccessionReports(String date, String owningInstitution, boolean isDeleted, String collectionGroupDesignation) {
         StringBuilder query = new StringBuilder();
         query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
@@ -500,6 +640,13 @@ public class SolrQueryBuilder {
     }
 
 
+    /**
+     * Build solr query for cgd reports.
+     *
+     * @param owningInstitution          the owning institution
+     * @param collectionGroupDesignation the collection group designation
+     * @return the solr query
+     */
     public SolrQuery buildSolrQueryForCGDReports(String owningInstitution , String collectionGroupDesignation){
         StringBuilder query = new StringBuilder();
         query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);
@@ -511,6 +658,14 @@ public class SolrQueryBuilder {
     }
 
 
+    /**
+     * Build solr query for deaccesion report information.
+     *
+     * @param date              the date
+     * @param owningInstitution the owning institution
+     * @param isDeleted         the is deleted
+     * @return the solr query
+     */
     public SolrQuery buildSolrQueryForDeaccesionReportInformation(String date, String owningInstitution, boolean isDeleted) {
         StringBuilder query = new StringBuilder();
         query.append(RecapConstants.DOCTYPE).append(":").append(RecapConstants.ITEM).append(and);

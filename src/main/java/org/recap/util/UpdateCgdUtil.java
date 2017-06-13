@@ -31,29 +31,39 @@ public class UpdateCgdUtil {
     private static final Logger logger = LoggerFactory.getLogger(UpdateCgdUtil.class);
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
-    HoldingsDetailsRepository holdingsDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
-    ItemDetailsRepository itemDetailsRepository;
+    private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired
-    ItemCrudRepository itemSolrCrudRepository;
+    private ItemCrudRepository itemSolrCrudRepository;
 
     @Autowired
-    SolrTemplate solrTemplate;
+    private SolrTemplate solrTemplate;
 
     @Autowired
-    ProducerTemplate producerTemplate;
+    private ProducerTemplate producerTemplate;
 
+    /**
+     * This method updates cgd for item in both solr and database based on the given input parameters and sends email on successful cgd updation.
+     *
+     * @param itemBarcode                   the item barcode
+     * @param owningInstitution             the owning institution
+     * @param oldCollectionGroupDesignation the old collection group designation
+     * @param newCollectionGroupDesignation the new collection group designation
+     * @param cgdChangeNotes                the cgd change notes
+     * @return the string
+     */
     public String updateCGDForItem(String itemBarcode, String owningInstitution, String oldCollectionGroupDesignation, String newCollectionGroupDesignation, String cgdChangeNotes) {
         String username = RecapConstants.GUEST;
         List<ItemEntity> itemEntities = new ArrayList<>();
@@ -73,11 +83,24 @@ public class UpdateCgdUtil {
         }
     }
 
+    /**
+     * This method updates cgd for item in database.
+     *
+     * @param itemBarcode                   the item barcode
+     * @param newCollectionGroupDesignation the new collection group designation
+     * @param username                      the username
+     * @param lastUpdatedDate               the last updated date
+     */
     public void updateCGDForItemInDB(String itemBarcode, String newCollectionGroupDesignation, String username, Date lastUpdatedDate) {
         CollectionGroupEntity collectionGroupEntity = collectionGroupDetailsRepository.findByCollectionGroupCode(newCollectionGroupDesignation);
         itemDetailsRepository.updateCollectionGroupIdByItemBarcode(collectionGroupEntity.getCollectionGroupId(), itemBarcode, username, lastUpdatedDate);
     }
 
+    /**
+     * This method updates cgd for item in solr.
+     *
+     * @param itemEntities the item entities
+     */
     public void updateCGDForItemInSolr(List<ItemEntity> itemEntities) {
         BibJSONUtil bibJSONUtil = new BibJSONUtil();
         if (CollectionUtils.isNotEmpty(itemEntities)) {
@@ -96,6 +119,14 @@ public class UpdateCgdUtil {
         }
     }
 
+    /**
+     * This method is used to save the updated cgd in itemChangeLogEntity.
+     * @param itemEntities
+     * @param username
+     * @param lastUpdatedDate
+     * @param operationType
+     * @param notes
+     */
     private void saveItemChangeLogEntity(List<ItemEntity> itemEntities, String username, Date lastUpdatedDate, String operationType, String notes) {
         if (CollectionUtils.isNotEmpty(itemEntities)) {
             for (ItemEntity itemEntity : itemEntities) {
@@ -110,6 +141,14 @@ public class UpdateCgdUtil {
         }
     }
 
+    /**
+     * This method is used to send email using the email route builder.
+     * @param itemBarcode
+     * @param owningInstitution
+     * @param oldCollectionGroupDesignation
+     * @param newCollectionGroupDesignation
+     * @param cgdChangeNotes
+     */
     private void sendEmail(String itemBarcode, String owningInstitution, String oldCollectionGroupDesignation, String newCollectionGroupDesignation, String cgdChangeNotes) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setItemBarcode(itemBarcode);
@@ -120,6 +159,11 @@ public class UpdateCgdUtil {
         producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_FOR, RecapConstants.UPDATECGD);
     }
 
+    /**
+     * This method is used to set the cgdChangeLog in Item Entity.
+     * @param cgdChangeLog
+     * @param itemEntityList
+     */
     private void setCGDChangeLogToItemEntity(String cgdChangeLog,List<ItemEntity> itemEntityList){
         for(ItemEntity itemEntity:itemEntityList){
             itemEntity.setCgdChangeLog(cgdChangeLog);
