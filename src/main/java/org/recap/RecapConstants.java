@@ -179,6 +179,7 @@ public final class RecapConstants {
     public static final String SERVER_ERROR_MSG = "Server is down for maintenance. Please try again later.";
     public static final String EMPTY_FACET_ERROR_MSG = "Check facets. At least one Bib Facet and one Item Facet must be checked to get results.";
     public static final String ACCESS_RESTRICTED="User is not permitted to access this record";
+    public static final String INVALID_BARCODE_LENGTH="Barcode length should not exceed 45 characters";
 
     //Search Response Types
     public static final String SEARCH_SUCCESS_RESPONSE = "SuccessResponse";

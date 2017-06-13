@@ -211,8 +211,7 @@ public class AccessionService {
      * @return
      */
     public List<AccessionEntity> getAccessionEntities(String accessionStatus) {
-        List<AccessionEntity> accessionEntityList = accessionDetailsRepository.findByAccessionStatus(accessionStatus);
-        return accessionEntityList;
+        return accessionDetailsRepository.findByAccessionStatus(accessionStatus);
     }
 
     /**
@@ -263,13 +262,16 @@ public class AccessionService {
             boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
             boolean isDeaccessionedItem = isItemDeaccessioned(itemEntityList);
             AccessionResponse accessionResponse = new AccessionResponse();
-            if(isItemBarcodeEmpty) {
+            if (isItemBarcodeEmpty) {
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.ITEM_BARCODE_EMPTY);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.ITEM_BARCODE_EMPTY));
-            }else if (!itemExists) {
+            } else if (!itemExists) {
                 if (owningInstitution == null) {
                     setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, accessionRequest.getCustomerCode() + " " + RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST);
                     reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.CUSTOMER_CODE_DOESNOT_EXIST));
+                } else if (accessionRequest.getItemBarcode().length() > 45) {
+                    setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, RecapConstants.INVALID_BARCODE_LENGTH);
+                    reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.INVALID_BARCODE_LENGTH));
                 } else {
                     try {
                         if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON)) {
@@ -277,7 +279,7 @@ public class AccessionService {
                             stopWatch.start();
                             bibDataResponse = getPrincetonService().getBibData(accessionRequest.getItemBarcode());
                             stopWatch.stop();
-                            logger.info("Time taken to get bib data from ils : {}" ,stopWatch.getTotalTimeSeconds());
+                            logger.info("Time taken to get bib data from ils : {}", stopWatch.getTotalTimeSeconds());
                             response = processAccessionForMarcXml(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest, accessionResponse);
                         } else if (owningInstitution != null && owningInstitution.equalsIgnoreCase(RecapConstants.COLUMBIA)) {
                             StopWatch stopWatch = new StopWatch();
@@ -311,11 +313,11 @@ public class AccessionService {
                 }
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, response);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
-                saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
+                saveItemChangeLogEntity(RecapConstants.REACCESSION, RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE, itemEntityList);
             } else {
                 String itemAreadyAccessionedOwnInstBibId = itemEntityList.get(0).getBibliographicEntities() != null ? itemEntityList.get(0).getBibliographicEntities().get(0).getOwningInstitutionBibId() : " ";
                 String itemAreadyAccessionedOwnInstHoldingId = itemEntityList.get(0).getHoldingsEntities() != null ? itemEntityList.get(0).getHoldingsEntities().get(0).getOwningInstitutionHoldingsId() : " ";
-                String itemAreadyAccessionedMessage = RecapConstants.ITEM_ALREADY_ACCESSIONED+RecapConstants.OWN_INST_BIB_ID+itemAreadyAccessionedOwnInstBibId+RecapConstants.OWN_INST_HOLDING_ID+itemAreadyAccessionedOwnInstHoldingId+RecapConstants.OWN_INST_ITEM_ID+itemEntityList.get(0).getOwningInstitutionItemId();
+                String itemAreadyAccessionedMessage = RecapConstants.ITEM_ALREADY_ACCESSIONED + RecapConstants.OWN_INST_BIB_ID + itemAreadyAccessionedOwnInstBibId + RecapConstants.OWN_INST_HOLDING_ID + itemAreadyAccessionedOwnInstHoldingId + RecapConstants.OWN_INST_ITEM_ID + itemEntityList.get(0).getOwningInstitutionItemId();
                 setAccessionResponse(accessionResponsesList, accessionRequest, accessionResponse, itemAreadyAccessionedMessage);
                 reportDataEntityList.addAll(createReportDataEntityList(accessionRequest, itemAreadyAccessionedMessage));
             }
@@ -663,12 +665,20 @@ public class AccessionService {
             }
             exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
 
-            if(!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())){
-                    reasonForFailureBib =  responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString()+ "," +reasonForFailureBib;
-                }
-            if((!StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib) &&
-                    !reasonForFailureItem.contains((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) {
-                reasonForFailureItem = responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE) + "," + reasonForFailureItem;
+            if (!StringUtils.isEmpty((String) responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE));
+                stringBuilder.append(",");
+                stringBuilder.append(reasonForFailureBib);
+                reasonForFailureBib = stringBuilder.toString();
+            }
+            if ((!StringUtils.isEmpty((String) responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib) &&
+                    !reasonForFailureItem.contains((String) responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
+                stringBuilder.append(",");
+                stringBuilder.append(reasonForFailureItem);
+                reasonForFailureItem = stringBuilder.toString();
             }
         }
 
