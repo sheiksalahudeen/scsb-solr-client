@@ -230,7 +230,7 @@ public class OngoingMatchingAlgorithmUtil {
                 }
                 reportEntity.setType(RecapConstants.SINGLE_MATCH);
                 try {
-                    itemIds = checkForMonographAndUpdateCGD(reportEntity, bibIds, materialTypeList, materialTypeSet);
+                    itemIds = updateCGDBasedOnMaterialTypes(reportEntity, bibIds, materialTypeList, materialTypeSet);
                 } catch (Exception e) {
                     logger.error(RecapConstants.LOG_ERROR,e);
                 }
@@ -238,7 +238,7 @@ public class OngoingMatchingAlgorithmUtil {
                 reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
             }
             matchingAlgorithmUtil.getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList, owningInstBibIds);
-            matchingAlgorithmUtil.getReportDataEntity(StringUtils.join(criteriaValues, ","), matchPointString, reportDataEntities);
+            matchingAlgorithmUtil.getReportDataEntity(matchPointString, StringUtils.join(criteriaValues, ","), reportDataEntities);
             reportEntity.addAll(reportDataEntities);
             reportEntitiesToSave.add(reportEntity);
             producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntitiesToSave);
@@ -331,7 +331,7 @@ public class OngoingMatchingAlgorithmUtil {
         }
 
         if(owningInstSet.size() > 1) {
-            itemIds = checkForMonographAndUpdateCGD(reportEntity, bibIdList, materialTypeList, materialTypes);
+            itemIds = updateCGDBasedOnMaterialTypes(reportEntity, bibIdList, materialTypeList, materialTypes);
             matchingAlgorithmUtil.getReportDataEntityList(reportDataEntities, owningInstList, bibIdList, materialTypeList, owningInstBibIds);
 
             if(CollectionUtils.isNotEmpty(oclcNumbers)) {
@@ -366,32 +366,41 @@ public class OngoingMatchingAlgorithmUtil {
      * @throws IOException
      * @throws SolrServerException
      */
-    private List<Integer> checkForMonographAndUpdateCGD(ReportEntity reportEntity, List<Integer> bibIdList, List<String> materialTypeList, Set<String> materialTypes) throws IOException, SolrServerException {
+    private List<Integer> updateCGDBasedOnMaterialTypes(ReportEntity reportEntity, List<Integer> bibIdList, List<String> materialTypeList, Set<String> materialTypes) throws IOException, SolrServerException {
         List<Integer> itemIds = new ArrayList<>();
+        MatchingAlgorithmCGDProcessor matchingAlgorithmCGDProcessor = new MatchingAlgorithmCGDProcessor(bibliographicDetailsRepository, producerTemplate,
+                getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, RecapConstants.ONGOING_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository, itemDetailsRepository);
         if(materialTypes.size() == 1) {
             reportEntity.setType(RecapConstants.MULTI_MATCH);
             matchingAlgorithmUtil.populateMatchingCounter();
             Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap = new HashMap<>();
             Map<Integer, ItemEntity> itemEntityMap = new HashMap<>();
-            MatchingAlgorithmCGDProcessor matchingAlgorithmCGDProcessor = new MatchingAlgorithmCGDProcessor(bibliographicDetailsRepository, producerTemplate,
-                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, RecapConstants.ONGOING_MATCHING_OPERATION_TYPE, collectionGroupDetailsRepository, itemDetailsRepository);
-            boolean isMonograph = matchingAlgorithmCGDProcessor.checkForMonographAndPopulateValues(materialTypes, useRestrictionMap, itemEntityMap, bibIdList);
-            if(isMonograph) {
-                matchingAlgorithmCGDProcessor.updateCGDProcess(useRestrictionMap, itemEntityMap);
-                itemIds.addAll(itemEntityMap.keySet());
-            } else {
-                if(materialTypes.size() > 1) {
-                    reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
-                } else if(materialTypes.size() == 1){
-                    reportEntity.setType(RecapConstants.MULTI_MATCH);
-                    if(materialTypes.contains(RecapConstants.MONOGRAPHIC_SET)) {
-                        int size = materialTypeList.size();
-                        materialTypeList = new ArrayList<>();
-                        for(int i = 0; i < size; i++) {
-                            materialTypeList.add(RecapConstants.MONOGRAPHIC_SET);
+            if(materialTypes.contains(RecapConstants.MONOGRAPH)) {
+                Set<String> materialTypeSet = new HashSet<>();
+                boolean isMonograph = matchingAlgorithmCGDProcessor.checkForMonographAndPopulateValues(materialTypeSet, useRestrictionMap, itemEntityMap, bibIdList);
+                if(isMonograph) {
+                    matchingAlgorithmCGDProcessor.updateCGDProcess(useRestrictionMap, itemEntityMap);
+                    itemIds.addAll(itemEntityMap.keySet());
+                } else {
+                    if(materialTypeSet.size() > 1) {
+                        reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
+                    } else if(materialTypeSet.size() == 1){
+                        reportEntity.setType(RecapConstants.MULTI_MATCH);
+                        if(materialTypeSet.contains(RecapConstants.MONOGRAPHIC_SET)) {
+                            int size = materialTypeList.size();
+                            materialTypeList = new ArrayList<>();
+                            for(int i = 0; i < size; i++) {
+                                materialTypeList.add(RecapConstants.MONOGRAPHIC_SET);
+                            }
+                            matchingAlgorithmCGDProcessor.updateItemsCGD(itemEntityMap);
+                            itemIds.addAll(itemEntityMap.keySet());
                         }
                     }
                 }
+            } else if(materialTypes.contains(RecapConstants.SERIAL)) {
+                matchingAlgorithmCGDProcessor.populateItemEntityMap(itemEntityMap, bibIdList);
+                matchingAlgorithmCGDProcessor.updateItemsCGD(itemEntityMap);
+                itemIds.addAll(itemEntityMap.keySet());
             }
         } else {
             reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);

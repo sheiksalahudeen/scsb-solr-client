@@ -7,7 +7,6 @@ import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
-import org.recap.util.SolrQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,6 @@ public class OngoingMatchingAlgorithmJobController {
 
     @Autowired
     private OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
-
-    @Autowired
-    private SolrQueryBuilder solrQueryBuilder;
 
     @Autowired
     private MatchingBibInfoDetailService matchingBibInfoDetailService;

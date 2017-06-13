@@ -88,8 +88,12 @@ function saveReport() {
         url = "/matchingAlgorithm/full";
     } else if (criteria === 'Reports') {
         url = "/matchingAlgorithm/reports";
-    } else if (criteria === 'UpdateCGDInDB') {
-        url = "/matchingAlgorithm/updateCGDInDB";
+    } else if (criteria === 'UpdateMonographCGDInDB') {
+        url = "/matchingAlgorithm/updateMonographCGDInDB";
+    } else if (criteria === 'UpdateSerialCGDInDB') {
+        url = "/matchingAlgorithm/updateSerialCGDInDB";
+    } else if (criteria === 'UpdateMvmCGDInDB') {
+        url = "/matchingAlgorithm/updateMvmCGDInDB";
     } else if (criteria === 'UpdateCGDInSolr') {
         url = "/matchingAlgorithm/updateCGDInSolr?matchingAlgoDate="+matchingAlgoDate;
     } else if (criteria === 'PopulateDataForDataDump') {

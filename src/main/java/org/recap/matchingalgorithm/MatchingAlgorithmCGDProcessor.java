@@ -65,20 +65,24 @@ public class MatchingAlgorithmCGDProcessor {
             // Multiple Use Restriction
             if(useRestrictionMap.containsKey(0)) {
                 // Institutions which has no restriction
-                Map<Integer, List<ItemEntity>> institutionMap = useRestrictionMap.get(0);
-                findItemsToBeUpdatedAsOpen(itemEntityMap, institutionMap);
+                Map<Integer, List<ItemEntity>> owningInstitutionMap = useRestrictionMap.get(0);
+                findItemsToBeUpdatedAsOpen(itemEntityMap, owningInstitutionMap);
             } else if(useRestrictionMap.containsKey(1)) {
                 // Institutions which has least restriction
-                Map<Integer, List<ItemEntity>> institutionMap = useRestrictionMap.get(1);
-                findItemsToBeUpdatedAsOpen(itemEntityMap, institutionMap);
+                Map<Integer, List<ItemEntity>> owningInstitutionMap = useRestrictionMap.get(1);
+                findItemsToBeUpdatedAsOpen(itemEntityMap, owningInstitutionMap);
             }
         } else {
             //Same UseRestriction
             for (Iterator<Map<Integer, List<ItemEntity>>> iterator = useRestrictionMap.values().iterator(); iterator.hasNext(); ) {
-                Map<Integer, List<ItemEntity>> institutionMap = iterator.next();
-                findItemToBeSharedBasedOnCounter(itemEntityMap, institutionMap);
+                Map<Integer, List<ItemEntity>> owningInstitutionMap = iterator.next();
+                findItemToBeSharedBasedOnCounter(itemEntityMap, owningInstitutionMap);
             }
         }
+        updateItemsCGD(itemEntityMap);
+    }
+
+    public void updateItemsCGD(Map<Integer, ItemEntity> itemEntityMap) {
         List<ItemEntity> itemEntitiesToUpdate = new ArrayList<>();
         List<ItemChangeLogEntity> itemChangeLogEntities = new ArrayList<>();
         CollectionGroupEntity collectionGroupEntity = null;
@@ -151,8 +155,8 @@ public class MatchingAlgorithmCGDProcessor {
                         if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
                             if(itemEntity.getCopyNumber() > 1) {
                                 isMultipleCopy = true;
-                                populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
                             }
+                            populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
                         }
                     }
                     if(!isMultipleCopy) {
@@ -175,6 +179,19 @@ public class MatchingAlgorithmCGDProcessor {
             }
         }
         return isMonograph;
+    }
+
+    public void populateItemEntityMap(Map<Integer, ItemEntity> itemEntityMap, List<Integer> bibIdList) {
+        List<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByBibliographicIdIn(bibIdList);
+        for(BibliographicEntity bibliographicEntity : bibliographicEntities) {
+            List<ItemEntity> itemEntities = bibliographicEntity.getItemEntities();
+            for(ItemEntity itemEntity : itemEntities) {
+                if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                    itemEntityMap.put(itemEntity.getItemId(), itemEntity);
+                    MatchingCounter.updateCounter(itemEntity.getOwningInstitutionId(), true);
+                }
+            }
+        }
     }
 
     /**
@@ -202,21 +219,21 @@ public class MatchingAlgorithmCGDProcessor {
      */
     public void populateUseRestrictionMap(Map<Integer, Map<Integer, List<ItemEntity>>> useRestrictionMap, ItemEntity itemEntity, Integer owningInstitutionId, Integer useRestriction) {
         if(useRestrictionMap.containsKey(useRestriction)) {
-            Map<Integer, List<ItemEntity>> institutionMap = new HashMap<>();
-            institutionMap.putAll(useRestrictionMap.get(useRestriction));
-            if(institutionMap.containsKey(owningInstitutionId)) {
+            Map<Integer, List<ItemEntity>> owningInstitutionMap = new HashMap<>();
+            owningInstitutionMap.putAll(useRestrictionMap.get(useRestriction));
+            if(owningInstitutionMap.containsKey(owningInstitutionId)) {
                 List<ItemEntity> itemEntityList = new ArrayList<>();
-                itemEntityList.addAll(institutionMap.get(owningInstitutionId));
+                itemEntityList.addAll(owningInstitutionMap.get(owningInstitutionId));
                 itemEntityList.add(itemEntity);
-                institutionMap.put(owningInstitutionId, itemEntityList);
+                owningInstitutionMap.put(owningInstitutionId, itemEntityList);
             } else {
-                institutionMap.put(owningInstitutionId, Arrays.asList(itemEntity));
+                owningInstitutionMap.put(owningInstitutionId, Arrays.asList(itemEntity));
             }
-            useRestrictionMap.put(useRestriction, institutionMap);
+            useRestrictionMap.put(useRestriction, owningInstitutionMap);
         } else {
-            Map<Integer, List<ItemEntity>> institutionMap = new HashMap<>();
-            institutionMap.put(owningInstitutionId, Arrays.asList(itemEntity));
-            useRestrictionMap.put(useRestriction, institutionMap);
+            Map<Integer, List<ItemEntity>> owningInstitutionMap = new HashMap<>();
+            owningInstitutionMap.put(owningInstitutionId, Arrays.asList(itemEntity));
+            useRestrictionMap.put(useRestriction, owningInstitutionMap);
         }
     }
 

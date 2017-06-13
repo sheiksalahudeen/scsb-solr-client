@@ -23,6 +23,19 @@ public interface ReportDataDetailsRepository extends JpaRepository<ReportDataEnt
             "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) and header_name=?1", nativeQuery = true)
     long getCountOfRecordNumForMatchingMonograph(String headerName);
 
+    @Query(value = "select count(*) from report_data_t where " +
+            "record_num in (select distinct RECORD_NUM from report_data_t " +
+            "where HEADER_NAME = 'MaterialType' and HEADER_VALUE like 'Serial,%' " +
+            "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) and header_name=?1", nativeQuery = true)
+    long getCountOfRecordNumForMatchingSerials(String headerName);
+
+    @Query(value = "select count(*) from report_data_t where " +
+            "record_num in (select distinct RECORD_NUM from report_data_t " +
+            "where HEADER_NAME = 'MaterialType' and HEADER_VALUE like 'MonographicSet,%' " +
+            "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) and header_name=?1", nativeQuery = true)
+    long getCountOfRecordNumForMatchingMVMs(String headerName);
+
+
     /**
      * Gets a list of report data entities for matching monographs based on the given header name and limit values.
      *
@@ -82,5 +95,19 @@ public interface ReportDataDetailsRepository extends JpaRepository<ReportDataEnt
             "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) " +
             "and header_name=?1 order by record_num limit ?2,?3", nativeQuery = true)
     List<ReportDataEntity> getReportDataEntityForMatchingSerials(String headerName, long from, long batchsize);
+
+    /**
+     * Gets a list of report data entities for matching monographicSet based on the given header name and limit values.
+     *
+     * @param headerName the header name
+     * @param from       the from
+     * @param batchsize  the batchsize
+     * @return the report data entity for matching monographicSet
+     */
+    @Query(value = "select * from report_data_t where record_num in (select distinct RECORD_NUM from report_data_t " +
+            "where HEADER_NAME = 'MaterialType' and HEADER_VALUE like 'MonographicSet,%'" +
+            "and RECORD_NUM in (select record_num from report_t where type in ('SingleMatch','MultiMatch'))) " +
+            "and header_name=?1 order by record_num limit ?2,?3", nativeQuery = true)
+    List<ReportDataEntity> getReportDataEntityForMatchingMVMs(String headerName, long from, long batchsize);
 }
 

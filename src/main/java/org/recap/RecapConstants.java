@@ -95,22 +95,11 @@ public final class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_ID = "ftpSubmitCollectionSummaryReport";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
-    public static final String MATCHING_ALGO_OCLC_FILE_NAME = "Matching_Algo_OCLC";
-    public static final String MATCHING_ALGO_ISBN_FILE_NAME = "Matching_Algo_ISBN";
-    public static final String MATCHING_ALGO_ISSN_FILE_NAME = "Matching_Algo_ISSN";
-    public static final String MATCHING_ALGO_LCCN_FILE_NAME = "Matching_Algo_LCCN";
-
     public static final String EXCEPTION_REPORT_FILE_NAME = "Exception_Report";
-    public static final String EXCEPTION_REPORT_OCLC_FILE_NAME = "Exception_Report_OCLC";
-    public static final String EXCEPTION_REPORT_ISBN_FILE_NAME = "Exception_Report_ISBN";
-    public static final String EXCEPTION_REPORT_ISSN_FILE_NAME = "Exception_Report_ISSN";
-    public static final String EXCEPTION_REPORT_LCCN_FILE_NAME = "Exception_Report_LCCN";
-
-    public static final String SUMMARY_REPORT_FILE_NAME = "Summary_Report_Phase1";
-    public static final String SUMMARY_REPORT_OCLC_FILE_NAME = "Summary_Report_OCLC";
-    public static final String SUMMARY_REPORT_ISBN_FILE_NAME = "Summary_Report_ISBN";
-    public static final String SUMMARY_REPORT_ISSN_FILE_NAME = "Summary_Report_ISSN";
-    public static final String SUMMARY_REPORT_LCCN_FILE_NAME = "Summary_Report_LCCN";
+    public static final String SUMMARY_REPORT_FILE_NAME = "MatchingCGDSummaryReport";
+    public static final String MATCHING_SUMMARY_MONOGRAPH = "MatchingMonographCGDSummary";
+    public static final String MATCHING_SUMMARY_SERIAL = "MatchingSerialCGDSummary";
+    public static final String MATCHING_SUMMARY_MVM = "MatchingMVMCGDSummary";
 
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";

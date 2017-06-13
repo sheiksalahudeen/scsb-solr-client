@@ -8,6 +8,7 @@ import org.recap.RecapConstants;
 import org.recap.admin.SolrAdmin;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
+import org.recap.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
@@ -63,7 +65,10 @@ public abstract class MatchingIndexExecutorService {
      * @return the integer
      * @throws InterruptedException the interrupted exception
      */
-    public Integer indexingForMatchingAlgorithm(String operationType) throws InterruptedException {
+    @Autowired
+    DateUtil dateUtil;
+
+    public Integer indexingForMatchingAlgorithm(String operationType, Date updatedDate) throws InterruptedException {
         StopWatch stopWatch1 = new StopWatch();
         stopWatch1.start();
         Integer numThreads = 5;
@@ -71,10 +76,12 @@ public abstract class MatchingIndexExecutorService {
         Integer commitIndexesInterval = commitInterval;
         String coreName = solrCore;
         Integer totalBibsProcessed = 0;
+        Date fromDate = dateUtil.getFromDate(updatedDate);
+        Date currentDate = new Date();
 
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-            Integer totalDocCount = getTotalDocCount(operationType);
+            Integer totalDocCount = getTotalDocCount(operationType, fromDate, currentDate);
             if(totalDocCount > 0) {
                 int quotient = totalDocCount / (docsPerThread);
                 int remainder = totalDocCount % (docsPerThread);
@@ -92,7 +99,7 @@ public abstract class MatchingIndexExecutorService {
 
                 List<Callable<Integer>> callables = new ArrayList<>();
                 for (int pageNum = 0; pageNum < loopCount; pageNum++) {
-                    Callable callable = getCallable(coreName, pageNum, docsPerThread, operationType);
+                    Callable callable = getCallable(coreName, pageNum, docsPerThread, operationType, fromDate, currentDate);
                     callables.add(callable);
                 }
 
@@ -165,7 +172,7 @@ public abstract class MatchingIndexExecutorService {
      * @param operationType the operation type
      * @return the callable
      */
-    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, String operationType);
+    public abstract Callable getCallable(String coreName, int pageNum, int docsPerpage, String operationType, Date from, Date to);
 
     /**
      * This method gets total doc count based on the operation type.
@@ -173,5 +180,5 @@ public abstract class MatchingIndexExecutorService {
      * @param operationType the operation type
      * @return the total doc count
      */
-    protected abstract Integer getTotalDocCount(String operationType);
+    protected abstract Integer getTotalDocCount(String operationType, Date fromDate, Date toDate);
 }

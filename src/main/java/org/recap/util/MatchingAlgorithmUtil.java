@@ -753,10 +753,10 @@ public class MatchingAlgorithmUtil {
     /**
      * This method saves the summary report for the counts of the CGD in each institutions.
      */
-    public void saveCGDUpdatedSummaryReport() {
+    public void saveCGDUpdatedSummaryReport(String type) {
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setType("MatchingCGDSummary");
-        reportEntity.setFileName("MatchingCGDSummaryReport");
+        reportEntity.setType(type);
+        reportEntity.setFileName(RecapConstants.SUMMARY_REPORT_FILE_NAME);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setInstitutionName(RecapConstants.ALL_INST);
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();

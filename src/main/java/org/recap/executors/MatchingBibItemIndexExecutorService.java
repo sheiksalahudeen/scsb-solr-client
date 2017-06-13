@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -32,8 +33,8 @@ public class MatchingBibItemIndexExecutorService extends MatchingIndexExecutorSe
      * @return
      */
     @Override
-    public Callable getCallable(String coreName, int pageNum, int docsPerPage, String operationType) {
-        return new MatchingBibItemIndexCallable(solrServerProtocol + solrUrl, coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate, solrTemplate, operationType);
+    public Callable getCallable(String coreName, int pageNum, int docsPerPage, String operationType, Date from, Date to) {
+        return new MatchingBibItemIndexCallable(coreName, pageNum, docsPerPage, bibliographicDetailsRepository, holdingsDetailsRepository, producerTemplate, solrTemplate, operationType, from, to);
     }
 
     /**
@@ -42,9 +43,9 @@ public class MatchingBibItemIndexExecutorService extends MatchingIndexExecutorSe
      * @return
      */
     @Override
-    protected Integer getTotalDocCount(String operationType) {
+    protected Integer getTotalDocCount(String operationType, Date from, Date to) {
         Long bibCountForChangedItems;
-        bibCountForChangedItems = bibliographicDetailsRepository.getCountOfBibliographicEntitiesForChangedItems(operationType);
+        bibCountForChangedItems = bibliographicDetailsRepository.getCountOfBibliographicEntitiesForChangedItems(operationType, from, to);
         return bibCountForChangedItems.intValue();
     }
 

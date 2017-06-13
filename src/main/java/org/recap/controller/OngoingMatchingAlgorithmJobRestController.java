@@ -7,7 +7,6 @@ import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
-import org.recap.util.SolrQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +31,13 @@ public class OngoingMatchingAlgorithmJobRestController {
     private OngoingMatchingAlgorithmUtil ongoingMatchingAlgorithmUtil;
 
     @Autowired
-    private SolrQueryBuilder solrQueryBuilder;
-
-    @Autowired
     private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @RequestMapping(value = "/ongoingMatchingAlgorithmJob", method = RequestMethod.POST,  consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     private String startMatchingAlgorithmJob(@RequestBody SolrIndexRequest solrIndexRequest) {
         Date date = solrIndexRequest.getCreatedDate();
-        String status = "";
+        String status;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);

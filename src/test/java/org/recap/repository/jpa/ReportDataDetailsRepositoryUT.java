@@ -26,19 +26,24 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
 
     @Test
     public void getCountOfRecordNumForMatchingMonographTest() throws Exception {
-        saveReportEntity();
+        saveReportEntity("Monograph,Monograph");
         long countOfRecordNumForMatchingMonograph = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
         assertTrue(countOfRecordNumForMatchingMonograph > 0);
     }
 
     @Test
+    public void getCountOfRecordNumForMatchingSerialsTest() throws Exception {
+
+    }
+
+    @Test
     public void getReportDataEntityForMatchingMonographsTest() throws Exception {
-        saveReportEntity();
+        saveReportEntity("Monograph,Monograph");
         List<ReportDataEntity> reportDataEntities = reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, 0, 100);
         assertNotNull(reportDataEntities);
     }
 
-    private ReportEntity saveReportEntity() {
+    private ReportEntity saveReportEntity(String materialTypes) {
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportEntity reportEntity = new ReportEntity();
@@ -54,7 +59,7 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
 
         ReportDataEntity reportDataEntity2 = new ReportDataEntity();
         reportDataEntity2.setHeaderName("MaterialType");
-        reportDataEntity2.setHeaderValue("Monograph,Monograph");
+        reportDataEntity2.setHeaderValue(materialTypes);
         reportDataEntities.add(reportDataEntity2);
 
         reportEntity.setReportDataEntities(reportDataEntities);
