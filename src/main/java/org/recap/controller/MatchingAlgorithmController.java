@@ -188,20 +188,20 @@ public class MatchingAlgorithmController {
     }
 
     /**
-     * This method is used to update cgd in database.
+     * This method is used to update cgd for Monographs in database.
      *
      * @return the string
      */
     @ResponseBody
-    @RequestMapping(value = "/matchingAlgorithm/updateCGDInDB", method = RequestMethod.POST)
-    public String updateCGDInDB() {
+    @RequestMapping(value = "/matchingAlgorithm/updateMonographCGDInDB", method = RequestMethod.POST)
+    public String updateMonographCGDInDB() {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             matchingAlgorithmUpdateCGDService.updateCGDProcessForMonographs(Integer.valueOf(matchingAlgoBatchSize));
             stopWatch.stop();
-            logger.info("Total Time taken to Update CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
+            logger.info("Total Time taken to Update Monographs CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
             stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
         } catch (Exception e) {
@@ -212,7 +212,55 @@ public class MatchingAlgorithmController {
     }
 
     /**
-     * This mehtod is used to update cgd in solr.
+     * This method is used to update cgd for Serials in database.
+     *
+     * @return the string
+     */
+    @ResponseBody
+    @RequestMapping(value = "/matchingAlgorithm/updateSerialCGDInDB", method = RequestMethod.POST)
+    public String updateSerialCGDInDB() {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            matchingAlgorithmUpdateCGDService.updateCGDProcessForSerials(Integer.valueOf(matchingAlgoBatchSize));
+            stopWatch.stop();
+            logger.info("Total Time taken to Update Serials CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
+            stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
+        } catch (Exception e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * This method is used to update cgd for MonographicSets in database.
+     *
+     * @return the string
+     */
+    @ResponseBody
+    @RequestMapping(value = "/matchingAlgorithm/updateMvmCGDInDB", method = RequestMethod.POST)
+    public String updateMvmCGDInDB() {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            matchingAlgorithmUpdateCGDService.updateCGDProcessForMVMs(Integer.valueOf(matchingAlgoBatchSize));
+            stopWatch.stop();
+            logger.info("Total Time taken to Update MVMs CGD In DB For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
+            stringBuilder.append(RecapConstants.STATUS_DONE ).append("\n");
+            stringBuilder.append(RecapConstants.TOTAL_TIME_TAKEN + stopWatch.getTotalTimeSeconds()).append("\n");
+        } catch (Exception e) {
+            logger.error(RecapConstants.LOG_ERROR,e);
+            stringBuilder.append(RecapConstants.STATUS_FAILED);
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * This method is used to update the cgds for the items which got updated through matching algorithm in solr.
      *
      * @param matchingAlgoDate the matching algo date
      * @return the string
@@ -222,10 +270,10 @@ public class MatchingAlgorithmController {
     public String updateCGDInSolr(@Valid @ModelAttribute("matchingAlgoDate") String matchingAlgoDate) {
         StringBuilder stringBuilder = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
-
+        Date updatedDate = new Date();
         if(StringUtils.isNotBlank(matchingAlgoDate)) {
             try {
-                 sdf.parse(matchingAlgoDate);
+                updatedDate = sdf.parse(matchingAlgoDate);
             } catch (ParseException e) {
                 logger.error("Exception while parsing Date : " + e.getMessage());
             }
@@ -233,7 +281,7 @@ public class MatchingAlgorithmController {
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            Integer totalProcessedRecords = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE);
+            Integer totalProcessedRecords = matchingBibItemIndexExecutorService.indexingForMatchingAlgorithm(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE, updatedDate);
             stopWatch.stop();
             logger.info("Total Time taken to Update CGD In Solr For Matching Algorithm : " + stopWatch.getTotalTimeSeconds());
             String status = "Total number of records processed : " + totalProcessedRecords;
@@ -248,7 +296,7 @@ public class MatchingAlgorithmController {
     }
 
     /**
-     * This method is used to populate matching institution bibid information for data dump.
+     * This method is used to populate matching institution bibId information for data dump.
      *
      * @return the string
      */

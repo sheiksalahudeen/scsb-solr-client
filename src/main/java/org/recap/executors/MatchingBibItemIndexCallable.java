@@ -14,6 +14,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -31,17 +32,17 @@ public class MatchingBibItemIndexCallable implements Callable {
     private final int pageNum;
     private final int docsPerPage;
     private String coreName;
-    private String solrURL;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
     private HoldingsDetailsRepository holdingsDetailsRepository;
     private ProducerTemplate producerTemplate;
     private SolrTemplate solrTemplate;
     private String operationType;
+    private Date from;
+    private Date to;
 
     /**
      * This method instantiates a new matching bib item index callable.
      *
-     * @param solrURL                        the solr url
      * @param coreName                       the core name
      * @param pageNum                        the page num
      * @param docsPerPage                    the docs per page
@@ -50,11 +51,13 @@ public class MatchingBibItemIndexCallable implements Callable {
      * @param producerTemplate               the producer template
      * @param solrTemplate                   the solr template
      * @param operationType                  the operation type
+     * @param from                           the from date
+     * @param to                             the to date
      */
-    public MatchingBibItemIndexCallable(String solrURL, String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository,
-                                        HoldingsDetailsRepository holdingsDetailsRepository, ProducerTemplate producerTemplate, SolrTemplate solrTemplate, String operationType) {
+    public MatchingBibItemIndexCallable(String coreName, int pageNum, int docsPerPage, BibliographicDetailsRepository bibliographicDetailsRepository,
+                                        HoldingsDetailsRepository holdingsDetailsRepository, ProducerTemplate producerTemplate, SolrTemplate solrTemplate, String operationType,
+                                        Date from, Date to) {
         this.coreName = coreName;
-        this.solrURL = solrURL;
         this.pageNum = pageNum;
         this.docsPerPage = docsPerPage;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
@@ -62,6 +65,8 @@ public class MatchingBibItemIndexCallable implements Callable {
         this.producerTemplate = producerTemplate;
         this.solrTemplate = solrTemplate;
         this.operationType = operationType;
+        this.from = from;
+        this.to = to;
     }
 
     /**
@@ -74,7 +79,7 @@ public class MatchingBibItemIndexCallable implements Callable {
 
         Page<BibliographicEntity> bibliographicEntities;
 
-        bibliographicEntities = bibliographicDetailsRepository.getBibliographicEntitiesForChangedItems(new PageRequest(pageNum, docsPerPage), operationType);
+        bibliographicEntities = bibliographicDetailsRepository.getBibliographicEntitiesForChangedItems(new PageRequest(pageNum, docsPerPage), operationType, from, to);
 
         logger.info("Num Bibs Fetched : " + bibliographicEntities.getNumberOfElements());
         Iterator<BibliographicEntity> iterator = bibliographicEntities.iterator();

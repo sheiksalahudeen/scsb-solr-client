@@ -7,7 +7,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
-import org.recap.executors.MatchingAlgorithmCGDCallable;
+import org.recap.executors.MatchingAlgorithmMonographCGDCallable;
+import org.recap.executors.MatchingAlgorithmMVMsCGDCallable;
+import org.recap.executors.MatchingAlgorithmSerialsCGDCallable;
 import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
@@ -85,7 +87,7 @@ public class MatchingAlgorithmUpdateCGDService {
      * @throws SolrServerException the solr server exception
      */
     public void updateCGDProcessForMonographs(Integer batchSize) throws IOException, SolrServerException {
-        logger.info("Start");
+        logger.info("Start CGD Process For Monographs.");
 
         matchingAlgorithmUtil.populateMatchingCounter();
 
@@ -96,7 +98,7 @@ public class MatchingAlgorithmUpdateCGDService {
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
-            Callable callable = new MatchingAlgorithmCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
+            Callable callable = new MatchingAlgorithmMonographCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
                     getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
             callables.add(callable);
         }
@@ -109,7 +111,73 @@ public class MatchingAlgorithmUpdateCGDService {
 
         matchingAlgorithmUtil.updateExceptionRecords(exceptionRecordNums, batchSize);
 
-        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport();
+        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MONOGRAPH);
+
+        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
+        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
+        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
+
+        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
+
+        while (updateItemsQ.getQueueSize() != 0) {
+            //Waiting for the updateItemQ messages finish processing
+        }
+
+        executor.shutdown();
+    }
+
+    public void updateCGDProcessForSerials(Integer batchSize) throws IOException, SolrServerException {
+        logger.info("Start CGD Process For Serials.");
+
+        matchingAlgorithmUtil.populateMatchingCounter();
+
+        ExecutorService executor = getExecutorService(50);
+        List<Callable<Integer>> callables = new ArrayList<>();
+        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingSerials(RecapConstants.BIB_ID);
+        logger.info("Total Records : {}", countOfRecordNum);
+        int totalPagesCount = (int) (countOfRecordNum / batchSize);
+        logger.info("Total Pages : {}" , totalPagesCount);
+        for(int pageNum=0; pageNum < totalPagesCount + 1; pageNum++) {
+            Callable callable = new MatchingAlgorithmSerialsCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate, getCollectionGroupMap(),
+                    getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
+            callables.add(callable);
+        }
+        getFutures(executor, callables);
+
+        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_SERIAL);
+
+        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
+        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
+        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
+
+        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
+
+        while (updateItemsQ.getQueueSize() != 0) {
+            //Waiting for the updateItemQ messages finish processing
+        }
+
+        executor.shutdown();
+    }
+
+    public void updateCGDProcessForMVMs(Integer batchSize) throws IOException, SolrServerException {
+        logger.info("Start CGD Process For MVMs.");
+
+        matchingAlgorithmUtil.populateMatchingCounter();
+
+        ExecutorService executor = getExecutorService(50);
+        List<Callable<Integer>> callables = new ArrayList<>();
+        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMVMs(RecapConstants.BIB_ID);
+        logger.info("Total Records : {}", countOfRecordNum);
+        int totalPagesCount = (int) (countOfRecordNum / batchSize);
+        logger.info("Total Pages : {}" , totalPagesCount);
+        for(int pageNum=0; pageNum < totalPagesCount + 1; pageNum++) {
+            Callable callable = new MatchingAlgorithmMVMsCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate, getCollectionGroupMap(),
+                    getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
+            callables.add(callable);
+        }
+        getFutures(executor, callables);
+
+        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MVM);
 
         logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
         logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());

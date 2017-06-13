@@ -210,26 +210,30 @@ public interface BibliographicDetailsRepository extends JpaRepository<Bibliograp
     int markBibsAsDeleted(@Param("bibliographicIds") List<Integer> bibliographicIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
     /**
-     * Gets bibliographic entities for changed items based on the operation type.
+     * Gets bibliographic entities for changed items based on the operation type and date.
      *
      * @param pageable      the pageable
      * @param operationType the operation type
+     * @param from the from date
+     * @param to the to date
      * @return the bibliographic entities for changed items
      */
     @Query(value = "SELECT distinct BIB FROM BibliographicEntity as BIB WHERE BIB.bibliographicId IN " +
             "(SELECT DISTINCT BIB1.bibliographicId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.itemEntities AS ITEMS " +
-            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1))")
-    Page<BibliographicEntity> getBibliographicEntitiesForChangedItems(Pageable pageable, String operationType);
+            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1 and updated_date between ?2 and ?3))")
+    Page<BibliographicEntity> getBibliographicEntitiesForChangedItems(Pageable pageable, String operationType, Date from, Date to);
 
     /**
-     * Gets count of bibliographic entities for changed items based on the operation type.
+     * Gets count of bibliographic entities for changed items based on the operation type and date.
      *
+     * @param from the from date
+     * @param to the to date
      * @param operationType the operation type
      * @return the count of bibliographic entities for changed items
      */
     @Query(value = "SELECT count(distinct BIB) FROM BibliographicEntity as BIB WHERE BIB.bibliographicId IN " +
             "(SELECT DISTINCT BIB1.bibliographicId FROM BibliographicEntity as BIB1 INNER JOIN BIB1.itemEntities AS ITEMS " +
-            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1))")
-    Long getCountOfBibliographicEntitiesForChangedItems(String operationType);
+            "WHERE ITEMS.itemId IN (SELECT recordId FROM ItemChangeLogEntity where operationType=?1 and updated_date between ?2 and ?3))")
+    Long getCountOfBibliographicEntitiesForChangedItems(String operationType, Date from, Date to);
 
 }

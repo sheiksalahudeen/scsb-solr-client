@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by angelind on 6/1/17.
  */
-public class MatchingAlgorithmCGDCallable implements Callable {
+public class MatchingAlgorithmMonographCGDCallable implements Callable {
 
     private ReportDataDetailsRepository reportDataDetailsRepository;
     private BibliographicDetailsRepository bibliographicDetailsRepository;
@@ -41,10 +41,10 @@ public class MatchingAlgorithmCGDCallable implements Callable {
      * @param collectionGroupDetailsRepository the collection group details repository
      * @param itemDetailsRepository            the item details repository
      */
-    public MatchingAlgorithmCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
-                                        int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
-                                        ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
-                                        ItemDetailsRepository itemDetailsRepository) {
+    public MatchingAlgorithmMonographCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
+                                                 int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
+                                                 ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
+                                                 ItemDetailsRepository itemDetailsRepository) {
         this.reportDataDetailsRepository = reportDataDetailsRepository;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.pageNum = pageNum;
