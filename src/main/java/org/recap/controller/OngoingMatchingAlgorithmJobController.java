@@ -6,6 +6,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
+import org.recap.util.DateUtil;
 import org.recap.util.OngoingMatchingAlgorithmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -37,6 +37,25 @@ public class OngoingMatchingAlgorithmJobController {
     @Autowired
     private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
+    @Autowired
+    private DateUtil dateUtil;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public OngoingMatchingAlgorithmUtil getOngoingMatchingAlgorithmUtil() {
+        return ongoingMatchingAlgorithmUtil;
+    }
+
+    public MatchingBibInfoDetailService getMatchingBibInfoDetailService() {
+        return matchingBibInfoDetailService;
+    }
+
+    public DateUtil getDateUtil() {
+        return dateUtil;
+    }
+
     @RequestMapping("/ongoingMatchingJob")
     private String matchingJob(Model model) {
         model.addAttribute("matchingJobFromDate", new Date());
@@ -45,26 +64,16 @@ public class OngoingMatchingAlgorithmJobController {
 
     @RequestMapping(value = "/ongoingMatchingJob", method = RequestMethod.POST)
     @ResponseBody
-    private String startMatchingAlgorithmJob(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest) {
+    public String startMatchingAlgorithmJob(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest) {
         Date date = solrIndexRequest.getCreatedDate();
         String jobType = solrIndexRequest.getProcessType();
         String status = "";
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date fromDate = cal.getTime();
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        Date toDate = cal.getTime();
         if(jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
-            String formattedDate = ongoingMatchingAlgorithmUtil.getFormattedDateString(fromDate);
-            SolrDocumentList solrDocumentList = ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(formattedDate);
+            String formattedDate = getOngoingMatchingAlgorithmUtil().getFormattedDateString(getDateUtil().getFromDate(date));
+            SolrDocumentList solrDocumentList = getOngoingMatchingAlgorithmUtil().fetchDataForOngoingMatchingBasedOnDate(formattedDate);
             status = processOngoingMatchingAlgorithm(solrDocumentList);
         } else if(jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
-            status = matchingBibInfoDetailService.populateMatchingBibInfo(fromDate, toDate);
+            status = getMatchingBibInfoDetailService().populateMatchingBibInfo(getDateUtil().getFromDate(date), getDateUtil().getToDate(date));
         }
         return status;
     }
@@ -82,11 +91,11 @@ public class OngoingMatchingAlgorithmJobController {
         if(CollectionUtils.isNotEmpty(solrDocumentList)) {
             for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
                 SolrDocument solrDocument = iterator.next();
-                status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument);
+                status = getOngoingMatchingAlgorithmUtil().processMatchingForBib(solrDocument);
             }
         }
         stopWatch.stop();
-        logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+        getLogger().info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
         return status;
     }
 }

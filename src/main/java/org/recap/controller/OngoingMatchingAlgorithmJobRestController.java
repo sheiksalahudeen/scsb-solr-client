@@ -35,7 +35,7 @@ public class OngoingMatchingAlgorithmJobRestController {
 
     @RequestMapping(value = "/ongoingMatchingAlgorithmJob", method = RequestMethod.POST,  consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    private String startMatchingAlgorithmJob(@RequestBody SolrIndexRequest solrIndexRequest) {
+    public String startMatchingAlgorithmJob(@RequestBody SolrIndexRequest solrIndexRequest) {
         Date date = solrIndexRequest.getCreatedDate();
         String status;
         Calendar calendar = Calendar.getInstance();
