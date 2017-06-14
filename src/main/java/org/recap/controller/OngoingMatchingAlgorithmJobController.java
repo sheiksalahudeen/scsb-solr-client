@@ -38,7 +38,7 @@ public class OngoingMatchingAlgorithmJobController {
     private MatchingBibInfoDetailService matchingBibInfoDetailService;
 
     @Autowired
-    DateUtil dateUtil;
+    private DateUtil dateUtil;
 
     public Logger getLogger() {
         return logger;
