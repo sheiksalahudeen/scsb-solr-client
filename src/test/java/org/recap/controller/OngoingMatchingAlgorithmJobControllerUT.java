@@ -55,7 +55,7 @@ public class OngoingMatchingAlgorithmJobControllerUT extends BaseControllerUT{
         Mockito.when(ongoingMatchingAlgorithmUtil.fetchDataForOngoingMatchingBasedOnDate(processDate.toString())).thenReturn(solrDocumentList);
         Mockito.when(ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument)).thenReturn(RecapConstants.SUCCESS);
         Mockito.when(ongoingMatchingAlgoJobController.startMatchingAlgorithmJob(solrIndexRequest)).thenCallRealMethod();
-        Mockito.when(ongoingMatchingAlgoJobController.processOngoingMatchingAlgorithm(solrDocumentList)).thenCallRealMethod();
+        Mockito.when(ongoingMatchingAlgorithmUtil.processOngoingMatchingAlgorithm(solrDocumentList)).thenCallRealMethod();
         String status = ongoingMatchingAlgoJobController.startMatchingAlgorithmJob(solrIndexRequest);
         assertTrue(status.contains(RecapConstants.SUCCESS));
         Mockito.when(ongoingMatchingAlgoJobController.getOngoingMatchingAlgorithmUtil()).thenCallRealMethod();

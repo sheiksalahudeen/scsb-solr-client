@@ -28,7 +28,7 @@ public class ReCAPCSVSolrExceptionRecordGenerator {
      * @param solrExceptionReportReCAPCSVRecord the solr exception report re capcsv record
      * @return the solr exception report re capcsv record
      */
-    public SolrExceptionReportReCAPCSVRecord prepareMatchingReportReCAPCSVRecord(ReportEntity reportEntity, SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord) {
+    public SolrExceptionReportReCAPCSVRecord prepareSolrExceptionReportReCAPCSVRecord(ReportEntity reportEntity, SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord) {
 
         List<ReportDataEntity> reportDataEntities = reportEntity.getReportDataEntities();
 

@@ -52,7 +52,7 @@ public class FTPSolrExceptionReportGenerator implements ReportGeneratorInterface
 
         ReCAPCSVSolrExceptionRecordGenerator reCAPCSVSolrExceptionRecordGenerator = new ReCAPCSVSolrExceptionRecordGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord = reCAPCSVSolrExceptionRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new SolrExceptionReportReCAPCSVRecord());
+            SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord = reCAPCSVSolrExceptionRecordGenerator.prepareSolrExceptionReportReCAPCSVRecord(reportEntity, new SolrExceptionReportReCAPCSVRecord());
             solrExceptionReportReCAPCSVRecords.add(solrExceptionReportReCAPCSVRecord);
         }
 

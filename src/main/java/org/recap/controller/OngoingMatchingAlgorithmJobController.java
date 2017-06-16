@@ -1,7 +1,5 @@
 package org.recap.controller;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 import java.util.Date;
-import java.util.Iterator;
 
 /**
  * Created by angelind on 16/3/17.
@@ -65,37 +62,20 @@ public class OngoingMatchingAlgorithmJobController {
     @RequestMapping(value = "/ongoingMatchingJob", method = RequestMethod.POST)
     @ResponseBody
     public String startMatchingAlgorithmJob(@Valid @ModelAttribute("solrIndexRequest") SolrIndexRequest solrIndexRequest) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Date date = solrIndexRequest.getCreatedDate();
         String jobType = solrIndexRequest.getProcessType();
         String status = "";
         if(jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
             String formattedDate = getOngoingMatchingAlgorithmUtil().getFormattedDateString(getDateUtil().getFromDate(date));
             SolrDocumentList solrDocumentList = getOngoingMatchingAlgorithmUtil().fetchDataForOngoingMatchingBasedOnDate(formattedDate);
-            status = processOngoingMatchingAlgorithm(solrDocumentList);
+            status = getOngoingMatchingAlgorithmUtil().processOngoingMatchingAlgorithm(solrDocumentList);
         } else if(jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
             status = getMatchingBibInfoDetailService().populateMatchingBibInfo(getDateUtil().getFromDate(date), getDateUtil().getToDate(date));
         }
-        return status;
-    }
-
-    /**
-     * This method is called from the solr admin ui which is used to process ongoing matching algorithm for the given bibs from the solrDocumentList.
-     *
-     * @param solrDocumentList the solr document list
-     * @return the string
-     */
-    public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        String status = "Success";
-        if(CollectionUtils.isNotEmpty(solrDocumentList)) {
-            for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
-                SolrDocument solrDocument = iterator.next();
-                status = getOngoingMatchingAlgorithmUtil().processMatchingForBib(solrDocument);
-            }
-        }
         stopWatch.stop();
-        getLogger().info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+        getLogger().info("Total Time taken to complete Ongoing Matching Algorithm : {}", stopWatch.getTotalTimeSeconds());
         return status;
     }
 }

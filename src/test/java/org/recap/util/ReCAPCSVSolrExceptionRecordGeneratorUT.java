@@ -30,7 +30,7 @@ public class ReCAPCSVSolrExceptionRecordGeneratorUT extends BaseTestCase{
         solrExceptionReportReCAPCSVRecord.setExceptionMessage("Title is mandatory");
         ReportEntity reportEntity = getReportEntity();
         ReCAPCSVSolrExceptionRecordGenerator reCAPCSVSolrExceptionRecordGenerator = new ReCAPCSVSolrExceptionRecordGenerator();
-        SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord1 = reCAPCSVSolrExceptionRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity,solrExceptionReportReCAPCSVRecord);
+        SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord1 = reCAPCSVSolrExceptionRecordGenerator.prepareSolrExceptionReportReCAPCSVRecord(reportEntity,solrExceptionReportReCAPCSVRecord);
         assertNotNull(solrExceptionReportReCAPCSVRecord1);
         assertEquals(solrExceptionReportReCAPCSVRecord1.getOwningInstitution(),"PUL");
         assertEquals(solrExceptionReportReCAPCSVRecord1.getExceptionMessage(),RecapConstants.ITEM_ALREADY_ACCESSIONED);
