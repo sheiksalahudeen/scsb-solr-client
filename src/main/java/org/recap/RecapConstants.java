@@ -233,6 +233,7 @@ public final class RecapConstants {
 
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
     public static final String ITEM_BARCODE_EMPTY = "Item Barcode is Blank.";
+    public static final String OWNING_INST_EMPTY = "Owning Institution is Blank.";
 
     public static final String COLUMBIA = "CUL";
     public static final String PRINCETON = "PUL";
@@ -428,6 +429,9 @@ public final class RecapConstants {
     public static final String OWN_INST_BIB_ID = " OwningInstBibId-";
     public static final String OWN_INST_HOLDING_ID = " OwningInstHoldingId-";
     public static final String OWN_INST_ITEM_ID = " OwningInstItemId-";
+
+
+    public static final String BATCH_ACCESSION_SUMMARY = "BATCH_ACCESSION_SUMMARY";
 
     private RecapConstants(){}
 }

@@ -28,8 +28,8 @@ public class ReportsRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.REPORT_Q)
-                            .routeId(RecapConstants.REPORT_ROUTE_ID)
+                    from(RecapConstants.REPORT_Q + "?concurrentConsumers=10")
+                            .routeId(RecapConstants.REPORT_ROUTE_ID).threads(10)
                             .process(reportProcessor);
                 }
             });
