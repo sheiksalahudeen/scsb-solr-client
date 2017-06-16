@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -87,6 +88,27 @@ public class OngoingMatchingAlgorithmUtil {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
         return null;
+    }
+
+    /**
+     * This method is used to process ongoing matching algorithm based on the given bibs in solrDocumentList and updates the CGD and generates report in solr and database.
+     *
+     * @param solrDocumentList the solr document list
+     * @return the string
+     */
+    public String processOngoingMatchingAlgorithm(SolrDocumentList solrDocumentList) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        String status = RecapConstants.SUCCESS;
+        if(CollectionUtils.isNotEmpty(solrDocumentList)) {
+            for (Iterator<SolrDocument> iterator = solrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument solrDocument = iterator.next();
+                status = processMatchingForBib(solrDocument);
+            }
+        }
+        stopWatch.stop();
+        logger.info("Total Time taken to execute matching algorithm only : " + stopWatch.getTotalTimeSeconds());
+        return status;
     }
 
     /**
@@ -281,7 +303,7 @@ public class OngoingMatchingAlgorithmUtil {
             bibliographicIds.add(Integer.valueOf(bibId));
         }
         matchingAlgorithmUtil.getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList, owningInstBibIdList);
-        matchingAlgorithmUtil.getReportDataEntity(matchPointValue, matchPointString, reportDataEntityList);
+        matchingAlgorithmUtil.getReportDataEntity(matchPointString, matchPointValue, reportDataEntityList);
         unMatchReportEntity.addAll(reportDataEntityList);
         return unMatchReportEntity;
     }

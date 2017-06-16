@@ -193,7 +193,7 @@ public class MatchingAlgoReportUT extends BaseTestCase {
     }
 
     public Map getCollectionGroupMap() {
-        if (null == collectionGroupMap) {
+        if (null == collectionGroupMap || collectionGroupMap.size() == 0) {
             collectionGroupMap = new HashMap();
             Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
             for (Iterator<CollectionGroupEntity> iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {

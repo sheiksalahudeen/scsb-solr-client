@@ -7,14 +7,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
 import org.recap.camel.activemq.JmxHelper;
-import org.recap.executors.MatchingAlgorithmMonographCGDCallable;
 import org.recap.executors.MatchingAlgorithmMVMsCGDCallable;
+import org.recap.executors.MatchingAlgorithmMonographCGDCallable;
 import org.recap.executors.MatchingAlgorithmSerialsCGDCallable;
 import org.recap.matchingalgorithm.MatchingCounter;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.recap.util.MatchingAlgorithmUtil;
-import org.recap.util.UpdateCgdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +55,6 @@ public class MatchingAlgorithmUpdateCGDService {
 
     @Autowired
     private MatchingAlgorithmUtil matchingAlgorithmUtil;
-
-    @Autowired
-    private UpdateCgdUtil updateCgdUtil;
-
-    @Autowired
-    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
