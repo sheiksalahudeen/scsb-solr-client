@@ -11,6 +11,7 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.File;
 
@@ -18,6 +19,7 @@ import java.io.File;
  * The Main class is used to lanuch the spring boot application.
  */
 @SpringBootApplication
+@EnableTransactionManagement
 @EnableSolrRepositories(value = "org.recap.repository.solr.main", multicoreSupport = true)
 public class Main {
 

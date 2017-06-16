@@ -44,4 +44,19 @@ public class AccessionResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccessionResponse that = (AccessionResponse) o;
+
+        return itemBarcode != null ? itemBarcode.equals(that.itemBarcode) : that.itemBarcode == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return itemBarcode != null ? itemBarcode.hashCode() : 0;
+    }
 }

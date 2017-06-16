@@ -42,4 +42,22 @@ public class AccessionRequest {
     public void setCustomerCode(String customerCode) {
         this.customerCode = customerCode;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccessionRequest that = (AccessionRequest) o;
+
+        if (itemBarcode != null ? !itemBarcode.equals(that.itemBarcode) : that.itemBarcode != null) return false;
+        return customerCode != null ? customerCode.equals(that.customerCode) : that.customerCode == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = itemBarcode != null ? itemBarcode.hashCode() : 0;
+        result = 31 * result + (customerCode != null ? customerCode.hashCode() : 0);
+        return result;
+    }
 }

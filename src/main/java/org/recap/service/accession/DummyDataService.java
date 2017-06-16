@@ -39,6 +39,9 @@ public class DummyDataService {
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
+    @Autowired
+    private AccessionDAO accessionDAO;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -98,9 +101,7 @@ public class DummyDataService {
         } catch (Exception e) {
             logger.error(RecapConstants.LOG_ERROR,e);
         }
-
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
+        BibliographicEntity savedBibliographicEntity = accessionDAO.saveBibRecord(bibliographicEntity);
         return savedBibliographicEntity;
     }
 

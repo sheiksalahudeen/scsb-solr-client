@@ -7,9 +7,11 @@ import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
+import org.recap.model.accession.BatchAccessionResponse;
 import org.recap.model.jpa.AccessionEntity;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
+import org.recap.service.accession.BulkAccessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by chenchulakshmig on 6/10/16.
@@ -37,7 +38,10 @@ public class SharedCollectionRestController {
     private ItemAvailabilityService itemAvailabilityService;
 
     @Autowired
-    private AccessionService accessionService;
+    AccessionService accessionService;
+
+    @Autowired
+    BulkAccessionService bulkAccessionService;
 
     @Value("${ongoing.accession.input.limit}")
     private Integer inputLimit;
@@ -152,25 +156,33 @@ public class SharedCollectionRestController {
     /**
      * This method performs ongoing accession job.
      *
-     * @param accessionDate the accession date
      * @return the string
      */
-    @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.GET)
     @ResponseBody
-    public String ongoingAccessionJob(@RequestBody Date accessionDate) {
+    public String ongoingAccessionJob() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         String status;
-        List<AccessionResponse> accessionResponsesList = new ArrayList<>();
-        List<AccessionEntity> accessionEntities = getAccessionService().getAccessionEntities(RecapConstants.PENDING);
-        List<AccessionRequest> accessionRequestList = getAccessionService().getAccessionRequest(accessionEntities);
+        List<AccessionEntity> accessionEntities = bulkAccessionService.getAccessionEntities(RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestList = bulkAccessionService.getAccessionRequest(accessionEntities);
+        BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
         if(CollectionUtils.isNotEmpty(accessionRequestList)) {
-            accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
-        }
-        if(CollectionUtils.isNotEmpty(accessionResponsesList)) {
-            status = RecapConstants.SUCCESS;
+            batchAccessionResponse = bulkAccessionService.processAccessionRequest(accessionRequestList);
+            if(batchAccessionResponse.getSuccessRecords() != 0) {
+                status = RecapConstants.SUCCESS;
+            } else {
+                status = RecapConstants.FAILURE;
+            }
         } else {
             status = RecapConstants.FAILURE;
         }
         getAccessionService().updateStatusForAccessionEntities(accessionEntities, RecapConstants.COMPLETE_STATUS);
+        stopWatch.stop();
+        logger.info("Total time taken for processing {} records : {} secs", accessionRequestList.size(), stopWatch.getTotalTimeSeconds());
+        logger.info(batchAccessionResponse.toString());
+
         return status;
     }
 
