@@ -156,12 +156,11 @@ public class SharedCollectionRestController {
     /**
      * This method performs ongoing accession job.
      *
-     * @param accessionDate the accession date
      * @return the string
      */
-    @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/ongoingAccessionJob", method = RequestMethod.GET)
     @ResponseBody
-    public String ongoingAccessionJob(@RequestBody Date accessionDate) {
+    public String ongoingAccessionJob() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
