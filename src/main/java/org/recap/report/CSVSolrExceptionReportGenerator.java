@@ -4,7 +4,6 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
 import org.recap.model.csv.SolrExceptionReportReCAPCSVRecord;
 import org.recap.model.jpa.ReportEntity;
-import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.util.ReCAPCSVSolrExceptionRecordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +27,6 @@ public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface
     private static final Logger logger = LoggerFactory.getLogger(CSVSolrExceptionReportGenerator.class);
 
     @Autowired
-    private ReportDetailRepository reportDetailRepository;
-
-    @Autowired
     private ProducerTemplate producer;
 
     @Override
@@ -52,7 +48,7 @@ public class CSVSolrExceptionReportGenerator implements ReportGeneratorInterface
 
         ReCAPCSVSolrExceptionRecordGenerator reCAPCSVSolrExceptionRecordGenerator = new ReCAPCSVSolrExceptionRecordGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
-            SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord = reCAPCSVSolrExceptionRecordGenerator.prepareMatchingReportReCAPCSVRecord(reportEntity, new SolrExceptionReportReCAPCSVRecord());
+            SolrExceptionReportReCAPCSVRecord solrExceptionReportReCAPCSVRecord = reCAPCSVSolrExceptionRecordGenerator.prepareSolrExceptionReportReCAPCSVRecord(reportEntity, new SolrExceptionReportReCAPCSVRecord());
             solrExceptionReportReCAPCSVRecords.add(solrExceptionReportReCAPCSVRecord);
         }
 

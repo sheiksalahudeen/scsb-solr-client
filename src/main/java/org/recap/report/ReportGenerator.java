@@ -26,18 +26,6 @@ public class ReportGenerator {
     List<ReportGeneratorInterface> reportGenerators;
 
     @Autowired
-    private CSVMatchingAndExceptionReportGenerator csvMatchingAndExceptionReportGenerator;
-
-    @Autowired
-    private FTPMatchingAndExceptionReportGenerator ftpMatchingAndExceptionReportGenerator;
-
-    @Autowired
-    private CSVSummaryReportGenerator csvSummaryReportGenerator;
-
-    @Autowired
-    private FTPSummaryReportGenerator ftpSummaryReportGenerator;
-
-    @Autowired
     private CSVSolrExceptionReportGenerator csvSolrExceptionReportGenerator;
 
     @Autowired
@@ -145,10 +133,6 @@ public class ReportGenerator {
     public List<ReportGeneratorInterface> getReportGenerators() {
         if(CollectionUtils.isEmpty(reportGenerators)) {
             reportGenerators = new ArrayList<>();
-            reportGenerators.add(csvMatchingAndExceptionReportGenerator);
-            reportGenerators.add(ftpMatchingAndExceptionReportGenerator);
-            reportGenerators.add(csvSummaryReportGenerator);
-            reportGenerators.add(ftpSummaryReportGenerator);
             reportGenerators.add(csvSolrExceptionReportGenerator);
             reportGenerators.add(ftpSolrExceptionReportGenerator);
             reportGenerators.add(fsDeAccessionReportGenerator);

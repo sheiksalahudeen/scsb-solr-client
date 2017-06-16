@@ -1,7 +1,6 @@
 package org.recap.camel.route;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.recap.RecapConstants;
@@ -20,7 +19,7 @@ import java.io.*;
 @Component
 public class EmailRouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(CSVMatchingRecordRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(EmailRouteBuilder.class);
 
     private String emailBodyForCgdUpdate;
     private String emailBodyForBatchJob;
