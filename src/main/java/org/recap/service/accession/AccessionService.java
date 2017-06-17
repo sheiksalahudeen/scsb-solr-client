@@ -17,9 +17,6 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.*;
-import org.recap.model.marc.BibMarcRecord;
-import org.recap.model.marc.HoldingsMarcRecord;
-import org.recap.model.marc.ItemMarcRecord;
 import org.recap.repository.jpa.*;
 import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
@@ -271,7 +268,6 @@ public class AccessionService {
             boolean isItemBarcodeEmpty = isItemBarcodeEmpty(accessionRequest);
             boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
             boolean isDeaccessionedItem = isItemDeaccessioned(itemEntityList);
-            AccessionResponse accessionResponse = new AccessionResponse();
             if (isItemBarcodeEmpty) {
                 accessionHelperUtil.setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), RecapConstants.ITEM_BARCODE_EMPTY);
                 reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, RecapConstants.ITEM_BARCODE_EMPTY));
@@ -492,19 +488,19 @@ public class AccessionService {
      * @param accessionRequest
      */
     public String createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
-        String responseString = "";
+        String message = "";
         if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
             BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(accessionRequest.getItemBarcode());
             if (fetchBibliographicEntity == null) {
                 String dummyRecordResponse = createDummyRecord(accessionRequest, owningInstitution);
-                responseString = response+", "+dummyRecordResponse;
-                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, responseString));
+                message = response+", "+dummyRecordResponse;
+                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, message));
             } else {
-                responseString = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
-                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, responseString));
+                message = RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG;
+                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, message));
             }
         }
-        return responseString;
+        return message;
     }
 
     /**

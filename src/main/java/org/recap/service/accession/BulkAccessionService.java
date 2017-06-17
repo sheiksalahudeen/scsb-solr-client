@@ -18,6 +18,7 @@ import org.recap.spring.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,9 @@ public class BulkAccessionService extends AccessionService{
     private NYPLBibDataResolver nyplBibDataResolver;
 
     private List<BibDataResolver> bibDataResolvers;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     public BatchAccessionResponse processAccessionRequest(List<AccessionRequest> accessionRequestList) {
         BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
@@ -102,7 +106,7 @@ public class BulkAccessionService extends AccessionService{
             // Processed failed barcodes one by one
             for (Iterator<AccessionRequest> accessionRequestIterator = failedRequests.iterator(); accessionRequestIterator.hasNext(); ) {
                 AccessionRequest accessionRequest = accessionRequestIterator.next();
-                BibDataCallable bibDataCallable = (BibDataCallable) ApplicationContextProvider.getInstance().getApplicationContext().getBean(BibDataCallable.class);
+                BibDataCallable bibDataCallable = applicationContext.getBean(BibDataCallable.class);
                 bibDataCallable.setAccessionRequest(accessionRequest);
                 bibDataCallable.setWriteToReport(true);
                 Future submit = executorService.submit(bibDataCallable);
