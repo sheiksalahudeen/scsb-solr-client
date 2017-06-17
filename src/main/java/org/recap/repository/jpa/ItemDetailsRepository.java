@@ -21,14 +21,7 @@ import java.util.List;
 public interface ItemDetailsRepository extends JpaRepository<ItemEntity, ItemPK> {
 
     /**
-     * Counts the items by using isDeleted field which is false.
-     *
-     * @return the long
-     */
-    Long countByIsDeletedFalse();
-
-    /**
-     * Find all item entities by usign isDeleted field which is false.
+     * Find all item entities by using isDeleted field which is false.
      *
      * @param pageable the pageable
      * @return the page
@@ -75,6 +68,15 @@ public interface ItemDetailsRepository extends JpaRepository<ItemEntity, ItemPK>
      * @return the item entity
      */
     ItemEntity findByOwningInstitutionItemId(@Param("owningInstitutionItemId") String owningInstitutionItemId);
+
+    /**
+     * Finds the item entity by using owning institution item id and owning institution id.
+     *
+     * @param owningInstitutionItemId the owning institution item id
+     * @param owningInstitutionId     the owning institution id
+     * @return the item entity
+     */
+    ItemEntity findByOwningInstitutionItemIdAndOwningInstitutionId(String owningInstitutionItemId, Integer owningInstitutionId);
 
     /**
      * Finds a list of item entities based on the given barcode.

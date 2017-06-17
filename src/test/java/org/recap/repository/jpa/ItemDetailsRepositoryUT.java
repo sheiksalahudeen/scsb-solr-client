@@ -281,4 +281,81 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         Page<ItemEntity> byLastUpdatedDate = itemDetailsRepository.findByLastUpdatedDate(new PageRequest(0, 10), cal.getTime(), new Date());
         assertNotNull(byLastUpdatedDate.getContent());
     }
+
+    @Test
+    public void findByOwningInstitutionItemIdAndOwningInstitutionId() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem("32456723441256","PA","24252","PUL","9919400","7453441");
+        ItemEntity itemEntity = itemDetailsRepository.findByOwningInstitutionItemIdAndOwningInstitutionId("7453441",1);
+        assertNotEquals(null,itemEntity);
+        assertEquals("7453441",itemEntity.getOwningInstitutionItemId());
+        assertEquals(new Integer(1),itemEntity.getOwningInstitutionId());
+
+    }
+
+    public BibliographicEntity saveBibSingleHoldingsSingleItem(String itemBarcode, String customerCode, String callnumber, String institution,String owningInstBibId, String owningInstItemId) throws Exception {
+        File bibContentFile = getBibContentFile(institution);
+        File holdingsContentFile = getHoldingsContentFile(institution);
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        String sourceHoldingsContent = FileUtils.readFileToString(holdingsContentFile, "UTF-8");
+
+        Random random = new Random();
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionBibId(owningInstBibId);
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(sourceHoldingsContent.getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+
+        ItemEntity itemEntity = getItemEntity(itemBarcode,customerCode,callnumber,owningInstItemId);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        return savedBibliographicEntity;
+
+    }
+
+    public ItemEntity getItemEntity(String itemBarcode,String customerCode,String callnumber,String owningInstItemId){
+        Random random = new Random();
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(owningInstItemId);
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode(itemBarcode);
+        itemEntity.setCallNumber(callnumber);
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode(customerCode);
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setItemAvailabilityStatusId(1);
+        return itemEntity;
+    }
+
+    private File getBibContentFile(String institution) throws URISyntaxException {
+        URL resource = null;
+        resource = getClass().getResource("PUL-BibContent.xml");
+        return new File(resource.toURI());
+    }
+
+    private File getHoldingsContentFile(String institution) throws URISyntaxException {
+        URL resource = null;
+        resource = getClass().getResource("PUL-HoldingsContent.xml");
+        return new File(resource.toURI());
+    }
 }

@@ -16,8 +16,9 @@ import javax.persistence.PersistenceContext;
  */
 @Repository
 public class AccessionDAO {
+
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;

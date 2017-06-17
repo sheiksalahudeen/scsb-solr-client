@@ -13,6 +13,7 @@ import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ public class AccessionValidationServiceUT extends BaseTestCase{
     private EntityManager entityManager;
     @Autowired
     private MarcToBibEntityConverter marcToBibEntityConverter;
+    @Autowired
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Test
     public void validateBoundWithValidMarcRecordFromIls() throws URISyntaxException, IOException {
@@ -81,8 +84,8 @@ public class AccessionValidationServiceUT extends BaseTestCase{
     }
 
     @Test
-    public void validateItemRecord() throws Exception {
-        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem("32456723441256","PA","24252","PUL","9919400","7453441");
+    public void validateValidItemRecord() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem("32456723441256","PA","24252","PUL","9919400","74534419");
         File bibContentFile = getXmlContent("MarcRecord.xml");
         String marcXmlString = FileUtils.readFileToString(bibContentFile, "UTF-8");
         List<Record> records = readMarcXml(marcXmlString);
@@ -92,6 +95,20 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         StringBuilder errorMessage = new StringBuilder();
         boolean isValid = accessionValidationService.validateItemRecord(convertedBibliographicEntity,errorMessage);
         assertEquals(true,isValid);
+    }
+
+    @Test
+    public void validateInvalidItemRecord() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem("32456723441256","PA","24252","PUL","9919400","7453441");
+        File bibContentFile = getXmlContent("MarcRecord.xml");
+        String marcXmlString = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        List<Record> records = readMarcXml(marcXmlString);
+        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL","PA");
+        assertNotNull(map);
+        BibliographicEntity convertedBibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
+        StringBuilder errorMessage = new StringBuilder();
+        boolean isValid = accessionValidationService.validateItemRecord(convertedBibliographicEntity,errorMessage);
+        assertEquals(false,isValid);
     }
 
     private List<Record> readMarcXml(String marcXmlString) {
@@ -131,7 +148,7 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
         bibliographicEntity.setOwningInstitutionId(1);
-        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setOwningInstitutionBibId(owningInstBibId);
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent(sourceHoldingsContent.getBytes());
         holdingsEntity.setCreatedDate(new Date());

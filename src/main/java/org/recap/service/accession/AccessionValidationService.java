@@ -7,6 +7,7 @@ import org.recap.model.jaxb.Holdings;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class AccessionValidationService {
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    private ItemDetailsRepository itemDetailsRepository;
 
     public boolean validateBoundWithMarcRecordFromIls(List<Record> records){
         List<String> holdingIdList = new ArrayList<>();
@@ -47,11 +51,11 @@ public class AccessionValidationService {
             List<Holdings> holdings = bibRecord.getHoldings();
             for(Holdings holdings1 : holdings) {
                 for (Holding holding : holdings1.getHolding()) {
-                    String owninigInstitutionHoldingId = holding.getOwningInstitutionHoldingsId();
+                    String owningInstitutionHoldingId = holding.getOwningInstitutionHoldingsId();
                     if(holdingIdList.isEmpty()){
-                        holdingIdList.add(owninigInstitutionHoldingId);
+                        holdingIdList.add(owningInstitutionHoldingId);
                     } else {
-                        if(!holdingIdList.contains(owninigInstitutionHoldingId)){
+                        if(!holdingIdList.contains(owningInstitutionHoldingId)){
                             return false;
                         }
                     }
@@ -61,26 +65,32 @@ public class AccessionValidationService {
         return true;
     }
 
-    public boolean validateItemRecord(BibliographicEntity bibliographicEntity,StringBuilder errorMessage){
+    public boolean validateItemRecord(BibliographicEntity bibliographicEntity,StringBuilder errorMessage) {
         boolean isValid = true;
-        BibliographicEntity fetchBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(),bibliographicEntity.getOwningInstitutionBibId());
-        if (null != fetchBibliographicEntity) {
-            for(ItemEntity fetchedItemEntity:fetchBibliographicEntity.getItemEntities()){
-                for(ItemEntity incomingItemEntity:bibliographicEntity.getItemEntities()){
-                    if(fetchedItemEntity.getOwningInstitutionItemId().equals(incomingItemEntity.getOwningInstitutionItemId())){
-                        if(fetchedItemEntity.getBarcode().equals(incomingItemEntity.getBarcode())){
-                            return true;
-                        } else {
-                            errorMessage.append("Failure - The incoming owning institution itemid "+incomingItemEntity.getOwningInstitutionItemId()+" of incoming barcode "
-                                    +incomingItemEntity.getBarcode()+" is already available in scsb"
-                                    +" and linked with barcode "+fetchedItemEntity.getBarcode());
-                            return false;
-                        }
-                    }
-                }
+        List<ItemEntity> incomingItemEntityList = bibliographicEntity.getItemEntities();
+        for (ItemEntity incomingItemEntity : incomingItemEntityList) {
+            ItemEntity existingItemEntity = itemDetailsRepository.findByOwningInstitutionItemIdAndOwningInstitutionId(incomingItemEntity.getOwningInstitutionItemId(), incomingItemEntity.getOwningInstitutionId());
+            if (existingItemEntity != null) {
+                errorMessage.append("Failed - The incoming owning institution itemid " + incomingItemEntity.getOwningInstitutionItemId() + " of incoming barcode "
+                        + incomingItemEntity.getBarcode() + " is already available in scsb"
+                        + " and linked with barcode " + existingItemEntity.getBarcode() + " and its owning institution bib id(s) are "
+                        + getOwningInstitutionBibIds(existingItemEntity.getBibliographicEntities()));
+                return false;
             }
         }
         return isValid;
+    }
+
+    private StringBuilder getOwningInstitutionBibIds(List<BibliographicEntity> bibliographicEntityList){
+        StringBuilder bibIdsStringBuilder = new StringBuilder();
+        for(BibliographicEntity bibliographicEntity:bibliographicEntityList){
+            if (bibIdsStringBuilder.length()>0) {
+                bibIdsStringBuilder.append(", ").append(bibliographicEntity.getOwningInstitutionBibId());
+            } else {
+                bibIdsStringBuilder.append(bibliographicEntity.getOwningInstitutionBibId());
+            }
+        }
+        return bibIdsStringBuilder;
     }
 
 }
