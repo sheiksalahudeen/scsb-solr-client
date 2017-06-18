@@ -305,11 +305,11 @@ public class AccessionService {
                     } catch (Exception ex) {
                         logger.error(RecapConstants.LOG_ERROR, ex);
                         response = ex.getMessage();
+                        //Create dummy record
+                        response = createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
                         accessionHelperUtil.setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
                         reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
                     }
-                    //Create dummy record
-                    String dummyRecordIfAny = createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
                     accessionHelperUtil.generateAccessionSummaryReport(responseMapList, owningInstitution);
                 }
             } else if (isDeaccessionedItem) {
@@ -488,7 +488,7 @@ public class AccessionService {
      * @param accessionRequest
      */
     public String createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
-        String message = "";
+        String message = response;
         if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
             BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(accessionRequest.getItemBarcode());
             if (fetchBibliographicEntity == null) {

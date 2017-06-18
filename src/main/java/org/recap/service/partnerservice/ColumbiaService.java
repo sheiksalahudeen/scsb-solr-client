@@ -38,7 +38,6 @@ public class ColumbiaService {
         try {
             bibDataResponse = restTemplate.getForObject(ilsColumbiaBibData + itemBarcode, String.class);
         } catch (HttpClientErrorException e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
             logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
             response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
