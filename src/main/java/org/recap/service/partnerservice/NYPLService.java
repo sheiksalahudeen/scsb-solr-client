@@ -57,8 +57,8 @@ public class NYPLService {
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
         } catch (HttpClientErrorException e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
-            response = "Item Barcode not found";
+            logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
+            response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
         } catch (Exception e) {
             logger.error(RecapConstants.LOG_ERROR,e);
