@@ -7,6 +7,7 @@ import org.marc4j.MarcXmlReader;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.converter.MarcToBibEntityConverter;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
@@ -89,11 +90,14 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         File bibContentFile = getXmlContent("MarcRecord.xml");
         String marcXmlString = FileUtils.readFileToString(bibContentFile, "UTF-8");
         List<Record> records = readMarcXml(marcXmlString);
-        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL","PA");
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL",accessionRequest);
         assertNotNull(map);
         BibliographicEntity convertedBibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         StringBuilder errorMessage = new StringBuilder();
-        boolean isValid = accessionValidationService.validateItemRecord(convertedBibliographicEntity,errorMessage);
+        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,errorMessage);
         assertEquals(true,isValid);
     }
 
@@ -103,11 +107,14 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         File bibContentFile = getXmlContent("MarcRecord.xml");
         String marcXmlString = FileUtils.readFileToString(bibContentFile, "UTF-8");
         List<Record> records = readMarcXml(marcXmlString);
-        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL","PA");
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL",accessionRequest);
         assertNotNull(map);
         BibliographicEntity convertedBibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         StringBuilder errorMessage = new StringBuilder();
-        boolean isValid = accessionValidationService.validateItemRecord(convertedBibliographicEntity,errorMessage);
+        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,errorMessage);
         assertEquals(false,isValid);
     }
 

@@ -2,14 +2,17 @@ package org.recap.converter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.marc4j.marc.Leader;
-import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.Holding;
+import org.recap.model.jaxb.Holdings;
+import org.recap.model.jaxb.Items;
+import org.recap.model.jaxb.marc.CollectionType;
+import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jaxb.marc.LeaderFieldType;
+import org.recap.model.jaxb.marc.RecordType;
 import org.recap.model.jpa.*;
-import org.recap.model.marc.BibMarcRecord;
-import org.recap.model.marc.HoldingsMarcRecord;
-import org.recap.model.marc.ItemMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
@@ -48,7 +51,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
 
     @Autowired
     private BibliographicDetailsRepository bibliographicDetailsRepository;
-
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private Map institutionEntityMap;
@@ -61,7 +63,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      * @return
      */
     @Override
-    public Map convert(Object scsbRecord, String institutionName,String customerCode) {
+    public Map convert(Object scsbRecord, String institutionName, AccessionRequest accessionRequest){
         int failedItemCount = 0;
         int successItemCount = 0;
         String reasonForFailureItem = "";
@@ -76,14 +78,10 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         getDbReportUtil().setCollectionGroupMap(getCollectionGroupMap());
 
         BibRecord bibRecord = (BibRecord) scsbRecord;
-        String owningInstitutionBibId = bibRecord.getBib().getOwningInstitutionBibId();
-        BibMarcRecord bibMarcRecord = marcUtil.buildBibMarcRecord(bibRecord);
-        Record bibRecordObject = bibMarcRecord.getBibRecord();
-
         Integer owningInstitutionId = (Integer) getInstitutionEntityMap().get(institutionName);
         Date currentDate = new Date();
-        Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecordObject, owningInstitutionId, institutionName, owningInstitutionBibId,currentDate);
-        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
+        Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecord, owningInstitutionId, institutionName,currentDate);
+        BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get("bibliographicEntity");
         ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
         if (bibReportEntity != null) {
             reportEntities.add(bibReportEntity);
@@ -95,72 +93,85 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         map.put(RecapConstants.REASON_FOR_BIB_FAILURE , bibMap.get(RecapConstants.REASON_FOR_BIB_FAILURE));
         map.put(RecapConstants.EXIST_BIB_COUNT , bibMap.get(RecapConstants.EXIST_BIB_COUNT));
 
-        List<HoldingsMarcRecord> holdingsMarcRecords = bibMarcRecord.getHoldingsMarcRecords();
-        if (CollectionUtils.isNotEmpty(holdingsMarcRecords)) {
-            for (HoldingsMarcRecord holdingsMarcRecord : holdingsMarcRecords) {
+        List<Holdings> holdingsList = bibRecord.getHoldings();
+        for(Holdings holdings:holdingsList){
+            List<Holding> holdingList=null;
+            if (holdings.getHolding()!=null) {
+                holdingList = holdings.getHolding();
+            } else {
+                logger.error("holding is empty---"+bibRecord.getBib().getOwningInstitutionBibId());
+            }
+            for(Holding holding:holdingList){
                 boolean processHoldings = false;
-                Record holdingsRecord = holdingsMarcRecord.getHoldingsRecord();
-                Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, institutionName, holdingsRecord, bibRecord,bibRecordObject,currentDate);
-                HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
-                ReportEntity holdingsReportEntity = (ReportEntity) holdingsMap.get("holdingsReportEntity");
-                if (holdingsReportEntity != null) {
-                    reportEntities.add(holdingsReportEntity);
-                } else {
-                    processHoldings = true;
-                    holdingsEntities.add(holdingsEntity);
-                }
-                String holdingsCallNumber = marcUtil.getDataFieldValue(holdingsRecord, "852", 'h');
-                Character holdingsCallNumberType = marcUtil.getInd1(holdingsRecord, "852", 'h');
+                if (holding.getContent() != null) {
+                    CollectionType holdingContentCollection = holding.getContent().getCollection();
+                    List<RecordType> holdingRecordTypes = holdingContentCollection.getRecord();
+                    RecordType holdingsRecordType = holdingRecordTypes.get(0);
 
-                List<ItemMarcRecord> itemMarcRecordList = holdingsMarcRecord.getItemMarcRecordList();
-                if (CollectionUtils.isNotEmpty(itemMarcRecordList)) {
-                    for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
-                        Record itemRecord = itemMarcRecord.getItemRecord();
-                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId,
-                                holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, customerCode, bibRecord, bibRecordObject,currentDate);
-                        if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
-                            failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
-                        }
-                        if(itemMap.containsKey(RecapConstants.ITEMBARCODE)){
-                            map.put(RecapConstants.ITEMBARCODE,(String)itemMap.get(RecapConstants.ITEMBARCODE));
-                        }
-                        if(itemMap.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
-                            String reason = (String)itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
-                            if(!StringUtils.isEmpty(reason)){
-                                if(StringUtils.isEmpty(reasonForFailureItem)){
-                                    reasonForFailureItem = (String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
-                                }else{
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    stringBuilder.append(itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
-                                    stringBuilder.append(",");
-                                    stringBuilder.append(reasonForFailureItem);
-                                    reasonForFailureItem = stringBuilder.toString();
+                    Map<String, Object> holdingsMap = processAndValidateHoldingsEntity(bibliographicEntity, holding, holdingContentCollection,institutionName,currentDate);
+                    HoldingsEntity holdingsEntity = (HoldingsEntity) holdingsMap.get("holdingsEntity");
+                    ReportEntity holdingsReportEntity = (ReportEntity) holdingsMap.get("holdingsReportEntity");
+                    if (holdingsReportEntity != null) {
+                        reportEntities.add(holdingsReportEntity);
+                    } else {
+                        processHoldings = true;
+                        holdingsEntities.add(holdingsEntity);
+                    }
+                    String holdingsCallNumber = getMarcUtil().getDataFieldValueForRecordType(holdingsRecordType, "852", null, null, "h");
+                    String holdingsCallNumberType = getMarcUtil().getInd1ForRecordType(holdingsRecordType, "852", "h");
+
+                    List<Items> items = holding.getItems();
+                    for (Items item : items) {
+                        ContentType itemContent = item.getContent();
+                        CollectionType itemContentCollection = itemContent.getCollection();
+
+                        List<RecordType> itemRecordTypes = itemContentCollection.getRecord();
+                        for (RecordType itemRecordType : itemRecordTypes) {
+                            Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecordType,accessionRequest,institutionName,currentDate);
+                            if (itemMap != null) {
+                                if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
+                                    failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
                                 }
+                                if(itemMap.containsKey(RecapConstants.ITEMBARCODE)){
+                                    map.put(RecapConstants.ITEMBARCODE,(String)itemMap.get(RecapConstants.ITEMBARCODE));
+                                }
+                                if(itemMap.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
+                                    String reason = (String)itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
+                                    if(!StringUtils.isEmpty(reason)){
+                                        if(StringUtils.isEmpty(reasonForFailureItem)){
+                                            reasonForFailureItem = (String) itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE);
+                                        }else{
+                                            StringBuilder stringBuilder = new StringBuilder();
+                                            stringBuilder.append(itemMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
+                                            stringBuilder.append(",");
+                                            stringBuilder.append(reasonForFailureItem);
+                                            reasonForFailureItem = stringBuilder.toString();
+                                        }
 
+                                    }
+                                }
+                                if(itemMap.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
+                                    successItemCount = successItemCount + (int) itemMap.get(RecapConstants.SUCCESS_ITEM_COUNT);
+                                }
+                                ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
+                                ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
+                                if (itemReportEntity != null) {
+                                    reportEntities.add(itemReportEntity);
+                                } else if (processHoldings) {
+                                    if (holdingsEntity.getItemEntities() == null) {
+                                        holdingsEntity.setItemEntities(new ArrayList<>());
+                                    }
+                                    holdingsEntity.getItemEntities().add(itemEntity);
+                                    itemEntities.add(itemEntity);
+                                }
                             }
-                        }
-                        if(itemMap.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
-                            successItemCount = successItemCount + (int) itemMap.get(RecapConstants.SUCCESS_ITEM_COUNT);
-                        }
-                        ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
-                        ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
-                        if (itemReportEntity != null) {
-                            reportEntities.add(itemReportEntity);
-                        } else if (processHoldings) {
-                            if (holdingsEntity.getItemEntities() == null) {
-                                holdingsEntity.setItemEntities(new ArrayList<>());
-                            }
-                            holdingsEntity.getItemEntities().add(itemEntity);
-                            itemEntities.add(itemEntity);
                         }
                     }
                 }
-
             }
             bibliographicEntity.setHoldingsEntities(holdingsEntities);
             bibliographicEntity.setItemEntities(itemEntities);
         }
-
         if (CollectionUtils.isNotEmpty(reportEntities)) {
             map.put("reportEntities", reportEntities);
         }
@@ -193,9 +204,8 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         StringBuilder errorMessage = new StringBuilder();
-        if(StringUtils.isEmpty(owningInstitutionBibId)){
-            owningInstitutionBibId = marcUtil.getControlFieldValue(bibRecord, "001");
-        }
+        String owningInstitutionBibId = bibRecord.getBib().getOwningInstitutionBibId();
+
         if (StringUtils.isNotBlank(owningInstitutionBibId)) {
             bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
         } else {
@@ -212,27 +222,29 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
 
-        String bibXmlStringContent = marcUtil.writeMarcXml(bibRecord);
-        if (StringUtils.isNotBlank(bibXmlStringContent)) {
-            bibliographicEntity.setContent(bibXmlStringContent.getBytes());
+        ContentType bibContent = bibRecord.getBib().getContent();
+        CollectionType bibContentCollection = bibContent.getCollection();
+        String bibXmlContent = bibContentCollection.serialize(bibContentCollection);
+        if (!StringUtils.isEmpty(bibXmlContent)) {
+            bibliographicEntity.setContent(bibXmlContent.getBytes());
         } else {
             errorMessage.append("\n");
             errorMessage.append("Bib Content cannot be empty");
         }
 
-        boolean subFieldExistsFor245 = marcUtil.isSubFieldExists(bibRecord, "245");
+        boolean subFieldExistsFor245 = getMarcUtil().isSubFieldExists(bibContentCollection.getRecord().get(0), "245");
+
         if (!subFieldExistsFor245) {
             errorMessage.append("\n");
             errorMessage.append("Atleast one subfield should be there for 245 tag");
         }
-        Leader leader = bibRecord.getLeader();
-        if (leader != null) {
-            String leaderValue = bibRecord.getLeader().toString();
-            if (!(StringUtils.isNotBlank(leaderValue) && leaderValue.length() == 24)) {
-                errorMessage.append("\n");
-                errorMessage.append("Leader Field value should be 24 characters");
-            }
+
+        LeaderFieldType leader = bibContentCollection.getRecord().get(0).getLeader();
+        if (!(leader != null && StringUtils.isNotBlank(leader.getValue()) && leader.getValue().length() == 24)) {
+            errorMessage.append("\n");
+            errorMessage.append("Leader Field value should be 24 characters");
         }
+
         if(owningInstitutionId != null && StringUtils.isNotBlank(owningInstitutionBibId)){
             BibliographicEntity existBibliographicEntity = bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibIdAndIsDeletedFalse(owningInstitutionId,owningInstitutionBibId);
             if(null != existBibliographicEntity){
@@ -244,7 +256,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         if (errorMessage.toString().length() > 1) {
             failedBibCount = failedBibCount+1;
             reasonForFailureBib = errorMessage.toString();
-            reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity, bibRecord);
+            reportDataEntities = getDbReportUtil().generateBibFailureReportEntity(bibliographicEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -284,19 +296,20 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
 
-        String holdingsContent = new MarcUtil().writeMarcXml(holdingsRecord);
+        String holdingsContent = holdingContentCollection.serialize(holdingContentCollection);
         if (StringUtils.isNotBlank(holdingsContent)) {
             holdingsEntity.setContent(holdingsContent.getBytes());
         } else {
             errorMessage.append("Holdings Content cannot be empty");
         }
+
         holdingsEntity.setCreatedDate(currentDate);
         holdingsEntity.setCreatedBy(RecapConstants.ACCESSION);
         holdingsEntity.setLastUpdatedDate(currentDate);
         holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
-        String owningInstitutionHoldingsId = marcUtil.getDataFieldValue(holdingsRecord, "852", '0');
+        String owningInstitutionHoldingsId = holdingEnt.getOwningInstitutionHoldingsId();
         if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();
         } else if (owningInstitutionHoldingsId.length() > 100) {
@@ -305,7 +318,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         List<ReportDataEntity> reportDataEntities = null;
         if (errorMessage.toString().length() > 1) {
-            reportDataEntities = getDbReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity, institutionName, bibRecordObject);
+            reportDataEntities = getDbReportUtil().generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity);
             ReportDataEntity errorReportDataEntity = new ReportDataEntity();
             errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
             errorReportDataEntity.setHeaderValue(errorMessage.toString());
@@ -352,95 +365,97 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
         map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
         map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
-        String itemBarcode = marcUtil.getDataFieldValue(itemRecord, "876", 'p');
-        if (StringUtils.isNotBlank(itemBarcode)) {
-            itemEntity.setBarcode(itemBarcode);
-            map.put("itemBarcode",itemBarcode);
-        } else {
-            errorMessage.append("Item Barcode cannot be null");
-        }
-        itemEntity.setCustomerCode(customerCode);
-        itemEntity.setCallNumber(holdingsCallNumber);
-        itemEntity.setCallNumberType(String.valueOf(holdingsCallNumberType));
-        itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get("Available"));//TODO need to change
-        String copyNumber = marcUtil.getDataFieldValue(itemRecord, "876", 't');
-        if (StringUtils.isNotBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
-            itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
-        }
-        if (owningInstitutionId != null) {
-            itemEntity.setOwningInstitutionId(owningInstitutionId);
-        } else {
-            errorMessage.append("\n");
-            errorMessage.append("Owning Institution Id cannot be null");
-        }
-        String collectionGroupCode = marcUtil.getDataFieldValue(itemRecord, "900", 'a');
-        if (StringUtils.isNotBlank(collectionGroupCode) && getCollectionGroupMap().containsKey(collectionGroupCode)) {
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(collectionGroupCode));
-        } else {
-            isComplete = false;
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(RecapConstants.NOT_AVAILABLE_CGD));
-        }
-        itemEntity.setCreatedDate(currentDate);
-        itemEntity.setCreatedBy(RecapConstants.ACCESSION);
-        itemEntity.setLastUpdatedDate(currentDate);
-        itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-
-        String useRestrictions = marcUtil.getDataFieldValue(itemRecord, "876", 'h');
-        if (StringUtils.isNotBlank(useRestrictions) && ("In Library Use".equalsIgnoreCase(useRestrictions) || "Supervised Use".equalsIgnoreCase(useRestrictions))) {
-            itemEntity.setUseRestrictions(useRestrictions);
-        } else if(null == useRestrictions){
-            isComplete = false;
-        }
-
-        itemEntity.setVolumePartYear(marcUtil.getDataFieldValue(itemRecord, "876", '3'));
-        String owningInstitutionItemId = marcUtil.getDataFieldValue(itemRecord, "876", 'a');
-        if (StringUtils.isNotBlank(owningInstitutionItemId)) {
-            itemEntity.setOwningInstitutionItemId(owningInstitutionItemId);
-        } else {
-            errorMessage.append("\n");
-            errorMessage.append("Item Owning Institution Id cannot be null");
-        }
-
-        if(isComplete){
-            bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
-            itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
-        } else {
-            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
-            itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
-        }
-        List<ReportDataEntity> reportDataEntities = null;
-        if (errorMessage.toString().length() > 1) {
-            if(map.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
-                failedItemCount = ((int) map.get(RecapConstants.FAILED_ITEM_COUNT)) + 1;
-                map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
+        String itemBarcode = getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "876", null, null, "p");
+        if (accessionRequest.getItemBarcode().equals(itemBarcode)) {//This is to avoid creation of multiple items when response from partner service is having 1Bib 1Hold n items, accession should be done for one item which comes in the request and should not be done for other items which is linked with the same bib
+            if (StringUtils.isNotBlank(itemBarcode)) {
+                itemEntity.setBarcode(itemBarcode);
+                map.put("itemBarcode",itemBarcode);
+            } else {
+                errorMessage.append("Item Barcode cannot be null");
             }
-            if(map.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
-                reasonForFailureItem = errorMessage.toString();
-                map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+            itemEntity.setCustomerCode(accessionRequest.getCustomerCode());
+            itemEntity.setCallNumber(holdingsCallNumber);
+            itemEntity.setCallNumberType(String.valueOf(holdingsCallNumberType));
+            itemEntity.setItemAvailabilityStatusId((Integer) getItemStatusMap().get("Available"));
+            String copyNumber = getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "876", null, null, "t");
+            if (StringUtils.isNotBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
+                itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
+            }
+            if (owningInstitutionId != null) {
+                itemEntity.setOwningInstitutionId(owningInstitutionId);
+            } else {
+                errorMessage.append("\n");
+                errorMessage.append("Owning Institution Id cannot be null");
+            }
+            String collectionGroupCode = getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "900", null, null, "a");
+            if (StringUtils.isNotBlank(collectionGroupCode) && collectionGroupMap.containsKey(collectionGroupCode)) {
+                itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get(collectionGroupCode));
+            } else {
+                itemEntity.setCollectionGroupId((Integer) collectionGroupMap.get("Open"));
+            }
+            itemEntity.setCreatedDate(currentDate);
+            itemEntity.setCreatedBy(RecapConstants.ACCESSION);
+            itemEntity.setLastUpdatedDate(currentDate);
+            itemEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
+
+            String useRestrictions = getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "876", null, null, "h");
+            if (StringUtils.isNotBlank(useRestrictions) && ("In Library Use".equalsIgnoreCase(useRestrictions) || "Supervised Use".equalsIgnoreCase(useRestrictions))) {
+                itemEntity.setUseRestrictions(useRestrictions);
+            } else if(null == useRestrictions){
+                isComplete = false;
             }
 
-            reportDataEntities = getDbReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity, institutionName, bibRecordObject);
-            ReportDataEntity errorReportDataEntity = new ReportDataEntity();
-            errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
-            errorReportDataEntity.setHeaderValue(errorMessage.toString());
-            reportDataEntities.add(errorReportDataEntity);
-        }else{
-            if(map.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
-                successItemCount = (int) map.get(RecapConstants.SUCCESS_ITEM_COUNT) + 1;
-                map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
+            itemEntity.setVolumePartYear(getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "876", null, null, "3"));
+            String owningInstitutionItemId = getMarcUtil().getDataFieldValueForRecordType(itemRecordType, "876", null, null, "a");
+            if (StringUtils.isNotBlank(owningInstitutionItemId)) {
+                itemEntity.setOwningInstitutionItemId(owningInstitutionItemId);
+            } else {
+                errorMessage.append("\n");
+                errorMessage.append("Item Owning Institution Id cannot be null");
             }
+
+            if(isComplete){
+                bibliographicEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
+                itemEntity.setCatalogingStatus(RecapConstants.COMPLETE_STATUS);
+            } else {
+                bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+                itemEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+            }
+            List<ReportDataEntity> reportDataEntities = null;
+            if (errorMessage.toString().length() > 1) {
+                if(map.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
+                    failedItemCount = ((int) map.get(RecapConstants.FAILED_ITEM_COUNT)) + 1;
+                    map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
+                }
+                if(map.containsKey(RecapConstants.REASON_FOR_ITEM_FAILURE)){
+                    reasonForFailureItem = errorMessage.toString();
+                    map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+                }
+
+                reportDataEntities = getDbReportUtil().generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity);
+                ReportDataEntity errorReportDataEntity = new ReportDataEntity();
+                errorReportDataEntity.setHeaderName(RecapConstants.ERROR_DESCRIPTION);
+                errorReportDataEntity.setHeaderValue(errorMessage.toString());
+                reportDataEntities.add(errorReportDataEntity);
+            }else{
+                if(map.containsKey(RecapConstants.SUCCESS_ITEM_COUNT)){
+                    successItemCount = (int) map.get(RecapConstants.SUCCESS_ITEM_COUNT) + 1;
+                    map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
+                }
+            }
+            if (!org.springframework.util.CollectionUtils.isEmpty(reportDataEntities)) {
+                ReportEntity reportEntity = new ReportEntity();
+                reportEntity.setFileName(RecapConstants.ACCESSION_FAILURE_REPORT);
+                reportEntity.setInstitutionName(institutionName);
+                reportEntity.setType(RecapConstants.FAILURE);
+                reportEntity.setCreatedDate(new Date());
+                reportEntity.addAll(reportDataEntities);
+                map.put("itemReportEntity", reportEntity);
+            }
+            map.put("itemEntity", itemEntity);
+            return map;
         }
-        if (!org.springframework.util.CollectionUtils.isEmpty(reportDataEntities)) {
-            ReportEntity reportEntity = new ReportEntity();
-            reportEntity.setFileName(RecapConstants.ACCESSION_FAILURE_REPORT);
-            reportEntity.setInstitutionName(institutionName);
-            reportEntity.setType(org.recap.RecapConstants.FAILURE);
-            reportEntity.setCreatedDate(new Date());
-            reportEntity.addAll(reportDataEntities);
-            map.put("itemReportEntity", reportEntity);
-        }
-        map.put("itemEntity", itemEntity);
-        return map;
+        return null;
     }
 
     /**
@@ -522,5 +537,17 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      */
     public void setDbReportUtil(DBReportUtil dbReportUtil) {
         this.dbReportUtil = dbReportUtil;
+    }
+
+    /**
+     * Gets marc util.
+     *
+     * @return the marc util
+     */
+    public MarcUtil getMarcUtil() {
+        if (null == marcUtil) {
+            marcUtil = new MarcUtil();
+        }
+        return marcUtil;
     }
 }

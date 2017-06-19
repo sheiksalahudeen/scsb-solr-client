@@ -2,6 +2,7 @@ package org.recap.converter;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
@@ -154,7 +155,10 @@ public class SCSBToBibEntityConverterUT extends BaseTestCase{
     @Test
     public void convert() throws Exception {
         BibRecords bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(scsbXmlContent, BibRecords.class);
-        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecordList().get(0), "NYPL","NA");
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("NA");
+        accessionRequest.setItemBarcode("33433002031718");
+        Map map = scsbToBibEntityConverter.convert(bibRecords.getBibRecordList().get(0), "NYPL",accessionRequest);
         assertNotNull(map);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         assertNotNull(bibliographicEntity);

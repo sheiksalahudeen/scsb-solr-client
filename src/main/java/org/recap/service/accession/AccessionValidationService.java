@@ -5,8 +5,9 @@ import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.Holding;
 import org.recap.model.jaxb.Holdings;
 import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class AccessionValidationService {
     private MarcUtil marcUtil;
 
     @Autowired
-    private BibliographicDetailsRepository bibliographicDetailsRepository;
+    private HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
@@ -65,7 +66,15 @@ public class AccessionValidationService {
         return true;
     }
 
-    public boolean validateItemRecord(BibliographicEntity bibliographicEntity,StringBuilder errorMessage) {
+    public boolean validateItemAndHolding(BibliographicEntity bibliographicEntity, StringBuilder errorMessage){
+        boolean isValid = true;
+        isValid &= validateItem(bibliographicEntity,errorMessage);
+        isValid &= validateHolding(bibliographicEntity,errorMessage);
+        return isValid;
+
+    }
+
+    public boolean validateItem(BibliographicEntity bibliographicEntity, StringBuilder errorMessage) {
         boolean isValid = true;
         List<ItemEntity> incomingItemEntityList = bibliographicEntity.getItemEntities();
         for (ItemEntity incomingItemEntity : incomingItemEntityList) {
@@ -74,8 +83,29 @@ public class AccessionValidationService {
                 errorMessage.append("Failed - The incoming owning institution itemid " + incomingItemEntity.getOwningInstitutionItemId() + " of incoming barcode "
                         + incomingItemEntity.getBarcode() + " is already available in scsb"
                         + " and linked with barcode " + existingItemEntity.getBarcode() + " and its owning institution bib id(s) are "
-                        + getOwningInstitutionBibIds(existingItemEntity.getBibliographicEntities()));
+                        + getOwningInstitutionBibIds(existingItemEntity.getBibliographicEntities())+". ");//Getting bib ids if it is a bound with items
                 return false;
+            }
+        }
+        return isValid;
+    }
+
+    public boolean validateHolding(BibliographicEntity bibliographicEntity, StringBuilder errorMessage){
+        boolean isValid = true;
+        List<HoldingsEntity> holdingsEntityList = bibliographicEntity.getHoldingsEntities();
+        String itemBarcode = bibliographicEntity.getItemEntities().get(0).getBarcode();
+        for(HoldingsEntity holdingsEntity:holdingsEntityList){
+            HoldingsEntity existingHoldingEntity = holdingsDetailsRepository.findByOwningInstitutionHoldingsIdAndOwningInstitutionId(holdingsEntity.getOwningInstitutionHoldingsId(),holdingsEntity.getOwningInstitutionId());
+            if(existingHoldingEntity != null){
+                List<BibliographicEntity> existingBibliographicEntityList = existingHoldingEntity.getBibliographicEntities();
+                if(existingBibliographicEntityList.size()==1 && !existingBibliographicEntityList.get(0).getOwningInstitutionBibId().equals(bibliographicEntity.getOwningInstitutionBibId())){
+                    errorMessage.append("Failed - The incoming holding id "+ holdingsEntity.getOwningInstitutionHoldingsId()+" of the incoming barcode "+itemBarcode+" is already linked with another bib, " +
+                            "owning institution bib id "+existingBibliographicEntityList.get(0).getOwningInstitutionBibId());
+                    return false;
+                } else if(existingBibliographicEntityList.size()>1){
+                    errorMessage.append("Failed - The incoming holding id "+ holdingsEntity.getOwningInstitutionHoldingsId()+" of the incoming barcode "+itemBarcode+" is already linked with another bibs, " +
+                    "owning institution bib ids "+getOwningInstitutionBibIds(existingBibliographicEntityList));
+                }
             }
         }
         return isValid;

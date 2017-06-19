@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jpa.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
@@ -57,11 +58,11 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
      *
      * @param marcRecord
      * @param institutionName the institution name
-     * @param customerCode    the customer code
+     * @param accessionRequest    the customer code
      * @return
      */
     @Override
-    public Map convert(Object marcRecord, String institutionName,String customerCode) {
+    public Map convert(Object marcRecord, String institutionName, AccessionRequest accessionRequest) {
             int failedItemCount = 0;
             int successItemCount = 0;
             String reasonForFailureItem = "";
@@ -114,7 +115,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 if (CollectionUtils.isNotEmpty(itemMarcRecordList)) {
                     for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
                         Record itemRecord = itemMarcRecord.getItemRecord();
-                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId,customerCode, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord, currentDate);
+                        Map<String, Object> itemMap = processAndValidateItemEntity(bibliographicEntity, holdingsEntity, owningInstitutionId,accessionRequest.getCustomerCode(), holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, bibRecord, currentDate);
                         if(itemMap.containsKey(RecapConstants.FAILED_ITEM_COUNT)){
                             failedItemCount = failedItemCount + (int) itemMap.get(RecapConstants.FAILED_ITEM_COUNT);
                         }

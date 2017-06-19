@@ -11,8 +11,7 @@ import org.marc4j.marc.*;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.Holding;
 import org.recap.model.jaxb.Items;
-import org.recap.model.jaxb.marc.CollectionType;
-import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jaxb.marc.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
@@ -75,6 +74,11 @@ public class MarcUtil {
             }
         }
         return fieldValue.toString().trim();
+    }
+
+    public String getDataFieldValueForRecordType(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
+        List<String> strings = resolveValueForRecordType(marcRecord, field, ind1, ind2, subField);
+        return CollectionUtils.isEmpty(strings) ? "" : strings.get(0);
     }
 
     /**
@@ -196,6 +200,30 @@ public class MarcUtil {
         return values;
     }
 
+    private List<String> resolveValueForRecordType(RecordType marcRecord, String field, String ind1, String ind2, String subField) {
+        List<String> values = new ArrayList<>();
+        String indicator1 = StringUtils.isNotBlank(ind1) ? String.valueOf(ind1.charAt(0)) : " ";
+        String indicator2 = StringUtils.isNotBlank(ind2) ? String.valueOf(ind2.charAt(0)) : " ";
+        List<DataFieldType> dataFields = marcRecord.getDatafield();
+
+        for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
+            DataFieldType dataField = dataFieldIterator.next();
+            if (dataField != null && dataField.getTag().equals(field) && doIndicatorsMatchForDataFieldType(indicator1, indicator2, dataField)) {
+                List<SubfieldatafieldType> subFields = dataField.getSubfield();
+                for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                    SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                    if (subField != null && subfieldatafieldType.getCode().equals(subField)) {
+                        String data = subfieldatafieldType.getCode();
+                        if (StringUtils.isNotBlank(data)) {
+                            values.add(subfieldatafieldType.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        return values;
+    }
+
     private boolean doIndicatorsMatch(String indicator1, String indicator2, DataField dataField) {
         boolean result = true;
         if (StringUtils.isNotBlank(indicator1)) {
@@ -203,6 +231,17 @@ public class MarcUtil {
         }
         if (StringUtils.isNotBlank(indicator2)) {
             result &= dataField.getIndicator2() == indicator2.charAt(0);
+        }
+        return result;
+    }
+
+    private boolean doIndicatorsMatchForDataFieldType(String indicator1, String indicator2, DataFieldType dataField) {
+        boolean result = true;
+        if (StringUtils.isNotBlank(indicator1)) {
+            result = dataField.getInd1().equals(indicator1.charAt(0));
+        }
+        if (StringUtils.isNotBlank(indicator2)) {
+            result &= dataField.getInd2().equals(indicator2.charAt(0));
         }
         return result;
     }
@@ -310,6 +349,27 @@ public class MarcUtil {
         }
         return false;
     }
+    public boolean isSubFieldExists(RecordType marcRecord, String field) {
+        List<DataFieldType> dataFields = marcRecord.getDatafield();
+        for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
+            DataFieldType dataField = dataFieldIterator.next();
+            if (dataField != null && dataField.getTag().equals(field)) {
+                List<SubfieldatafieldType> subFields = dataField.getSubfield();
+                for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                    SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                    String data = subfieldatafieldType.getCode();
+                    if (StringUtils.isNotBlank(data)) {
+                        String value = subfieldatafieldType.getValue();
+                        if (StringUtils.isNotBlank(value)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        return false;
+    }
 
     /**
      * This method gets data field.
@@ -343,6 +403,24 @@ public class MarcUtil {
             Subfield subfield = dataField.getSubfield(subField);
             if (subfield != null) {
                 return dataField.getIndicator1();
+            }
+        }
+        return null;
+    }
+
+    public String getInd1ForRecordType(RecordType marcRecord, String field, String subField) {
+        List<DataFieldType> dataFields = marcRecord.getDatafield();
+
+        for (Iterator<DataFieldType> dataFieldIterator = dataFields.iterator(); dataFieldIterator.hasNext(); ) {
+            DataFieldType dataField = dataFieldIterator.next();
+            if (dataField != null && dataField.getTag().equals(field)) {
+                List<SubfieldatafieldType> subFields = dataField.getSubfield();
+                for (Iterator<SubfieldatafieldType> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
+                    SubfieldatafieldType subfieldatafieldType = subfieldIterator.next();
+                    if (subField != null && subfieldatafieldType.getCode().equals(subField)) {
+                        return dataField.getInd1();
+                    }
+                }
             }
         }
         return null;
@@ -450,13 +528,16 @@ public class MarcUtil {
             Record holdingContentRecord = getRecordFromContent(holdingXmlContent.getBytes());
             holdingsMarcRecord.setHoldingsRecord(holdingContentRecord);
             for(Items item : holding.getItems()){
-                ItemMarcRecord itemMarcRecord = new ItemMarcRecord();
-                ContentType itemContent = item.getContent();
-                CollectionType itemContentCollection = itemContent.getCollection();
-                String itemXmlContent = itemContentCollection.serialize(itemContentCollection);
-                Record itemContentRecord = getRecordFromContent(itemXmlContent.getBytes());
-                itemMarcRecord.setItemRecord(itemContentRecord);
-                itemMarcRecords.add(itemMarcRecord);
+                List<RecordType> recordTypes = item.getContent().getCollection().getRecord();
+                for (RecordType recordType:recordTypes) {
+                    ItemMarcRecord itemMarcRecord = new ItemMarcRecord();
+                    ContentType itemContent = item.getContent();
+                    CollectionType itemContentCollection = itemContent.getCollection();
+                    String itemXmlContent = itemContentCollection.serialize(recordType);
+                    Record itemContentRecord = getRecordFromContent(itemXmlContent.getBytes());
+                    itemMarcRecord.setItemRecord(itemContentRecord);
+                    itemMarcRecords.add(itemMarcRecord);
+                }
             }
             holdingsMarcRecord.setItemMarcRecordList(itemMarcRecords);
             holdingsMarcRecordList.add(holdingsMarcRecord);

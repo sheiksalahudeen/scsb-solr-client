@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
@@ -49,7 +50,13 @@ public class AccessionServiceUT extends BaseTestCase {
     private static final Logger logger = LoggerFactory.getLogger(AccessionServiceUT.class);
 
     @Mock
+    private AccessionService mockAccessionService;
+
+    @Autowired
     private AccessionService accessionService;
+
+    @Autowired
+    private ItemDetailsRepository itemDetailsRepository;
 
     @Value("${ils.nypl.bibdata}")
     String ilsNYPLBibData;
@@ -76,7 +83,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setCustomerCode("PB");
         accessionRequest.setItemBarcode("32101062128309");
         accessionRequestList.add(accessionRequest);
-        accessionService.processRequest(accessionRequestList);
+        mockAccessionService.processRequest(accessionRequestList);
         Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("32101062128309","PB","callnumber","PUL")));
         List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("202304");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
@@ -94,6 +101,50 @@ public class AccessionServiceUT extends BaseTestCase {
 
     }
 
+    @Ignore
+    public void accessionForExistingItemIdForSameBibSameHolding() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919400", "9734816", "7453441", true);
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        accessionRequestList.add(accessionRequest);
+        List<AccessionResponse> accessionResponseList = accessionService.processRequest(accessionRequestList);
+        assertNotNull(accessionResponseList);
+        assertEquals(new Integer(1), new Integer(accessionResponseList.size()));
+        assertEquals("Failed - The incoming owning institution itemid 7453441 of incoming barcode 32101095533293 is already available in scsb and linked with barcode 32101095533294 and its owning institution bib id(s) are 9919400. ",
+                accessionResponseList.get(0).getMessage());
+    }
+
+    @Ignore
+    public void accessionForExistingItemIdForDiffBibDiffHolding() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919401", "9734817", "7453441", true);
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        accessionRequestList.add(accessionRequest);
+        List<AccessionResponse> accessionResponseList = accessionService.processRequest(accessionRequestList);
+        assertNotNull(accessionResponseList);
+        assertEquals(new Integer(1), new Integer(accessionResponseList.size()));
+        assertEquals("Failed - The incoming owning institution itemid 7453441 of incoming barcode 32101095533293 is already available in scsb and linked with barcode 32101095533294 and its owning institution bib id(s) are 9919401. ", accessionResponseList.get(0).getMessage());
+    }
+
+    @Ignore
+    public void accessionForExistingItemIdForDiffBibSameHolding() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919401", "9734816", "7453441", true);
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        accessionRequestList.add(accessionRequest);
+        List<AccessionResponse> accessionResponseList = accessionService.processRequest(accessionRequestList);
+        assertNotNull(accessionResponseList);
+        assertEquals(new Integer(1), new Integer(accessionResponseList.size()));
+        assertEquals("Failed - The incoming owning institution itemid 7453441 of incoming barcode 32101095533293 is already available in scsb and linked with barcode 32101095533294 and its owning institution bib id(s) are 9919401. Failed - The incoming holding id 9734816 of the incoming barcode 32101095533293 is already linked with another bib, owning institution bib id 9919401",
+                accessionResponseList.get(0).getMessage());
+    }
+
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {
         UpdateResponse updateResponse = solrTemplate.getSolrClient().deleteByQuery(docIdParam+":"+docIdValue);
         solrTemplate.commit();
@@ -106,7 +157,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setCustomerCode("PA");
         accessionRequest.setItemBarcode("3210106212830");
         accessionRequestList.add(accessionRequest);
-        accessionService.processRequest(accessionRequestList);
+        mockAccessionService.processRequest(accessionRequestList);
         List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber","PUL").getItemEntities();
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities = mockedItemDetailsRepository.findByBarcode("3210106212830");
@@ -123,7 +174,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setCustomerCode("PA");
         accessionRequest.setItemBarcode("3210106212830");
         accessionRequestList.add(accessionRequest);
-        accessionService.processRequest(accessionRequestList);
+        mockAccessionService.processRequest(accessionRequestList);
         List<ItemEntity> itemEntityList = saveBibSingleHoldingsSingleItem("3210106212830","PA","dummycallnumber","PUL").getItemEntities();
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities = mockedItemDetailsRepository.findByBarcode("3210106212830");
@@ -137,8 +188,8 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionResponse.setItemBarcode("3210106212830");
         accessionResponse.setMessage(RecapConstants.ITEM_BARCODE_ALREADY_ACCESSIONED_MSG);
         accessionResponseList.add(accessionResponse);
-        Mockito.when(accessionService.processRequest(accessionRequestList)).thenReturn(accessionResponseList);
-        List<AccessionResponse> accessionResponses = accessionService.processRequest(accessionRequestList);
+        Mockito.when(mockAccessionService.processRequest(accessionRequestList)).thenReturn(accessionResponseList);
+        List<AccessionResponse> accessionResponses = mockAccessionService.processRequest(accessionRequestList);
         assertEquals(accessionResponses,accessionResponseList);
         Mockito.when(mockedItemDetailsRepository.findByBarcode("3210106212830")).thenReturn(itemEntityList);
         List<ItemEntity> itemEntities1 = mockedItemDetailsRepository.findByBarcode("3210106212830");
@@ -156,7 +207,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setCustomerCode("CU");
         accessionRequest.setItemBarcode("CU71437673");
         accessionRequestList.add(accessionRequest);
-        accessionService.processRequest(accessionRequestList);
+        mockAccessionService.processRequest(accessionRequestList);
         Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("5495636")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("CU71437673","CU","callnumber","CUL")));
         List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId("5495636");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
@@ -181,7 +232,7 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionRequest.setCustomerCode("NA");
         accessionRequest.setItemBarcode("33433002031718");
         accessionRequestList.add(accessionRequest);
-        accessionService.processRequest(accessionRequestList);
+        mockAccessionService.processRequest(accessionRequestList);
         Mockito.when(mockedBibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186")).thenReturn(Arrays.asList(saveBibSingleHoldingsSingleItem("33433002031718","NA","callnumber","NYPL")));
         List<BibliographicEntity> fetchedBibliographicEntityList = mockedBibliographicDetailsRepository.findByOwningInstitutionBibId(".b100000186");
         String updatedBibMarcXML = new String(fetchedBibliographicEntityList.get(0).getContent(), StandardCharsets.UTF_8);
@@ -213,9 +264,9 @@ public class AccessionServiceUT extends BaseTestCase {
     @Test
     public void getOwningInstitution() throws Exception {
         String customerCode = "PB";
-        Mockito.when(accessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
-        Mockito.when(accessionService.getOwningInstitution(customerCode)).thenCallRealMethod();
-        String owningInstitution = accessionService.getOwningInstitution(customerCode);
+        Mockito.when(mockAccessionService.getCustomerCodeDetailsRepository()).thenReturn(customerCodeDetailsRepository);
+        Mockito.when(mockAccessionService.getOwningInstitution(customerCode)).thenCallRealMethod();
+        String owningInstitution = mockAccessionService.getOwningInstitution(customerCode);
         assertNotNull(owningInstitution);
         assertTrue(owningInstitution.equalsIgnoreCase(RecapConstants.PRINCETON));
     }
@@ -235,15 +286,15 @@ public class AccessionServiceUT extends BaseTestCase {
         accessionEntity.setAccessionStatus("Pending");
         accessionEntity.setAccessionRequest("Accession Request");
         accessionEntity.setCreatedDate(accessionDate);
-        Mockito.when(accessionService.saveRequest(accessionRequestList)).thenReturn(RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
-        String status = accessionService.saveRequest(accessionRequestList);
+        Mockito.when(mockAccessionService.saveRequest(accessionRequestList)).thenReturn(RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
+        String status = mockAccessionService.saveRequest(accessionRequestList);
         assertEquals(status, RecapConstants.ACCESSION_SAVE_SUCCESS_STATUS);
 
         List<AccessionEntity> accessionEntities = Arrays.asList(accessionEntity);
-        Mockito.when(accessionService.getAccessionEntities(RecapConstants.PENDING)).thenReturn(accessionEntities);
-        Mockito.when(accessionService.getAccessionRequest(accessionEntities)).thenReturn(accessionRequestList);
-        List<AccessionEntity> accessionEntityList = accessionService.getAccessionEntities(RecapConstants.PENDING);
-        List<AccessionRequest> accessionRequestByDate = accessionService.getAccessionRequest(accessionEntityList);
+        Mockito.when(mockAccessionService.getAccessionEntities(RecapConstants.PENDING)).thenReturn(accessionEntities);
+        Mockito.when(mockAccessionService.getAccessionRequest(accessionEntities)).thenReturn(accessionRequestList);
+        List<AccessionEntity> accessionEntityList = mockAccessionService.getAccessionEntities(RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestByDate = mockAccessionService.getAccessionRequest(accessionEntityList);
         assertNotNull(accessionRequestByDate);
         assertEquals(accessionRequestByDate.size(), barcodes.size());
     }
@@ -327,5 +378,72 @@ public class AccessionServiceUT extends BaseTestCase {
         return new File(resource.toURI());
     }
 
+    public BibliographicEntity saveBibHoldingsItems(Integer itemCount, String itemBarcode, String customerCode, String callnumber, String institution, String owningInstBibId, String owningInstHoldingId, String owningInstItemId, boolean availableItem) throws Exception {
+        File bibContentFile = getBibContentFile(institution);
+        File holdingsContentFile = getHoldingsContentFile(institution);
+        String sourceBibContent = FileUtils.readFileToString(bibContentFile, "UTF-8");
+        String sourceHoldingsContent = FileUtils.readFileToString(holdingsContentFile, "UTF-8");
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setContent(sourceBibContent.getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionBibId(owningInstBibId);
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(sourceHoldingsContent.getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(owningInstHoldingId));
+
+        List<ItemEntity> itemEntityList = getItemEntityList(itemCount,itemBarcode,customerCode,callnumber,owningInstItemId,availableItem);
+        for(ItemEntity itemEntity1:itemEntityList){
+            itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
+            itemEntity1.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+        }
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(itemEntityList);
+        holdingsEntity.setItemEntities(itemEntityList);
+
+        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+        entityManager.refresh(savedBibliographicEntity);
+        return savedBibliographicEntity;
+
+    }
+
+    public List<ItemEntity> getItemEntityList(Integer itemCount,String itemBarcode,String customerCode,String callnumber,String owningInstItemId,boolean availableItem){
+        List<ItemEntity> itemEntityList = new ArrayList<>();
+        for(int count=0;count<itemCount;count++){
+            ItemEntity itemEntity = new ItemEntity();
+            itemEntity.setLastUpdatedDate(new Date());
+            if (count==0) {
+                itemEntity.setOwningInstitutionItemId(owningInstItemId);
+                itemEntity.setBarcode(itemBarcode);
+            } else {
+                itemEntity.setOwningInstitutionItemId(owningInstItemId+count);
+                itemEntity.setBarcode(itemBarcode+count);
+            }
+            itemEntity.setOwningInstitutionId(1);
+            itemEntity.setCallNumber(callnumber);
+            itemEntity.setCollectionGroupId(1);
+            itemEntity.setCallNumberType("1");
+            itemEntity.setCustomerCode(customerCode);
+            if (availableItem) {
+                itemEntity.setItemAvailabilityStatusId(1);
+            } else {
+                itemEntity.setItemAvailabilityStatusId(2);
+            }
+            itemEntity.setCreatedDate(new Date());
+            itemEntity.setCreatedBy("tst");
+            itemEntity.setLastUpdatedBy("tst");
+            itemEntityList.add(itemEntity);
+        }
+        return itemEntityList;
+    }
 
 }
