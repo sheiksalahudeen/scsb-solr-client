@@ -66,20 +66,20 @@ public class AccessionValidationService {
         return true;
     }
 
-    public boolean validateItemAndHolding(BibliographicEntity bibliographicEntity, StringBuilder errorMessage){
+    public boolean validateItemAndHolding(BibliographicEntity bibliographicEntity, boolean isValidBoundWithRecord, boolean isFirstRecord, StringBuilder errorMessage){
         boolean isValid = true;
-        isValid &= validateItem(bibliographicEntity,errorMessage);
-        isValid &= validateHolding(bibliographicEntity,errorMessage);
+        isValid &= validateItem(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
+        isValid &= validateHolding(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
         return isValid;
 
     }
 
-    public boolean validateItem(BibliographicEntity bibliographicEntity, StringBuilder errorMessage) {
+    public boolean validateItem(BibliographicEntity bibliographicEntity,boolean isValidBoundWithRecord,boolean isFirstRecord, StringBuilder errorMessage) {
         boolean isValid = true;
         List<ItemEntity> incomingItemEntityList = bibliographicEntity.getItemEntities();
         for (ItemEntity incomingItemEntity : incomingItemEntityList) {
             ItemEntity existingItemEntity = itemDetailsRepository.findByOwningInstitutionItemIdAndOwningInstitutionId(incomingItemEntity.getOwningInstitutionItemId(), incomingItemEntity.getOwningInstitutionId());
-            if (existingItemEntity != null) {
+            if (existingItemEntity != null && (!isValidBoundWithRecord || (isValidBoundWithRecord && isFirstRecord))) {
                 errorMessage.append("Failed - The incoming owning institution itemid " + incomingItemEntity.getOwningInstitutionItemId() + " of incoming barcode "
                         + incomingItemEntity.getBarcode() + " is already available in scsb"
                         + " and linked with barcode " + existingItemEntity.getBarcode() + " and its owning institution bib id(s) are "
@@ -90,13 +90,13 @@ public class AccessionValidationService {
         return isValid;
     }
 
-    public boolean validateHolding(BibliographicEntity bibliographicEntity, StringBuilder errorMessage){
+    public boolean validateHolding(BibliographicEntity bibliographicEntity,boolean isValidBoundWithRecord,boolean isFirstRecord, StringBuilder errorMessage){
         boolean isValid = true;
         List<HoldingsEntity> holdingsEntityList = bibliographicEntity.getHoldingsEntities();
         String itemBarcode = bibliographicEntity.getItemEntities().get(0).getBarcode();
         for(HoldingsEntity holdingsEntity:holdingsEntityList){
             HoldingsEntity existingHoldingEntity = holdingsDetailsRepository.findByOwningInstitutionHoldingsIdAndOwningInstitutionId(holdingsEntity.getOwningInstitutionHoldingsId(),holdingsEntity.getOwningInstitutionId());
-            if(existingHoldingEntity != null){
+            if(existingHoldingEntity != null && (!isValidBoundWithRecord || (isValidBoundWithRecord && isFirstRecord))){
                 List<BibliographicEntity> existingBibliographicEntityList = existingHoldingEntity.getBibliographicEntities();
                 if(existingBibliographicEntityList.size()==1 && !existingBibliographicEntityList.get(0).getOwningInstitutionBibId().equals(bibliographicEntity.getOwningInstitutionBibId())){
                     errorMessage.append("Failed - The incoming holding id "+ holdingsEntity.getOwningInstitutionHoldingsId()+" of the incoming barcode "+itemBarcode+" is already linked with another bib, " +

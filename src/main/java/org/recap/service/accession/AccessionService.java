@@ -369,10 +369,16 @@ public class AccessionService {
         }
         if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
             if (CollectionUtils.isNotEmpty(records)) {
+                int count=1;
                 for (Record record : records) {
-                    response = updateData(record, owningInstitution, responseMapList, accessionRequest);
+                    boolean isFirstRecord = false;
+                    if(count==1){
+                        isFirstRecord=true;
+                    }
+                    response = updateData(record, owningInstitution, responseMapList, accessionRequest,isValidBoundWithRecord,isFirstRecord);
                     accessionHelperUtil.setAccessionResponse(accessionResponsesList,accessionRequest.getItemBarcode(),response);
                     reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
+                    count++;
                 }
             }
         } else {
@@ -424,8 +430,13 @@ public class AccessionService {
             isValidBoundWithRecord = accessionValidationService.validateBoundWithScsbRecordFromIls(bibRecords.getBibRecordList());
         }
         if ((!isBoundWithItem) || (isBoundWithItem && isValidBoundWithRecord)) {
+            int count = 1;
             for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
-                response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest);
+                boolean isFirstRecord = false;
+                if(count==1){
+                    isFirstRecord=true;
+                }
+                response = updateData(bibRecord, owningInstitution, responseMapList, accessionRequest,isValidBoundWithRecord,isFirstRecord);
                 accessionHelperUtil.setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
                 reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
             }
@@ -586,8 +597,7 @@ public class AccessionService {
      * @param accessionRequest
      * @return
      */
-    @Transactional
-    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest){
+    private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest, boolean isValidBoundWithRecord,boolean isFirstRecord){
         String response = null;
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
         if (null != xmlToBibEntityConverterInterface) {
@@ -600,7 +610,7 @@ public class AccessionService {
             }
             if (bibliographicEntity != null) {
                 StringBuilder errorMessage = new StringBuilder();
-                boolean isValidItemAndHolding = accessionValidationService.validateItemAndHolding(bibliographicEntity,errorMessage);
+                boolean isValidItemAndHolding = accessionValidationService.validateItemAndHolding(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
                 if (isValidItemAndHolding) {
                     BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
                     if (null != savedBibliographicEntity) {

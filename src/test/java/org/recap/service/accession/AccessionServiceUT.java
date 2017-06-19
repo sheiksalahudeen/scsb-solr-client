@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
@@ -17,13 +16,13 @@ import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
 import org.recap.model.jpa.AccessionEntity;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.service.authorization.NyplOauthTokenApiService;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +100,7 @@ public class AccessionServiceUT extends BaseTestCase {
 
     }
 
-    @Ignore
+    @Test
     public void accessionForExistingItemIdForSameBibSameHolding() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919400", "9734816", "7453441", true);
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
@@ -116,7 +115,7 @@ public class AccessionServiceUT extends BaseTestCase {
                 accessionResponseList.get(0).getMessage());
     }
 
-    @Ignore
+    @Test
     public void accessionForExistingItemIdForDiffBibDiffHolding() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919401", "9734817", "7453441", true);
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
@@ -130,7 +129,7 @@ public class AccessionServiceUT extends BaseTestCase {
         assertEquals("Failed - The incoming owning institution itemid 7453441 of incoming barcode 32101095533293 is already available in scsb and linked with barcode 32101095533294 and its owning institution bib id(s) are 9919401. ", accessionResponseList.get(0).getMessage());
     }
 
-    @Ignore
+    @Test
     public void accessionForExistingItemIdForDiffBibSameHolding() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibHoldingsItems(1, "32101095533294", "PA", "24252", "PUL", "9919401", "9734816", "7453441", true);
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
