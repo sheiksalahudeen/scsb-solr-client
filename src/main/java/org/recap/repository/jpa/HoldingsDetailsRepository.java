@@ -61,6 +61,8 @@ public interface HoldingsDetailsRepository extends JpaRepository<HoldingsEntity,
      */
     Page<HoldingsEntity> findByOwningInstitutionIdAndIsDeletedFalse(Pageable pageable, Integer institutionId);
 
+    HoldingsEntity findByOwningInstitutionHoldingsIdAndOwningInstitutionId(String owningInstitutionHoldingsId, Integer owningInstitutionId);
+
     /**
      * Gets non deleted item entities based on the owning institution id and owning institution holdings id.
      *

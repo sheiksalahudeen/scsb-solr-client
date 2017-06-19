@@ -35,6 +35,12 @@ public class AccessionHelperUtil {
     @Autowired
     private ReportDetailRepository reportDetailRepository;
 
+    /**
+     * Gets owning institution for the given customer code.
+     *
+     * @param customerCode the customer code
+     * @return the owning institution
+     */
     public String getOwningInstitution(String customerCode) {
         String owningInstitution = null;
         try {
@@ -48,10 +54,23 @@ public class AccessionHelperUtil {
         return owningInstitution;
     }
 
+    /**
+     * Get item entity list for the given item barcode and customer code.
+     *
+     * @param itemBarcode  the item barcode
+     * @param customerCode the customer code
+     * @return the list
+     */
     public List<ItemEntity> getItemEntityList(String itemBarcode, String customerCode){
         return itemDetailsRepository.findByBarcodeAndCustomerCode(itemBarcode,customerCode);
     }
 
+    /**
+     * This method checks item barcode already exist for the given item list.
+     *
+     * @param itemEntityList the item entity list
+     * @return the boolean
+     */
     public boolean checkItemBarcodeAlreadyExist(List<ItemEntity> itemEntityList){
         boolean itemExists = false;
         if (itemEntityList != null && !itemEntityList.isEmpty()) {
@@ -60,6 +79,12 @@ public class AccessionHelperUtil {
         return itemExists;
     }
 
+    /**
+     * This method checks is item deaccessioned for the given item list.
+     *
+     * @param itemEntityList the item entity list
+     * @return the boolean
+     */
     public boolean isItemDeaccessioned(List<ItemEntity> itemEntityList){
         boolean itemDeleted = false;
         if (itemEntityList != null && !itemEntityList.isEmpty()) {
@@ -70,6 +95,12 @@ public class AccessionHelperUtil {
         return itemDeleted;
     }
 
+    /**
+     * Checks is the given item barcode is empty
+     *
+     * @param itemBarcode the item barcode
+     * @return the boolean
+     */
     public boolean isItemBarcodeEmpty(String itemBarcode) {
         if(StringUtils.isBlank(itemBarcode)) {
             return true;
@@ -77,6 +108,13 @@ public class AccessionHelperUtil {
         return false;
     }
 
+    /**
+     * Sets accession response.
+     *
+     * @param accessionResponseList the accession response list
+     * @param itemBarcode           the item barcode
+     * @param message               the message
+     */
     public void setAccessionResponse(Set<AccessionResponse> accessionResponseList, String itemBarcode, String message){
         AccessionResponse accessionResponse = new AccessionResponse();
         accessionResponse.setItemBarcode(itemBarcode);
@@ -84,6 +122,13 @@ public class AccessionHelperUtil {
         accessionResponseList.add(accessionResponse);
     }
 
+    /**
+     * Create report data entity list for accessioned item.
+     *
+     * @param accessionRequest the accession request
+     * @param response         the response
+     * @return the list
+     */
     public List<ReportDataEntity> createReportDataEntityList(AccessionRequest accessionRequest,String response){
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         if(StringUtils.isNotBlank(accessionRequest.getCustomerCode())) {
@@ -105,6 +150,14 @@ public class AccessionHelperUtil {
         return reportDataEntityList;
     }
 
+    /**
+     * This method is used to generate AccessionSummary Report
+     * <p>
+     * It saves the data in report_t and report_data_t
+     *
+     * @param responseMapList   the response map list
+     * @param owningInstitution the owning institution
+     */
     public void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
         int successBibCount = 0;
         int successItemCount = 0;

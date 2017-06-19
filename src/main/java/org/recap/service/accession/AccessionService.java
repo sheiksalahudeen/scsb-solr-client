@@ -22,7 +22,6 @@ import org.recap.service.partnerservice.ColumbiaService;
 import org.recap.service.partnerservice.NYPLService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.recap.util.AccessionHelperUtil;
-import org.recap.util.DateUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,9 +95,6 @@ public class AccessionService {
 
     @Autowired
     private AccessionDetailsRepository accessionDetailsRepository;
-
-    @Autowired
-    private DateUtil dateUtil;
 
     @Autowired
     private ProducerTemplate producerTemplate;
@@ -595,7 +591,7 @@ public class AccessionService {
         String response = null;
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
         if (null != xmlToBibEntityConverterInterface) {
-            Map responseMap = xmlToBibEntityConverterInterface.convert(record, owningInstitution,accessionRequest.getCustomerCode());
+            Map responseMap = xmlToBibEntityConverterInterface.convert(record, owningInstitution,accessionRequest);
             responseMapList.add(responseMap);
             BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
             List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
@@ -604,8 +600,8 @@ public class AccessionService {
             }
             if (bibliographicEntity != null) {
                 StringBuilder errorMessage = new StringBuilder();
-                boolean isValidItem = accessionValidationService.validateItemRecord(bibliographicEntity,errorMessage);
-                if (isValidItem) {
+                boolean isValidItemAndHolding = accessionValidationService.validateItemAndHolding(bibliographicEntity,errorMessage);
+                if (isValidItemAndHolding) {
                     BibliographicEntity savedBibliographicEntity = updateBibliographicEntity(bibliographicEntity);
                     if (null != savedBibliographicEntity) {
                         response = indexBibliographicRecord(savedBibliographicEntity.getBibliographicId());
@@ -628,110 +624,6 @@ public class AccessionService {
         getSolrIndexService().indexByBibliographicId(bibliographicId);
         response = RecapConstants.SUCCESS;
         return response;
-    }
-
-    /**
-     * This method is used to generate AccessionSummary Report
-     *
-     * It saves the data in report_t and report_data_t
-     *
-     * @param responseMapList
-     * @param owningInstitution
-     */
-    private void generateAccessionSummaryReport(List<Map<String,String>> responseMapList,String owningInstitution){
-        int successBibCount = 0;
-        int successItemCount = 0;
-        int failedBibCount = 0;
-        int failedItemCount = 0;
-        int exitsBibCount = 0;
-        String reasonForFailureBib = "";
-        String reasonForFailureItem = "";
-
-        for(Map responseMap : responseMapList){
-            successBibCount = successBibCount + (responseMap.get(RecapConstants.SUCCESS_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.SUCCESS_BIB_COUNT) : 0);
-            failedBibCount = failedBibCount + (responseMap.get(RecapConstants.FAILED_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.FAILED_BIB_COUNT) : 0);
-            if(failedBibCount == 0){
-                if(StringUtils.isEmpty((String)responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))){
-                    successItemCount = 1;
-                }else{
-                    failedItemCount = 1;
-                }
-            }
-            exitsBibCount = exitsBibCount + (responseMap.get(RecapConstants.EXIST_BIB_COUNT)!=null ? (Integer) responseMap.get(RecapConstants.EXIST_BIB_COUNT) : 0);
-
-            if (!StringUtils.isEmpty((String) responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE)) && !reasonForFailureBib.contains(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE).toString())) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(responseMap.get(RecapConstants.REASON_FOR_BIB_FAILURE));
-                stringBuilder.append(",");
-                stringBuilder.append(reasonForFailureBib);
-                reasonForFailureBib = stringBuilder.toString();
-            }
-            if ((!StringUtils.isEmpty((String) responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) && StringUtils.isEmpty(reasonForFailureBib) &&
-                    !reasonForFailureItem.contains((String) responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE))) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(responseMap.get(RecapConstants.REASON_FOR_ITEM_FAILURE));
-                stringBuilder.append(",");
-                stringBuilder.append(reasonForFailureItem);
-                reasonForFailureItem = stringBuilder.toString();
-            }
-        }
-
-        List<ReportEntity> reportEntityList = new ArrayList<>();
-        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-        ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setFileName(RecapConstants.ACCESSION_REPORT);
-        reportEntity.setType(RecapConstants.ACCESSION_SUMMARY_REPORT);
-        reportEntity.setCreatedDate(new Date());
-        reportEntity.setInstitutionName(owningInstitution);
-
-        ReportDataEntity successBibCountReportDataEntity = new ReportDataEntity();
-        successBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_SUCCESS_COUNT);
-        successBibCountReportDataEntity.setHeaderValue(String.valueOf(successBibCount));
-        reportDataEntities.add(successBibCountReportDataEntity);
-
-        ReportDataEntity successItemCountReportDataEntity = new ReportDataEntity();
-        successItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_SUCCESS_COUNT);
-        successItemCountReportDataEntity.setHeaderValue(String.valueOf(successItemCount));
-        reportDataEntities.add(successItemCountReportDataEntity);
-
-        ReportDataEntity existsBibCountReportDataEntity = new ReportDataEntity();
-        existsBibCountReportDataEntity.setHeaderName(RecapConstants.NUMBER_OF_BIB_MATCHES);
-        existsBibCountReportDataEntity.setHeaderValue(String.valueOf(exitsBibCount));
-        reportDataEntities.add(existsBibCountReportDataEntity);
-
-        ReportDataEntity failedBibCountReportDataEntity = new ReportDataEntity();
-        failedBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_FAILURE_COUNT);
-        failedBibCountReportDataEntity.setHeaderValue(String.valueOf(failedBibCount));
-        reportDataEntities.add(failedBibCountReportDataEntity);
-
-        ReportDataEntity failedItemCountReportDataEntity = new ReportDataEntity();
-        failedItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_FAILURE_COUNT);
-        failedItemCountReportDataEntity.setHeaderValue(String.valueOf(failedItemCount));
-        reportDataEntities.add(failedItemCountReportDataEntity);
-
-        ReportDataEntity reasonForBibFailureReportDataEntity = new ReportDataEntity();
-        reasonForBibFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_BIB_REASON);
-        if(reasonForFailureBib.startsWith("\n")){
-            reasonForFailureBib = reasonForFailureBib.substring(1,reasonForFailureBib.length()-1);
-        }
-        reasonForFailureBib = reasonForFailureBib.replaceAll("\n",",");
-        reasonForFailureBib = reasonForFailureBib.replaceAll(",$", "");
-        reasonForBibFailureReportDataEntity.setHeaderValue(reasonForFailureBib);
-        reportDataEntities.add(reasonForBibFailureReportDataEntity);
-
-        ReportDataEntity reasonForItemFailureReportDataEntity = new ReportDataEntity();
-        reasonForItemFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_ITEM_REASON);
-        if(reasonForFailureItem.startsWith("\n")){
-            reasonForFailureItem = reasonForFailureItem.substring(1,reasonForFailureItem.length()-1);
-        }
-        reasonForFailureItem = reasonForFailureItem.replaceAll("\n",",");
-        reasonForFailureItem = reasonForFailureItem.replaceAll(",$", "");
-        reasonForItemFailureReportDataEntity.setHeaderValue(reasonForFailureItem);
-        reportDataEntities.add(reasonForItemFailureReportDataEntity);
-
-        reportEntity.setReportDataEntities(reportDataEntities);
-        reportEntityList.add(reportEntity);
-        getReportDetailRepository().save(reportEntityList);
     }
 
     /**
