@@ -59,7 +59,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      * This method is used to convert scsb record into bib entity
      * @param scsbRecord
      * @param institutionName the institution name
-     * @param customerCode    the customer code
+     * @param accessionRequest    the customer code
      * @return
      */
     @Override
@@ -190,12 +190,10 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      * @param bibRecord
      * @param owningInstitutionId
      * @param institutionName
-     * @param owningInstitutionBibId
      * @param currentDate
      * @return
      */
-    private Map<String, Object> processAndValidateBibliographicEntity(Record bibRecord, Integer owningInstitutionId, String institutionName,String owningInstitutionBibId,
-                                                                      Date currentDate) {
+    private Map<String, Object> processAndValidateBibliographicEntity(BibRecord bibRecord,Integer owningInstitutionId,String institutionName, Date currentDate) {
         int failedBibCount = 0;
         int successBibCount = 0;
         int exitsBibCount = 0;
@@ -285,13 +283,13 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      * This method is used to validate all necessary holdings fields required in the bib record.
      * @param bibliographicEntity
      * @param institutionName
-     * @param holdingsRecord
-     * @param bibRecord
-     * @param bibRecordObject
+     * @param holding
+     * @param holdingContentCollection
+     * @param institutionName
      * @param currentDate
      * @return
      */
-    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, Record holdingsRecord, BibRecord bibRecord , Record bibRecordObject, Date currentDate) {
+    private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Holding holding, CollectionType holdingContentCollection,String institutionName,Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -309,7 +307,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
-        String owningInstitutionHoldingsId = holdingEnt.getOwningInstitutionHoldingsId();
+        String owningInstitutionHoldingsId = holding.getOwningInstitutionHoldingsId();
         if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();
         } else if (owningInstitutionHoldingsId.length() > 100) {
@@ -346,15 +344,14 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      * @param owningInstitutionId
      * @param holdingsCallNumber
      * @param holdingsCallNumberType
-     * @param itemRecord
+     * @param itemRecordType
      * @param institutionName
-     * @param customerCode
-     * @param bibRecord
-     * @param bibRecordObject
+     * @param accessionRequest
+     * @param institutionName
      * @param currentDate
      * @return
      */
-    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, Character holdingsCallNumberType, Record itemRecord, String institutionName, String customerCode, BibRecord bibRecord, Record bibRecordObject, Date currentDate) {
+    private Map<String, Object> processAndValidateItemEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, Integer owningInstitutionId, String holdingsCallNumber, String holdingsCallNumberType, RecordType itemRecordType,AccessionRequest accessionRequest,String institutionName, Date currentDate) {
         StringBuilder errorMessage = new StringBuilder();
         Map<String, Object> map = new HashMap<>();
         ItemEntity itemEntity = new ItemEntity();
