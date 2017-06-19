@@ -1,5 +1,7 @@
 package org.recap.converter;
 
+import org.recap.model.accession.AccessionRequest;
+
 import java.util.Map;
 
 /**
@@ -13,8 +15,8 @@ public interface XmlToBibEntityConverterInterface {
      *
      * @param record          the record
      * @param institutionName the institution name
-     * @param customerCode    the customer code
+     * @param accessionRequest    the accessionRequest
      * @return the map
      */
-    public Map convert(Object record, String institutionName, String customerCode);
+    public Map convert(Object record, String institutionName, AccessionRequest accessionRequest);
 }

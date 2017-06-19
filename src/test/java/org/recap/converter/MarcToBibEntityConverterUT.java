@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
+import org.recap.model.accession.AccessionRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -30,8 +31,10 @@ public class MarcToBibEntityConverterUT extends BaseTestCase {
         List<Record> records = getRecords();
         assertNotNull(records);
         assertEquals(records.size(), 1);
-
-        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL","PA");
+        AccessionRequest accessionRequest = new AccessionRequest();
+        accessionRequest.setCustomerCode("PA");
+        accessionRequest.setItemBarcode("32101095533293");
+        Map map = marcToBibEntityConverter.convert(records.get(0), "PUL",accessionRequest);
         assertNotNull(map);
         BibliographicEntity bibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         assertNotNull(bibliographicEntity);
