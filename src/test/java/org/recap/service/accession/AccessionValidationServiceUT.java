@@ -97,7 +97,7 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         assertNotNull(map);
         BibliographicEntity convertedBibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         StringBuilder errorMessage = new StringBuilder();
-        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,errorMessage);
+        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,false,false,errorMessage);
         assertEquals(true,isValid);
     }
 
@@ -114,7 +114,7 @@ public class AccessionValidationServiceUT extends BaseTestCase{
         assertNotNull(map);
         BibliographicEntity convertedBibliographicEntity = (BibliographicEntity) map.get("bibliographicEntity");
         StringBuilder errorMessage = new StringBuilder();
-        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,errorMessage);
+        boolean isValid = accessionValidationService.validateItem(convertedBibliographicEntity,false,false,errorMessage);
         assertEquals(false,isValid);
     }
 
