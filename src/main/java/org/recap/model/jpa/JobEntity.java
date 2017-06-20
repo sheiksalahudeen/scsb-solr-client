@@ -35,6 +35,9 @@ public class JobEntity {
     @Column(name = "STATUS")
     private String status;
 
+    @Column(name = "JOB_INSTANCE_ID")
+    private Integer jobInstanceId;
+
     /**
      * Gets job id.
      *
@@ -159,5 +162,23 @@ public class JobEntity {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Gets job instance id.
+     *
+     * @return the job instance id
+     */
+    public Integer getJobInstanceId() {
+        return jobInstanceId;
+    }
+
+    /**
+     * Sets job instance id.
+     *
+     * @param jobInstanceId the job instance id
+     */
+    public void setJobInstanceId(Integer jobInstanceId) {
+        this.jobInstanceId = jobInstanceId;
     }
 }
