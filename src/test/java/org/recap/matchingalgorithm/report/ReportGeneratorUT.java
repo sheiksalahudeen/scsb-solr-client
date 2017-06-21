@@ -28,8 +28,8 @@ public class ReportGeneratorUT extends BaseTestCase{
     @Autowired
     ReportDetailRepository reportDetailRepository;
 
-    @Value("${matching.report.directory}")
-    String matchingReportsDirectory;
+    @Value("${scsb.collection.report.directory}")
+    String reportsDirectory;
 
     @Autowired
     ReportGenerator reportGenerator;
@@ -39,157 +39,71 @@ public class ReportGeneratorUT extends BaseTestCase{
 
     @Test
     public void testMatchingReportForFileSystem() throws Exception {
-        ReportEntity reportEntity1 = saveMatchingReportEntity();
-        saveMatchingReportEntity();
-        saveMatchingReportEntity();
-
-        Date createdDate = reportEntity1.getCreatedDate();
+        saveAccessionSummaryReportEntity();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(new Date()), dateUtil.getToDate(new Date()));
         Thread.sleep(1000);
         stopWatch.stop();
         System.out.println("Total Time taken to generate matching report : " + stopWatch.getTotalTimeSeconds());
         assertNotNull(generatedReportFileName);
-        File file = new File(matchingReportsDirectory + File.separator + generatedReportFileName);
-        assertTrue(file.exists());
-    }
-
-    @Test
-    public void testExceptionReportForFileSystem() throws Exception {
-        ReportEntity reportEntity1 = saveExceptionReportEntity();
-        ReportEntity reportEntity2 = saveExceptionReportEntity();
-
-        Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
-        Thread.sleep(1000);
-
-        assertNotNull(generatedReportFileName);
-        File file = new File(matchingReportsDirectory + File.separator + generatedReportFileName);
-        assertTrue(file.exists());
     }
 
     @Test
     public void testMatchingReportForFTP() throws Exception {
-        ReportEntity reportEntity1 = saveMatchingReportEntity();
-        ReportEntity reportEntity2 = saveMatchingReportEntity();
-        ReportEntity reportEntity3 = saveMatchingReportEntity();
-
-        Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.MATCHING_TYPE, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
+        saveAccessionSummaryReportEntity();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FTP, dateUtil.getFromDate(new Date()), dateUtil.getToDate(new Date()));
         Thread.sleep(1000);
-
+        stopWatch.stop();
+        System.out.println("Total Time taken to generate matching report : " + stopWatch.getTotalTimeSeconds());
         assertNotNull(generatedReportFileName);
     }
 
-    @Test
-    public void testExceptionReportForFTP() throws Exception {
-        ReportEntity reportEntity1 = saveExceptionReportEntity();
-        ReportEntity reportEntity2 = saveExceptionReportEntity();
-
-        Date createdDate = reportEntity1.getCreatedDate();
-        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.EXCEPTION_REPORT_FILE_NAME, RecapConstants.ALL_INST, RecapConstants.EXCEPTION_TYPE, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
-        Thread.sleep(1000);
-
-        assertNotNull(generatedReportFileName);
-    }
-
-    private ReportEntity saveExceptionReportEntity() {
+    private List<ReportEntity> saveAccessionSummaryReportEntity(){
+        List<ReportEntity> reportEntityList = new ArrayList<>();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setFileName(RecapConstants.EXCEPTION_REPORT_FILE_NAME);
+        reportEntity.setFileName(RecapConstants.ACCESSION_REPORT);
+        reportEntity.setType(RecapConstants.ACCESSION_SUMMARY_REPORT);
         reportEntity.setCreatedDate(new Date());
-        reportEntity.setType(RecapConstants.EXCEPTION_TYPE);
-        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
+        reportEntity.setInstitutionName("PUL");
 
-        ReportDataEntity reportDataEntity1 = new ReportDataEntity();
-        reportDataEntity1.setHeaderName(RecapConstants.MATCHING_BIB_ID);
-        reportDataEntity1.setHeaderValue("1");
-        reportDataEntities.add(reportDataEntity1);
+        ReportDataEntity successBibCountReportDataEntity = new ReportDataEntity();
+        successBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_SUCCESS_COUNT);
+        successBibCountReportDataEntity.setHeaderValue(String.valueOf(1));
+        reportDataEntities.add(successBibCountReportDataEntity);
 
-        ReportDataEntity reportDataEntity2 = new ReportDataEntity();
-        reportDataEntity2.setHeaderName(RecapConstants.MATCHING_INSTITUTION_ID);
-        reportDataEntity2.setHeaderValue("NYPL");
-        reportDataEntities.add(reportDataEntity2);
+        ReportDataEntity successItemCountReportDataEntity = new ReportDataEntity();
+        successItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_SUCCESS_COUNT);
+        successItemCountReportDataEntity.setHeaderValue(String.valueOf(1));
+        reportDataEntities.add(successItemCountReportDataEntity);
 
-        ReportDataEntity reportDataEntity3 = new ReportDataEntity();
-        reportDataEntity3.setHeaderName(RecapConstants.MATCHING_BARCODE);
-        reportDataEntity3.setHeaderValue("103");
-        reportDataEntities.add(reportDataEntity3);
+        ReportDataEntity failedBibCountReportDataEntity = new ReportDataEntity();
+        failedBibCountReportDataEntity.setHeaderName(RecapConstants.BIB_FAILURE_COUNT);
+        failedBibCountReportDataEntity.setHeaderValue(String.valueOf(0));
+        reportDataEntities.add(failedBibCountReportDataEntity);
 
-        ReportDataEntity reportDataEntity4 = new ReportDataEntity();
-        reportDataEntity4.setHeaderName(RecapConstants.MATCHING_OCLC);
-        reportDataEntity4.setHeaderValue("213654");
-        reportDataEntities.add(reportDataEntity4);
+        ReportDataEntity failedItemCountReportDataEntity = new ReportDataEntity();
+        failedItemCountReportDataEntity.setHeaderName(RecapConstants.ITEM_FAILURE_COUNT);
+        failedItemCountReportDataEntity.setHeaderValue(String.valueOf(0));
+        reportDataEntities.add(failedItemCountReportDataEntity);
 
-        ReportDataEntity reportDataEntity5 = new ReportDataEntity();
-        reportDataEntity5.setHeaderName(RecapConstants.MATCHING_USE_RESTRICTIONS);
-        reportDataEntity5.setHeaderValue("In Library Use");
-        reportDataEntities.add(reportDataEntity5);
+        ReportDataEntity reasonForBibFailureReportDataEntity = new ReportDataEntity();
+        reasonForBibFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_BIB_REASON);
+        reasonForBibFailureReportDataEntity.setHeaderValue("");
+        reportDataEntities.add(reasonForBibFailureReportDataEntity);
 
-        ReportDataEntity reportDataEntity6 = new ReportDataEntity();
-        reportDataEntity6.setHeaderName(RecapConstants.MATCHING_SUMMARY_HOLDINGS);
-        reportDataEntity6.setHeaderValue("no.1 18292938");
-        reportDataEntities.add(reportDataEntity6);
-
-        ReportDataEntity reportDataEntity7 = new ReportDataEntity();
-        reportDataEntity7.setHeaderName(RecapConstants.MATCHING_TITLE);
-        reportDataEntity7.setHeaderValue("Testing the Matching Algorithm");
-        reportDataEntities.add(reportDataEntity7);
+        ReportDataEntity reasonForItemFailureReportDataEntity = new ReportDataEntity();
+        reasonForItemFailureReportDataEntity.setHeaderName(RecapConstants.FAILURE_ITEM_REASON);
+        reasonForItemFailureReportDataEntity.setHeaderValue("");
+        reportDataEntities.add(reasonForItemFailureReportDataEntity);
 
         reportEntity.setReportDataEntities(reportDataEntities);
+        reportEntityList.add(reportEntity);
+        return reportDetailRepository.save(reportEntityList);
 
-        return reportDetailRepository.save(reportEntity);
-    }
-
-    private ReportEntity saveMatchingReportEntity() {
-        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-
-        ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setCreatedDate(new Date());
-        reportEntity.setFileName(RecapConstants.MATCHING_ALGO_FULL_FILE_NAME);
-        reportEntity.setType(RecapConstants.MATCHING_TYPE);
-        reportEntity.setInstitutionName(RecapConstants.ALL_INST);
-
-        ReportDataEntity reportDataEntity1 = new ReportDataEntity();
-        reportDataEntity1.setHeaderName(RecapConstants.MATCHING_BIB_ID);
-        reportDataEntity1.setHeaderValue("1");
-        reportDataEntities.add(reportDataEntity1);
-
-        ReportDataEntity reportDataEntity2 = new ReportDataEntity();
-        reportDataEntity2.setHeaderName(RecapConstants.MATCHING_INSTITUTION_ID);
-        reportDataEntity2.setHeaderValue("NYPL");
-        reportDataEntities.add(reportDataEntity2);
-
-        ReportDataEntity reportDataEntity3 = new ReportDataEntity();
-        reportDataEntity3.setHeaderName(RecapConstants.MATCHING_BARCODE);
-        reportDataEntity3.setHeaderValue("103");
-        reportDataEntities.add(reportDataEntity3);
-
-        ReportDataEntity reportDataEntity4 = new ReportDataEntity();
-        reportDataEntity4.setHeaderName(RecapConstants.MATCHING_OCLC);
-        reportDataEntity4.setHeaderValue("213654");
-        reportDataEntities.add(reportDataEntity4);
-
-        ReportDataEntity reportDataEntity5 = new ReportDataEntity();
-        reportDataEntity5.setHeaderName(RecapConstants.MATCHING_USE_RESTRICTIONS);
-        reportDataEntity5.setHeaderValue("In Library Use");
-        reportDataEntities.add(reportDataEntity5);
-
-        ReportDataEntity reportDataEntity6 = new ReportDataEntity();
-        reportDataEntity6.setHeaderName(RecapConstants.MATCHING_SUMMARY_HOLDINGS);
-        reportDataEntity6.setHeaderValue("no.1 18292938");
-        reportDataEntities.add(reportDataEntity6);
-
-        ReportDataEntity reportDataEntity7 = new ReportDataEntity();
-        reportDataEntity7.setHeaderName(RecapConstants.MATCHING_TITLE);
-        reportDataEntity7.setHeaderValue("Testing the Matching Algorithm");
-        reportDataEntities.add(reportDataEntity7);
-
-        reportEntity.setReportDataEntities(reportDataEntities);
-
-        return reportDetailRepository.save(reportEntity);
     }
 
 }
