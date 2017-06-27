@@ -9,6 +9,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by premkb on 18/12/16.
@@ -36,13 +38,15 @@ public class PrincetonService {
         String bibDataResponse = null;
         String response = null;
         try {
-            bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
+            Map<String, String> params = new HashMap<>();
+            params.put("barcode", itemBarcode);
+            bibDataResponse = restTemplate.getForObject(ilsprincetonBibData, String.class, params);
         } catch (HttpClientErrorException e) {
             logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
             response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
+            logger.error(RecapConstants.LOG_ERROR, e);
             logger.error(RecapConstants.SERVICE_UNAVAILABLE);
             response = ilsprincetonBibData + RecapConstants.SERVICE_UNAVAILABLE;
             throw new RuntimeException(response);
