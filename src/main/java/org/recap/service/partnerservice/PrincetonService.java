@@ -4,11 +4,15 @@ import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by premkb on 18/12/16.
@@ -36,13 +40,20 @@ public class PrincetonService {
         String bibDataResponse = null;
         String response = null;
         try {
-            bibDataResponse = restTemplate.getForObject(ilsprincetonBibData + itemBarcode, String.class);
+            logger.info("BIBDATA URL = "+ilsprincetonBibData);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
+            HttpEntity requestEntity = new HttpEntity(headers);
+            Map<String, String> params = new HashMap<>();
+            params.put("barcode", itemBarcode);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(ilsprincetonBibData, HttpMethod.GET, requestEntity, String.class, params);
+            bibDataResponse = responseEntity.getBody();
         } catch (HttpClientErrorException e) {
             logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
             response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
             throw new RuntimeException(response);
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
+            logger.error(RecapConstants.LOG_ERROR, e);
             logger.error(RecapConstants.SERVICE_UNAVAILABLE);
             response = ilsprincetonBibData + RecapConstants.SERVICE_UNAVAILABLE;
             throw new RuntimeException(response);
