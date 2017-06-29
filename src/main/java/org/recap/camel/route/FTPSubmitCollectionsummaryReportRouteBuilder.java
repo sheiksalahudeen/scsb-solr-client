@@ -27,7 +27,6 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
      * @param submitCollectionPULFtpLocation  the submit collection pul ftp location
      * @param submitCollectionCULFtpLocation  the submit collection cul ftp location
      * @param submitCollectionNYPLFtpLocation the submit collection nypl ftp location
-     * @param culftpRemoteServer              the culftp remote server
      * @param ftpKnownHost                    the ftp known host
      * @param ftpPrivateKey                   the ftp private key
      */
@@ -36,7 +35,7 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
                                                         @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.pul.report}") String submitCollectionPULFtpLocation,
                                                         @Value("${ftp.submit.collection.cul.report}") String submitCollectionCULFtpLocation,
                                                         @Value("${ftp.submit.collection.nypl.report}") String submitCollectionNYPLFtpLocation,
-                                                        @Value("${ftp.submit.collection.report}") String culftpRemoteServer,@Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
+                                                        @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override
@@ -50,7 +49,7 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
                                 .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.COLUMBIA))
                                     .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionCULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
                                 .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.NYPL))
-                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionCULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
+                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionNYPLFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
                             ;
                 }
             });
