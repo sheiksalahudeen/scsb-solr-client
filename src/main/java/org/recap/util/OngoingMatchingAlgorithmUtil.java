@@ -308,7 +308,7 @@ public class OngoingMatchingAlgorithmUtil {
                 reportEntity.setType(RecapConstants.MATERIAL_TYPE_EXCEPTION);
             }
             matchingAlgorithmUtil.getReportDataEntityList(reportDataEntities, owningInstList, bibIds, materialTypeList, owningInstBibIds);
-            matchingAlgorithmUtil.getReportDataEntity(matchPointString, StringUtils.join(criteriaValues, ","), reportDataEntities);
+            matchingAlgorithmUtil.getReportDataEntity(matchPointString.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) ? RecapConstants.OCLC_CRITERIA : matchPointString, StringUtils.join(criteriaValues, ","), reportDataEntities);
             reportEntity.addAll(reportDataEntities);
             reportEntitiesToSave.add(reportEntity);
             producerTemplate.sendBody("scsbactivemq:queue:saveMatchingReportsQ", reportEntitiesToSave);
@@ -351,7 +351,7 @@ public class OngoingMatchingAlgorithmUtil {
             bibliographicIds.add(Integer.valueOf(bibId));
         }
         matchingAlgorithmUtil.getReportDataEntityList(reportDataEntityList, owningInstitutionList, bibIdList, materialTypeList, owningInstBibIdList);
-        matchingAlgorithmUtil.getReportDataEntity(matchPointString, matchPointValue, reportDataEntityList);
+        matchingAlgorithmUtil.getReportDataEntity(matchPointString.equalsIgnoreCase(RecapConstants.OCLC_NUMBER) ? RecapConstants.OCLC_CRITERIA : matchPointString, matchPointValue, reportDataEntityList);
         unMatchReportEntity.addAll(reportDataEntityList);
         return unMatchReportEntity;
     }
@@ -405,7 +405,7 @@ public class OngoingMatchingAlgorithmUtil {
             matchingAlgorithmUtil.getReportDataEntityList(reportDataEntities, owningInstList, bibIdList, materialTypeList, owningInstBibIds);
 
             if(CollectionUtils.isNotEmpty(oclcNumbers)) {
-                ReportDataEntity oclcNumberReportDataEntity = matchingAlgorithmUtil.getReportDataEntityForCollectionValues(oclcNumbers, RecapConstants.OCLC_NUMBER);
+                ReportDataEntity oclcNumberReportDataEntity = matchingAlgorithmUtil.getReportDataEntityForCollectionValues(oclcNumbers, RecapConstants.OCLC_CRITERIA);
                 reportDataEntities.add(oclcNumberReportDataEntity);
             }
             if(CollectionUtils.isNotEmpty(isbns)) {
