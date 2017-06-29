@@ -180,6 +180,10 @@ public class SharedCollectionRestController {
         }
         getAccessionService().updateStatusForAccessionEntities(accessionEntities, RecapConstants.COMPLETE_STATUS);
         stopWatch.stop();
+        batchAccessionResponse.setTimeElapsed(stopWatch.getTotalTimeSeconds() + " Secs");
+
+        bulkAccessionService.createSummaryReport(batchAccessionResponse.toString());
+
         logger.info("Total time taken for processing {} records : {} secs", accessionRequestList.size(), stopWatch.getTotalTimeSeconds());
         logger.info(batchAccessionResponse.toString());
 

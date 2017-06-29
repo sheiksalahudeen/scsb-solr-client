@@ -11,6 +11,7 @@ import org.recap.model.jpa.ReportEntity;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
+import org.recap.service.accession.AccessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class AccessionHelperUtil {
 
     @Autowired
     private ReportDetailRepository reportDetailRepository;
+
+    @Autowired
+    private AccessionService accessionService;
 
     /**
      * Gets owning institution for the given customer code.
@@ -252,6 +256,19 @@ public class AccessionHelperUtil {
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntityList.add(reportEntity);
         reportDetailRepository.save(reportEntityList);
+    }
+
+
+
+    public void processBibDataApiException(Set<AccessionResponse> accessionResponsesList, AccessionRequest accessionRequest,
+                                           List<ReportDataEntity> reportDataEntityList, String owningInstitution, Exception ex) {
+        String response;
+        logger.error(RecapConstants.LOG_ERROR, ex);
+        response = ex.getMessage();
+        //Create dummy record
+        response = accessionService.createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
+        accessionService.getAccessionHelperUtil().setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
+        reportDataEntityList.addAll(accessionService.getAccessionHelperUtil().createReportDataEntityList(accessionRequest, response));
     }
 
 }

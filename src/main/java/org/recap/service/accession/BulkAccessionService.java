@@ -18,6 +18,7 @@ import org.recap.spring.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -51,6 +52,12 @@ public class BulkAccessionService extends AccessionService{
     @Autowired
     private ApplicationContext applicationContext;
 
+    /**
+     * The batch accession thread size.
+     */
+    @Value("${batch.accession.thread.size}")
+    int batchAccessionThreadSize;
+
     public BatchAccessionResponse processAccessionRequest(List<AccessionRequest> accessionRequestList) {
         BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
         int requestedCount = accessionRequestList.size();
@@ -63,10 +70,9 @@ public class BulkAccessionService extends AccessionService{
 
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
 
-        int threadSize = 20;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadSize);
+        ExecutorService executorService = Executors.newFixedThreadPool(batchAccessionThreadSize);
 
-        List<List<AccessionRequest>> partitions = Lists.partition(trimmedAccessionRequests, threadSize);
+        List<List<AccessionRequest>> partitions = Lists.partition(trimmedAccessionRequests, batchAccessionThreadSize);
 
         for (Iterator<List<AccessionRequest>> iterator = partitions.iterator(); iterator.hasNext(); ) {
             List<AccessionRequest> accessionRequests = iterator.next();
@@ -83,7 +89,7 @@ public class BulkAccessionService extends AccessionService{
                     saveReportEntity(owningInstitution, reportDataEntityList);
                     continue;
                 }
-                BibDataCallable bibDataCallable = (BibDataCallable) ApplicationContextProvider.getInstance().getApplicationContext().getBean(BibDataCallable.class);
+                BibDataCallable bibDataCallable = (BibDataCallable) applicationContext.getBean(BibDataCallable.class);
                 bibDataCallable.setAccessionRequest(accessionRequest);
                 futures.add(executorService.submit(bibDataCallable));
 
@@ -115,17 +121,16 @@ public class BulkAccessionService extends AccessionService{
                     processSuccessResponse(batchAccessionResponse, o);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    batchAccessionResponse.addException(1);
                 }
             }
         }
-
-        createSummaryReport(batchAccessionResponse.toString());
 
         return batchAccessionResponse;
 
     }
 
-    private void createSummaryReport(String summary) {
+    public void createSummaryReport(String summary) {
         List<ReportDataEntity> reportDataEntityList = new ArrayList<>();
         ReportDataEntity reportDataEntityMessage = new ReportDataEntity();
         reportDataEntityMessage.setHeaderName(RecapConstants.BATCH_ACCESSION_SUMMARY);
@@ -149,6 +154,8 @@ public class BulkAccessionService extends AccessionService{
                     batchAccessionResponse.addSuccessRecord(1);
                 }else if(message.contains(RecapConstants.ITEM_ALREADY_ACCESSIONED)) {
                     batchAccessionResponse.addAlreadyAccessioned(1);
+                } else if(message.contains(RecapConstants.ACCESSION_DUMMY_RECORD)) {
+                    batchAccessionResponse.addDummyRecords(1);
                 } else if(message.contains(RecapConstants.EXCEPTION)) {
                     batchAccessionResponse.addException(1);
                 } else if(StringUtils.equalsIgnoreCase(RecapConstants.INVALID_BARCODE_LENGTH, message)) {
@@ -157,6 +164,8 @@ public class BulkAccessionService extends AccessionService{
                     batchAccessionResponse.addEmptyOwningInst(1);
                 } else if(StringUtils.equalsIgnoreCase(RecapConstants.ITEM_BARCODE_EMPTY, message)) {
                     batchAccessionResponse.addEmptyBarcodes(1);
+                } else {
+                    batchAccessionResponse.setFailure(1);
                 }
             }
         }
