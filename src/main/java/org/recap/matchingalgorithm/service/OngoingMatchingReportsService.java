@@ -89,14 +89,14 @@ public class OngoingMatchingReportsService {
      * @return the string
      */
     public String generateTitleExceptionReport(Date createdDate, Integer batchSize) {
-        Page<ReportEntity> reportEntityPage = reportDetailRepository.findByFileAndTypeAndDateRangeWithPaging(new PageRequest(0, batchSize), "OCLC", RecapConstants.TITLE_EXCEPTION_TYPE,
+        Page<ReportEntity> reportEntityPage = reportDetailRepository.findByFileAndTypeAndDateRangeWithPaging(new PageRequest(0, batchSize), RecapConstants.ONGOING_MATCHING_ALGORITHM, RecapConstants.TITLE_EXCEPTION_TYPE,
                 dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         int totalPages = reportEntityPage.getTotalPages();
         List<TitleExceptionReport> titleExceptionReports = new ArrayList<>();
         int maxTitleCount = 0;
         maxTitleCount = getTitleExceptionReport(reportEntityPage.getContent(), titleExceptionReports, maxTitleCount);
         for(int pageNum=1; pageNum<totalPages; pageNum++) {
-            reportEntityPage = reportDetailRepository.findByFileAndTypeAndDateRangeWithPaging(new PageRequest(pageNum, batchSize), "OCLC", RecapConstants.TITLE_EXCEPTION_TYPE,
+            reportEntityPage = reportDetailRepository.findByFileAndTypeAndDateRangeWithPaging(new PageRequest(pageNum, batchSize), RecapConstants.ONGOING_MATCHING_ALGORITHM, RecapConstants.TITLE_EXCEPTION_TYPE,
                     dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
             maxTitleCount = getTitleExceptionReport(reportEntityPage.getContent(), titleExceptionReports, maxTitleCount);
         }
