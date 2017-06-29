@@ -372,7 +372,7 @@ public class MatchingAlgorithmUtil {
         }
 
         if(CollectionUtils.isNotEmpty(materialTypes)) {
-            ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, "MaterialType");
+            ReportDataEntity materialTypeReportDataEntity = getReportDataEntityForCollectionValues(materialTypes, RecapConstants.MATERIAL_TYPE);
             reportDataEntities.add(materialTypeReportDataEntity);
         }
 
@@ -542,13 +542,13 @@ public class MatchingAlgorithmUtil {
     /**
      * This method gets report data entity.
      *
-     * @param header1            the header 1
+     * @param headerName            the header 1
      * @param headerValues       the header values
      * @param reportDataEntities the report data entities
      */
-    public void getReportDataEntity(String header1, String headerValues, List<ReportDataEntity> reportDataEntities) {
+    public void getReportDataEntity(String headerName, String headerValues, List<ReportDataEntity> reportDataEntities) {
         ReportDataEntity criteriaReportDataEntity = new ReportDataEntity();
-        criteriaReportDataEntity.setHeaderName(header1);
+        criteriaReportDataEntity.setHeaderName(headerName);
         criteriaReportDataEntity.setHeaderValue(headerValues);
         reportDataEntities.add(criteriaReportDataEntity);
     }
@@ -696,8 +696,8 @@ public class MatchingAlgorithmUtil {
      * @throws SolrServerException the solr server exception
      * @throws IOException         the io exception
      */
-    public Integer getCGDCountBasedOnInst(String owningInstitution) throws SolrServerException, IOException {
-        SolrQuery solrQuery = solrQueryBuilder.buildSolrQueryForCGDReports(owningInstitution, RecapConstants.SHARED_CGD);
+    public Integer getCGDCountBasedOnInst(String owningInstitution, String cgd) throws SolrServerException, IOException {
+        SolrQuery solrQuery = solrQueryBuilder.buildSolrQueryForCGDReports(owningInstitution, cgd);
         solrQuery.setRows(0);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(solrQuery);
         SolrDocumentList results = queryResponse.getResults();
@@ -733,7 +733,7 @@ public class MatchingAlgorithmUtil {
         if(CollectionUtils.isNotEmpty(nonMonographRecordNums)) {
             List<List<Integer>> monographicSetRecordNumbers = Lists.partition(nonMonographRecordNums, batchSize);
             for(List<Integer> monographicSetRecordNumberList : monographicSetRecordNumbers) {
-                List<ReportDataEntity> reportDataEntitiesToUpdate = reportDataDetailsRepository.getReportDataEntityByRecordNumIn(monographicSetRecordNumberList, RecapConstants.MATCHING_MATERIAL_TYPE);
+                List<ReportDataEntity> reportDataEntitiesToUpdate = reportDataDetailsRepository.getReportDataEntityByRecordNumIn(monographicSetRecordNumberList, RecapConstants.MATERIAL_TYPE);
                 if(CollectionUtils.isNotEmpty(reportDataEntitiesToUpdate)) {
                     for(ReportDataEntity reportDataEntity : reportDataEntitiesToUpdate) {
                         String headerValue = reportDataEntity.getHeaderValue();
@@ -779,9 +779,13 @@ public class MatchingAlgorithmUtil {
     public void populateMatchingCounter() throws IOException, SolrServerException {
         MatchingCounter.reset();
 
-        MatchingCounter.setPulSharedCount(getCGDCountBasedOnInst(RecapConstants.PRINCETON));
-        MatchingCounter.setCulSharedCount(getCGDCountBasedOnInst(RecapConstants.COLUMBIA));
-        MatchingCounter.setNyplSharedCount(getCGDCountBasedOnInst(RecapConstants.NYPL));
+        MatchingCounter.setPulSharedCount(getCGDCountBasedOnInst(RecapConstants.PRINCETON, RecapConstants.SHARED_CGD));
+        MatchingCounter.setCulSharedCount(getCGDCountBasedOnInst(RecapConstants.COLUMBIA, RecapConstants.SHARED_CGD));
+        MatchingCounter.setNyplSharedCount(getCGDCountBasedOnInst(RecapConstants.NYPL, RecapConstants.SHARED_CGD));
+
+        MatchingCounter.setPulOpenCount(getCGDCountBasedOnInst(RecapConstants.PRINCETON, RecapConstants.REPORTS_OPEN));
+        MatchingCounter.setCulOpenCount(getCGDCountBasedOnInst(RecapConstants.COLUMBIA, RecapConstants.REPORTS_OPEN));
+        MatchingCounter.setNyplOpenCount(getCGDCountBasedOnInst(RecapConstants.NYPL, RecapConstants.REPORTS_OPEN));
 
         logger.info("PUL Initial Counter Value: " + MatchingCounter.getPulSharedCount());
         logger.info("CUL Initial Counter Value: " + MatchingCounter.getCulSharedCount());

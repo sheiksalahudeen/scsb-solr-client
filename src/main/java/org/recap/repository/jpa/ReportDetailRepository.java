@@ -96,6 +96,19 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
     List<ReportEntity> findByFileAndTypeAndDateRange(String fileName, String type, Date from, Date to);
 
     /**
+     * Find by file and type and date range with paging page.
+     *
+     * @param pageable the pageable
+     * @param fileName the file name
+     * @param type     the type
+     * @param from     the from
+     * @param to       the to
+     * @return the page
+     */
+    @Query(value = "select reportEntity from ReportEntity reportEntity where fileName=?1 and type=?2 and createdDate between ?3 and ?4")
+    Page<ReportEntity> findByFileAndTypeAndDateRangeWithPaging(Pageable pageable, String fileName, String type, Date from, Date to);
+
+    /**
      * Finds ReportEntity based on the given filename,type and date range.
      *
      * @param fileName the file name
