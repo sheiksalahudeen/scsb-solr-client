@@ -49,8 +49,11 @@ public final class RecapConstants {
     public static final String CGD_CHANAGE_LOG = "CGDChangeLog";
     public static final String CGD_CHANAGE_LOG_SHARED_TO_PRIVATE = "SharedToPrivate";
     public static final String CGD_CHANAGE_LOG_OPEN_TO_PRIVATE = "OpenToPrivate";
+    public static final String TITLE_SUBFIELD_A = "Title_subfield_a";
+    public static final String ROOT = "_root_";
 
     public static final String USE_RESTRICTION = "UseRestriction_search";
+    public static final String USE_RESTRICTION_DISPLAY = "UseRestriction_display";
     public static final String NO_RESTRICTIONS = "No Restrictions";
     public static final String IN_LIBRARY_USE = "In Library Use";
     public static final String SUPERVISED_USE = "Supervised Use";
@@ -64,14 +67,11 @@ public final class RecapConstants {
 
     public static final String INCREMENTAL_DATE_FORMAT = "dd-MM-yyyy hh:mm";
 
-    //Matching Algorithm Constants
-    public static final String CSV_MATCHING_ALGO_REPORT_Q = "scsbactivemq:queue:csvMatchingAlgoReportQ";
-    public static final String CSV_SUMMARY_ALGO_REPORT_Q = "scsbactivemq:queue:csvSummaryAlgoReportQ";
+    //Camel Queues Constants
     public static final String CSV_SOLR_EXCEPTION_REPORT_Q = "scsbactivemq:queue:csvSolrExceptionReportQ";
-    public static final String FTP_MATCHING_ALGO_REPORT_Q = "scsbactivemq:queue:ftpMatchingAlgoReportQ";
-    public static final String FTP_SUMMARY_ALGO_REPORT_Q = "scsbactivemq:queue:ftpSummaryAlgoReportQ";
     public static final String FTP_SOLR_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSolrExceptionReportQ";
     public static final String REPORT_Q= "scsbactivemq:queue:reportQ";
+    public static final String SOLR_QUEUE = "scsbactivemq:queue:solrQ";
     public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionRejectionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_REJECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionRejectionReportQ";
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionExceptionReportQ";
@@ -79,13 +79,17 @@ public final class RecapConstants {
     public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionSummaryReportQ";
     public static final String FTP_ONGOING_ACCESSON_REPORT_Q = "scsbactivemq:queue:ftpOngoingAccessionReportQ";
     public static final String FS_ONGOING_ACCESSION_REPORT_Q = "scsbactivemq:queue:fsOngoingAccessionReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionReportQ";
+    public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
+    public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpDeAccessionSummaryReportQ";
+    public static final String FS_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsAccessionSummaryReportQ";
+    public static final String FTP_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpAccessionSummaryReportQ";
+    public static final String EMAIL_Q = "scsbactivemq:queue:solrClientEmailQ";
+    public static final String FTP_SERIAL_MVM_REPORT_Q = "scsbactivemq:queue:ftpSerialMvmReportsQ";
+    public static final String FTP_MATCHING_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpMatchingSummaryReportQ";
 
-
-    public static final String CSV_MATCHING_ALGO_REPORT_ROUTE_ID = "csvMatchingAlgoReportRoute";
-    public static final String CSV_SUMMARY_ALGO_REPORT_ROUTE_ID = "csvSummaryAlgoReportRoute";
+    //Camel Route Id Constants
     public static final String CSV_SOLR_EXCEPTION_REPORT_ROUTE_ID = "csvSolrExceptionReportRoute";
-    public static final String FTP_MATCHING_ALGO_REPORT_ROUTE_ID = "ftpMatchingAlgoReportRoute";
-    public static final String FTP_SUMMARY_ALGO_REPORT_ROUTE_ID = "ftpSummaryAlgoReportRoute";
     public static final String FTP_SOLR_EXCEPTION_REPORT_ROUTE_ID = "ftpSolrExceptionReportRoute";
     public static final String REPORT_ROUTE_ID = "reportQRoute";
     public static final String FS_SUBMIT_COLLECTION_REJECTION_REPORT_ID = "fsSubmitCollectionRejectionReport";
@@ -93,40 +97,38 @@ public final class RecapConstants {
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "fsSubmitCollectionExceptionReport";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "ftpSubmitCollectionExceptionReport";
     public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_ID = "ftpSubmitCollectionSummaryReport";
+    public static final String FTP_SUBMIT_COLLECTION_REPORT_ID = "ftpSubmitCollectionReportRoute";
+    public static final String EMAIL_ROUTE_ID = "solrClientEmailQ";
+    public static final String FTP_TITLE_EXCEPTION_REPORT_ROUTE_ID = "ftpTitleExceptionReportsRoute";
+    public static final String FTP_SERIAL_MVM_REPORT_ROUTE_ID = "ftpSerialMvmReportsRoute";
+    public static final String FTP_MATCHING_SUMMARY_REPORT_ROUTE_ID = "ftpMatchingSummaryReportRoute";
 
     public static final String MATCHING_ALGO_FULL_FILE_NAME = "Matching_Algo_Phase1";
-    public static final String EXCEPTION_REPORT_FILE_NAME = "Exception_Report";
     public static final String SUMMARY_REPORT_FILE_NAME = "MatchingCGDSummaryReport";
     public static final String MATCHING_SUMMARY_MONOGRAPH = "MatchingMonographCGDSummary";
     public static final String MATCHING_SUMMARY_SERIAL = "MatchingSerialCGDSummary";
     public static final String MATCHING_SUMMARY_MVM = "MatchingMVMCGDSummary";
+    public static final String TITLE_EXCEPTION_REPORT = "TitleExceptionReport";
+    public static final String MATCHING_SUMMARY_REPORT = "MatchingSummaryReport";
+    public static final String MATCHING_SERIAL_MVM_REPORT = "MatchingSerialMvmReport";
+    public static final String UNDER_SCORE = "_";
+    public static final String CSV_EXTENSION = ".csv";
 
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
     public static final String DATE_FORMAT_FOR_REPORT_FILE_NAME = "ddMMMyyyyHHmmss";
 
-    public static final String MATCHING_BIB_ID = "BibId";
-    public static final String MATCHING_TITLE = "Title";
-    public static final String MATCHING_BARCODE = "Barcode";
-    public static final String MATCHING_VOLUME_PART_YEAR = "VolumePartYear";
-    public static final String MATCHING_INSTITUTION_ID = "InstitutionId";
-    public static final String MATCHING_OCLC = "Oclc";
-    public static final String MATCHING_ISBN = "Isbn";
-    public static final String MATCHING_ISSN = "Issn";
-    public static final String MATCHING_LCCN = "Lccn";
-    public static final String MATCHING_USE_RESTRICTIONS = "UseRestrictions";
-    public static final String MATCHING_SUMMARY_HOLDINGS = "SummaryHoldings";
-    public static final String MATCHING_MATERIAL_TYPE = "MaterialType";
+    public static final String VOLUME_PART_YEAR = "VolumePartYear";
+    public static final String INSTITUTION_ID = "InstitutionId";
+    public static final String OCLC = "Oclc";
+    public static final String ISBN = "Isbn";
+    public static final String ISSN = "Issn";
+    public static final String LCCN = "Lccn";
+    public static final String USE_RESTRICTIONS = "UseRestrictions";
+    public static final String SUMMARY_HOLDINGS = "SummaryHoldings";
+    public static final String MATERIAL_TYPE = "MaterialType";
     public static final String INITIAL_MATCHING_OPERATION_TYPE = "InitialMatchingAlgorithm";
     public static final String ONGOING_MATCHING_OPERATION_TYPE = "OngoingMatchingAlgorithm";
-
-    public static final String SUMMARY_NUM_BIBS_IN_TABLE = "CountOfBibsInTable";
-    public static final String SUMMARY_NUM_ITEMS_IN_TABLE = "CountOfItemsInTable";
-    public static final String SUMMARY_MATCHING_KEY_FIELD = "MatchingKeyField";
-    public static final String SUMMARY_MATCHING_BIB_COUNT = "CountOfBibMatches";
-    public static final String SUMMARY_NUM_ITEMS_AFFECTED = "CountOfItemAffected";
-
-    public static final String MATCHING_LOCAL_BIB_ID = "LocalBibId";
 
     public static final String MATCH_POINT_FIELD_OCLC = "OCLCNumber";
     public static final String MATCH_POINT_FIELD_ISBN = "ISBN";
@@ -140,10 +142,7 @@ public final class RecapConstants {
     public static final String ISSN_TAG = "022";
     public static final String LCCN_TAG = "010";
 
-    //Report Types
-    public static final String MATCHING_TYPE = "Matching";
-    public static final String EXCEPTION_TYPE = "Exception";
-    public static final String SUMMARY_TYPE = "Summary";
+    //Report Types For Matching Algorithm
     public static final String SINGLE_MATCH = "SingleMatch";
     public static final String MULTI_MATCH = "MultiMatch";
 
@@ -165,14 +164,11 @@ public final class RecapConstants {
     public static final String ITEM_COUNT = "itemCount";
     public static final String BIB_ITEM_COUNT = "bibItemCount";
 
-    public static final String MATCHING_EXCEPTION_OCCURED = "MatchingExceptionOccurred";
     public static final String EXCEPTION_MSG = "ExceptionMessage";
-
-    public static final String MATCHING_REPORT_ENTITY_MAP = "matchingReportEntityMap";
-    public static final String EXCEPTION_REPORT_ENTITY_MAP = "exceptionReportEntityMap";
 
     public static final String ONGOING_MATCHING_ALGORITHM = "OngoingMatchingAlgorithm";
     public static final String MATERIAL_TYPE_EXCEPTION = "MaterialTypeException";
+    public static final String TITLE_EXCEPTION_TYPE = "TitleException";
 
     //Error Message
     public static final String RECORD_NOT_AVAILABLE = "Database may be empty or bib table does not contain this record";
@@ -187,7 +183,6 @@ public final class RecapConstants {
 
 
     public static final String SOLR_CORE = "solrCore";
-    public static final String SOLR_QUEUE = "scsbactivemq:queue:solrQ";
 
     public static final String SOLR_INDEX_FAILURE_REPORT = "Solr_Index_Failure_Report";
     public static final String SOLR_INDEX_EXCEPTION = "SolrIndexException";
@@ -260,14 +255,8 @@ public final class RecapConstants {
     public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
     public static final String DATE_OF_ACCESSION = "DateOfAccession";
 
-    public static final String FS_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsDeAccessionSummaryReportQ";
-    public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpDeAccessionSummaryReportQ";
-
     public static final String FS_DE_ACCESSION_SUMMARY_REPORT_ID = "fsDeAccessionSummaryReportQ";
     public static final String FTP_DE_ACCESSION_SUMMARY_REPORT_ID = "ftpDeAccessionSummaryReportQ";
-
-    public static final String FS_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsAccessionSummaryReportQ";
-    public static final String FTP_ACCESSION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpAccessionSummaryReportQ";
 
     public static final String FS_ACCESSION_SUMMARY_REPORT_ID = "fsAccessionSummaryReportQ";
     public static final String FTP_ACCESSION_SUMMARY_REPORT_ID = "ftpAccessionSummaryReportQ";
@@ -347,9 +336,6 @@ public final class RecapConstants {
     public static final String  ITEM_LASTUPDATED_DATE = "ItemLastUpdatedDate";
     public static final String  ITEM_CREATED_DATE = "ItemCreatedDate";
 
-    public static final String EMAIL_Q = "scsbactivemq:queue:solrClientEmailQ";
-    public static final String EMAIL_ROUTE_ID = "solrClientEmailQ";
-
     public static final String CGD_UPDATE_ITEM_BARCODE = "itemBarcode";
     public static final String OWNING_INST = "owningInstitution";
     public static final String OLD_CGD = "oldCollectionGroupDesignation";
@@ -395,6 +381,8 @@ public final class RecapConstants {
 
     public static final String SFTP = "sftp://";
     public static final String AT = "@";
+    public static final String FILE = "file:";
+    public static final String DELETE_FILE_OPTION = "?delete=true";
     public static final String PRIVATE_KEY_FILE = "?privateKeyFile=";
     public static final String KNOWN_HOST_FILE = "&knownHostsFile=";
     public static final String FILE_NAME = "fileName";
@@ -423,8 +411,6 @@ public final class RecapConstants {
     public static final String ITEM_BIB_ID = "ItemBibId";
     public static final String AUTHOR_DISPLAY = "Author_display";
 
-    public static final String FTP_SUBMIT_COLLECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionReportQ";
-    public static final String FTP_SUBMIT_COLLECTION_REPORT_ID = "ftpSubmitCollectionReportRoute";
     public static final String SUBMIT_COLLECTION = "SubmitCollectionReport";
     public static final String OWN_INST_BIB_ID = " OwningInstBibId-";
     public static final String OWN_INST_HOLDING_ID = " OwningInstHoldingId-";

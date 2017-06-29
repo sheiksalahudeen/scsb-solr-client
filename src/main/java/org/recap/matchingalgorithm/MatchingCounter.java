@@ -9,6 +9,10 @@ public class MatchingCounter {
     private static Integer culSharedCount;
     private static Integer nyplSharedCount;
 
+    private static Integer pulOpenCount;
+    private static Integer culOpenCount;
+    private static Integer nyplOpenCount;
+
     private static Integer pulCGDUpdatedSharedCount;
     private static Integer culCGDUpdatedSharedCount;
     private static Integer nyplCGDUpdatedSharedCount;
@@ -180,6 +184,60 @@ public class MatchingCounter {
     }
 
     /**
+     * Gets pul open count.
+     *
+     * @return the pul open count
+     */
+    public static synchronized Integer getPulOpenCount() {
+        return pulOpenCount;
+    }
+
+    /**
+     * Sets pul open count.
+     *
+     * @param pulOpenCount the pul open count
+     */
+    public static synchronized void setPulOpenCount(Integer pulOpenCount) {
+        MatchingCounter.pulOpenCount = pulOpenCount;
+    }
+
+    /**
+     * Gets cul open count.
+     *
+     * @return the cul open count
+     */
+    public static synchronized Integer getCulOpenCount() {
+        return culOpenCount;
+    }
+
+    /**
+     * Sets cul open count.
+     *
+     * @param culOpenCount the cul open count
+     */
+    public static synchronized void setCulOpenCount(Integer culOpenCount) {
+        MatchingCounter.culOpenCount = culOpenCount;
+    }
+
+    /**
+     * Gets nypl open count.
+     *
+     * @return the nypl open count
+     */
+    public static synchronized Integer getNyplOpenCount() {
+        return nyplOpenCount;
+    }
+
+    /**
+     * Sets nypl open count.
+     *
+     * @param nyplOpenCount the nypl open count
+     */
+    public static synchronized void setNyplOpenCount(Integer nyplOpenCount) {
+        MatchingCounter.nyplOpenCount = nyplOpenCount;
+    }
+
+    /**
      * Reset.
      */
     public static void reset() {
@@ -204,6 +262,7 @@ public class MatchingCounter {
         if (owningInstitution == 1) {
             if(isOpen) {
                 pulCGDUpdatedOpenCount++;
+                pulOpenCount++;
                 pulSharedCount--;
             } else {
                 pulCGDUpdatedSharedCount++;
@@ -211,6 +270,7 @@ public class MatchingCounter {
         } else if (owningInstitution == 2) {
             if(isOpen) {
                 culCGDUpdatedOpenCount++;
+                culOpenCount++;
                 culSharedCount--;
             } else {
                 culCGDUpdatedSharedCount++;
@@ -218,6 +278,7 @@ public class MatchingCounter {
         } else if (owningInstitution == 3) {
             if(isOpen) {
                 nyplCGDUpdatedOpenCount++;
+                nyplOpenCount++;
                 nyplSharedCount--;
             } else {
                 nyplCGDUpdatedSharedCount++;

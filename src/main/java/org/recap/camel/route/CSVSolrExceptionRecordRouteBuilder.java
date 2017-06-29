@@ -25,10 +25,10 @@ public class CSVSolrExceptionRecordRouteBuilder {
      * This route builder is used to generate solr exception csv report to the file system.
      *
      * @param context                  the context
-     * @param matchingReportsDirectory the matching reports directory
+     * @param solrReportsDirectory the matching reports directory
      */
     @Autowired
-    public CSVSolrExceptionRecordRouteBuilder(CamelContext context, @Value("${solr.report.directory}") String matchingReportsDirectory) {
+    public CSVSolrExceptionRecordRouteBuilder(CamelContext context, @Value("${solr.report.directory}") String solrReportsDirectory) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override
@@ -36,7 +36,7 @@ public class CSVSolrExceptionRecordRouteBuilder {
                     from(RecapConstants.CSV_SOLR_EXCEPTION_REPORT_Q)
                             .routeId(RecapConstants.CSV_SOLR_EXCEPTION_REPORT_ROUTE_ID)
                             .marshal().bindy(BindyType.Csv, SolrExceptionReportReCAPCSVRecord.class)
-                            .to("file:" + matchingReportsDirectory + File.separator + "?fileName=${in.header.fileName}-${date:now:ddMMMyyyy}.csv")
+                            .to("file:" + solrReportsDirectory + File.separator + "?fileName=${in.header.fileName}-${date:now:ddMMMyyyy}.csv")
                             .onCompletion().log("File has been created successfully.");
                 }
             });
