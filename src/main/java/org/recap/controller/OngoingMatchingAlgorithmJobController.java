@@ -1,6 +1,5 @@
 package org.recap.controller;
 
-import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
 import org.recap.matchingalgorithm.service.MatchingBibInfoDetailService;
 import org.recap.model.solr.SolrIndexRequest;
@@ -9,6 +8,7 @@ import org.recap.util.OngoingMatchingAlgorithmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
@@ -36,6 +36,9 @@ public class OngoingMatchingAlgorithmJobController {
 
     @Autowired
     private DateUtil dateUtil;
+
+    @Value("${matching.algorithm.bibinfo.batchsize}")
+    private String batchSize;
 
     public Logger getLogger() {
         return logger;
@@ -67,12 +70,15 @@ public class OngoingMatchingAlgorithmJobController {
         Date date = solrIndexRequest.getCreatedDate();
         String jobType = solrIndexRequest.getProcessType();
         String status = "";
-        if(jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
-            String formattedDate = getOngoingMatchingAlgorithmUtil().getFormattedDateString(getDateUtil().getFromDate(date));
-            SolrDocumentList solrDocumentList = getOngoingMatchingAlgorithmUtil().fetchDataForOngoingMatchingBasedOnDate(formattedDate);
-            status = getOngoingMatchingAlgorithmUtil().processOngoingMatchingAlgorithm(solrDocumentList);
-        } else if(jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
-            status = getMatchingBibInfoDetailService().populateMatchingBibInfo(getDateUtil().getFromDate(date), getDateUtil().getToDate(date));
+        Integer rows = Integer.valueOf(batchSize);
+        try {
+            if (jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
+                status = ongoingMatchingAlgorithmUtil.fetchUpdatedRecordsAndStartProcess(dateUtil.getFromDate(date), rows);
+            } else if (jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
+                status = getMatchingBibInfoDetailService().populateMatchingBibInfo(getDateUtil().getFromDate(date), getDateUtil().getToDate(date));
+            }
+        } catch (Exception e) {
+            logger.error("Exception : {}", e);
         }
         stopWatch.stop();
         getLogger().info("Total Time taken to complete Ongoing Matching Algorithm : {}", stopWatch.getTotalTimeSeconds());

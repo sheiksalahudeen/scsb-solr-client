@@ -32,11 +32,6 @@ public class ReportDataDetailsRepositoryUT extends BaseTestCase{
     }
 
     @Test
-    public void getCountOfRecordNumForMatchingSerialsTest() throws Exception {
-
-    }
-
-    @Test
     public void getReportDataEntityForMatchingMonographsTest() throws Exception {
         saveReportEntity("Monograph,Monograph");
         List<ReportDataEntity> reportDataEntities = reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, 0, 100);

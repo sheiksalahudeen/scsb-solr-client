@@ -6,6 +6,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -19,8 +21,8 @@ public class OngoingMatchingAlgorithmUtilUT extends BaseTestCase{
     @Test
     public void processMatchingForBibTest() {
         SolrDocument solrDocument = new SolrDocument();
-        Mockito.when(ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument)).thenReturn("Success");
-        String status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument);
+        Mockito.when(ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument, new ArrayList<>())).thenReturn("Success");
+        String status = ongoingMatchingAlgorithmUtil.processMatchingForBib(solrDocument, new ArrayList<>());
         assertEquals("Success", status);
     }
 

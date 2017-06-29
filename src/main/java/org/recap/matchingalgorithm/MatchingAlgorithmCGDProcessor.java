@@ -152,10 +152,10 @@ public class MatchingAlgorithmCGDProcessor {
                     //NYPL
                     boolean isMultipleCopy = false;
                     for(ItemEntity itemEntity : itemEntities) {
+                        if(itemEntity.getCopyNumber() > 1) {
+                            isMultipleCopy = true;
+                        }
                         if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
-                            if(itemEntity.getCopyNumber() > 1) {
-                                isMultipleCopy = true;
-                            }
                             populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
                         }
                     }
