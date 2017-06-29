@@ -69,18 +69,17 @@ public class BibDataCallable implements Callable{
                                 try {
                                     bibData = bibDataResolver.getBibData(itemBarcode, customerCode);
                                 } catch (Exception e) {
-                                    response = processException(e, reportDataEntityList, accessionResponses);
+                                    accessionHelperUtil.processBibDataApiException(accessionResponses, accessionRequest, reportDataEntityList, owningInstitution, e);
+                                    break;
                                 }
-                                if(StringUtils.isNotBlank(bibData)) {
-                                    try {
-                                        response = bibDataResolver.processXml(accessionResponses, bibData,
-                                                responseMapList, owningInstitution, reportDataEntityList, accessionRequest);
-                                    } catch (Exception e) {
-                                        if(writeToReport) {
-                                            processException(e, reportDataEntityList, accessionResponses);
-                                        } else {
-                                            return accessionRequest;
-                                        }
+                                try {
+                                    response = bibDataResolver.processXml(accessionResponses, bibData,
+                                            responseMapList, owningInstitution, reportDataEntityList, accessionRequest);
+                                } catch (Exception e) {
+                                    if(writeToReport) {
+                                        processException(e, reportDataEntityList, accessionResponses);
+                                    } else {
+                                        return accessionRequest;
                                     }
                                 }
                                 break;
@@ -91,18 +90,16 @@ public class BibDataCallable implements Callable{
                     } catch (Exception ex) {
                         response = processException(ex, reportDataEntityList, accessionResponses);
                 }
-                //Create dummy record
-                String dummyRecordIfAny = bulkAccessionService.createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
                 accessionHelperUtil.generateAccessionSummaryReport(responseMapList, owningInstitution);
             }
         } else if(isDeaccessionedItem){
             response = bulkAccessionService.reAccessionItem(itemEntityList);
             if (response.equals(RecapConstants.SUCCESS)) {
                 response = bulkAccessionService.indexReaccessionedItem(itemEntityList);
+                bulkAccessionService.saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
             }
             accessionHelperUtil.setAccessionResponse(accessionResponses, accessionRequest.getItemBarcode(), response);
-            reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
-            bulkAccessionService.saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
+            reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
         } else {
             String itemAreadyAccessionedMessage;
             if(CollectionUtils.isNotEmpty(itemEntityList.get(0).getBibliographicEntities())) {

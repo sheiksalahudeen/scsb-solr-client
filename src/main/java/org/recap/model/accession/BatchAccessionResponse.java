@@ -6,12 +6,15 @@ package org.recap.model.accession;
 public class BatchAccessionResponse {
     private int requestedRecords;
     private int successRecords;
+    private int dummyRecords;
     private int duplicateRecords;
     private int emptyBarcodes;
     private int emptyOwningInst;
     private int alreadyAccessioned;
     private int exception;
+    private int failure;
     private int invalidLenghBarcode;
+    private String timeElapsed;
 
     public int getRequestedRecords() {
         return requestedRecords;
@@ -29,12 +32,28 @@ public class BatchAccessionResponse {
         this.successRecords = successRecords;
     }
 
+    public int getDummyRecords() {
+        return dummyRecords;
+    }
+
+    public void setDummyRecords(int dummyRecords) {
+        this.dummyRecords = dummyRecords;
+    }
+
     public int getDuplicateRecords() {
         return duplicateRecords;
     }
 
     public void setDuplicateRecords(int duplicateRecords) {
         this.duplicateRecords = duplicateRecords;
+    }
+
+    public int getFailure() {
+        return failure;
+    }
+
+    public void setFailure(int failure) {
+        this.failure = failure;
     }
 
     public int getEmptyBarcodes() {
@@ -77,8 +96,16 @@ public class BatchAccessionResponse {
         this.invalidLenghBarcode = invalidLenghBarcode;
     }
 
-    public void addDuplicateRecords(int duplicateRecords) {
-        this.duplicateRecords += duplicateRecords;
+    public String getTimeElapsed() {
+        return timeElapsed;
+    }
+
+    public void setTimeElapsed(String timeElapsed) {
+        this.timeElapsed = timeElapsed;
+    }
+
+    public void addDummyRecords(int dummyRecords) {
+        this.dummyRecords += dummyRecords;
     }
 
     public void addEmptyBarcodes(int emptyBarcodes) {
@@ -104,18 +131,24 @@ public class BatchAccessionResponse {
     public void addSuccessRecord(int successRecords) {
         this.successRecords += successRecords;
     }
+    public void addFailure(int failure) {
+        this.failure += failure;
+    }
 
     @Override
     public String toString() {
         return "BatchAccessionResponse{" +
                 "requestedRecords=" + requestedRecords +
                 ", successRecords=" + successRecords +
+                ", dummyRecords=" + dummyRecords +
                 ", duplicateRecords=" + duplicateRecords +
                 ", emptyBarcodes=" + emptyBarcodes +
                 ", emptyOwningInst=" + emptyOwningInst +
                 ", alreadyAccessioned=" + alreadyAccessioned +
                 ", exception=" + exception +
+                ", failure=" + failure +
                 ", invalidLenghBarcode=" + invalidLenghBarcode +
+                ", timeElapsed='" + timeElapsed + '\'' +
                 '}';
     }
 }

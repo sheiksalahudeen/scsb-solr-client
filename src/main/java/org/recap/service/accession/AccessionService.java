@@ -299,12 +299,7 @@ public class AccessionService {
                             response = processAccessionForSCSBXml(accessionResponsesList, bibDataResponse, responseMapList, owningInstitution, reportDataEntityList, accessionRequest);
                         }
                     } catch (Exception ex) {
-                        logger.error(RecapConstants.LOG_ERROR, ex);
-                        response = ex.getMessage();
-                        //Create dummy record
-                        response = createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
-                        accessionHelperUtil.setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
-                        reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
+                        accessionHelperUtil.processBibDataApiException(accessionResponsesList, accessionRequest, reportDataEntityList, owningInstitution, ex);
                     }
                     accessionHelperUtil.generateAccessionSummaryReport(responseMapList, owningInstitution);
                 }
@@ -312,10 +307,10 @@ public class AccessionService {
                 response = reAccessionItem(itemEntityList);
                 if (response.equals(RecapConstants.SUCCESS)) {
                     response = indexReaccessionedItem(itemEntityList);
+                    saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
                 }
                 accessionHelperUtil.setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
-                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, RecapConstants.SUCCESS));
-                saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
+                reportDataEntityList.addAll(accessionHelperUtil.createReportDataEntityList(accessionRequest, response));
             } else {
                 String itemAreadyAccessionedOwnInstBibId = itemEntityList.get(0).getBibliographicEntities() != null ? itemEntityList.get(0).getBibliographicEntities().get(0).getOwningInstitutionBibId() : " ";
                 String itemAreadyAccessionedOwnInstHoldingId = itemEntityList.get(0).getHoldingsEntities() != null ? itemEntityList.get(0).getHoldingsEntities().get(0).getOwningInstitutionHoldingsId() : " ";
@@ -597,6 +592,7 @@ public class AccessionService {
      * @param accessionRequest
      * @return
      */
+    @Transactional
     private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest, boolean isValidBoundWithRecord,boolean isFirstRecord){
         String response = null;
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
