@@ -63,12 +63,87 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setStopCode("test");
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
-        requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestStatusId(4);
         requestItemEntity.setCreatedBy("test");
+        requestItemEntity.setNotes("test");
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
+    }
+
+    @Test
+    public void testRequestItemEntity() throws Exception {
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionCode("UOC");
+        institutionEntity.setInstitutionName("University of Chicago");
+        InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
+        assertNotNull(entity);
+
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setRequestStatusId(1);
+        requestStatusEntity.setRequestStatusCode("REFILE");
+        requestStatusEntity.setRequestStatusDescription("REFILE");
+
+        PatronEntity patronEntity = new PatronEntity();
+        patronEntity.setInstitutionIdentifier(entity.getInstitutionCode());
+        patronEntity.setInstitutionId(entity.getInstitutionId());
+        patronEntity.setEmailId("hamalatha.s@htcindia.com");
+        PatronEntity savedPatronEntity = patronDetailsRepository.save(patronEntity);
+        assertNotNull(savedPatronEntity);
+
+        RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
+        requestTypeEntity.setRequestTypeCode("Recallhold");
+        requestTypeEntity.setRequestTypeDesc("Recallhold");
+        RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
+        assertNotNull(savedRequestTypeEntity);
+
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
+
+        RequestItemEntity requestItemEntity = new RequestItemEntity();
+        requestItemEntity.setRequestId(1);
+        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
+        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestingInstitutionId(1);
+        requestItemEntity.setPatronId(savedPatronEntity.getPatronId());
+        requestItemEntity.setStopCode("test");
+        requestItemEntity.setCreatedDate(new Date());
+        requestItemEntity.setRequestExpirationDate(new Date());
+        requestItemEntity.setRequestStatusId(4);
+        requestItemEntity.setCreatedBy("test");
+        requestItemEntity.setNotes("test");
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+        requestItemEntity.setInstitutionEntity(institutionEntity);
+        requestItemEntity.setPatronEntity(patronEntity);
+        requestItemEntity.setItemEntity(bibliographicEntity.getItemEntities().get(0));
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+        requestItemEntity.setLastUpdatedDate(new Date());
+        requestItemEntity.setRequestTypeEntity(requestTypeEntity);
+
+        assertNotNull(requestItemEntity.getRequestId());
+        assertNotNull(requestItemEntity.getItemId());
+        assertNotNull(requestItemEntity.getRequestTypeId());
+        assertNotNull(requestItemEntity.getRequestingInstitutionId());
+        assertNotNull(requestItemEntity.getPatronId());
+        assertNotNull(requestItemEntity.getRequestExpirationDate());
+        assertNotNull(requestItemEntity.getCreatedBy());
+        assertNotNull(requestItemEntity.getCreatedDate());
+        assertNotNull(requestItemEntity.getLastUpdatedDate());
+        assertNotNull(requestItemEntity.getStopCode());
+        assertNotNull(requestItemEntity.getRequestStatusId());
+        assertNotNull(requestItemEntity.getInstitutionEntity());
+        assertNotNull(requestItemEntity.getRequestTypeEntity());
+        assertNotNull(requestItemEntity.getPatronEntity());
+        assertNotNull(requestItemEntity.getItemEntity());
+        assertNotNull(requestItemEntity.getRequestStatusEntity());
+        assertNotNull(requestItemEntity.getNotes());
+
+        assertNotNull(requestStatusEntity.getRequestStatusId());
+        assertNotNull(requestStatusEntity.getRequestStatusCode());
+        assertNotNull(requestStatusEntity.getRequestStatusDescription());
+
+        assertNotNull(requestTypeEntity.getRequestTypeId());
+        assertNotNull(requestTypeEntity.getRequestTypeCode());
+        assertNotNull(requestTypeEntity.getRequestTypeDesc());
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {

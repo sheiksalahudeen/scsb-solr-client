@@ -14,6 +14,8 @@ import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.UpdateCgdUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -32,6 +34,8 @@ import static org.junit.Assert.*;
  * Created by hemalathas on 25/1/17.
  */
 public class UpdateItemStatusControllerUT extends BaseTestCase{
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateItemStatusControllerUT.class);
 
     @Mock
     UpdateItemStatusController updateItemStatusController;
@@ -58,6 +62,8 @@ public class UpdateItemStatusControllerUT extends BaseTestCase{
         Mockito.when(updateItemStatusController.getUpdateCgdUtil()).thenReturn(updateCgdUtil);
         Mockito.when(updateItemStatusController.getItemDetailsRepository().findByBarcode(itemBarcode)).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(updateItemStatusController.updateCgdForItem(itemBarcode)).thenCallRealMethod();
+        Mockito.when(updateItemStatusController.getLogger()).thenCallRealMethod();
+        updateItemStatusController.getLogger();
         String status = updateItemStatusController.updateCgdForItem(itemBarcode);
         assertNotNull(status);
         assertEquals(status,"Solr Indexing Successful");

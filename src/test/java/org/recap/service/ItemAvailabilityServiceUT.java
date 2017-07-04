@@ -49,6 +49,18 @@ public class ItemAvailabilityServiceUT extends BaseTestCase {
     }
 
     @Test
+    public void testItemAvailabilityResponse(){
+        ItemAvailabilityResponse itemAvailabilityResponse = new ItemAvailabilityResponse();
+        itemAvailabilityResponse.setItemBarcode("33124866845647");
+        itemAvailabilityResponse.setItemAvailabilityStatus("Available");
+        itemAvailabilityResponse.setErrorMessage(" ");
+        assertNotNull(itemAvailabilityResponse.getErrorMessage());
+        assertNotNull(itemAvailabilityResponse.getItemAvailabilityStatus());
+        assertNotNull(itemAvailabilityResponse.getItemBarcode());
+
+    }
+
+    @Test
     public void testgetbibItemAvaiablityStatus() throws Exception {
         BibItemAvailabityStatusRequest bibItemAvailabityStatusRequest = new BibItemAvailabityStatusRequest();
         bibItemAvailabityStatusRequest.setBibliographicId("93540");

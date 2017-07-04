@@ -5,6 +5,8 @@ import org.recap.BaseTestCase;
 import org.recap.repository.jpa.PermissionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 /**
@@ -23,6 +25,19 @@ public class PermissionEntityUT extends BaseTestCase{
         PermissionEntity savedPermissionEntity = permissionsRepository.save(permissionEntity);
         assertNotNull(savedPermissionEntity);
         assertNotNull(savedPermissionEntity.getPermissionId());
+    }
+
+    @Test
+    public void testPermission(){
+        PermissionEntity permissionEntity = new PermissionEntity();
+        permissionEntity.setPermissionId(1);
+        permissionEntity.setPermissionName("new admin");
+        permissionEntity.setPermissionDesc("new admin");
+        permissionEntity.setRoleEntityList(Arrays.asList(new RoleEntity()));
+        assertNotNull(permissionEntity.getPermissionId());
+        assertNotNull(permissionEntity.getPermissionDesc());
+        assertNotNull(permissionEntity.getPermissionName());
+        assertNotNull(permissionEntity.getRoleEntityList());
     }
 
 

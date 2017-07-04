@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
+import org.recap.model.IncompleteReportBibDetails;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemChangeLogEntity;
@@ -219,6 +220,15 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         reportsResponse.setDeaccessionPrivateCulCount(1);
         reportsResponse.setDeaccessionPrivateNyplCount(1);
         return reportsResponse;
+    }
+
+    @Test
+    public void testIncompleteReportBibDetails(){
+        IncompleteReportBibDetails incompleteReportBibDetails = new IncompleteReportBibDetails();
+        incompleteReportBibDetails.setAuthorDisplay("John");
+        incompleteReportBibDetails.setTitle("test");
+        assertNotNull(incompleteReportBibDetails.getAuthorDisplay());
+        assertNotNull(incompleteReportBibDetails.getTitle());
     }
 
     @Test

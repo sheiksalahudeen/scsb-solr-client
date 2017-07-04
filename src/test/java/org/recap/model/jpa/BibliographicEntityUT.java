@@ -419,4 +419,34 @@ public class BibliographicEntityUT extends BaseTestCase {
         return new File(resource.toURI());
     }
 
+    @Test
+    public void testBibliographicPK(){
+        BibliographicPK bibliographicPK = new BibliographicPK();
+        bibliographicPK.setOwningInstitutionBibId("AD4534455551");
+        bibliographicPK.setOwningInstitutionId(1);
+        BibliographicPK bibliographicPK1 = new BibliographicPK(1,"AD4534455551");
+        assertNotNull(bibliographicPK.getOwningInstitutionId());
+        assertNotNull(bibliographicPK.getOwningInstitutionBibId());
+    }
+
+    @Test
+    public void testHoldingsPK(){
+        HoldingsPK holdingsPK = new HoldingsPK();
+        HoldingsPK holdingsPK1 = new HoldingsPK(1,"HS1454564584");
+        holdingsPK.setOwningInstitutionId(1);
+        holdingsPK.setOwningInstitutionHoldingsId("HS1454564584");
+        assertNotNull(holdingsPK.getOwningInstitutionId());
+        assertNotNull(holdingsPK.getOwningInstitutionHoldingsId());
+    }
+
+    @Test
+    public void testItemsPK(){
+        ItemPK itemPK = new ItemPK();
+        ItemPK itemPK1 = new ItemPK(1,"HR65664456754");
+        itemPK.setOwningInstitutionId(1);
+        itemPK.setOwningInstitutionItemId("HR65664456754");
+        assertNotNull(itemPK.getOwningInstitutionId());
+        assertNotNull(itemPK.getOwningInstitutionItemId());
+    }
+
 }

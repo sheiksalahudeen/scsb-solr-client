@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created by premkb on 19/8/16.
@@ -131,6 +132,20 @@ public class SearchRecordRestControllerUT extends BaseControllerUT {
                 .andReturn();
         int status = mvcResult.getResponse().getStatus();
         assertTrue(status == 200);
+    }
+
+    @Test
+    public void testSearchRecords() throws Exception{
+        SearchRecordsRequest searchRecordsRequest = new SearchRecordsRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        MvcResult mvcResult = this.mockMvc.perform(post("/searchService/searchRecords")
+                .headers(getHttpHeaders())
+                .contentType(contentType)
+                .content(objectMapper.writeValueAsString(searchRecordsRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String result = mvcResult.getResponse().getContentAsString();
+        assertNotNull(result);
     }
 
     @Test

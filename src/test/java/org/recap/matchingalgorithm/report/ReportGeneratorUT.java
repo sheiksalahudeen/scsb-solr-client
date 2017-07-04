@@ -14,6 +14,7 @@ import org.springframework.util.StopWatch;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -59,6 +60,32 @@ public class ReportGeneratorUT extends BaseTestCase{
         stopWatch.stop();
         System.out.println("Total Time taken to generate matching report : " + stopWatch.getTotalTimeSeconds());
         assertNotNull(generatedReportFileName);
+    }
+
+    @Test
+    public void testReportDataEntity(){
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setRecordNumber(1);
+        reportEntity.setCreatedDate(new Date());
+        reportEntity.setInstitutionName("PUL");
+        reportEntity.setFileName("Accession");
+        reportEntity.setType("Accession");
+        ReportDataEntity reportDataEntity = new ReportDataEntity();
+        reportDataEntity.setReportDataId(1);
+        reportDataEntity.setRecordNum("10");
+        reportDataEntity.setHeaderName("ItemBarcode");
+        reportDataEntity.setHeaderValue("3328456458454714");
+        reportEntity.setReportDataEntities(Arrays.asList(reportDataEntity));
+        assertNotNull(reportEntity.getRecordNumber());
+        assertNotNull(reportEntity.getFileName());
+        assertNotNull(reportEntity.getReportDataEntities());
+        assertNotNull(reportEntity.getType());
+        assertNotNull(reportEntity.getCreatedDate());
+        assertNotNull(reportEntity.getInstitutionName());
+        assertNotNull(reportDataEntity.getRecordNum());
+        assertNotNull(reportDataEntity.getReportDataId());
+        assertNotNull(reportDataEntity.getHeaderName());
+        assertNotNull(reportDataEntity.getHeaderValue());
     }
 
     private List<ReportEntity> saveAccessionSummaryReportEntity(){
