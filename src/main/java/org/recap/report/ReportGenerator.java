@@ -115,7 +115,13 @@ public class ReportGenerator {
 
     private List<ReportEntity> getReportEntities(String fileName, String institutionName, String reportType, Date from, Date to) {
         List<ReportEntity> reportEntityList;
-        if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST)) {
+        if(!institutionName.equalsIgnoreCase(RecapConstants.ALL_INST) && (reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT))){
+            fileName = getFileNameLike(fileName);
+            reportEntityList = reportDetailRepository.findByFileLikeAndInstitutionAndTypeAndDateRange(fileName,institutionName,reportType,from,to);
+        }else if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST) && (reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT))){
+            fileName = getFileNameLike(fileName);
+            reportEntityList = reportDetailRepository.findByFileLikeAndTypeAndDateRange(fileName,reportType,from,to);
+        } else if(institutionName.equalsIgnoreCase(RecapConstants.ALL_INST)) {
             reportEntityList = reportDetailRepository.findByFileLikeAndTypeAndDateRange(fileName, reportType, from, to);
         } else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY)){
             reportEntityList = reportDetailRepository.findByFileName(fileName);
@@ -124,6 +130,7 @@ public class ReportGenerator {
         }
         return reportEntityList;
     }
+
 
     /**
      * Gets report generators.
@@ -172,5 +179,9 @@ public class ReportGenerator {
 
     private List<ReportEntity> getReportEntityList(List<Integer> reportRecordNumberList) {
         return reportDetailRepository.findByRecordNumberIn(reportRecordNumberList);
+    }
+
+    private String getFileNameLike(String fileName) {
+        return fileName+"%";
     }
 }

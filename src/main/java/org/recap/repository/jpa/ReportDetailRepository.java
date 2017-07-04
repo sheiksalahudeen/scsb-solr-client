@@ -226,4 +226,17 @@ public interface ReportDetailRepository extends JpaRepository<ReportEntity, Inte
      */
     @Query(value = "SELECT recordNumber from ReportEntity WHERE type IN (?1) AND fileName = ?2 AND createdDate between ?3 and ?4")
     Page<Integer> getRecordNumByTypeAndFileNameAndDateRange(Pageable pageable, List<String> typeList, String fileName, Date from, Date to);
+
+    /**
+     * Finds list of report entities based on the given institution,file name,report type and date range.
+     *
+     * @param fileName        the file name
+     * @param institutionName the institution name
+     * @param type            the type
+     * @param from            the from
+     * @param to              the to
+     * @return the list
+     */
+    @Query(value = "select * from report_t where FILE_NAME like ?1 and INSTITUTION_NAME=?2 and TYPE=?3 and CREATED_DATE >= ?4 and CREATED_DATE <= ?5", nativeQuery = true)
+    List<ReportEntity> findByFileLikeAndInstitutionAndTypeAndDateRange(String fileName, String institutionName, String type, Date from, Date to);
 }
