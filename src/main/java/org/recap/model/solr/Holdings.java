@@ -27,6 +27,9 @@ public class Holdings {
     @Field("HoldingsOwningInstitution")
     private String owningInstitution;
 
+    @Field("OwningInstitutionHoldingsId")
+    private String owningInstitutionHoldingsId;
+
     @Field("HoldingsCreatedBy")
     private String holdingsCreatedBy;
 
@@ -79,6 +82,24 @@ public class Holdings {
      */
     public void setHoldingsId(Integer holdingsId) {
         this.holdingsId = holdingsId;
+    }
+
+    /**
+     * Gets owning institution holdings id.
+     *
+     * @return the owning institution holdings id
+     */
+    public String getOwningInstitutionHoldingsId() {
+        return owningInstitutionHoldingsId;
+    }
+
+    /**
+     * Sets owning institution holdings id.
+     *
+     * @param owningInstitutionHoldingsId the owning institution holdings id
+     */
+    public void setOwningInstitutionHoldingsId(String owningInstitutionHoldingsId) {
+        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
     /**

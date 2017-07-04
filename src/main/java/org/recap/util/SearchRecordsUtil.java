@@ -96,6 +96,12 @@ public final class SearchRecordsUtil {
         return new ArrayList<>();
     }
 
+    /**
+     * Builds search result rows from the bib and items.
+     *
+     * @param bibItems
+     * @return
+     */
     private List<SearchResultRow> buildGeneralResults(List<BibItem> bibItems) {
         List<SearchResultRow> searchResultRows = new ArrayList<>();
         if (!CollectionUtils.isEmpty(bibItems)) {
@@ -109,6 +115,7 @@ public final class SearchRecordsUtil {
                 searchResultRow.setOwningInstitution(bibItem.getOwningInstitution());
                 searchResultRow.setLeaderMaterialType(bibItem.getLeaderMaterialType());
                 searchResultRow.setBibCreatedDate(bibItem.getBibCreatedDate());
+                searchResultRow.setOwningInstitutionBibId(bibItem.getOwningInstitutionBibId());
                 String authorSearch = CollectionUtils.isNotEmpty(bibItem.getAuthorSearch()) ? bibItem.getAuthorSearch().get(0) : " ";
                 searchResultRow.setAuthorSearch(authorSearch);
                 Holdings holdings = CollectionUtils.isEmpty(bibItem.getHoldingsList()) ? new Holdings() : bibItem.getHoldingsList().get(0);
@@ -116,12 +123,14 @@ public final class SearchRecordsUtil {
                     Item item = bibItem.getItems().get(0);
                     if (null != item) {
                         searchResultRow.setItemId(item.getItemId());
+                        searchResultRow.setOwningInstitutionItemId(item.getOwningInstitutionItemId());
                         searchResultRow.setCustomerCode(item.getCustomerCode());
                         searchResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                         searchResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                         searchResultRow.setBarcode(item.getBarcode());
                         searchResultRow.setAvailability(item.getAvailabilityDisplay());
                         searchResultRow.setSummaryHoldings(holdings.getSummaryHoldings());
+                        searchResultRow.setOwningInstitutionHoldingsId(getMatchedOwningInstitutionHoldingsId(bibItem.getHoldingsList(), item.getHoldingsIdList()));
                     }
                 } else {
                     if (!CollectionUtils.isEmpty(bibItem.getItems())) {
@@ -131,6 +140,7 @@ public final class SearchRecordsUtil {
                             if (null != item) {
                                 SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
                                 searchItemResultRow.setItemId(item.getItemId());
+                                searchItemResultRow.setOwningInstitutionItemId(item.getOwningInstitutionItemId());
                                 searchItemResultRow.setCallNumber(item.getCallNumberDisplay());
                                 searchItemResultRow.setChronologyAndEnum(item.getVolumePartYear());
                                 searchItemResultRow.setCustomerCode(item.getCustomerCode());
@@ -138,6 +148,7 @@ public final class SearchRecordsUtil {
                                 searchItemResultRow.setUseRestriction(item.getUseRestrictionDisplay());
                                 searchItemResultRow.setCollectionGroupDesignation(item.getCollectionGroupDesignation());
                                 searchItemResultRow.setAvailability(item.getAvailabilityDisplay());
+                                searchItemResultRow.setOwningInstitutionHoldingsId(getMatchedOwningInstitutionHoldingsId(bibItem.getHoldingsList(), item.getHoldingsIdList()));
                                 searchItemResultRows.add(searchItemResultRow);
                                 mixedStatus.add(item.getAvailabilityDisplay());
                                 searchResultRow.setAvailability(item.getAvailabilityDisplay());
@@ -158,6 +169,27 @@ public final class SearchRecordsUtil {
             }
         }
         return searchResultRows;
+    }
+
+    /**
+     * Returns matching owning institution holdings id for the passed holdings id.
+     *
+     * @param holdingsList
+     * @param holdingsIdList
+     * @return
+     */
+    private String getMatchedOwningInstitutionHoldingsId(List<Holdings> holdingsList, List<Integer> holdingsIdList) {
+        String owningInstitutionHoldingsId = "";
+        if (CollectionUtils.isNotEmpty(holdingsList)) {
+            for (Holdings holdings : holdingsList) {
+                if (CollectionUtils.isNotEmpty(holdingsIdList)) {
+                    if (holdingsIdList.contains(holdings.getHoldingsId())) {
+                        owningInstitutionHoldingsId = holdings.getOwningInstitutionHoldingsId();
+                    }
+                }
+            }
+        }
+        return owningInstitutionHoldingsId;
     }
 
     /**
@@ -187,6 +219,12 @@ public final class SearchRecordsUtil {
         return dataDumpSearchResults;
     }
 
+    /**
+     * Returns true if no field is specified in the search records request.
+     *
+     * @param searchRecordsRequest
+     * @return
+     */
     private boolean isEmptySearch(SearchRecordsRequest searchRecordsRequest) {
         boolean emptySearch = false;
         if (searchRecordsRequest.getMaterialTypes().isEmpty() && searchRecordsRequest.getAvailability().isEmpty() &&

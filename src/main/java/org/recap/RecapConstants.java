@@ -239,6 +239,7 @@ public final class RecapConstants {
     public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
     public static final String TITLE = "Title";
     public static final String OWNING_INSTITUTION_HOLDINGS_ID = "OwningInstitutionHoldingsId";
+    public static final String OWNING_INSTITUTION_ITEM_ID = "OwningInstitutionItemId";
     public static final String LOCAL_ITEM_ID = "LocalItemId";
     public static final String ITEM_BARCODE = "ItemBarcode";
     public static final String CUSTOMER_CODE = "CustomerCode";

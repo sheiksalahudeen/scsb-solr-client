@@ -31,6 +31,7 @@ public class HoldingsJSONUtil extends MarcUtil {
         try {
             Holdings holdings = new Holdings();
             holdings.setHoldingsId(holdingsEntity.getHoldingsId());
+            holdings.setOwningInstitutionHoldingsId(holdingsEntity.getOwningInstitutionHoldingsId());
             holdings.setDocType(RecapConstants.HOLDINGS);
             holdings.setId(holdingsEntity.getOwningInstitutionId()+holdingsEntity.getOwningInstitutionHoldingsId());
             String holdingsContent = new String(holdingsEntity.getContent());
