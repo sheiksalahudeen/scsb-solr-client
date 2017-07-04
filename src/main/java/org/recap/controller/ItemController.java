@@ -29,6 +29,10 @@ public class ItemController {
         this.itemDetailsRepository = itemDetailsRepository;
     }
 
+    public ItemDetailsRepository getItemDetailsRepository() {
+        return itemDetailsRepository;
+    }
+
     /**
      * This method is used to find a list of items by passing barcodes as parameter.
      *
@@ -37,8 +41,8 @@ public class ItemController {
      */
     @RequestMapping(method = RequestMethod.GET, value ="/findByBarcodeIn")
     public List<ItemEntity> findByBarcodeIn(String barcodes){
-
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(splitStringAndGetList(barcodes));
+        List<String> barcodeList = splitStringAndGetList(barcodes);
+        List<ItemEntity> itemEntityList = getItemDetailsRepository().findByBarcodeIn(barcodeList);
         for (Iterator<ItemEntity> itemEntityIterator = itemEntityList.iterator(); itemEntityIterator.hasNext(); ) {
             ItemEntity itemEntity = itemEntityIterator.next();
             for(BibliographicEntity bibliographicEntity : itemEntity.getBibliographicEntities()){

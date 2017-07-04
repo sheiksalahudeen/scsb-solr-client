@@ -25,6 +25,18 @@ public class PrincetonService {
     @Value("${ils.princeton.bibdata}")
     private String ilsprincetonBibData;
 
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    public String getIlsprincetonBibData() {
+        return ilsprincetonBibData;
+    }
+
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+
     /**
      * This method gets bib data response(marc xml) based on the itemBarcode from ILS for Princeton.
      *
@@ -32,7 +44,7 @@ public class PrincetonService {
      * @return the bib data
      */
     public String getBibData(String itemBarcode) {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = getRestTemplate();
         HostnameVerifier verifier = new NullHostnameVerifier();
         SCSBSimpleClientHttpRequestFactory factory = new SCSBSimpleClientHttpRequestFactory(verifier);
         restTemplate.setRequestFactory(factory);
@@ -40,13 +52,13 @@ public class PrincetonService {
         String bibDataResponse = null;
         String response = null;
         try {
-            logger.info("BIBDATA URL = "+ilsprincetonBibData);
+            getLogger().info("BIBDATA URL = "+getIlsprincetonBibData());
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
             HttpEntity requestEntity = new HttpEntity(headers);
             Map<String, String> params = new HashMap<>();
             params.put("barcode", itemBarcode);
-            ResponseEntity<String> responseEntity = restTemplate.exchange(ilsprincetonBibData, HttpMethod.GET, requestEntity, String.class, params);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(getIlsprincetonBibData(), HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
         } catch (HttpClientErrorException e) {
             logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);

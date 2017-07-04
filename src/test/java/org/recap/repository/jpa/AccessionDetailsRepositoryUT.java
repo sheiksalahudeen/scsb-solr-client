@@ -48,4 +48,17 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
         List<AccessionEntity> accessionEntities = accessionDetailsRepository.findByAccessionStatus(RecapConstants.PENDING);
         assertNotNull(accessionEntities);
     }
+
+    @Test
+    public void testAccessionEntity(){
+        AccessionEntity accessionEntity = new AccessionEntity();
+        accessionEntity.setAccessionId(1);
+        accessionEntity.setAccessionRequest("test");
+        accessionEntity.setAccessionStatus("Complete");
+        accessionEntity.setCreatedDate(new Date());
+        assertNotNull(accessionEntity.getAccessionId());
+        assertNotNull(accessionEntity.getAccessionRequest());
+        assertNotNull(accessionEntity.getAccessionStatus());
+        assertNotNull(accessionEntity.getCreatedDate());
+    }
 }

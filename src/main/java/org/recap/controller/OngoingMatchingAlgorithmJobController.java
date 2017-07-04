@@ -56,6 +56,10 @@ public class OngoingMatchingAlgorithmJobController {
         return dateUtil;
     }
 
+    public String getBatchSize() {
+        return batchSize;
+    }
+
     @RequestMapping("/ongoingMatchingJob")
     private String matchingJob(Model model) {
         model.addAttribute("matchingJobFromDate", new Date());
@@ -70,10 +74,10 @@ public class OngoingMatchingAlgorithmJobController {
         Date date = solrIndexRequest.getCreatedDate();
         String jobType = solrIndexRequest.getProcessType();
         String status = "";
-        Integer rows = Integer.valueOf(batchSize);
+        Integer rows = Integer.valueOf(getBatchSize());
         try {
             if (jobType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM_JOB)) {
-                status = ongoingMatchingAlgorithmUtil.fetchUpdatedRecordsAndStartProcess(dateUtil.getFromDate(date), rows);
+                status = getOngoingMatchingAlgorithmUtil().fetchUpdatedRecordsAndStartProcess(getDateUtil().getFromDate(date), rows);
             } else if (jobType.equalsIgnoreCase(RecapConstants.POPULATE_DATA_FOR_DATA_DUMP_JOB)) {
                 status = getMatchingBibInfoDetailService().populateMatchingBibInfo(getDateUtil().getFromDate(date), getDateUtil().getToDate(date));
             }

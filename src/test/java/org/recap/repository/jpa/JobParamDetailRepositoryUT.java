@@ -8,6 +8,7 @@ import org.recap.model.jpa.JobParamEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -47,5 +48,17 @@ public class JobParamDetailRepositoryUT extends BaseTestCase{
         jobParamEntity.addAll(jobParamDataEntityList);
 
         return jobParamDetailRepository.saveAndFlush(jobParamEntity);
+    }
+
+    @Test
+    public void testJobParamEntity(){
+        JobParamEntity jobparamEntity = new JobParamEntity();
+        jobparamEntity.setRecordNumber(1);
+        jobparamEntity.setJobName("Test");
+        jobparamEntity.setJobParamDataEntities(Arrays.asList(new JobParamDataEntity()));
+        assertNotNull(jobparamEntity.getJobName());
+        assertNotNull(jobparamEntity.getRecordNumber());
+        assertNotNull(jobparamEntity.getJobParamDataEntities());
+
     }
 }

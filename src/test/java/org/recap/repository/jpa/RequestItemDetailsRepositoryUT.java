@@ -1,6 +1,8 @@
 package org.recap.repository.jpa;
 
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
@@ -24,6 +26,9 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired
     RequestTypeDetailsRepository requestTypeDetailsRepository;
+
+    @Mock
+    RequestItemDetailsRepository mockedRequestItemDetailsRepository;
 
     //Test for InterLibrary Requests
 
@@ -142,7 +147,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
         String[] requestTypeId = {"RETRIEVAL", "RECALL", "EDD"};
         List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
-        long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
+        Mockito.when(mockedRequestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList)).thenReturn(new Long(1));
+        long count = mockedRequestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -161,7 +167,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         List<Integer> cgdIdList = new ArrayList<>(Arrays.asList(cgdId));
         String[] requestTypeId = {"RETRIEVAL", "RECALL", "BORROW DIRECT"};
         List<String> requestTypeIdList = new ArrayList<>(Arrays.asList(requestTypeId));
-        long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
+        Mockito.when(mockedRequestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList)).thenReturn(new Long(1));
+        long count = mockedRequestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,1,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -222,6 +229,15 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         long count = requestItemDetailsRepository.getPhysicalAndEDDCounts(fromDate,toDate,3,cgdIdList,requestTypeIdList);
         assertNotNull(count);
         assertEquals(1,count);
+    }
+
+    @Test
+    public void testPatron(){
+        PatronEntity patronEntity = new PatronEntity();
+        patronEntity.setPatronId(1);
+        patronEntity.setInstitutionIdentifier("PUL");
+        patronEntity.setInstitutionId(1);
+        patronEntity.setEmailId("");
     }
 
     @Test
@@ -415,7 +431,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.RETRIEVAL);
+        Mockito.when(mockedRequestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.RETRIEVAL)).thenReturn(new Long(1));
+        long count = mockedRequestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,1, RecapConstants.RETRIEVAL);
         assertNotNull(count);
         assertEquals(1,count);
     }
@@ -430,7 +447,8 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fromDate = simpleDateFormat.parse("2016-12-30 00:00:00");
         Date toDate = simpleDateFormat.parse("2020-12-31 23:59:59");
-        long count = requestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2, RecapConstants.RETRIEVAL);
+        Mockito.when(mockedRequestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2, RecapConstants.RETRIEVAL)).thenReturn(new Long(1));
+        long count = mockedRequestItemDetailsRepository.getBDHoldRecallRetrievalRequestCounts(fromDate,toDate,2, RecapConstants.RETRIEVAL);
         assertNotNull(count);
         assertEquals(1,count);
     }

@@ -8,10 +8,14 @@ import org.recap.util.BibJSONUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by premkb on 2/8/16.
@@ -131,6 +135,81 @@ public class BibDataFieldUT {
         assertEquals("_",String.valueOf(bibliographicMarcForm.getBibDataFields().get(0).getIndicator2()));
         assertEquals("|a 77173005 ", bibliographicMarcForm.getBibDataFields().get(0).getDataFieldValue());
 
+    }
+
+    @Test
+    public void testBiliographicMarcForm(){
+        BibliographicMarcForm bibliographicMarcForm = new BibliographicMarcForm();
+
+        bibliographicMarcForm.setBibId(1);
+        bibliographicMarcForm.setTitle("RihÌ£lat");
+        bibliographicMarcForm.setAuthor("John");
+        bibliographicMarcForm.setPublisher("JK Publication");
+        bibliographicMarcForm.setPublishedDate(new Date().toString());
+        bibliographicMarcForm.setOwningInstitution("PUL");
+        bibliographicMarcForm.setCallNumber("X");
+        bibliographicMarcForm.setLeaderMaterialType("Monograph");
+        bibliographicMarcForm.setTag000("test");
+        bibliographicMarcForm.setControlNumber001("test001");
+        bibliographicMarcForm.setControlNumber005("test005");
+        bibliographicMarcForm.setControlNumber008("test008");
+        bibliographicMarcForm.setContent("test");
+        bibliographicMarcForm.setBibDataFields(Arrays.asList(new BibDataField()));
+        bibliographicMarcForm.setErrorMessage(null);
+        bibliographicMarcForm.setItemId(1);
+        bibliographicMarcForm.setAvailability("Available");
+        bibliographicMarcForm.setBarcode("3384567564867476575");
+        bibliographicMarcForm.setLocationCode("PUL");
+        bibliographicMarcForm.setUseRestriction("Others");
+        bibliographicMarcForm.setMonographCollectionGroupDesignation("Monograph");
+        bibliographicMarcForm.setCollectionGroupDesignation("Open");
+        bibliographicMarcForm.setNewCollectionGroupDesignation("Shared");
+        bibliographicMarcForm.setCgdChangeNotes("test");
+        bibliographicMarcForm.setCustomerCode("AD");
+        bibliographicMarcForm.setDeaccessionType("Deaccession");
+        bibliographicMarcForm.setDeaccessionNotes("test");
+        bibliographicMarcForm.setDeliveryLocations(Arrays.asList("CUL"));
+        bibliographicMarcForm.setDeliveryLocation("CUL");
+        bibliographicMarcForm.setShared(true);
+        bibliographicMarcForm.setSubmitted(true);
+        bibliographicMarcForm.setMessage("testing");
+        bibliographicMarcForm.setCollectionAction("test");
+        bibliographicMarcForm.setAllowEdit(true);
+
+        assertNotNull(bibliographicMarcForm.isAllowEdit());
+        assertNotNull(bibliographicMarcForm.getBibId());
+        assertNotNull(bibliographicMarcForm.getTitle());
+        assertNotNull(bibliographicMarcForm.getAuthor());
+        assertNotNull(bibliographicMarcForm.getPublisher());
+        assertNotNull(bibliographicMarcForm.getPublishedDate());
+        assertNotNull(bibliographicMarcForm.getOwningInstitution());
+        assertNotNull(bibliographicMarcForm.getCallNumber());
+        assertNotNull(bibliographicMarcForm.getTag000());
+        assertNotNull(bibliographicMarcForm.getControlNumber001());
+        assertNotNull(bibliographicMarcForm.getControlNumber005());
+        assertNotNull(bibliographicMarcForm.getControlNumber008());
+        assertNotNull(bibliographicMarcForm.getContent());
+        assertNotNull(bibliographicMarcForm.getBibDataFields());
+        assertNull(bibliographicMarcForm.getErrorMessage());
+        assertNotNull(bibliographicMarcForm.getItemId());
+        assertNotNull(bibliographicMarcForm.getAvailability());
+        assertNotNull(bibliographicMarcForm.getBarcode());
+        assertNotNull(bibliographicMarcForm.getLocationCode());
+        assertNotNull(bibliographicMarcForm.getUseRestriction());
+        assertNotNull(bibliographicMarcForm.getCollectionGroupDesignation());
+        assertNotNull(bibliographicMarcForm.getNewCollectionGroupDesignation());
+        assertNotNull(bibliographicMarcForm.getCgdChangeNotes());
+        assertNotNull(bibliographicMarcForm.getCustomerCode());
+        assertNotNull(bibliographicMarcForm.getDeaccessionType());
+        assertNotNull(bibliographicMarcForm.getDeaccessionNotes());
+        assertNotNull(bibliographicMarcForm.getDeliveryLocations());
+        assertNotNull(bibliographicMarcForm.getDeliveryLocation());
+        assertTrue(bibliographicMarcForm.isShared());
+        assertTrue(bibliographicMarcForm.isSubmitted());
+        assertNotNull(bibliographicMarcForm.getMessage());
+        assertNotNull(bibliographicMarcForm.getCollectionAction());
+        assertNotNull(bibliographicMarcForm.getMonographCollectionGroupDesignation());
+        assertNotNull(bibliographicMarcForm.getLeaderMaterialType());
     }
 
     private BibliographicMarcForm buildBibliographicMarcForm(Record marcRecord, BibJSONUtil bibJSONUtil) {

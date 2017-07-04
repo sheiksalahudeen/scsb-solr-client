@@ -26,6 +26,10 @@ public class MatchingBibInfoDetailUT extends BaseTestCase{
         MatchingBibInfoDetail savedMatchingBibInfoDetail = matchingBibInfoDetailRepository.save(matchingBibInfoDetail);
         assertNotNull(savedMatchingBibInfoDetail);
         assertNotNull(savedMatchingBibInfoDetail.getMatchingBibInfoDetailId());
+        assertNotNull(savedMatchingBibInfoDetail.getBibId());
+        assertNotNull(savedMatchingBibInfoDetail.getRecordNum());
+        assertNotNull(savedMatchingBibInfoDetail.getOwningInstitution());
+        assertNotNull(savedMatchingBibInfoDetail.getOwningInstitutionBibId());
     }
 
 }

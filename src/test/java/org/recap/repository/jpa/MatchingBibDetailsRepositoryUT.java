@@ -29,6 +29,36 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
         assertNotNull(bibEntity);
     }
 
+    @Test
+    public void testMatchingBibEntity(){
+        MatchingBibEntity matchingBibEntity = new MatchingBibEntity();
+        matchingBibEntity.setId(1);
+        matchingBibEntity.setBibId(1);
+        matchingBibEntity.setOwningInstitution("NYPL");
+        matchingBibEntity.setOwningInstBibId("N1029");
+        matchingBibEntity.setTitle("Middleware for ReCAP");
+        matchingBibEntity.setOclc("129393");
+        matchingBibEntity.setIsbn("93930");
+        matchingBibEntity.setIssn("12283");
+        matchingBibEntity.setLccn("039329");
+        matchingBibEntity.setMaterialType("monograph");
+        matchingBibEntity.setMatching("test");
+        matchingBibEntity.setRoot("31");
+        assertNotNull(matchingBibEntity.getId());
+        assertNotNull(matchingBibEntity.getRoot());
+        assertNotNull(matchingBibEntity.getId());
+        assertNotNull(matchingBibEntity.getBibId());
+        assertNotNull(matchingBibEntity.getOwningInstitution());
+        assertNotNull(matchingBibEntity.getOwningInstBibId());
+        assertNotNull(matchingBibEntity.getTitle());
+        assertNotNull(matchingBibEntity.getOclc());
+        assertNotNull(matchingBibEntity.getIsbn());
+        assertNotNull(matchingBibEntity.getIssn());
+        assertNotNull(matchingBibEntity.getLccn());
+        assertNotNull(matchingBibEntity.getMaterialType());
+        assertNotNull(matchingBibEntity.getMatching());
+    }
+
     private MatchingBibEntity saveMatchingBibEntity(String matchingCriteria) {
         MatchingBibEntity matchingBibEntity = new MatchingBibEntity();
         matchingBibEntity.setBibId(1);

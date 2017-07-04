@@ -17,8 +17,11 @@ public class RecapErrorPageControllerUT extends BaseTestCase{
     @Test
     public void testErrorPage(){
         String response = recapErrorPageController.recapErrorPage();
+        String path = recapErrorPageController.getErrorPath();
         assertNotNull(response);
         assertEquals(response,"error");
+        assertNotNull(path);
+        assertEquals(path,"/error");
     }
 
 }

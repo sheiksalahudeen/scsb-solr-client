@@ -66,6 +66,21 @@ public class CustomerCodeDetailsRepositoryUT extends BaseTestCase {
         }
     }
 
+    @Test
+    public void testCustomerCodeEntity(){
+        CustomerCodeEntity customerCodeEntity = new CustomerCodeEntity();
+        customerCodeEntity.setCustomerCodeId(1);
+        customerCodeEntity.setCustomerCode("AD");
+        customerCodeEntity.setDescription("AD");
+        customerCodeEntity.setOwningInstitutionId(2);
+        customerCodeEntity.setDeliveryRestrictions("test");
+        assertNotNull(customerCodeEntity.getOwningInstitutionId());
+        assertNotNull(customerCodeEntity.getCustomerCodeId());
+        assertNotNull(customerCodeEntity.getCustomerCode());
+        assertNotNull(customerCodeEntity.getDescription());
+        assertNotNull(customerCodeEntity.getDeliveryRestrictions());
+    }
+
     private CustomerCodeEntity getCustomerCodeEntity(String customerCode, String description, Integer institutionId, String deliveryRestrictions) {
         CustomerCodeEntity customerCodeEntity = new CustomerCodeEntity();
         customerCodeEntity.setCustomerCode(customerCode);

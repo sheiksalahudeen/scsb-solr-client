@@ -54,6 +54,19 @@ public class MatchingMatchPointsDetailsRepositoryUT extends BaseTestCase{
     }
 
     @Test
+    public void testMatchingMatchPointsEntity(){
+        MatchingMatchPointsEntity matchingMatchPointsEntity = new MatchingMatchPointsEntity();
+        matchingMatchPointsEntity.setId(1);
+        matchingMatchPointsEntity.setCriteriaValue("3093949");
+        matchingMatchPointsEntity.setMatchCriteria(RecapConstants.MATCH_POINT_FIELD_OCLC);
+        matchingMatchPointsEntity.setCriteriaValueCount(1);
+        assertNotNull(matchingMatchPointsEntity.getId());
+        assertNotNull(matchingMatchPointsEntity.getCriteriaValue());
+        assertNotNull(matchingMatchPointsEntity.getCriteriaValueCount());
+        assertNotNull(matchingMatchPointsEntity.getMatchCriteria());
+    }
+
+    @Test
     public void verifyMatchingCriteriaValue() throws Exception {
         MatchingMatchPointsEntity matchingMatchPointsEntity = saveMatchingMatchPointEntity(RecapConstants.MATCH_POINT_FIELD_OCLC, "25001781 /\\");
         assertNotNull(matchingMatchPointsEntity);

@@ -32,6 +32,30 @@ public class NYPLService {
     @Autowired
     private NyplOauthTokenApiService nyplOauthTokenApiService;
 
+    public NyplOauthTokenApiService getNyplOauthTokenApiService() {
+        return nyplOauthTokenApiService;
+    }
+
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+
+    public String getIlsNYPLBibData() {
+        return ilsNYPLBibData;
+    }
+
+    public String getIlsNYPLBibDataParameter() {
+        return ilsNYPLBibDataParameter;
+    }
+
+    public HttpEntity getHttpEntity(HttpHeaders headers){
+        return new HttpEntity(headers);
+    }
+
+    public HttpHeaders getHttpHeaders(){
+        return new HttpHeaders();
+    }
+
     /**
      * This method gets bib data response(scsb xml) based on the itemBarcode and customer code from ILS for NYPL.
      *
@@ -40,20 +64,20 @@ public class NYPLService {
      * @return the bib data
      */
     public String getBibData(String itemBarcode, String customerCode) {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = getRestTemplate();
         String bibDataResponse = null;
         String response = null;
         try {
-            String authorization = "Bearer " + nyplOauthTokenApiService.generateAccessTokenForNyplApi();
-            HttpHeaders headers = new HttpHeaders();
+            String authorization = "Bearer " + getNyplOauthTokenApiService().generateAccessTokenForNyplApi();
+            HttpHeaders headers = getHttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
             headers.set("Authorization", authorization);
-            HttpEntity requestEntity = new HttpEntity(headers);
+            HttpEntity requestEntity = getHttpEntity(headers);
             Map<String, String> params  = new HashMap<>();
             params.put("barcode", itemBarcode);
             params.put("customercode", customerCode);
-            String url = ilsNYPLBibData + ilsNYPLBibDataParameter;
+            String url = getIlsNYPLBibData() + getIlsNYPLBibDataParameter();
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
         } catch (HttpClientErrorException e) {
