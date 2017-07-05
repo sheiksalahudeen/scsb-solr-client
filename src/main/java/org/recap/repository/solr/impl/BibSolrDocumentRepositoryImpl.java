@@ -15,10 +15,7 @@ import org.recap.model.search.resolver.ItemValueResolver;
 import org.recap.model.search.resolver.impl.bib.*;
 import org.recap.model.search.resolver.impl.bib.DocTypeValueResolver;
 import org.recap.model.search.resolver.impl.bib.IdValueResolver;
-import org.recap.model.search.resolver.impl.holdings.HoldingsIdValueResolver;
-import org.recap.model.search.resolver.impl.holdings.HoldingsRootValueResolver;
-import org.recap.model.search.resolver.impl.holdings.IsDeletedHoldingsValueResolver;
-import org.recap.model.search.resolver.impl.holdings.SummaryHoldingsValueResolver;
+import org.recap.model.search.resolver.impl.holdings.*;
 import org.recap.model.search.resolver.impl.item.*;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Holdings;
@@ -393,6 +390,8 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             itemValueResolvers.add(new org.recap.model.search.resolver.impl.item.IdValueResolver());
             itemValueResolvers.add(new IsDeletedItemValueResolver());
             itemValueResolvers.add(new ItemCreatedDateValueResolver());
+            itemValueResolvers.add(new OwningInstitutionItemIdValueResolver());
+            itemValueResolvers.add(new HoldingsIdsValueResolver());
         }
         return itemValueResolvers;
     }
@@ -411,6 +410,7 @@ public class BibSolrDocumentRepositoryImpl implements CustomDocumentRepository {
             holdingsValueResolvers.add(new org.recap.model.search.resolver.impl.holdings.IdValueResolver());
             holdingsValueResolvers.add(new HoldingsIdValueResolver());
             holdingsValueResolvers.add(new IsDeletedHoldingsValueResolver());
+            holdingsValueResolvers.add(new OwningInstitutionHoldingsIdValueResolver());
         }
         return holdingsValueResolvers;
     }

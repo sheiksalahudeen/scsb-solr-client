@@ -5,29 +5,29 @@ import org.recap.model.search.resolver.HoldingsValueResolver;
 import org.recap.model.solr.Holdings;
 
 /**
- * Created by angelind on 6/10/16.
+ * Created by rajeshbabuk on 3/7/17.
  */
-public class HoldingsIdValueResolver implements HoldingsValueResolver {
+public class OwningInstitutionHoldingsIdValueResolver implements HoldingsValueResolver {
 
     /**
-     * Returns true if field name is 'HoldingId'.
+     * Returns true if field name is 'OwningInstitutionHoldingsId'.
      *
      * @param field the field
      * @return
      */
     @Override
     public Boolean isInterested(String field) {
-        return RecapConstants.HOLDING_ID.equals(field);
+        return RecapConstants.OWNING_INSTITUTION_HOLDINGS_ID.equals(field);
     }
 
     /**
-     * Set Holding Id value to holdings
+     * Set owning Institution Holdings Id value to holdings
      *
      * @param holdings the holdings
      * @param value the value
      */
     @Override
     public void setValue(Holdings holdings, Object value) {
-        holdings.setHoldingsId((Integer) value);
+        holdings.setOwningInstitutionHoldingsId((String) value);
     }
 }

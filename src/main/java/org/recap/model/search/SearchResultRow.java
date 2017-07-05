@@ -49,6 +49,12 @@ public class SearchResultRow {
     private List<SearchItemResultRow> searchItemResultRows = new ArrayList<>();
     @ApiModelProperty(name= "itemId", value= "Item Id",position = 17)
     private Integer itemId;
+    @ApiModelProperty(name= "owningInstitutionBibId", value= "Owning Institution Bib Id",position = 18)
+    private String owningInstitutionBibId;
+    @ApiModelProperty(name= "owningInstitutionHoldingsId", value= "Owning Institution Holdings Id",position = 19)
+    private String owningInstitutionHoldingsId;
+    @ApiModelProperty(name= "owningInstitutionItemId", value= "Owning Institution Item Id",position = 20)
+    private String owningInstitutionItemId;
 
     private Integer patronBarcode;
     private String requestingInstitution;
@@ -506,5 +512,59 @@ public class SearchResultRow {
      */
     public void setAuthorSearch(String authorSearch) {
         this.authorSearch = authorSearch;
+    }
+
+    /**
+     * Gets owning institution bib id.
+     *
+     * @return the owning institution bib id
+     */
+    public String getOwningInstitutionBibId() {
+        return owningInstitutionBibId;
+    }
+
+    /**
+     * Sets owning institution bib id.
+     *
+     * @param owningInstitutionBibId the owning institution bib id
+     */
+    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
+        this.owningInstitutionBibId = owningInstitutionBibId;
+    }
+
+    /**
+     * Gets owning institution holdings id.
+     *
+     * @return the owning institution holdings id
+     */
+    public String getOwningInstitutionHoldingsId() {
+        return owningInstitutionHoldingsId;
+    }
+
+    /**
+     * Sets owning institution holdings id.
+     *
+     * @param owningInstitutionHoldingsId the owning institution holdings id
+     */
+    public void setOwningInstitutionHoldingsId(String owningInstitutionHoldingsId) {
+        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
+    }
+
+    /**
+     * Gets owning institution item id.
+     *
+     * @return the owning institution item id
+     */
+    public String getOwningInstitutionItemId() {
+        return owningInstitutionItemId;
+    }
+
+    /**
+     * Sets owning institution item id.
+     *
+     * @param owningInstitutionItemId the owning institution item id
+     */
+    public void setOwningInstitutionItemId(String owningInstitutionItemId) {
+        this.owningInstitutionItemId = owningInstitutionItemId;
     }
 }

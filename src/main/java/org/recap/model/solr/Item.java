@@ -19,6 +19,9 @@ public class Item {
     @Field("ItemId")
     private Integer itemId;
 
+    @Field("OwningInstitutionItemId")
+    private String owningInstitutionItemId;
+
     @Field("Barcode")
     private String barcode;
 
@@ -125,6 +128,24 @@ public class Item {
      */
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
+    }
+
+    /**
+     * Gets owning institution item id.
+     *
+     * @return the owning institution item id
+     */
+    public String getOwningInstitutionItemId() {
+        return owningInstitutionItemId;
+    }
+
+    /**
+     * Sets owning institution item id.
+     *
+     * @param owningInstitutionItemId the owning institution item id
+     */
+    public void setOwningInstitutionItemId(String owningInstitutionItemId) {
+        this.owningInstitutionItemId = owningInstitutionItemId;
     }
 
     /**

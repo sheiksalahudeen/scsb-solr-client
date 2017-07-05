@@ -27,6 +27,10 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
     private boolean selectedItem = false;
     @ApiModelProperty(name= "itemId", value= "Item Id",position = 8)
     private Integer itemId;
+    @ApiModelProperty(name= "owningInstitutionItemId", value= "Owning Institution Item Id",position = 9)
+    private String owningInstitutionItemId;
+    @ApiModelProperty(name= "owningInstitutionHoldingsId", value= "Owning Institution Holdings Id",position = 10)
+    private String owningInstitutionHoldingsId;
 
     /**
      * Gets call number.
@@ -188,6 +192,42 @@ public class SearchItemResultRow implements Comparable<SearchItemResultRow> {
      */
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
+    }
+
+    /**
+     * Gets owning institution item id.
+     *
+     * @return the owning institution item id
+     */
+    public String getOwningInstitutionItemId() {
+        return owningInstitutionItemId;
+    }
+
+    /**
+     * Sets owning institution item id.
+     *
+     * @param owningInstitutionItemId the owning institution item id
+     */
+    public void setOwningInstitutionItemId(String owningInstitutionItemId) {
+        this.owningInstitutionItemId = owningInstitutionItemId;
+    }
+
+    /**
+     * Gets owning institution holdings id.
+     *
+     * @return the owning institution holdings id
+     */
+    public String getOwningInstitutionHoldingsId() {
+        return owningInstitutionHoldingsId;
+    }
+
+    /**
+     * Sets owning institution holdings id.
+     *
+     * @param owningInstitutionHoldingsId the owning institution holdings id
+     */
+    public void setOwningInstitutionHoldingsId(String owningInstitutionHoldingsId) {
+        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
     @Override
