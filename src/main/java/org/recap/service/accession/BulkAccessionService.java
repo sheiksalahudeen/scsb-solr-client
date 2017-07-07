@@ -89,6 +89,7 @@ public class BulkAccessionService extends AccessionService{
                     saveReportEntity(owningInstitution, reportDataEntityList);
                     continue;
                 }
+
                 BibDataCallable bibDataCallable = (BibDataCallable) applicationContext.getBean(BibDataCallable.class);
                 bibDataCallable.setAccessionRequest(accessionRequest);
                 futures.add(executorService.submit(bibDataCallable));

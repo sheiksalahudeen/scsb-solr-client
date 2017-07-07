@@ -8,6 +8,8 @@ import org.recap.model.jpa.CustomerCodeEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
+import org.recap.model.request.ItemCheckInRequest;
+import org.recap.model.request.ItemCheckinResponse;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
@@ -15,7 +17,12 @@ import org.recap.service.accession.AccessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -23,6 +30,7 @@ import java.util.*;
  * Created by sheiks on 26/05/17.
  */
 @Service
+@EnableAsync
 public class AccessionHelperUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessionHelperUtil.class);
@@ -258,8 +266,6 @@ public class AccessionHelperUtil {
         reportDetailRepository.save(reportEntityList);
     }
 
-
-
     public void processBibDataApiException(Set<AccessionResponse> accessionResponsesList, AccessionRequest accessionRequest,
                                            List<ReportDataEntity> reportDataEntityList, String owningInstitution, Exception ex) {
         String response;
@@ -271,4 +277,27 @@ public class AccessionHelperUtil {
         reportDataEntityList.addAll(accessionService.getAccessionHelperUtil().createReportDataEntityList(accessionRequest, response));
     }
 
+    @Async
+    public void callCheckin(String itemBarcode, String owningInstitutionId) {
+        ResponseEntity<ItemCheckinResponse> responseEntity = null;
+        ItemCheckInRequest itemRequestInfo = new ItemCheckInRequest();
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            itemRequestInfo.setItemBarcodes(Arrays.asList(itemBarcode));
+            itemRequestInfo.setItemOwningInstitution(owningInstitutionId);
+            HttpEntity request = new HttpEntity<>(itemRequestInfo,getHttpHeadersAuth());
+            responseEntity =restTemplate.exchange("http://localhost:9093/requestItem/checkinItem", HttpMethod.POST,request  , ItemCheckinResponse.class);
+        } catch (RestClientException ex) {
+            logger.error(RecapConstants.EXCEPTION, ex);
+        } catch (Exception ex) {
+            logger.error(RecapConstants.EXCEPTION, ex);
+        }
+    }
+
+    private HttpHeaders getHttpHeadersAuth() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(RecapConstants.API_KEY, RecapConstants.RECAP);
+        return headers;
+    }
 }

@@ -75,6 +75,7 @@ public class BibDataCallable implements Callable{
                                 try {
                                     response = bibDataResolver.processXml(accessionResponses, bibData,
                                             responseMapList, owningInstitution, reportDataEntityList, accessionRequest);
+                                    accessionHelperUtil.callCheckin(accessionRequest.getItemBarcode(),owningInstitution);
                                 } catch (Exception e) {
                                     if(writeToReport) {
                                         processException(e, reportDataEntityList, accessionResponses);
