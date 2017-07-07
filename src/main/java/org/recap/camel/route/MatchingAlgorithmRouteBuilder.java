@@ -55,9 +55,18 @@ public class MatchingAlgorithmRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from("scsbactivemq:queue:updateItemsQ")
+                    from("scsbactivemq:queue:updateItemsQ?concurrentConsumers=10")
                             .routeId("updateItemsQ")
                             .bean(MatchingAlgorithmProcessor.class, "updateItemEntity");
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from("scsbactivemq:queue:updateMatchingBibEntityQ?concurrentConsumers=10")
+                            .routeId("updateMatchingBibQ")
+                            .bean(MatchingAlgorithmProcessor.class, "updateMatchingBibEntity");
                 }
             });
 

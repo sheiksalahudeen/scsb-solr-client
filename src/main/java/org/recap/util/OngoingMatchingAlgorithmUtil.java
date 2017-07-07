@@ -509,12 +509,13 @@ public class OngoingMatchingAlgorithmUtil {
 
     /**
      * This method is used to get bibs from the solr
-     * @param matchPointString
-     * @param fieldName
-     * @param query
-     * @return
+     *
+     * @param matchPointString the match point string
+     * @param fieldName        the field name
+     * @param query            the query
+     * @return bibs from solr
      */
-    private Map<Integer, BibItem> getBibsFromSolr(Set<String> matchPointString, String fieldName, String query) {
+    public Map<Integer, BibItem> getBibsFromSolr(Set<String> matchPointString, String fieldName, String query) {
         Map<Integer, BibItem> bibItemMap = new HashMap<>();
         SolrQuery solrQuery = new SolrQuery(query);
         try {

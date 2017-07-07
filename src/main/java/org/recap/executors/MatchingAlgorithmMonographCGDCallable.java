@@ -26,6 +26,7 @@ public class MatchingAlgorithmMonographCGDCallable implements Callable {
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
     private ItemDetailsRepository itemDetailsRepository;
+    private boolean isPendingMatch;
 
     /**
      * This method instantiates a new matching algorithm cgd callable.
@@ -40,11 +41,12 @@ public class MatchingAlgorithmMonographCGDCallable implements Callable {
      * @param itemChangeLogDetailsRepository   the item change log details repository
      * @param collectionGroupDetailsRepository the collection group details repository
      * @param itemDetailsRepository            the item details repository
+     * @param isPendingMatch                   the is pending match
      */
     public MatchingAlgorithmMonographCGDCallable(ReportDataDetailsRepository reportDataDetailsRepository, BibliographicDetailsRepository bibliographicDetailsRepository,
                                                  int pageNum, Integer batchSize, ProducerTemplate producerTemplate, Map collectionGroupMap, Map institutionMap,
                                                  ItemChangeLogDetailsRepository itemChangeLogDetailsRepository, CollectionGroupDetailsRepository collectionGroupDetailsRepository,
-                                                 ItemDetailsRepository itemDetailsRepository) {
+                                                 ItemDetailsRepository itemDetailsRepository, boolean isPendingMatch) {
         this.reportDataDetailsRepository = reportDataDetailsRepository;
         this.bibliographicDetailsRepository = bibliographicDetailsRepository;
         this.pageNum = pageNum;
@@ -55,6 +57,7 @@ public class MatchingAlgorithmMonographCGDCallable implements Callable {
         this.itemChangeLogDetailsRepository = itemChangeLogDetailsRepository;
         this.collectionGroupDetailsRepository = collectionGroupDetailsRepository;
         this.itemDetailsRepository = itemDetailsRepository;
+        this.isPendingMatch = isPendingMatch;
     }
 
     /**
@@ -66,7 +69,12 @@ public class MatchingAlgorithmMonographCGDCallable implements Callable {
     public Object call() throws Exception {
 
         long from = pageNum * Long.valueOf(batchSize);
-        List<ReportDataEntity> reportDataEntities =  reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, from, batchSize);
+        List<ReportDataEntity> reportDataEntities;
+        if(isPendingMatch) {
+            reportDataEntities = reportDataDetailsRepository.getReportDataEntityForPendingMatchingMonographs(RecapConstants.BIB_ID, from, batchSize);
+        } else {
+            reportDataEntities =  reportDataDetailsRepository.getReportDataEntityForMatchingMonographs(RecapConstants.BIB_ID, from, batchSize);
+        }
         List<Integer> nonMonographRecordNums = new ArrayList<>();
         List<Integer> exceptionRecordNums = new ArrayList<>();
         Map<String, List<Integer>> unProcessedRecordNumMap = new HashMap<>();

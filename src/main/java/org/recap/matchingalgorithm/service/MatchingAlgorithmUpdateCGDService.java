@@ -85,14 +85,47 @@ public class MatchingAlgorithmUpdateCGDService {
         matchingAlgorithmUtil.populateMatchingCounter();
 
         ExecutorService executor = getExecutorService(50);
+
+        processCallablesForMonographs(batchSize, executor, false);
+
+        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
+
+        if(updateItemsQ != null) {
+            while (updateItemsQ.getQueueSize() != 0) {
+                //Waiting for the updateItemQ messages finish processing
+            }
+        }
+
+        processCallablesForMonographs(batchSize, executor, true);
+
+        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MONOGRAPH);
+
+        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
+        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
+        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
+
+        if(updateItemsQ != null){
+            while (updateItemsQ.getQueueSize() != 0) {
+                //Waiting for the updateItemQ messages finish processing
+            }
+        }
+        executor.shutdown();
+    }
+
+    private void processCallablesForMonographs(Integer batchSize, ExecutorService executor, boolean isPendingMatch) {
         List<Callable<Integer>> callables = new ArrayList<>();
-        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
+        long countOfRecordNum;
+        if(isPendingMatch) {
+            countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingPendingMonograph(RecapConstants.BIB_ID);
+        } else {
+            countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
+        }
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             Callable callable = new MatchingAlgorithmMonographCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
-                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
+                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository, isPendingMatch);
             callables.add(callable);
         }
         Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executor, callables);
@@ -103,22 +136,15 @@ public class MatchingAlgorithmUpdateCGDService {
         matchingAlgorithmUtil.updateMonographicSetRecords(nonMonographRecordNums, batchSize);
 
         matchingAlgorithmUtil.updateExceptionRecords(exceptionRecordNums, batchSize);
-
-        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MONOGRAPH);
-
-        logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
-        logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
-        logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
-
-        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
-
-        while (updateItemsQ.getQueueSize() != 0) {
-            //Waiting for the updateItemQ messages finish processing
-        }
-
-        executor.shutdown();
     }
 
+    /**
+     * Update cgd process for serials.
+     *
+     * @param batchSize the batch size
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public void updateCGDProcessForSerials(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start CGD Process For Serials.");
 
@@ -145,13 +171,22 @@ public class MatchingAlgorithmUpdateCGDService {
 
         DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
 
-        while (updateItemsQ.getQueueSize() != 0) {
-            //Waiting for the updateItemQ messages finish processing
+        if(updateItemsQ != null) {
+            while (updateItemsQ.getQueueSize() != 0) {
+                //Waiting for the updateItemQ messages finish processing
+            }
         }
 
         executor.shutdown();
     }
 
+    /**
+     * Update cgd process for mv ms.
+     *
+     * @param batchSize the batch size
+     * @throws IOException         the io exception
+     * @throws SolrServerException the solr server exception
+     */
     public void updateCGDProcessForMVMs(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start CGD Process For MVMs.");
 
@@ -178,8 +213,10 @@ public class MatchingAlgorithmUpdateCGDService {
 
         DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
 
-        while (updateItemsQ.getQueueSize() != 0) {
-            //Waiting for the updateItemQ messages finish processing
+        if(updateItemsQ != null) {
+            while (updateItemsQ.getQueueSize() != 0) {
+                //Waiting for the updateItemQ messages finish processing
+            }
         }
 
         executor.shutdown();
@@ -250,7 +287,7 @@ public class MatchingAlgorithmUpdateCGDService {
      * @param batchSize the batch size
      */
     public void getItemsCountForSerialsMatching(Integer batchSize) {
-        long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingSerial(RecapConstants.BIB_ID);
+        long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingSerials(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);

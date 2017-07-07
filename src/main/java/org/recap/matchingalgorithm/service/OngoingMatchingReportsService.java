@@ -186,7 +186,8 @@ public class OngoingMatchingReportsService {
         SolrQuery solrQueryForChildDocuments = solrQueryBuilder.getSolrQueryForBibItem(RecapConstants.ROOT + ":" + solrDocument.getFieldValue(RecapConstants.ROOT));
         solrQueryForChildDocuments.setFilterQueries(RecapConstants.DOCTYPE + ":" + "(\"" + RecapConstants.HOLDINGS + "\" \"" + RecapConstants.ITEM + "\")");
         String[] fieldNameList = {RecapConstants.VOLUME_PART_YEAR, RecapConstants.HOLDING_ID, RecapConstants.SUMMARY_HOLDINGS, RecapConstants.BARCODE,
-                RecapConstants.USE_RESTRICTION_DISPLAY, RecapConstants.ITEM_ID, RecapConstants.ROOT, RecapConstants.DOCTYPE, RecapConstants.HOLDINGS_ID};
+                RecapConstants.USE_RESTRICTION_DISPLAY, RecapConstants.ITEM_ID, RecapConstants.ROOT, RecapConstants.DOCTYPE, RecapConstants.HOLDINGS_ID,
+                RecapConstants.IS_DELETED_ITEM, RecapConstants.ITEM_CATALOGING_STATUS};
         solrQueryForChildDocuments.setFields(fieldNameList);
         solrQueryForChildDocuments.setSort(RecapConstants.DOCTYPE, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = null;
@@ -207,18 +208,22 @@ public class OngoingMatchingReportsService {
                             String.valueOf(solrChildDocument.getFieldValue(RecapConstants.SUMMARY_HOLDINGS)));
                 }
                 if(docType.equalsIgnoreCase(RecapConstants.ITEM)) {
-                    MatchingSerialAndMVMReports matchingSerialAndMVMReports = new MatchingSerialAndMVMReports();
-                    matchingSerialAndMVMReports.setTitle(String.valueOf(solrDocument.getFieldValue(RecapConstants.TITLE_SUBFIELD_A)));
-                    matchingSerialAndMVMReports.setBibId(String.valueOf(solrDocument.getFieldValue(RecapConstants.BIB_ID)));
-                    matchingSerialAndMVMReports.setOwningInstitutionId(String.valueOf(solrDocument.getFieldValue(RecapConstants.BIB_OWNING_INSTITUTION)));
-                    matchingSerialAndMVMReports.setOwningInstitutionBibId(String.valueOf(solrDocument.getFieldValue(RecapConstants.OWNING_INST_BIB_ID)));
-                    matchingSerialAndMVMReports.setBarcode(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.BARCODE)));
-                    matchingSerialAndMVMReports.setVolumePartYear(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.VOLUME_PART_YEAR)));
-                    matchingSerialAndMVMReports.setUseRestriction(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.USE_RESTRICTION_DISPLAY)));
-                    List<Integer> holdingsIds = (List<Integer>) solrChildDocument.getFieldValue(RecapConstants.HOLDINGS_ID);
-                    Integer holdingsId = holdingsIds.get(0);
-                    matchingSerialAndMVMReports.setSummaryHoldings(holdingsMap.get(holdingsId));
-                    matchingSerialAndMVMReportsList.add(matchingSerialAndMVMReports);
+                    boolean isDeletedItem = (boolean) solrChildDocument.getFieldValue(RecapConstants.IS_DELETED_ITEM);
+                    String itemCatalogingStatus = String.valueOf(solrChildDocument.getFieldValue(RecapConstants.ITEM_CATALOGING_STATUS));
+                    if(!isDeletedItem && itemCatalogingStatus.equalsIgnoreCase(RecapConstants.COMPLETE_STATUS)) {
+                        MatchingSerialAndMVMReports matchingSerialAndMVMReports = new MatchingSerialAndMVMReports();
+                        matchingSerialAndMVMReports.setTitle(String.valueOf(solrDocument.getFieldValue(RecapConstants.TITLE_SUBFIELD_A)));
+                        matchingSerialAndMVMReports.setBibId(String.valueOf(solrDocument.getFieldValue(RecapConstants.BIB_ID)));
+                        matchingSerialAndMVMReports.setOwningInstitutionId(String.valueOf(solrDocument.getFieldValue(RecapConstants.BIB_OWNING_INSTITUTION)));
+                        matchingSerialAndMVMReports.setOwningInstitutionBibId(String.valueOf(solrDocument.getFieldValue(RecapConstants.OWNING_INST_BIB_ID)));
+                        matchingSerialAndMVMReports.setBarcode(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.BARCODE)));
+                        matchingSerialAndMVMReports.setVolumePartYear(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.VOLUME_PART_YEAR)));
+                        matchingSerialAndMVMReports.setUseRestriction(String.valueOf(solrChildDocument.getFieldValue(RecapConstants.USE_RESTRICTION_DISPLAY)));
+                        List<Integer> holdingsIds = (List<Integer>) solrChildDocument.getFieldValue(RecapConstants.HOLDINGS_ID);
+                        Integer holdingsId = holdingsIds.get(0);
+                        matchingSerialAndMVMReports.setSummaryHoldings(holdingsMap.get(holdingsId));
+                        matchingSerialAndMVMReportsList.add(matchingSerialAndMVMReports);
+                    }
                 }
             }
         }catch (Exception e) {
