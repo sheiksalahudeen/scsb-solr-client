@@ -151,40 +151,42 @@ public class MatchingAlgorithmUtil {
         Integer nyplMatchingCount = 0;
         List<Integer> matchingBibIds = new ArrayList<>();
 
-        for(MatchingBibEntity matchingBibEntity : matchingBibEntityList) {
-            if(!matchingBibIds.contains(matchingBibEntity.getId())) {
-                Map<Integer, MatchingBibEntity> matchingBibEntityMap = new HashMap<>();
-                String matchPointValue = "";
-                String query = "";
-                if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
-                    matchPointValue = matchingBibEntity.getOclc();
-                    if(StringUtils.isNotBlank(matchPointValue))
-                        query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_OCLC, Arrays.asList(matchPointValue.split(",")));
-                } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
-                    matchPointValue = matchingBibEntity.getIsbn();
-                    if(StringUtils.isNotBlank(matchPointValue))
-                        query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_ISBN, Arrays.asList(matchPointValue.split(",")));
-                } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
-                    matchPointValue = matchingBibEntity.getIssn();
-                    if(StringUtils.isNotBlank(matchPointValue))
-                        query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_ISSN, Arrays.asList(matchPointValue.split(",")));
-                } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
-                    matchPointValue = matchingBibEntity.getLccn();
-                    query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_LCCN, matchPointValue);
-                }
-                List<Integer> bibIds = getBibsFromSolr(query);
-                if(bibIds.size() > 1) {
-                    List<MatchingBibEntity> bibEntities = matchingBibDetailsRepository.findByMatchingAndBibIdIn(matchingBibEntity.getMatching(), bibIds);
-                    for(MatchingBibEntity bibEntity : bibEntities) {
-                        matchingBibEntityMap.put(bibEntity.getBibId(), bibEntity);
-                        if(!matchingBibEntity.getBibId().equals(bibEntity.getBibId()) && matchingBibEntityList.contains(bibEntity)) {
-                            matchingBibIds.add(bibEntity.getId());
-                        }
+        if(CollectionUtils.isNotEmpty(matchingBibEntityList)) {
+            for(MatchingBibEntity matchingBibEntity : matchingBibEntityList) {
+                if(!matchingBibIds.contains(matchingBibEntity.getId())) {
+                    Map<Integer, MatchingBibEntity> matchingBibEntityMap = new HashMap<>();
+                    String matchPointValue = "";
+                    String query = "";
+                    if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_OCLC)) {
+                        matchPointValue = matchingBibEntity.getOclc();
+                        if(StringUtils.isNotBlank(matchPointValue))
+                            query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_OCLC, Arrays.asList(matchPointValue.split(",")));
+                    } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISBN)) {
+                        matchPointValue = matchingBibEntity.getIsbn();
+                        if(StringUtils.isNotBlank(matchPointValue))
+                            query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_ISBN, Arrays.asList(matchPointValue.split(",")));
+                    } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_ISSN)) {
+                        matchPointValue = matchingBibEntity.getIssn();
+                        if(StringUtils.isNotBlank(matchPointValue))
+                            query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_ISSN, Arrays.asList(matchPointValue.split(",")));
+                    } else if(matchingBibEntity.getMatching().equalsIgnoreCase(RecapConstants.MATCH_POINT_FIELD_LCCN)) {
+                        matchPointValue = matchingBibEntity.getLccn();
+                        query = solrQueryBuilder.solrQueryForOngoingMatching(RecapConstants.MATCH_POINT_FIELD_LCCN, matchPointValue);
                     }
-                    Map<String, Integer> countsMap = saveReportForSingleMatch(matchPointValue, bibIds, matchingBibEntity.getMatching(), matchingBibEntityMap, true);
-                    pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
-                    culMatchingCount = culMatchingCount + countsMap.get("culMatchingCount");
-                    nyplMatchingCount = nyplMatchingCount + countsMap.get("nyplMatchingCount");
+                    List<Integer> bibIds = getBibsFromSolr(query);
+                    if(bibIds.size() > 1) {
+                        List<MatchingBibEntity> bibEntities = matchingBibDetailsRepository.findByMatchingAndBibIdIn(matchingBibEntity.getMatching(), bibIds);
+                        for(MatchingBibEntity bibEntity : bibEntities) {
+                            matchingBibEntityMap.put(bibEntity.getBibId(), bibEntity);
+                            if(!matchingBibEntity.getBibId().equals(bibEntity.getBibId()) && matchingBibEntityList.contains(bibEntity)) {
+                                matchingBibIds.add(bibEntity.getId());
+                            }
+                        }
+                        Map<String, Integer> countsMap = saveReportForSingleMatch(matchPointValue, bibIds, matchingBibEntity.getMatching(), matchingBibEntityMap, true);
+                        pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
+                        culMatchingCount = culMatchingCount + countsMap.get("culMatchingCount");
+                        nyplMatchingCount = nyplMatchingCount + countsMap.get("nyplMatchingCount");
+                    }
                 }
             }
         }

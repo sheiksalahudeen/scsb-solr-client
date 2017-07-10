@@ -578,7 +578,7 @@ public class MatchingAlgorithmHelperService {
         nyplMatchingCount = nyplMatchingCount + countsMap.get("nyplMatchingCount");
 
         for(int pageNum=1; pageNum < totalPages; pageNum++) {
-            matchingBibEntities = getMatchingBibDetailsRepository().findByStatus(new PageRequest(0, batchSize), RecapConstants.PENDING);
+            matchingBibEntities = getMatchingBibDetailsRepository().findByStatus(new PageRequest(pageNum, batchSize), RecapConstants.PENDING);
             matchingBibEntityList = matchingBibEntities.getContent();
             countsMap = getMatchingAlgorithmUtil().processPendingMatchingBibs(matchingBibEntityList);
             pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
