@@ -57,58 +57,58 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         reportsRequest.setOwningInstitutions(Arrays.asList("CUL", "PUL", "NYPL"));
         reportsRequest.setCollectionGroupDesignations(Arrays.asList("Private", "Open", "Shared"));
 
-        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, false);
+        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, false, "b1");
         indexBibHoldingItem(bibliographicEntity);
 
-        BibliographicEntity bibliographicEntity1 = saveBibHoldingItemEntity(2, 2, false);
+        BibliographicEntity bibliographicEntity1 = saveBibHoldingItemEntity(2, 2, false, "b2");
         indexBibHoldingItem(bibliographicEntity1);
 
-        BibliographicEntity bibliographicEntity2 = saveBibHoldingItemEntity(3, 2, false);
+        BibliographicEntity bibliographicEntity2 = saveBibHoldingItemEntity(3, 2, false, "b3");
         indexBibHoldingItem(bibliographicEntity2);
 
-        BibliographicEntity bibliographicEntity3 = saveBibHoldingItemEntity(1, 1, false);
+        BibliographicEntity bibliographicEntity3 = saveBibHoldingItemEntity(1, 1, false, "b4");
         indexBibHoldingItem(bibliographicEntity3);
 
-        BibliographicEntity bibliographicEntity4 = saveBibHoldingItemEntity(2, 1, false);
+        BibliographicEntity bibliographicEntity4 = saveBibHoldingItemEntity(2, 1, false, "b5");
         indexBibHoldingItem(bibliographicEntity4);
 
-        BibliographicEntity bibliographicEntity5 = saveBibHoldingItemEntity(3, 1, false);
+        BibliographicEntity bibliographicEntity5 = saveBibHoldingItemEntity(3, 1, false, "b6");
         indexBibHoldingItem(bibliographicEntity5);
 
-        BibliographicEntity bibliographicEntity6 = saveBibHoldingItemEntity(1, 3, false);
+        BibliographicEntity bibliographicEntity6 = saveBibHoldingItemEntity(1, 3, false, "b7");
         indexBibHoldingItem(bibliographicEntity6);
 
-        BibliographicEntity bibliographicEntity7 = saveBibHoldingItemEntity(2, 3, false);
+        BibliographicEntity bibliographicEntity7 = saveBibHoldingItemEntity(2, 3, false, "b8");
         indexBibHoldingItem(bibliographicEntity7);
 
-        BibliographicEntity bibliographicEntity8 = saveBibHoldingItemEntity(3, 3, false);
+        BibliographicEntity bibliographicEntity8 = saveBibHoldingItemEntity(3, 3, false, "b9");
         indexBibHoldingItem(bibliographicEntity8);
 
-        BibliographicEntity bibliographicEntity9 = saveBibHoldingItemEntity(1, 2, true);
+        BibliographicEntity bibliographicEntity9 = saveBibHoldingItemEntity(1, 2, true, "b10");
         indexBibHoldingItem(bibliographicEntity9);
 
-        BibliographicEntity bibliographicEntity10 = saveBibHoldingItemEntity(2, 2, true);
+        BibliographicEntity bibliographicEntity10 = saveBibHoldingItemEntity(2, 2, true, "b11");
         indexBibHoldingItem(bibliographicEntity10);
 
-        BibliographicEntity bibliographicEntity11 = saveBibHoldingItemEntity(3, 2, true);
+        BibliographicEntity bibliographicEntity11 = saveBibHoldingItemEntity(3, 2, true, "b12");
         indexBibHoldingItem(bibliographicEntity11);
 
-        BibliographicEntity bibliographicEntity12 = saveBibHoldingItemEntity(1, 1, true);
+        BibliographicEntity bibliographicEntity12 = saveBibHoldingItemEntity(1, 1, true, "b13");
         indexBibHoldingItem(bibliographicEntity12);
 
-        BibliographicEntity bibliographicEntity13 = saveBibHoldingItemEntity(2, 1, true);
+        BibliographicEntity bibliographicEntity13 = saveBibHoldingItemEntity(2, 1, true, "b14");
         indexBibHoldingItem(bibliographicEntity13);
 
-        BibliographicEntity bibliographicEntity14 = saveBibHoldingItemEntity(3, 1, true);
+        BibliographicEntity bibliographicEntity14 = saveBibHoldingItemEntity(3, 1, true, "b15");
         indexBibHoldingItem(bibliographicEntity14);
 
-        BibliographicEntity bibliographicEntity15 = saveBibHoldingItemEntity(1, 3, true);
+        BibliographicEntity bibliographicEntity15 = saveBibHoldingItemEntity(1, 3, true, "b16");
         indexBibHoldingItem(bibliographicEntity15);
 
-        BibliographicEntity bibliographicEntity16 = saveBibHoldingItemEntity(2, 3, true);
+        BibliographicEntity bibliographicEntity16 = saveBibHoldingItemEntity(2, 3, true, "b17");
         indexBibHoldingItem(bibliographicEntity16);
 
-        BibliographicEntity bibliographicEntity17 = saveBibHoldingItemEntity(3, 3, true);
+        BibliographicEntity bibliographicEntity17 = saveBibHoldingItemEntity(3, 3, true, "b18");
         indexBibHoldingItem(bibliographicEntity17);
         Mockito.when(reportsServiceUtil.populateAccessionDeaccessionItemCounts(reportsRequest)).thenReturn(getReportResponseForPopulateAccessionDeaccessionItemCounts());
         ReportsResponse reportsResponse = reportsServiceUtil.populateAccessionDeaccessionItemCounts(reportsRequest);
@@ -139,31 +139,31 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         reportsRequest.setOwningInstitutions(Arrays.asList("CUL", "PUL", "NYPL"));
         reportsRequest.setCollectionGroupDesignations(Arrays.asList("Private", "Open", "Shared"));
 
-        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, false);
+        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, false, "b19");
         indexBibHoldingItem(bibliographicEntity);
 
-        BibliographicEntity bibliographicEntity1 = saveBibHoldingItemEntity(2, 2, false);
+        BibliographicEntity bibliographicEntity1 = saveBibHoldingItemEntity(2, 2, false, "b20");
         indexBibHoldingItem(bibliographicEntity1);
 
-        BibliographicEntity bibliographicEntity2 = saveBibHoldingItemEntity(3, 2, false);
+        BibliographicEntity bibliographicEntity2 = saveBibHoldingItemEntity(3, 2, false, "b21");
         indexBibHoldingItem(bibliographicEntity2);
 
-        BibliographicEntity bibliographicEntity3 = saveBibHoldingItemEntity(1, 1, false);
+        BibliographicEntity bibliographicEntity3 = saveBibHoldingItemEntity(1, 1, false, "b22");
         indexBibHoldingItem(bibliographicEntity3);
 
-        BibliographicEntity bibliographicEntity4 = saveBibHoldingItemEntity(2, 1, false);
+        BibliographicEntity bibliographicEntity4 = saveBibHoldingItemEntity(2, 1, false, "b23");
         indexBibHoldingItem(bibliographicEntity4);
 
-        BibliographicEntity bibliographicEntity5 = saveBibHoldingItemEntity(3, 1, false);
+        BibliographicEntity bibliographicEntity5 = saveBibHoldingItemEntity(3, 1, false, "b24");
         indexBibHoldingItem(bibliographicEntity5);
 
-        BibliographicEntity bibliographicEntity6 = saveBibHoldingItemEntity(1, 3, false);
+        BibliographicEntity bibliographicEntity6 = saveBibHoldingItemEntity(1, 3, false, "b25");
         indexBibHoldingItem(bibliographicEntity6);
 
-        BibliographicEntity bibliographicEntity7 = saveBibHoldingItemEntity(2, 3, false);
+        BibliographicEntity bibliographicEntity7 = saveBibHoldingItemEntity(2, 3, false, "b26");
         indexBibHoldingItem(bibliographicEntity7);
 
-        BibliographicEntity bibliographicEntity8 = saveBibHoldingItemEntity(3, 3, false);
+        BibliographicEntity bibliographicEntity8 = saveBibHoldingItemEntity(3, 3, false, "b27");
         indexBibHoldingItem(bibliographicEntity8);
         Mockito.when(reportsServiceUtil.populateCgdItemCounts(reportsRequest)).thenReturn(getReportsResponseForPopulateCGDItemCounts());
         ReportsResponse reportsResponse = reportsServiceUtil.populateCgdItemCounts(reportsRequest);
@@ -239,7 +239,7 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         reportsRequest.setAccessionDeaccessionToDate(simpleDateFormat.format(new Date()));
         reportsRequest.setDeaccessionOwningInstitution("PUL");
 
-        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, true);
+        BibliographicEntity bibliographicEntity = saveBibHoldingItemEntity(1, 2, true, "b1");
         indexBibHoldingItem(bibliographicEntity);
 
         ReportsResponse reportsResponse1 = new ReportsResponse();
@@ -256,7 +256,7 @@ public class ReportsServiceUtilUT extends BaseTestCase {
         assertTrue(deaccessionItemResultsRows.size() > 0);
     }
 
-    private BibliographicEntity saveBibHoldingItemEntity(Integer owningInstitutionId, Integer collectionGroupId, boolean isDeleted) throws Exception {
+    private BibliographicEntity saveBibHoldingItemEntity(Integer owningInstitutionId, Integer collectionGroupId, boolean isDeleted, String barcode) throws Exception {
         Random random = new Random();
 
         File bibContentFile = getBibContentFile();
@@ -286,7 +286,7 @@ public class ReportsServiceUtilUT extends BaseTestCase {
 
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setItemId(new Random().nextInt());
-        itemEntity.setBarcode("b3");
+        itemEntity.setBarcode(barcode);
         itemEntity.setCustomerCode("c1");
         itemEntity.setCallNumber("cn1");
         itemEntity.setCallNumberType("ct1");

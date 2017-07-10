@@ -75,7 +75,7 @@ public class BibliographicDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setBarcode("1231");
+        itemEntity.setBarcode("12310");
         itemEntity.setOwningInstitutionItemId(".i1231");
         itemEntity.setOwningInstitutionId(1);
         itemEntity.setCollectionGroupId(1);

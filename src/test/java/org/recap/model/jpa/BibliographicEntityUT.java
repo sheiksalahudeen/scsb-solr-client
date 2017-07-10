@@ -302,7 +302,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode("4123");
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
@@ -354,7 +354,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity1.setItemAvailabilityStatusId(1);
         itemEntity1.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity1.setOwningInstitutionId(1);
-        itemEntity1.setBarcode("123");
+        itemEntity1.setBarcode("123000");
         itemEntity1.setCallNumber("x.12321");
         itemEntity1.setCollectionGroupId(1);
         itemEntity1.setCallNumberType("1");
@@ -369,7 +369,7 @@ public class BibliographicEntityUT extends BaseTestCase {
         itemEntity2.setItemAvailabilityStatusId(1);
         itemEntity2.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity2.setOwningInstitutionId(1);
-        itemEntity2.setBarcode("123");
+        itemEntity2.setBarcode("788123");
         itemEntity2.setCallNumber("x.12321");
         itemEntity2.setCollectionGroupId(1);
         itemEntity2.setCallNumberType("1");
