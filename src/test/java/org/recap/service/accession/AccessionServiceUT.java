@@ -14,16 +14,20 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
+import org.recap.converter.MarcToBibEntityConverter;
+import org.recap.converter.SCSBToBibEntityConverter;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
 import org.recap.model.jpa.AccessionEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.*;
 import org.recap.service.authorization.NyplOauthTokenApiService;
+import org.recap.service.partnerservice.ColumbiaService;
+import org.recap.service.partnerservice.NYPLService;
+import org.recap.service.partnerservice.PrincetonService;
+import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +71,33 @@ public class AccessionServiceUT extends BaseTestCase {
     @Mock
     BibliographicDetailsRepository mockedBibliographicDetailsRepository;
 
+    @Mock
+    InstitutionDetailsRepository mockedInstitutionDetailsRepository;
+
+    @Mock
+    private MarcToBibEntityConverter marcToBibEntityConverter;
+
+    @Mock
+    private SCSBToBibEntityConverter scsbToBibEntityConverter;
+
+    @Mock
+    private ReportDetailRepository reportDetailRepository;
+
+    @Mock
+    private PrincetonService princetonService;
+
+    @Mock
+    private ColumbiaService columbiaService;
+
+    @Mock
+    private NYPLService nyplService;
+
+    @Mock
+    private SolrIndexService solrIndexService;
+
+    @Mock
+    private AccessionDetailsRepository accessionDetailsRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -74,7 +105,14 @@ public class AccessionServiceUT extends BaseTestCase {
     CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
     @Mock
+    CustomerCodeDetailsRepository mockedCustomerCodeDetailsRepository;
+
+
+    @Mock
     ItemDetailsRepository mockedItemDetailsRepository;
+
+    @Mock
+    MarcUtil marcUtil;
 
     @Test
     public void processForPUL() throws Exception {
@@ -99,6 +137,36 @@ public class AccessionServiceUT extends BaseTestCase {
         List<ItemEntity> itemEntityList = fetchedBibliographicEntityList.get(0).getItemEntities();
         assertEquals("32101062128309",itemEntityList.get(0).getBarcode());
 
+    }
+
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(mockAccessionService.getMarcUtil()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getMarcToBibEntityConverter()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getScsbToBibEntityConverter()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getReportDetailRepository()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getSolrIndexService()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getCustomerCodeDetailsRepository()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getBibliographicDetailsRepository()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getInstitutionDetailsRepository()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getPrincetonService()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getColumbiaService()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getNyplService()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getEntityManager()).thenCallRealMethod();
+        Mockito.when(mockAccessionService.getAccessionDetailsRepository()).thenCallRealMethod();
+        assertNotEquals(marcUtil,mockAccessionService.getMarcUtil());
+        assertNotEquals(marcToBibEntityConverter,mockAccessionService.getMarcToBibEntityConverter());
+        assertNotEquals(scsbToBibEntityConverter,mockAccessionService.getScsbToBibEntityConverter());
+        assertNotEquals(reportDetailRepository,mockAccessionService.getReportDetailRepository());
+        assertNotEquals(solrIndexService,mockAccessionService.getSolrIndexService());
+        assertNotEquals(mockedCustomerCodeDetailsRepository,mockAccessionService.getCustomerCodeDetailsRepository());
+        assertNotEquals(mockedBibliographicDetailsRepository,mockAccessionService.getBibliographicDetailsRepository());
+        assertNotEquals(mockedInstitutionDetailsRepository,mockAccessionService.getInstitutionDetailsRepository());
+        assertNotEquals(princetonService,mockAccessionService.getPrincetonService());
+        assertNotEquals(columbiaService,mockAccessionService.getColumbiaService());
+        assertNotEquals(nyplService,mockAccessionService.getNyplService());
+        assertNotEquals(entityManager,mockAccessionService.getEntityManager());
+        assertNotEquals(accessionDetailsRepository,mockAccessionService.getAccessionDetailsRepository());
     }
 
     @Ignore

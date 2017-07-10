@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by akulak on 30/5/17.
@@ -28,6 +29,10 @@ public class FTPSubmitCollectionReportGeneratorUT extends BaseTestCase{
     @InjectMocks
     @Spy
     FTPSubmitCollectionReportGenerator ftpSubmitCollectionReportGenerator;
+
+    @InjectMocks
+    @Spy
+    FTPSubmitCollectionSummaryReportGenerator ftpSubmitCollectionSummaryReportGenerator;
 
     @Mock
     private ReportDetailRepository reportDetailRepository;
@@ -41,17 +46,32 @@ public class FTPSubmitCollectionReportGeneratorUT extends BaseTestCase{
     @Test
     public void testGenerateReport() throws Exception{
         camelContext.getEndpoint(RecapConstants.FTP_SUBMIT_COLLECTION_REPORT_Q, MockEndpoint.class);
-        String response = ftpSubmitCollectionReportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION,saveSubmitCollectionExceptionReport());
+        boolean isInterested = ftpSubmitCollectionReportGenerator.isInterested(RecapConstants.SUBMIT_COLLECTION);
+        assertTrue(isInterested);
+        boolean isTransmitted = ftpSubmitCollectionReportGenerator.isTransmitted(RecapConstants.FTP);
+        assertTrue(isTransmitted);
+        String response = ftpSubmitCollectionReportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION,saveSubmitCollectionExceptionReport(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT));
         assertNotNull(response);
         assertEquals("Success",response);
     }
 
-    private List<ReportEntity> saveSubmitCollectionExceptionReport(){
+    @Test
+    public void testSubmitCollectionSummaryReportGenerator() throws Exception{
+        camelContext.getEndpoint(RecapConstants.FTP_SUBMIT_COLLECTION_REPORT_Q, MockEndpoint.class);
+        boolean isInterested = ftpSubmitCollectionSummaryReportGenerator.isInterested(RecapConstants.SUBMIT_COLLECTION_SUMMARY);
+        assertTrue(isInterested);
+        boolean isTransmitted = ftpSubmitCollectionSummaryReportGenerator.isTransmitted(RecapConstants.FTP);
+        assertTrue(isTransmitted);
+        String response = ftpSubmitCollectionSummaryReportGenerator.generateReport(RecapConstants.SUBMIT_COLLECTION,saveSubmitCollectionExceptionReport(RecapConstants.SUBMIT_COLLECTION_SUMMARY));
+        assertNotNull(response);
+    }
+
+    private List<ReportEntity> saveSubmitCollectionExceptionReport(String reportType){
         List<ReportEntity> reportEntityList = new ArrayList<>();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(RecapConstants.SUBMIT_COLLECTION_REPORT);
-        reportEntity.setType(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT);
+        reportEntity.setType(reportType);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setInstitutionName("PUL");
 

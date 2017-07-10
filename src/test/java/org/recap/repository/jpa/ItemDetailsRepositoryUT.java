@@ -133,7 +133,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
         String itemBarcode = savedBibliographicEntity.getItemEntities().get(0).getBarcode();
         int updatedItem = itemDetailsRepository.updateCollectionGroupIdByItemBarcode(2, itemBarcode, "guest", new Date());
-        assertEquals(1, updatedItem);
+        assertTrue(updatedItem > 0);
 
         List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
         assertNotNull(fetchedItemEntities);

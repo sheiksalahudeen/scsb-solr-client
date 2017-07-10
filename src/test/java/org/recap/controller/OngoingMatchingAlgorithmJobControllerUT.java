@@ -100,4 +100,16 @@ public class OngoingMatchingAlgorithmJobControllerUT extends BaseControllerUT{
         assertNotEquals(matchingBibInfoDetailService, ongoingMatchingAlgoJobController.getMatchingBibInfoDetailService());
     }
 
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(ongoingMatchingAlgoJobController.getMatchingBibInfoDetailService()).thenCallRealMethod();
+        Mockito.when(ongoingMatchingAlgoJobController.getOngoingMatchingAlgorithmUtil()).thenCallRealMethod();
+        Mockito.when(ongoingMatchingAlgoJobController.getBatchSize()).thenCallRealMethod();
+        Mockito.when(ongoingMatchingAlgoJobController.getDateUtil()).thenCallRealMethod();
+        assertNotEquals(matchingBibInfoDetailService,ongoingMatchingAlgoJobController.getMatchingBibInfoDetailService());
+        assertNotEquals(ongoingMatchingAlgorithmUtil,ongoingMatchingAlgoJobController.getOngoingMatchingAlgorithmUtil());
+        assertNotEquals(batchSize,ongoingMatchingAlgoJobController.getBatchSize());
+        assertNotEquals(dateUtil,ongoingMatchingAlgoJobController.getDateUtil());
+    }
+
 }

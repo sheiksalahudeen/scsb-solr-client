@@ -68,6 +68,42 @@ public class MatchingAlgorithmUpdateCGDService {
         return reportDataDetailsRepository;
     }
 
+    public MatchingAlgorithmUtil getMatchingAlgorithmUtil() {
+        return matchingAlgorithmUtil;
+    }
+
+    public BibliographicDetailsRepository getBibliographicDetailsRepository() {
+        return bibliographicDetailsRepository;
+    }
+
+    public ProducerTemplate getProducerTemplate() {
+        return producerTemplate;
+    }
+
+    public CollectionGroupDetailsRepository getCollectionGroupDetailsRepository() {
+        return collectionGroupDetailsRepository;
+    }
+
+    public InstitutionDetailsRepository getInstitutionDetailsRepository() {
+        return institutionDetailsRepository;
+    }
+
+    public ItemChangeLogDetailsRepository getItemChangeLogDetailsRepository() {
+        return itemChangeLogDetailsRepository;
+    }
+
+    public ItemDetailsRepository getItemDetailsRepository() {
+        return itemDetailsRepository;
+    }
+
+    public JmxHelper getJmxHelper() {
+        return jmxHelper;
+    }
+
+    public static Logger getLogger() {
+        return logger;
+    }
+
     private ExecutorService executorService;
     private Map collectionGroupMap;
     private Map institutionMap;
@@ -80,15 +116,14 @@ public class MatchingAlgorithmUpdateCGDService {
      * @throws SolrServerException the solr server exception
      */
     public void updateCGDProcessForMonographs(Integer batchSize) throws IOException, SolrServerException {
-        logger.info("Start CGD Process For Monographs.");
+        getLogger().info("Start CGD Process For Monographs.");
 
-        matchingAlgorithmUtil.populateMatchingCounter();
-
+        getMatchingAlgorithmUtil().populateMatchingCounter();
         ExecutorService executor = getExecutorService(50);
 
         processCallablesForMonographs(batchSize, executor, false);
 
-        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
+        DestinationViewMBean updateItemsQ = getJmxHelper().getBeanForQueueName("updateItemsQ");
 
         if(updateItemsQ != null) {
             while (updateItemsQ.getQueueSize() != 0) {
@@ -98,7 +133,7 @@ public class MatchingAlgorithmUpdateCGDService {
 
         processCallablesForMonographs(batchSize, executor, true);
 
-        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MONOGRAPH);
+        getMatchingAlgorithmUtil().saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MONOGRAPH);
 
         logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
         logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
@@ -116,16 +151,16 @@ public class MatchingAlgorithmUpdateCGDService {
         List<Callable<Integer>> callables = new ArrayList<>();
         long countOfRecordNum;
         if(isPendingMatch) {
-            countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingPendingMonograph(RecapConstants.BIB_ID);
+            countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingPendingMonograph(RecapConstants.BIB_ID);
         } else {
-            countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
+            countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingMonograph(RecapConstants.BIB_ID);
         }
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
-            Callable callable = new MatchingAlgorithmMonographCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate,
-                    getCollectionGroupMap(), getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository, isPendingMatch);
+            Callable callable = new MatchingAlgorithmMonographCGDCallable(getReportDataDetailsRepository(), getBibliographicDetailsRepository(), pageNum, batchSize, getProducerTemplate(),
+                    getCollectionGroupMap(), getInstitutionEntityMap(), getItemChangeLogDetailsRepository(), getCollectionGroupDetailsRepository(), getItemDetailsRepository(),isPendingMatch);
             callables.add(callable);
         }
         Map<String, List<Integer>> unProcessedRecordNumberMap = executeCallables(executor, callables);
@@ -133,9 +168,9 @@ public class MatchingAlgorithmUpdateCGDService {
         List<Integer> nonMonographRecordNums = unProcessedRecordNumberMap.get(RecapConstants.NON_MONOGRAPH_RECORD_NUMS);
         List<Integer> exceptionRecordNums = unProcessedRecordNumberMap.get(RecapConstants.EXCEPTION_RECORD_NUMS);
 
-        matchingAlgorithmUtil.updateMonographicSetRecords(nonMonographRecordNums, batchSize);
+        getMatchingAlgorithmUtil().updateMonographicSetRecords(nonMonographRecordNums, batchSize);
 
-        matchingAlgorithmUtil.updateExceptionRecords(exceptionRecordNums, batchSize);
+        getMatchingAlgorithmUtil().updateExceptionRecords(exceptionRecordNums, batchSize);
     }
 
     /**
@@ -148,30 +183,29 @@ public class MatchingAlgorithmUpdateCGDService {
     public void updateCGDProcessForSerials(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start CGD Process For Serials.");
 
-        matchingAlgorithmUtil.populateMatchingCounter();
+        getMatchingAlgorithmUtil().populateMatchingCounter();
 
         ExecutorService executor = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
-        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingSerials(RecapConstants.BIB_ID);
+        long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingSerials(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum=0; pageNum < totalPagesCount + 1; pageNum++) {
-            Callable callable = new MatchingAlgorithmSerialsCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate, getCollectionGroupMap(),
-                    getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
+            Callable callable = new MatchingAlgorithmSerialsCGDCallable(getReportDataDetailsRepository(), getBibliographicDetailsRepository(), pageNum, batchSize, getProducerTemplate(), getCollectionGroupMap(),
+                    getInstitutionEntityMap(), getItemChangeLogDetailsRepository(), getCollectionGroupDetailsRepository(), getItemDetailsRepository());
             callables.add(callable);
         }
         getFutures(executor, callables);
 
-        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_SERIAL);
+        getMatchingAlgorithmUtil().saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_SERIAL);
 
         logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
         logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
         logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
 
-        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
-
-        if(updateItemsQ != null) {
+        DestinationViewMBean updateItemsQ = getJmxHelper().getBeanForQueueName("updateItemsQ");
+        if(updateItemsQ != null){
             while (updateItemsQ.getQueueSize() != 0) {
                 //Waiting for the updateItemQ messages finish processing
             }
@@ -190,28 +224,28 @@ public class MatchingAlgorithmUpdateCGDService {
     public void updateCGDProcessForMVMs(Integer batchSize) throws IOException, SolrServerException {
         logger.info("Start CGD Process For MVMs.");
 
-        matchingAlgorithmUtil.populateMatchingCounter();
+        getMatchingAlgorithmUtil().populateMatchingCounter();
 
         ExecutorService executor = getExecutorService(50);
         List<Callable<Integer>> callables = new ArrayList<>();
-        long countOfRecordNum = reportDataDetailsRepository.getCountOfRecordNumForMatchingMVMs(RecapConstants.BIB_ID);
+        long countOfRecordNum = getReportDataDetailsRepository().getCountOfRecordNumForMatchingMVMs(RecapConstants.BIB_ID);
         logger.info("Total Records : {}", countOfRecordNum);
         int totalPagesCount = (int) (countOfRecordNum / batchSize);
         logger.info("Total Pages : {}" , totalPagesCount);
         for(int pageNum=0; pageNum < totalPagesCount + 1; pageNum++) {
-            Callable callable = new MatchingAlgorithmMVMsCGDCallable(reportDataDetailsRepository, bibliographicDetailsRepository, pageNum, batchSize, producerTemplate, getCollectionGroupMap(),
-                    getInstitutionEntityMap(), itemChangeLogDetailsRepository, collectionGroupDetailsRepository, itemDetailsRepository);
+            Callable callable = new MatchingAlgorithmMVMsCGDCallable(getReportDataDetailsRepository(), getBibliographicDetailsRepository(), pageNum, batchSize, getProducerTemplate(), getCollectionGroupMap(),
+                    getInstitutionEntityMap(), getItemChangeLogDetailsRepository(), getCollectionGroupDetailsRepository(), getItemDetailsRepository());
             callables.add(callable);
         }
         getFutures(executor, callables);
 
-        matchingAlgorithmUtil.saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MVM);
+        getMatchingAlgorithmUtil().saveCGDUpdatedSummaryReport(RecapConstants.MATCHING_SUMMARY_MVM);
 
         logger.info("PUL Final Counter Value:{} " , MatchingCounter.getPulSharedCount());
         logger.info("CUL Final Counter Value: {}" , MatchingCounter.getCulSharedCount());
         logger.info("NYPL Final Counter Value: {}" , MatchingCounter.getNyplSharedCount());
 
-        DestinationViewMBean updateItemsQ = jmxHelper.getBeanForQueueName("updateItemsQ");
+        DestinationViewMBean updateItemsQ = getJmxHelper().getBeanForQueueName("updateItemsQ");
 
         if(updateItemsQ != null) {
             while (updateItemsQ.getQueueSize() != 0) {
@@ -308,7 +342,7 @@ public class MatchingAlgorithmUpdateCGDService {
             bibIds.addAll(bibIdList.stream().map(Integer::parseInt).collect(Collectors.toList()));
         }
         logger.info("Bibs count in Page {} : {} " ,pageNum,bibIds.size());
-        List<BibliographicEntity> bibliographicEntities = bibliographicDetailsRepository.findByBibliographicIdIn(bibIds);
+        List<BibliographicEntity> bibliographicEntities = getBibliographicDetailsRepository().findByBibliographicIdIn(bibIds);
         for(BibliographicEntity bibliographicEntity : bibliographicEntities) {
             for(ItemEntity itemEntity : bibliographicEntity.getItemEntities()) {
                 if(itemEntity.getCollectionGroupId().equals(getCollectionGroupMap().get(RecapConstants.SHARED_CGD))) {
@@ -326,7 +360,7 @@ public class MatchingAlgorithmUpdateCGDService {
     public Map getCollectionGroupMap() {
         if (null == collectionGroupMap) {
             collectionGroupMap = new HashMap();
-            Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
+            Iterable<CollectionGroupEntity> collectionGroupEntities = getCollectionGroupDetailsRepository().findAll();
             for (Iterator<CollectionGroupEntity> iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
                 CollectionGroupEntity collectionGroupEntity = iterator.next();
                 collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
@@ -343,7 +377,7 @@ public class MatchingAlgorithmUpdateCGDService {
     public Map getInstitutionEntityMap() {
         if (null == institutionMap) {
             institutionMap = new HashMap();
-            Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
+            Iterable<InstitutionEntity> institutionEntities = getInstitutionDetailsRepository().findAll();
             for (Iterator<InstitutionEntity> iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
                 InstitutionEntity institutionEntity = iterator.next();
                 institutionMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getInstitutionId());

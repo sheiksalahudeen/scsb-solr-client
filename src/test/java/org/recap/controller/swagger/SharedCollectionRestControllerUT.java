@@ -14,13 +14,17 @@ import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
+import org.recap.model.accession.BatchAccessionResponse;
+import org.recap.model.jpa.AccessionEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.AccessionDetailsRepository;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.main.BibSolrCrudRepository;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
+import org.recap.service.accession.BulkAccessionService;
 import org.recap.service.accession.SolrIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,6 +68,12 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
 
     @Mock
     private ItemAvailabilityService itemAvailabilityService;
+
+    @Mock
+    private BulkAccessionService bulkAccessionService;
+
+    @Mock
+    private AccessionDetailsRepository accessionDetailsRepository;
 
     @Before
     public void setup()throws Exception{
@@ -122,6 +132,30 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
         assertNotNull(responseEntity);
         assertEquals(responseEntity.getBody(),accessionResponseList);
+    }
+
+    @Test
+    public void testOngoingAccessionJob(){
+        AccessionEntity accessionEntity = new AccessionEntity();
+        accessionEntity.setCreatedDate(new Date());
+        accessionEntity.setAccessionStatus("Complete");
+        accessionEntity.setAccessionRequest("Test");
+        accessionEntity.setAccessionId(1);
+        AccessionRequest accessionRequest = new AccessionRequest();
+        List<AccessionRequest> accessionRequestList = new ArrayList<>();
+        accessionRequestList.add(accessionRequest);
+        BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
+        batchAccessionResponse.setSuccessRecords(1);
+        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService()).thenReturn(bulkAccessionService);
+        Mockito.when(accessionService.getAccessionDetailsRepository()).thenReturn(accessionDetailsRepository);
+        Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
+        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().getAccessionEntities(RecapConstants.PENDING)).thenReturn(Arrays.asList(accessionEntity));
+        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().getAccessionRequest(Mockito.any())).thenReturn(accessionRequestList);
+        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().processAccessionRequest(accessionRequestList)).thenReturn(batchAccessionResponse);
+        Mockito.when(mockedSharedCollectionRestController.ongoingAccessionJob()).thenCallRealMethod();
+        String response = mockedSharedCollectionRestController.ongoingAccessionJob();
+        assertNotNull(response);
+        assertEquals(response,"Success");
     }
 
     private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {

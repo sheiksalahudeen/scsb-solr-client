@@ -242,8 +242,11 @@ public class MatchingCounter {
      */
     public static void reset() {
         pulSharedCount = 0;
+        pulOpenCount = 0;
         culSharedCount = 0;
+        culOpenCount = 0;
         nyplSharedCount = 0;
+        nyplOpenCount = 0;
         pulCGDUpdatedSharedCount = 0;
         culCGDUpdatedSharedCount = 0;
         nyplCGDUpdatedSharedCount = 0;

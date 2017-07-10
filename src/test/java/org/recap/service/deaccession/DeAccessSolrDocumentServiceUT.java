@@ -145,6 +145,21 @@ public class DeAccessSolrDocumentServiceUT extends BaseTestCase{
 
     }
 
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(deAccessSolrDocumentService.getBibJSONUtil()).thenCallRealMethod();
+        Mockito.when(deAccessSolrDocumentService.getBibliographicDetailsRepository()).thenCallRealMethod();
+        Mockito.when(deAccessSolrDocumentService.getHoldingDetailRepository()).thenCallRealMethod();
+        Mockito.when(deAccessSolrDocumentService.getItemDetailsRepository()).thenCallRealMethod();
+        Mockito.when(deAccessSolrDocumentService.getSolrTemplate()).thenCallRealMethod();
+        assertNotEquals(bibJSONUtil,deAccessSolrDocumentService.getBibJSONUtil());
+        assertNotEquals(bibliographicDetailsRepository,deAccessSolrDocumentService.getBibliographicDetailsRepository());
+        assertNotEquals(holdingDetailRepository,deAccessSolrDocumentService.getHoldingDetailRepository());
+        assertNotEquals(itemDetailsRepository,deAccessSolrDocumentService.getItemDetailsRepository());
+        assertNotEquals(solrTemplate,deAccessSolrDocumentService.getSolrTemplate());
+    }
+
+
     private BibliographicEntity getBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {
         Random random = new Random();
         File bibContentFile = getBibContentFile();

@@ -44,6 +44,8 @@ public class ItemControllerUT extends BaseTestCase{
         Mockito.when(mockedItemController.findByBarcodeIn("[3325656544854,334545888458]")).thenCallRealMethod();
         List<ItemEntity> itemEntityList = mockedItemController.findByBarcodeIn("[3325656544854,334545888458]");
         assertNotNull(itemEntityList);
+        Mockito.when(mockedItemController.getItemDetailsRepository()).thenCallRealMethod();
+        assertNotEquals(itemDetailsRepository,mockedItemController.getItemDetailsRepository());
     }
 
 }

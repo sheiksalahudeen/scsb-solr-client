@@ -69,6 +69,14 @@ public class UpdateItemStatusControllerUT extends BaseTestCase{
         assertEquals(status,"Solr Indexing Successful");
     }
 
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(updateItemStatusController.getItemDetailsRepository()).thenCallRealMethod();
+        Mockito.when(updateItemStatusController.getUpdateCgdUtil()).thenCallRealMethod();
+        assertNotEquals(itemDetailsRepository,updateItemStatusController.getItemDetailsRepository());
+        assertNotEquals(updateCgdUtil,updateItemStatusController.getUpdateCgdUtil());
+    }
+
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
