@@ -144,28 +144,20 @@ public class AccessionService {
         return princetonService;
     }
 
-    public void setPrincetonService(PrincetonService princetonService) {
-        this.princetonService = princetonService;
-    }
-
     public ColumbiaService getColumbiaService() {
         return columbiaService;
-    }
-
-    public void setColumbiaService(ColumbiaService columbiaService) {
-        this.columbiaService = columbiaService;
     }
 
     public NYPLService getNyplService() {
         return nyplService;
     }
-
-    public void setNyplService(NYPLService nyplService) {
-        this.nyplService = nyplService;
-    }
-
+    
     public EntityManager getEntityManager() {
         return entityManager;
+    }
+
+    public AccessionDetailsRepository getAccessionDetailsRepository() {
+        return accessionDetailsRepository;
     }
 
     /**
@@ -247,7 +239,7 @@ public class AccessionService {
         for (AccessionEntity accessionEntity : accessionEntities) {
             accessionEntity.setAccessionStatus(status);
         }
-        accessionDetailsRepository.save(accessionEntities);
+        getAccessionDetailsRepository().save(accessionEntities);
     }
 
     /**

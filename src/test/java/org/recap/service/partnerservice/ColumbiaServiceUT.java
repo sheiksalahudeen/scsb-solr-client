@@ -6,6 +6,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.util.MarcUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -17,11 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by premkb on 14/3/17.
  */
 public class ColumbiaServiceUT extends BaseTestCase{
+
+    private static final Logger logger = LoggerFactory.getLogger(ColumbiaServiceUT.class);
 
     @Mock
     private ColumbiaService columbiaService;
@@ -170,5 +175,14 @@ public class ColumbiaServiceUT extends BaseTestCase{
         assertNotNull(bibDataResponse);
         List<Record> records = marcUtil.readMarcXml(bibDataResponse);
         assertNotNull(records);
+    }
+
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(columbiaService.getIlsColumbiaBibData()).thenCallRealMethod();
+        Mockito.when(columbiaService.getRestTemplate()).thenCallRealMethod();
+        assertNotEquals(ilsColumbiaBibData,columbiaService.getIlsColumbiaBibData());
+        assertNotEquals(restTemplate,columbiaService.getRestTemplate());
+        assertNotEquals(logger,columbiaService.getLogger());
     }
 }

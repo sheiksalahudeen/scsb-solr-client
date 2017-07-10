@@ -64,6 +64,9 @@ public class MatchingAlgorithmUtil {
 
     private String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
+    public ReportDetailRepository getReportDetailRepository() {
+        return reportDetailRepository;
+    }
 
     /**
      * This method populates and save the reports for single match bibs.
@@ -878,7 +881,7 @@ public class MatchingAlgorithmUtil {
         getReportDataEntity("CULOpenCount", String.valueOf(MatchingCounter.getCulCGDUpdatedOpenCount()), reportDataEntities);
         getReportDataEntity("NYPLOpenCount", String.valueOf(MatchingCounter.getNyplCGDUpdatedOpenCount()), reportDataEntities);
         reportEntity.addAll(reportDataEntities);
-        reportDetailRepository.save(reportEntity);
+        getReportDetailRepository().save(reportEntity);
     }
 
     /**

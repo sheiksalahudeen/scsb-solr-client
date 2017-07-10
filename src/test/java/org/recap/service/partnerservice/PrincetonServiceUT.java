@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by premkb on 18/12/16.
  */
 public class PrincetonServiceUT extends BaseTestCase{
 
-    private static final Logger logger = LoggerFactory.getLogger(PrincetonService.class);
+    private static final Logger logger = LoggerFactory.getLogger(PrincetonServiceUT.class);
 
     @Mock
     private PrincetonService princetonService;
@@ -175,4 +176,15 @@ public class PrincetonServiceUT extends BaseTestCase{
         List<Record> records = marcUtil.readMarcXml(bibDataResponse);
         assertNotNull(records);
     }
+
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(princetonService.getIlsprincetonBibData()).thenCallRealMethod();
+        Mockito.when(princetonService.getRestTemplate()).thenCallRealMethod();
+        assertNotEquals(princetonService,princetonService.getIlsprincetonBibData());
+        assertNotEquals(restTemplate,princetonService.getRestTemplate());
+        assertNotEquals(logger,princetonService.getLogger());
+    }
+
+
 }

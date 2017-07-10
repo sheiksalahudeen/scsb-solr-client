@@ -31,7 +31,7 @@ public class AccessionReportGeneratorUT extends BaseTestCase{
 
     @Test
     public void testAccessionSummaryReportForFileSystem() throws Exception{
-        List<ReportEntity> reportEntityList = saveSummaryReportEntity();
+        List<ReportEntity> reportEntityList = saveSummaryReportEntity(RecapConstants.ACCESSION_SUMMARY_REPORT);
         Date createdDate = reportEntityList.get(0).getCreatedDate();
         String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
@@ -40,20 +40,38 @@ public class AccessionReportGeneratorUT extends BaseTestCase{
 
     @Test
     public void testAccessionSummaryReportForFTP() throws Exception{
-        List<ReportEntity> reportEntityList = saveSummaryReportEntity();
+        List<ReportEntity> reportEntityList = saveSummaryReportEntity(RecapConstants.ACCESSION_SUMMARY_REPORT);
         Date createdDate = reportEntityList.get(0).getCreatedDate();
         String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ACCESSION_SUMMARY_REPORT, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
         Thread.sleep(1000);
         assertNotNull(generatedReportFileName);
     }
 
+    @Test
+    public void testOngoingAccessionSummaryReportForFileSystem() throws Exception{
+        List<ReportEntity> reportEntityList = saveSummaryReportEntity(RecapConstants.ONGOING_ACCESSION_REPORT);
+        Date createdDate = reportEntityList.get(0).getCreatedDate();
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ONGOING_ACCESSION_REPORT, RecapConstants.FILE_SYSTEM, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
+        Thread.sleep(1000);
+        assertNotNull(generatedReportFileName);
+    }
 
-    private List<ReportEntity> saveSummaryReportEntity(){
+    @Test
+    public void testOngoingAccessionSummaryReportForFTP() throws Exception{
+        List<ReportEntity> reportEntityList = saveSummaryReportEntity(RecapConstants.ONGOING_ACCESSION_REPORT);
+        Date createdDate = reportEntityList.get(0).getCreatedDate();
+        String generatedReportFileName = reportGenerator.generateReport(RecapConstants.ACCESSION_REPORT, RecapConstants.PRINCETON, RecapConstants.ONGOING_ACCESSION_REPORT, RecapConstants.FTP, dateUtil.getFromDate(createdDate), dateUtil.getToDate(createdDate));
+        Thread.sleep(1000);
+        assertNotNull(generatedReportFileName);
+    }
+
+
+    private List<ReportEntity> saveSummaryReportEntity(String reportType){
         List<ReportEntity> reportEntityList = new ArrayList<>();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setFileName(RecapConstants.ACCESSION_REPORT);
-        reportEntity.setType(RecapConstants.ACCESSION_SUMMARY_REPORT);
+        reportEntity.setType(reportType);
         reportEntity.setCreatedDate(new Date());
         reportEntity.setInstitutionName("PUL");
 

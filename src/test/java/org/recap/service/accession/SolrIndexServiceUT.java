@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -111,7 +112,20 @@ public class SolrIndexServiceUT extends BaseTestCase {
         Mockito.when(solrIndexService.getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository())).thenReturn(new SolrInputDocument());
         Mockito.when(solrIndexService.indexByBibliographicId(bibliographicId)).thenCallRealMethod();
         SolrInputDocument solrInputDocument = solrIndexService.indexByBibliographicId(bibliographicId);
+    }
 
+    @Test
+    public void checkGetterServices(){
+        Mockito.when(solrIndexService.getBibJSONUtil()).thenCallRealMethod();
+        Mockito.when(solrIndexService.getBibliographicDetailsRepository()).thenCallRealMethod();
+        Mockito.when(solrIndexService.getHoldingsDetailsRepository()).thenCallRealMethod();
+        Mockito.when(solrIndexService.getProducerTemplate()).thenCallRealMethod();
+        Mockito.when(solrIndexService.getSolrTemplate()).thenCallRealMethod();
+        assertNotEquals(bibJSONUtil,solrIndexService.getBibJSONUtil());
+        assertNotEquals(mockedBibliographicDetailsRepository,solrIndexService.getBibliographicDetailsRepository());
+        assertNotEquals(holdingsDetailsRepository,solrIndexService.getHoldingsDetailsRepository());
+        assertNotEquals(solrTemplate,solrIndexService.getSolrTemplate());
+        assertNotEquals(producerTemplate,solrIndexService.getProducerTemplate());
     }
 
     public void deleteByDocId(String docIdParam, String docIdValue) throws IOException, SolrServerException {

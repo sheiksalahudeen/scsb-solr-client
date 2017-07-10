@@ -38,6 +38,22 @@ public class MatchingBibInfoDetailService {
     @Value("${matching.algorithm.bibinfo.batchsize}")
     private Integer batchSize;
 
+    public ReportDetailRepository getReportDetailRepository() {
+        return reportDetailRepository;
+    }
+
+    public MatchingBibInfoDetailRepository getMatchingBibInfoDetailRepository() {
+        return matchingBibInfoDetailRepository;
+    }
+
+    public ReportDataDetailsRepository getReportDataDetailsRepository() {
+        return reportDataDetailsRepository;
+    }
+
+    public Integer getBatchSize() {
+        return batchSize;
+    }
+
     /**
      * This method is used to populate matching bib info and save it to MATCHING_BIB_INFO_DETAIL_T for the given from and to date.
      *
@@ -53,9 +69,9 @@ public class MatchingBibInfoDetailService {
         headerNameList.add(RecapConstants.BIB_ID);
         headerNameList.add(RecapConstants.OWNING_INSTITUTION);
         headerNameList.add(RecapConstants.OWNING_INSTITUTION_BIB_ID);
-        Integer matchingCount = reportDetailRepository.getCountByTypeAndFileNameAndDateRange(typeList, RecapConstants.ONGOING_MATCHING_ALGORITHM, fromDate, toDate);
+        Integer matchingCount = getReportDetailRepository().getCountByTypeAndFileNameAndDateRange(typeList, RecapConstants.ONGOING_MATCHING_ALGORITHM, fromDate, toDate);
         logger.info("matchingReports Count ------> {} ",matchingCount);
-        Integer pageCount = getPageCount(matchingCount,batchSize);
+        Integer pageCount = getPageCount(matchingCount,getBatchSize());
         logger.info("Total pages ---> {}",pageCount);
         StopWatch stopWatchFull = new StopWatch();
         stopWatchFull.start();
@@ -63,15 +79,16 @@ public class MatchingBibInfoDetailService {
             logger.info("Current page ---> {}", pageNum);
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByTypeAndFileNameAndDateRange(new PageRequest(pageNum, batchSize), typeList,
+            Page<Integer> recordNumbers = getReportDetailRepository().getRecordNumByTypeAndFileNameAndDateRange(new PageRequest(pageNum, getBatchSize()), typeList,
                     RecapConstants.ONGOING_MATCHING_ALGORITHM, fromDate, toDate);
             List<Integer> recordNumberList = recordNumbers.getContent();
             logger.info("recordNumberList size -----> {}", recordNumberList.size());
-            List<ReportDataEntity> reportDataEntityList = reportDataDetailsRepository.getRecordsForMatchingBibInfo(getStringList(recordNumberList),headerNameList);
+            List<String> stringList = getStringList(recordNumberList);
+            List<ReportDataEntity> reportDataEntityList = getReportDataDetailsRepository().getRecordsForMatchingBibInfo(stringList,headerNameList);
             Map<String,List<ReportDataEntity>> reportDataEntityMap = getRecordNumReportDataEntityMap(reportDataEntityList);
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = findAndPopulateMatchingBibInfoDetail(reportDataEntityMap);
-            matchingBibInfoDetailRepository.save(matchingBibInfoDetailList);
-            matchingBibInfoDetailRepository.flush();
+            getMatchingBibInfoDetailRepository().save(matchingBibInfoDetailList);
+            getMatchingBibInfoDetailRepository().flush();
             stopWatch.stop();
             logger.info("Time taken to save ---> {}", stopWatch.getTotalTimeSeconds());
             logger.info("Page {} saved to db ", pageCount);
@@ -94,9 +111,9 @@ public class MatchingBibInfoDetailService {
         headerNameList.add(RecapConstants.BIB_ID);
         headerNameList.add(RecapConstants.OWNING_INSTITUTION);
         headerNameList.add(RecapConstants.OWNING_INSTITUTION_BIB_ID);
-        Integer matchingCount = reportDetailRepository.getCountByType(typeList);
+        Integer matchingCount = getReportDetailRepository().getCountByType(typeList);
         logger.info("matchingCount------> {}", matchingCount);
-        Integer pageCount = getPageCount(matchingCount,batchSize);
+        Integer pageCount = getPageCount(matchingCount,getBatchSize());
         logger.info("pageCount---> {} ", pageCount);
         StopWatch stopWatchFull = new StopWatch();
         stopWatchFull.start();
@@ -104,14 +121,14 @@ public class MatchingBibInfoDetailService {
             logger.info("Current page---> {}", count);
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            Page<Integer> recordNumbers = reportDetailRepository.getRecordNumByType(new PageRequest(count, batchSize),typeList);
+            Page<Integer> recordNumbers = getReportDetailRepository().getRecordNumByType(new PageRequest(count, getBatchSize()),typeList);
             List<Integer> recordNumberList = recordNumbers.getContent();
             logger.info("recordNumberList size-----> {}", recordNumberList.size());
-            List<ReportDataEntity> reportDataEntityList = reportDataDetailsRepository.getRecordsForMatchingBibInfo(getStringList(recordNumberList),headerNameList);
+            List<ReportDataEntity> reportDataEntityList = getReportDataDetailsRepository().getRecordsForMatchingBibInfo(getStringList(recordNumberList),headerNameList);
             Map<String,List<ReportDataEntity>> reportDataEntityMap = getRecordNumReportDataEntityMap(reportDataEntityList);
             List<MatchingBibInfoDetail> matchingBibInfoDetailList = populateMatchingBibInfoDetail(reportDataEntityMap);
-            matchingBibInfoDetailRepository.save(matchingBibInfoDetailList);
-            matchingBibInfoDetailRepository.flush();
+            getMatchingBibInfoDetailRepository().save(matchingBibInfoDetailList);
+            getMatchingBibInfoDetailRepository().flush();
             stopWatch.stop();
             logger.info("Time taken to save--> {}", stopWatch.getTotalTimeSeconds());
             logger.info("Page {} saved to db", count);
@@ -197,8 +214,8 @@ public class MatchingBibInfoDetailService {
     private List<MatchingBibInfoDetail> getMatchingBibInfoDetailsToBeSaved(Integer recordNum, String[] bibIdArray, String[] institutionArray, String[] owningInstitutionBibIdArray) {
         List<MatchingBibInfoDetail> matchingBibInfoDetailList = new ArrayList<>();
         List<String> addedBibIds = new ArrayList<>();
-        List<Integer> recordNums = matchingBibInfoDetailRepository.findRecordNumByBibIds(Arrays.asList(bibIdArray));
-        List<MatchingBibInfoDetail> matchingBibInfoDetails = matchingBibInfoDetailRepository.findByRecordNumIn(recordNums);
+        List<Integer> recordNums = getMatchingBibInfoDetailRepository().findRecordNumByBibIds(Arrays.asList(bibIdArray));
+        List<MatchingBibInfoDetail> matchingBibInfoDetails = getMatchingBibInfoDetailRepository().findByRecordNumIn(recordNums);
         if(CollectionUtils.isNotEmpty(matchingBibInfoDetails)) {
             for(MatchingBibInfoDetail matchingBibInfoDetail : matchingBibInfoDetails) {
                 addedBibIds.add(matchingBibInfoDetail.getBibId());

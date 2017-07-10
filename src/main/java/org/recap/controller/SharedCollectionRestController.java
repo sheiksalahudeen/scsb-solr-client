@@ -43,6 +43,10 @@ public class SharedCollectionRestController {
     @Autowired
     BulkAccessionService bulkAccessionService;
 
+    public BulkAccessionService getBulkAccessionService() {
+        return bulkAccessionService;
+    }
+
     @Value("${ongoing.accession.input.limit}")
     private Integer inputLimit;
 
@@ -165,11 +169,11 @@ public class SharedCollectionRestController {
         stopWatch.start();
 
         String status;
-        List<AccessionEntity> accessionEntities = bulkAccessionService.getAccessionEntities(RecapConstants.PENDING);
-        List<AccessionRequest> accessionRequestList = bulkAccessionService.getAccessionRequest(accessionEntities);
+        List<AccessionEntity> accessionEntities = getBulkAccessionService().getAccessionEntities(RecapConstants.PENDING);
+        List<AccessionRequest> accessionRequestList = getBulkAccessionService().getAccessionRequest(accessionEntities);
         BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
         if(CollectionUtils.isNotEmpty(accessionRequestList)) {
-            batchAccessionResponse = bulkAccessionService.processAccessionRequest(accessionRequestList);
+            batchAccessionResponse = getBulkAccessionService().processAccessionRequest(accessionRequestList);
             if(batchAccessionResponse.getSuccessRecords() != 0) {
                 status = RecapConstants.SUCCESS;
             } else {
@@ -182,7 +186,7 @@ public class SharedCollectionRestController {
         stopWatch.stop();
         batchAccessionResponse.setTimeElapsed(stopWatch.getTotalTimeSeconds() + " Secs");
 
-        bulkAccessionService.createSummaryReport(batchAccessionResponse.toString());
+        getBulkAccessionService().createSummaryReport(batchAccessionResponse.toString());
 
         logger.info("Total time taken for processing {} records : {} secs", accessionRequestList.size(), stopWatch.getTotalTimeSeconds());
         logger.info(batchAccessionResponse.toString());
