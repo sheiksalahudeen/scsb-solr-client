@@ -1,5 +1,6 @@
 package org.recap.camel.processor;
 
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by angelind on 27/10/16.
@@ -81,5 +83,15 @@ public class MatchingAlgorithmProcessor {
      */
     public void updateItemEntity(List<ItemEntity> itemEntities) {
         itemDetailsRepository.save(itemEntities);
+    }
+
+    public void updateMatchingBibEntity(Map matchingBibMap) {
+        String status = (String) matchingBibMap.get(RecapConstants.STATUS);
+        List<Integer> matchingBibIds = (List<Integer>) matchingBibMap.get(RecapConstants.MATCHING_BIB_IDS);
+        try {
+            matchingBibDetailsRepository.updateStatus(status, matchingBibIds);
+        } catch (Exception e) {
+            logger.info("Exception while updating matching Bib entity status : " , e);
+        }
     }
 }

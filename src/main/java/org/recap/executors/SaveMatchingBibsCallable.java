@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.MatchingBibEntity;
 import org.recap.model.jpa.MatchingMatchPointsEntity;
 import org.recap.model.search.resolver.BibValueResolver;
@@ -104,6 +105,7 @@ public class SaveMatchingBibsCallable implements Callable {
                     matchingBibEntity.setLccn(bibItem.getLccn());
                     matchingBibEntity.setMaterialType(bibItem.getLeaderMaterialType());
                     matchingBibEntity.setMatching(matchCriteria);
+                    matchingBibEntity.setStatus(RecapConstants.PENDING);
                     if(addBibIdToList(bibId)) {
                         matchingBibEntityList.add(matchingBibEntity);
                     }

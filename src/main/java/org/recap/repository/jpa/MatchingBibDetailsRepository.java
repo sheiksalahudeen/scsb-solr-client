@@ -1,8 +1,13 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.MatchingBibEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -152,4 +157,42 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
             "bib_id not in (select bib_id from matching_bib_t where MATCHING in ('OCLCNumber','ISSN') group by BIB_ID having count(bib_id) > 1) and " +
             "MATCHING in ('ISBN','ISSN') order by bib_id", nativeQuery = true)
     List<Integer> getMultiMatchBibIdsForIssnAndLccn();
+
+    /**
+     * Update status int.
+     *
+     * @param status the status
+     * @param bibIds the bib ids
+     * @return the int
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE MatchingBibEntity mbe SET mbe.status = :status WHERE mbe.bibId in :bibIds")
+    int updateStatus(@Param("status") String status,@Param("bibIds") List<Integer> bibIds);
+
+    /**
+     * Find by status page.
+     *
+     * @param pageable the pageable
+     * @param status   the status
+     * @return the page
+     */
+    Page<MatchingBibEntity> findByStatus(Pageable pageable, String status);
+
+    /**
+     * Find by bib id in list.
+     *
+     * @param bibIds the bib ids
+     * @return the list
+     */
+    List<MatchingBibEntity> findByBibIdIn(List<Integer> bibIds);
+
+    /**
+     * Find by matching and bib id in list.
+     *
+     * @param matching the matching
+     * @param bibIds   the bib ids
+     * @return the list
+     */
+    List<MatchingBibEntity> findByMatchingAndBibIdIn(String matching, List<Integer> bibIds);
 }

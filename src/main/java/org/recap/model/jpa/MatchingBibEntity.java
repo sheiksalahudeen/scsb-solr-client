@@ -48,6 +48,9 @@ public class MatchingBibEntity implements Serializable{
     @Column(name = "MATCHING")
     private String matching;
 
+    @Column(name = "STATUS")
+    private String status;
+
     /**
      * Gets id.
      *
@@ -262,5 +265,23 @@ public class MatchingBibEntity implements Serializable{
      */
     public void setMatching(String matching) {
         this.matching = matching;
+    }
+
+    /**
+     * Gets status.
+     *
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

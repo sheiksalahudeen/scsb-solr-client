@@ -72,6 +72,7 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
         matchingBibEntity.setMaterialType("monograph");
         matchingBibEntity.setMatching(matchingCriteria);
         matchingBibEntity.setRoot("31");
+        matchingBibEntity.setStatus(RecapConstants.PENDING);
         return matchingBibDetailsRepository.save(matchingBibEntity);
     }
 
@@ -108,6 +109,25 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
         long multipleMatchUniqueBibCount = matchingBibDetailsRepository.getSingleMatchBibCountBasedOnMatching(RecapConstants.MATCH_POINT_FIELD_OCLC);
         assertNotNull(multipleMatchUniqueBibCount);
         assertTrue(multipleMatchUniqueBibCount > 0);
+    }
+
+    @Test
+    public void updateAndFetchMatchingBibByStatus() throws Exception {
+        MatchingBibEntity matchingBibEntity = saveMatchingBibEntity(RecapConstants.MATCH_POINT_FIELD_OCLC);
+        assertNotNull(matchingBibEntity);
+        assertNotNull(matchingBibEntity.getId());
+        Page<MatchingBibEntity> byStatus = matchingBibDetailsRepository.findByStatus(new PageRequest(0, 10), RecapConstants.PENDING);
+        assertNotNull(byStatus);
+        MatchingBibEntity matchingBibEntity1 = byStatus.getContent().get(0);
+        assertNotNull(matchingBibEntity1);
+        assertEquals(matchingBibEntity.getId(), matchingBibEntity1.getId());
+        int updateStatus = matchingBibDetailsRepository.updateStatus(RecapConstants.COMPLETE_STATUS, Arrays.asList(matchingBibEntity.getId()));
+        assertEquals(1, updateStatus);
+        Page<MatchingBibEntity> matchingBibEntities = matchingBibDetailsRepository.findByStatus(new PageRequest(0, 10), RecapConstants.COMPLETE_STATUS);
+        assertNotNull(matchingBibEntities);
+        MatchingBibEntity bibEntity = matchingBibEntities.getContent().get(0);
+        assertNotNull(bibEntity);
+        assertEquals(matchingBibEntity.getId(), bibEntity.getId());
     }
 
 }

@@ -113,6 +113,7 @@ public final class RecapConstants {
     public static final String MATCHING_SERIAL_MVM_REPORT = "MatchingSerialMvmReport";
     public static final String UNDER_SCORE = "_";
     public static final String CSV_EXTENSION = ".csv";
+    public static final String MATCHING_BIB_IDS = "matchingBibIds";
 
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
@@ -133,8 +134,8 @@ public final class RecapConstants {
     public static final String MATCH_POINT_FIELD_OCLC = "OCLCNumber";
     public static final String MATCH_POINT_FIELD_ISBN = "ISBN";
     public static final String MATCH_POINT_FIELD_ISSN = "ISSN";
-
     public static final String MATCH_POINT_FIELD_LCCN = "LCCN";
+    public static final String MATCHING_PENDING_BIBS = "PendingBibMatches";
     public static final String ALL_INST = "ALL";
 
     public static final String OCLC_TAG = "035";

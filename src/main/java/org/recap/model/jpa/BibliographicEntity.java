@@ -1,7 +1,10 @@
 package org.recap.model.jpa;
 
+import org.recap.RecapConstants;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -324,6 +327,20 @@ public class BibliographicEntity implements Serializable {
         this.itemEntities = itemEntities;
     }
 
+    /**
+     * Gets non deleted and complete item entities.
+     *
+     * @return the non deleted and complete item entities
+     */
+    public List<ItemEntity> getNonDeletedAndCompleteItemEntities() {
+        List<ItemEntity> itemEntityList = new ArrayList<>();
+        for(ItemEntity itemEntity : getItemEntities()) {
+            if(!itemEntity.isDeleted() && itemEntity.getCatalogingStatus().equalsIgnoreCase(RecapConstants.COMPLETE_STATUS)) {
+                itemEntityList.add(itemEntity);
+            }
+        }
+        return itemEntityList;
+    }
 
 }
 
