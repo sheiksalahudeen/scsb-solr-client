@@ -1,1 +1,6 @@
-The "${header.emailPayLoad.jobName}" (${header.emailPayLoad.jobDescription}) job ran ${header.emailPayLoad.status} at ${header.emailPayLoad.startDate}.
+The "${header.emailPayLoad.jobName}" job ran successfully at ${header.emailPayLoad.startDate}. Below are the status details.
+
+Job Name  :  ${header.emailPayLoad.jobName}
+Job Description  :  ${header.emailPayLoad.jobDescription}
+Status  :  ${header.emailPayLoad.status}
+Message  :  ${header.emailPayLoad.message}
