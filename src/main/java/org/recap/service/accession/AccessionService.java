@@ -776,17 +776,17 @@ public class AccessionService {
             logger.info("Fetched Item Entities = {}",CollectionUtils.isNotEmpty(fetchItemsEntities) ? fetchItemsEntities.size() : 0);
             logger.info("Incoming Item Entities = {}",CollectionUtils.isNotEmpty(incomingItemsEntities) ? incomingItemsEntities.size() : 0);
 
-            fetchItemsEntities.clear();
+            List<ItemEntity> finalItemEntities = new ArrayList<>();
 
             for (Iterator<HoldingsEntity> iterator = fetchHoldingsEntities.iterator(); iterator.hasNext(); ) {
                 HoldingsEntity holdingsEntity =  iterator.next();
-                fetchItemsEntities.addAll(holdingsEntity.getItemEntities());
+                finalItemEntities.addAll(holdingsEntity.getItemEntities());
             }
 
-            logger.info("Item Final Count = {}",fetchItemsEntities.size());
+            logger.info("Item Final Count = {}",finalItemEntities.size());
 
             fetchBibliographicEntity.setHoldingsEntities(fetchHoldingsEntities);
-            fetchBibliographicEntity.setItemEntities(fetchItemsEntities);
+            fetchBibliographicEntity.setItemEntities(finalItemEntities);
 
             savedBibliographicEntity = saveBibRecord(fetchBibliographicEntity);
         }
