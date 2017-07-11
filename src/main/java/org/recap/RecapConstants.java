@@ -229,6 +229,7 @@ public final class RecapConstants {
 
     public static final String CUSTOMER_CODE_DOESNOT_EXIST = "Customer Code doesn't exist in SCSB database.";
     public static final String ITEM_BARCODE_EMPTY = "Item Barcode is Blank.";
+    public static final String CUSTOMER_CODE_EMPTY = "Customer Code is Blank.";
     public static final String OWNING_INST_EMPTY = "Owning Institution is Blank.";
 
     public static final String COLUMBIA = "CUL";
@@ -419,7 +420,13 @@ public final class RecapConstants {
     public static final String OWN_INST_ITEM_ID = " OwningInstItemId-";
 
 
-    public static final String BATCH_ACCESSION_SUMMARY = "BATCH_ACCESSION_SUMMARY";
+    public static final String BULK_ACCESSION_SUMMARY = "BULK_ACCESSION_SUMMARY";
+    public static final String ACCESSION_SUMMARY = "ACCESSION_SUMMARY";
+
+    public static class SERVICE_PATH {
+        public static final String CHECKIN_ITEM = "requestItem/checkinItem";
+    }
+
     public static final String SUCCESS_INCOMPLETE_RECORD = "Success - Incomplete record";
     public static final String INCOMPLETE_RESPONSE = "incompleteResponse";
 
