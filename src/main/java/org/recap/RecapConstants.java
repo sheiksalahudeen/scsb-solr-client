@@ -420,6 +420,8 @@ public final class RecapConstants {
 
 
     public static final String BATCH_ACCESSION_SUMMARY = "BATCH_ACCESSION_SUMMARY";
+    public static final String SUCCESS_INCOMPLETE_RECORD = "Success - Incomplete record";
+    public static final String INCOMPLETE_RESPONSE = "incompleteResponse";
 
     private RecapConstants(){}
 }
