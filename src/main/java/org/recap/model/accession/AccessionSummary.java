@@ -3,18 +3,33 @@ package org.recap.model.accession;
 /**
  * Created by sheiks on 15/06/17.
  */
-public class BatchAccessionResponse {
+public class AccessionSummary {
+    private String type;
     private int requestedRecords;
     private int successRecords;
     private int dummyRecords;
     private int duplicateRecords;
     private int emptyBarcodes;
+    private int emptyCustomerCode;
+    private int customerCodeDoesNotExist;
     private int emptyOwningInst;
     private int alreadyAccessioned;
     private int exception;
     private int failure;
     private int invalidLenghBarcode;
     private String timeElapsed;
+
+    public AccessionSummary(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public int getRequestedRecords() {
         return requestedRecords;
@@ -58,6 +73,23 @@ public class BatchAccessionResponse {
 
     public int getEmptyBarcodes() {
         return emptyBarcodes;
+    }
+
+
+    public int getEmptyCustomerCode() {
+        return emptyCustomerCode;
+    }
+
+    public void setEmptyCustomerCode(int emptyCustomerCode) {
+        this.emptyCustomerCode = emptyCustomerCode;
+    }
+
+    public int getCustomerCodeDoesNotExist() {
+        return customerCodeDoesNotExist;
+    }
+
+    public void setCustomerCodeDoesNotExist(int customerCodeDoesNotExist) {
+        this.customerCodeDoesNotExist = customerCodeDoesNotExist;
     }
 
     public void setEmptyBarcodes(int emptyBarcodes) {
@@ -131,18 +163,31 @@ public class BatchAccessionResponse {
     public void addSuccessRecord(int successRecords) {
         this.successRecords += successRecords;
     }
+
     public void addFailure(int failure) {
         this.failure += failure;
     }
 
+
+    public void addEmptyCustomerCode(int emptyCustomerCode) {
+        this.emptyCustomerCode += emptyCustomerCode;
+    }
+
+    public void addCustomerCodeDoesNotExist(int customerCodeDoesNotExist) {
+        this.customerCodeDoesNotExist += customerCodeDoesNotExist;
+    }
+
     @Override
     public String toString() {
-        return "BatchAccessionResponse{" +
-                "requestedRecords=" + requestedRecords +
+        return "{" +
+                "type='" + type + '\'' +
+                ", requestedRecords=" + requestedRecords +
                 ", successRecords=" + successRecords +
                 ", dummyRecords=" + dummyRecords +
                 ", duplicateRecords=" + duplicateRecords +
                 ", emptyBarcodes=" + emptyBarcodes +
+                ", emptyCustomerCode=" + emptyCustomerCode +
+                ", customerCodeDoesNotExist=" + customerCodeDoesNotExist +
                 ", emptyOwningInst=" + emptyOwningInst +
                 ", alreadyAccessioned=" + alreadyAccessioned +
                 ", exception=" + exception +

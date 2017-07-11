@@ -68,7 +68,7 @@ public class AccessionValidationService {
 
     public boolean validateItemAndHolding(BibliographicEntity bibliographicEntity, boolean isValidBoundWithRecord, boolean isFirstRecord, StringBuilder errorMessage){
         boolean isValid = true;
-        isValid &= validateItem(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
+//        isValid &= validateItem(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
         isValid &= validateHolding(bibliographicEntity,isValidBoundWithRecord,isFirstRecord,errorMessage);
         return isValid;
 

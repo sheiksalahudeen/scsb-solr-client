@@ -7,7 +7,7 @@ import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
-import org.recap.model.accession.BatchAccessionResponse;
+import org.recap.model.accession.AccessionSummary;
 import org.recap.model.jpa.AccessionEntity;
 import org.recap.service.ItemAvailabilityService;
 import org.recap.service.accession.AccessionService;
@@ -151,7 +151,20 @@ public class SharedCollectionRestController {
             accessionResponsesList = getAccessionResponses();
             return new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         } else {
-            accessionResponsesList = getAccessionService().processRequest(accessionRequestList);
+            String accessionType = RecapConstants.ACCESSION_SUMMARY;
+            AccessionSummary accessionSummary = new AccessionSummary(accessionType);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            logger.info("Total record for Accession : {}" , accessionRequestList.size());
+            accessionResponsesList = getAccessionService().doAccession(accessionRequestList, accessionSummary);
+
+            stopWatch.stop();
+            accessionSummary.setTimeElapsed(stopWatch.getTotalTimeSeconds() + " Secs");
+
+            logger.info(accessionSummary.toString());
+
+            bulkAccessionService.createSummaryReport(accessionSummary.toString(), accessionType);
+
             responseEntity = new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         }
         return responseEntity;
@@ -171,10 +184,12 @@ public class SharedCollectionRestController {
         String status;
         List<AccessionEntity> accessionEntities = getBulkAccessionService().getAccessionEntities(RecapConstants.PENDING);
         List<AccessionRequest> accessionRequestList = getBulkAccessionService().getAccessionRequest(accessionEntities);
-        BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
+        String accessionType = RecapConstants.BULK_ACCESSION_SUMMARY;
+        AccessionSummary accessionSummary = new AccessionSummary(accessionType);
         if(CollectionUtils.isNotEmpty(accessionRequestList)) {
-            batchAccessionResponse = getBulkAccessionService().processAccessionRequest(accessionRequestList);
-            if(batchAccessionResponse.getSuccessRecords() != 0) {
+            logger.info("Total record for Bulk Accession : {}" , accessionRequestList.size());
+            getBulkAccessionService().doAccession(accessionRequestList, accessionSummary);
+            if(accessionSummary.getSuccessRecords() != 0) {
                 status = RecapConstants.SUCCESS;
             } else {
                 status = RecapConstants.FAILURE;
@@ -184,12 +199,12 @@ public class SharedCollectionRestController {
         }
         getAccessionService().updateStatusForAccessionEntities(accessionEntities, RecapConstants.COMPLETE_STATUS);
         stopWatch.stop();
-        batchAccessionResponse.setTimeElapsed(stopWatch.getTotalTimeSeconds() + " Secs");
+        accessionSummary.setTimeElapsed(stopWatch.getTotalTimeSeconds() + " Secs");
 
-        getBulkAccessionService().createSummaryReport(batchAccessionResponse.toString());
+        getBulkAccessionService().createSummaryReport(accessionSummary.toString(),accessionType);
 
         logger.info("Total time taken for processing {} records : {} secs", accessionRequestList.size(), stopWatch.getTotalTimeSeconds());
-        logger.info(batchAccessionResponse.toString());
+        logger.info(accessionSummary.toString());
 
         return status;
     }

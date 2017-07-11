@@ -1,26 +1,28 @@
 package org.recap.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ReportDataEntity;
-import org.recap.model.jpa.ReportEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.request.ItemCheckInRequest;
 import org.recap.model.request.ItemCheckinResponse;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
+import org.recap.repository.jpa.ItemBarcodeHistoryDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.service.accession.AccessionService;
+import org.recap.service.accession.resolver.BibDataResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,7 +47,106 @@ public class AccessionHelperUtil {
     private ReportDetailRepository reportDetailRepository;
 
     @Autowired
+    private ItemBarcodeHistoryDetailsRepository itemBarcodeHistoryDetailsRepository;
+
+    @Autowired
     private AccessionService accessionService;
+
+    @Value("${scsb.url}")
+    private String scsbUrl;
+
+
+    public Object processRecords(Set<AccessionResponse> accessionResponses, List<Map<String, String>> responseMaps,
+                               AccessionRequest accessionRequest, List<ReportDataEntity> reportDataEntitys,
+                               String owningInstitution, boolean writeToReport) {
+        String customerCode = accessionRequest.getCustomerCode();
+        String itemBarcode = accessionRequest.getItemBarcode();
+        // Check item availability
+        List<ItemEntity> itemEntityList = getItemEntityList(itemBarcode, customerCode);
+        boolean itemExists = checkItemBarcodeAlreadyExist(itemEntityList);
+        if(itemExists) { // If available check deaccessioned item or not
+
+            boolean isDeaccessionedItem = isItemDeaccessioned(itemEntityList);
+            if(isDeaccessionedItem) { // If deacccessioned item make it available
+                String response = accessionService.reAccessionItem(itemEntityList);
+                if (response.equals(RecapConstants.SUCCESS)) {
+                    response = accessionService.indexReaccessionedItem(itemEntityList);
+                    accessionService.saveItemChangeLogEntity(RecapConstants.REACCESSION,RecapConstants.ITEM_ISDELETED_TRUE_TO_FALSE,itemEntityList);
+                }
+                setAccessionResponse(accessionResponses, itemBarcode, response);
+                reportDataEntitys.addAll(createReportDataEntityList(accessionRequest, response));
+            } else { // else, error response
+                String itemAreadyAccessionedMessage;
+                if(CollectionUtils.isNotEmpty(itemEntityList.get(0).getBibliographicEntities())) {
+                    String itemAreadyAccessionedOwnInstBibId = itemEntityList.get(0).getBibliographicEntities() != null ? itemEntityList.get(0).getBibliographicEntities().get(0).getOwningInstitutionBibId() : " ";
+                    String itemAreadyAccessionedOwnInstHoldingId = itemEntityList.get(0).getHoldingsEntities() != null ? itemEntityList.get(0).getHoldingsEntities().get(0).getOwningInstitutionHoldingsId() : " ";
+                    itemAreadyAccessionedMessage = RecapConstants.ITEM_ALREADY_ACCESSIONED + RecapConstants.OWN_INST_BIB_ID + itemAreadyAccessionedOwnInstBibId + RecapConstants.OWN_INST_HOLDING_ID + itemAreadyAccessionedOwnInstHoldingId + RecapConstants.OWN_INST_ITEM_ID + itemEntityList.get(0).getOwningInstitutionItemId();
+                } else {
+                    itemAreadyAccessionedMessage = RecapConstants.ITEM_ALREADY_ACCESSIONED;
+                }
+                setAccessionResponse(accessionResponses, itemBarcode, itemAreadyAccessionedMessage);
+                reportDataEntitys.addAll(createReportDataEntityList(accessionRequest, itemAreadyAccessionedMessage));
+            }
+
+        } else { // If not available
+
+            // Call ILS - Bib Data API
+            StopWatch individualStopWatch = new StopWatch();
+            individualStopWatch.start();
+            for (Iterator<BibDataResolver> bibDataResolverIterator = accessionService.getBibDataResolvers().iterator(); bibDataResolverIterator.hasNext(); ) {
+                BibDataResolver bibDataResolver = bibDataResolverIterator.next();
+                if (bibDataResolver.isInterested(owningInstitution)) {
+                    String bibData = null;
+                    try {
+                        // Calling ILS - Bib Data API
+                        bibData = bibDataResolver.getBibData(itemBarcode, customerCode);
+                    } catch (Exception e) { // Process dummy record if record not found in ILS
+                        processException(accessionResponses, accessionRequest, reportDataEntitys, owningInstitution, e);
+                        break;
+                    } finally {
+                        individualStopWatch.stop();
+                        logger.info("Time taken to get bib data from {} ILS : {}" , owningInstitution, individualStopWatch.getTotalTimeSeconds());
+                    }
+                    try { // Check whether owningInsitutionItemId attached with another barcode.
+
+                        Object unmarshalObject = bibDataResolver.unmarshal(bibData);
+                        ItemEntity itemEntity = bibDataResolver.getItemEntityFromRecord(unmarshalObject);
+                        boolean accessionProcess = bibDataResolver.isAccessionProcess(itemEntity, owningInstitution);
+
+                        // Process XML Record
+                        if(accessionProcess) { // Accession process
+                            String response = bibDataResolver.processXml(accessionResponses, unmarshalObject,
+                                    responseMaps, owningInstitution, reportDataEntitys, accessionRequest);
+                        } else {  // If attached
+
+                            // update item record with new barcode. Accession Process
+                            String response = bibDataResolver.processXml(accessionResponses, unmarshalObject,
+                                    responseMaps, owningInstitution, reportDataEntitys, accessionRequest);
+                            // Move item record information to history table
+                            ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = prepareBarcodeHistoryEntity(itemEntity, itemBarcode);
+                            itemBarcodeHistoryDetailsRepository.save(itemBarcodeHistoryEntity);
+                            callCheckin(accessionRequest.getItemBarcode(),owningInstitution);
+                        }
+                    } catch (Exception e) {
+                        if(writeToReport) {
+                            processException(accessionResponses, accessionRequest, reportDataEntitys, owningInstitution, e);
+                        } else {
+                            return accessionRequest;
+                        }
+                    }
+                    generateAccessionSummaryReport(responseMaps, owningInstitution);
+                    break;
+                }
+            }
+
+        }
+
+        // Save report
+        accessionService.saveReportEntity(owningInstitution, reportDataEntitys);
+
+        return accessionResponses;
+    }
+
 
     /**
      * Gets owning institution for the given customer code.
@@ -105,19 +206,6 @@ public class AccessionHelperUtil {
             }
         }
         return itemDeleted;
-    }
-
-    /**
-     * Checks is the given item barcode is empty
-     *
-     * @param itemBarcode the item barcode
-     * @return the boolean
-     */
-    public boolean isItemBarcodeEmpty(String itemBarcode) {
-        if(StringUtils.isBlank(itemBarcode)) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -266,15 +354,25 @@ public class AccessionHelperUtil {
         reportDetailRepository.save(reportEntityList);
     }
 
-    public void processBibDataApiException(Set<AccessionResponse> accessionResponsesList, AccessionRequest accessionRequest,
-                                           List<ReportDataEntity> reportDataEntityList, String owningInstitution, Exception ex) {
-        String response;
-        logger.error(RecapConstants.LOG_ERROR, ex);
-        response = ex.getMessage();
+    public void processException(Set<AccessionResponse> accessionResponsesList, AccessionRequest accessionRequest,
+                                 List<ReportDataEntity> reportDataEntityList, String owningInstitution, Exception ex) {
+        String response = ex.getMessage();
+        if(StringUtils.equalsIgnoreCase(response, RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
+            logger.error(RecapConstants.LOG_ERROR + response);
+        } else {
+            response = RecapConstants.EXCEPTION + response;
+            ex.printStackTrace();
+        }
         //Create dummy record
         response = accessionService.createDummyRecordIfAny(response, owningInstitution, reportDataEntityList, accessionRequest);
         accessionService.getAccessionHelperUtil().setAccessionResponse(accessionResponsesList, accessionRequest.getItemBarcode(), response);
         reportDataEntityList.addAll(accessionService.getAccessionHelperUtil().createReportDataEntityList(accessionRequest, response));
+    }
+
+
+    public List<AccessionRequest> removeDuplicateRecord(List<AccessionRequest> trimmedAccessionRequests) {
+        Set<AccessionRequest> accessionRequests = new HashSet<>(trimmedAccessionRequests);
+        return new ArrayList<>(accessionRequests);
     }
 
     @Async
@@ -286,7 +384,7 @@ public class AccessionHelperUtil {
             itemRequestInfo.setItemBarcodes(Arrays.asList(itemBarcode));
             itemRequestInfo.setItemOwningInstitution(owningInstitutionId);
             HttpEntity request = new HttpEntity<>(itemRequestInfo,getHttpHeadersAuth());
-            responseEntity =restTemplate.exchange("http://localhost:9093/requestItem/checkinItem", HttpMethod.POST,request  , ItemCheckinResponse.class);
+            responseEntity =restTemplate.exchange(scsbUrl + RecapConstants.SERVICE_PATH.CHECKIN_ITEM, HttpMethod.POST,request  , ItemCheckinResponse.class);
         } catch (RestClientException ex) {
             logger.error(RecapConstants.EXCEPTION, ex);
         } catch (Exception ex) {
@@ -300,4 +398,15 @@ public class AccessionHelperUtil {
         headers.set(RecapConstants.API_KEY, RecapConstants.RECAP);
         return headers;
     }
+
+    public ItemBarcodeHistoryEntity prepareBarcodeHistoryEntity(ItemEntity itemEntity, String newBarcode) {
+        ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = new ItemBarcodeHistoryEntity();
+        itemBarcodeHistoryEntity.setOwningingInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemBarcodeHistoryEntity.setOwningingInstitutionItemId(itemEntity.getOwningInstitutionItemId());
+        itemBarcodeHistoryEntity.setOldBarcode(itemEntity.getBarcode());
+        itemBarcodeHistoryEntity.setNewBarcode(newBarcode);
+        itemBarcodeHistoryEntity.setCreatedDate(new Date());
+        return itemBarcodeHistoryEntity;
+    }
+
 }
