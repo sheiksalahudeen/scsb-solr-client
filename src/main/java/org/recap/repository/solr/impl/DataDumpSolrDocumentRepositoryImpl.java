@@ -174,9 +174,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         String querForItemString = "_root_:" + getRootIds(bibItems) + and + RecapConstants.DOCTYPE + ":" + RecapConstants.ITEM + and
                 + queryStringForMatchParentReturnChild + and + RecapConstants.IS_DELETED_ITEM + ":" + searchRecordsRequest.isDeleted() + and + RecapConstants.ITEM_CATALOGING_STATUS + ":"
                 + RecapConstants.COMPLETE_STATUS;
-        if(searchRecordsRequest.getFieldName().contains(RecapConstants.BIBITEM_LASTUPDATED_DATE)){
-            querForItemString = querForItemString + and + RecapConstants.ITEM_LASTUPDATED_DATE + ":["+searchRecordsRequest.getFieldValue()+"]";
-        }
 
         SolrQuery solrQueryForItem = solrQueryBuilder.getSolrQueryForBibItem(querForItemString) ;
         QueryResponse queryResponse = null;

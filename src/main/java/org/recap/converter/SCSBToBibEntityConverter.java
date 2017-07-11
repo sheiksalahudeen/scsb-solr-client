@@ -69,7 +69,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         String reasonForFailureItem = "";
         Map<String, Object> map = new HashMap<>();
         boolean processBib = false;
-
+        String incompleteResponse = new String();
         List<HoldingsEntity> holdingsEntities = new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
@@ -164,6 +164,9 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                                     holdingsEntity.getItemEntities().add(itemEntity);
                                     itemEntities.add(itemEntity);
                                 }
+                                if(RecapConstants.INCOMPLETE_STATUS.equalsIgnoreCase(itemEntity.getCatalogingStatus())){
+                                    incompleteResponse = RecapConstants.INCOMPLETE_STATUS;
+                                }
                             }
                         }
                     }
@@ -181,6 +184,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
         map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
         map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+        map.put(RecapConstants.INCOMPLETE_RESPONSE,incompleteResponse);
 
         return map;
     }
