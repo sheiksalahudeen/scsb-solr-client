@@ -242,7 +242,7 @@ public class ReportDetailRepositoryUT extends BaseTestCase {
         typeList.add(RecapConstants.MULTI_MATCH);
         Integer matchingBibCount = reportDetailRepository.getCountByType(typeList);
         assertNotNull(matchingBibCount);
-        assertEquals(new Integer(1), matchingBibCount);
+        assertTrue(matchingBibCount > 0);
     }
 
     @Test

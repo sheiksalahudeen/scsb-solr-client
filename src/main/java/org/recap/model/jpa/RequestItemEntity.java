@@ -61,10 +61,6 @@ public class RequestItemEntity implements Serializable {
     private RequestTypeEntity requestTypeEntity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PATRON_ID", insertable = false, updatable = false)
-    private PatronEntity patronEntity;
-
-    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ITEM_ID", insertable = false, updatable = false)
     private ItemEntity itemEntity;
 
@@ -304,24 +300,6 @@ public class RequestItemEntity implements Serializable {
      */
     public void setRequestTypeEntity(RequestTypeEntity requestTypeEntity) {
         this.requestTypeEntity = requestTypeEntity;
-    }
-
-    /**
-     * Gets patron entity.
-     *
-     * @return the patron entity
-     */
-    public PatronEntity getPatronEntity() {
-        return patronEntity;
-    }
-
-    /**
-     * Sets patron entity.
-     *
-     * @param patronEntity the patron entity
-     */
-    public void setPatronEntity(PatronEntity patronEntity) {
-        this.patronEntity = patronEntity;
     }
 
     /**

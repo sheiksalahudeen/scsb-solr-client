@@ -55,9 +55,6 @@ public class BaseTestCase {
     public CollectionGroupDetailsRepository collectionGroupDetailRepository;
 
     @Autowired
-    public PatronDetailsRepository patronDetailsRepository;
-
-    @Autowired
     public ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
     @Autowired

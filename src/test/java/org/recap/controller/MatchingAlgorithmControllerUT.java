@@ -172,7 +172,6 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT {
     @Test
     public void testUpdateMonographCGDInDB() throws Exception {
         Mockito.when(matchingAlgoController.getMatchingAlgorithmUpdateCGDService()).thenReturn(matchingAlgorithmUpdateCGDService);
-        //Mockito.when(matchingAlgorithmUpdateCGDService.getLogger()).thenCallRealMethod();
         Mockito.when(matchingAlgorithmUpdateCGDService.getMatchingAlgorithmUtil()).thenReturn(matchingAlgorithmUtil);
         Mockito.when(matchingAlgorithmUpdateCGDService.getReportDataDetailsRepository()).thenReturn(reportDataDetailsRepository);
         Mockito.when(matchingAlgorithmUpdateCGDService.getBibliographicDetailsRepository()).thenReturn(mockedBibliographicDetailsRepository);
@@ -372,7 +371,7 @@ public class MatchingAlgorithmControllerUT extends BaseControllerUT {
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode("512356");
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
