@@ -64,7 +64,7 @@ public class EmailRouteBuilder {
                                         .log("Email for update cgd")
                                         .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
                                     .when(header(RecapConstants.EMAIL_FOR).isEqualTo(RecapConstants.BATCHJOB))
-                                        .setHeader("subject", simple(batchJobSubject))
+                                        .setHeader("subject", simple(batchJobSubject + " - " + "${header.emailPayLoad.jobName}" + " - " + "${header.emailPayLoad.status}"))
                                         .setBody(simple(emailBodyForBatchJob))
                                         .setHeader("from", simple(from))
                                         .setHeader("to", simple(batchJobTo))
