@@ -36,13 +36,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
         assertNotNull(entity);
 
-        PatronEntity patronEntity = new PatronEntity();
-        patronEntity.setInstitutionIdentifier(entity.getInstitutionCode());
-        patronEntity.setInstitutionId(entity.getInstitutionId());
-        patronEntity.setEmailId("hamalatha.s@htcindia.com");
-        PatronEntity savedPatronEntity = patronDetailsRepository.save(patronEntity);
-        assertNotNull(savedPatronEntity);
-
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
 
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
@@ -59,7 +52,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
         requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
         requestItemEntity.setRequestingInstitutionId(1);
-        requestItemEntity.setPatronId(savedPatronEntity.getPatronId());
         requestItemEntity.setStopCode("test");
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
@@ -67,6 +59,7 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setNotes("test");
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+        requestItemEntity.setPatronId(1);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
     }
@@ -84,13 +77,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestStatusEntity.setRequestStatusCode("REFILE");
         requestStatusEntity.setRequestStatusDescription("REFILE");
 
-        PatronEntity patronEntity = new PatronEntity();
-        patronEntity.setInstitutionIdentifier(entity.getInstitutionCode());
-        patronEntity.setInstitutionId(entity.getInstitutionId());
-        patronEntity.setEmailId("hamalatha.s@htcindia.com");
-        PatronEntity savedPatronEntity = patronDetailsRepository.save(patronEntity);
-        assertNotNull(savedPatronEntity);
-
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("Recallhold");
         requestTypeEntity.setRequestTypeDesc("Recallhold");
@@ -104,7 +90,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
         requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
         requestItemEntity.setRequestingInstitutionId(1);
-        requestItemEntity.setPatronId(savedPatronEntity.getPatronId());
         requestItemEntity.setStopCode("test");
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
@@ -113,7 +98,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         requestItemEntity.setNotes("test");
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setInstitutionEntity(institutionEntity);
-        requestItemEntity.setPatronEntity(patronEntity);
         requestItemEntity.setItemEntity(bibliographicEntity.getItemEntities().get(0));
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setLastUpdatedDate(new Date());
@@ -123,7 +107,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         assertNotNull(requestItemEntity.getItemId());
         assertNotNull(requestItemEntity.getRequestTypeId());
         assertNotNull(requestItemEntity.getRequestingInstitutionId());
-        assertNotNull(requestItemEntity.getPatronId());
         assertNotNull(requestItemEntity.getRequestExpirationDate());
         assertNotNull(requestItemEntity.getCreatedBy());
         assertNotNull(requestItemEntity.getCreatedDate());
@@ -132,7 +115,6 @@ public class RequestItemEntityUT extends BaseTestCase{
         assertNotNull(requestItemEntity.getRequestStatusId());
         assertNotNull(requestItemEntity.getInstitutionEntity());
         assertNotNull(requestItemEntity.getRequestTypeEntity());
-        assertNotNull(requestItemEntity.getPatronEntity());
         assertNotNull(requestItemEntity.getItemEntity());
         assertNotNull(requestItemEntity.getRequestStatusEntity());
         assertNotNull(requestItemEntity.getNotes());
@@ -170,7 +152,7 @@ public class RequestItemEntityUT extends BaseTestCase{
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode("3123");
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");

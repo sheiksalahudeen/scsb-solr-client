@@ -669,12 +669,14 @@ public class AccessionService {
     @Transactional
     private String updateData(Object record, String owningInstitution, List<Map<String, String>> responseMapList, AccessionRequest accessionRequest, boolean isValidBoundWithRecord,boolean isFirstRecord){
         String response = null;
+        String incompleteResponse = new String();
         XmlToBibEntityConverterInterface xmlToBibEntityConverterInterface = getConverter(owningInstitution);
         if (null != xmlToBibEntityConverterInterface) {
             Map responseMap = xmlToBibEntityConverterInterface.convert(record, owningInstitution,accessionRequest);
             responseMapList.add(responseMap);
             BibliographicEntity bibliographicEntity = (BibliographicEntity) responseMap.get(RecapConstants.BIBLIOGRAPHICENTITY);
             List<ReportEntity> reportEntityList = (List<ReportEntity>) responseMap.get(RecapConstants.REPORTENTITIES);
+            incompleteResponse = (String) responseMap.get(RecapConstants.INCOMPLETE_RESPONSE);
             if (CollectionUtils.isNotEmpty(reportEntityList)) {
                 reportDetailRepository.save(reportEntityList);
             }
@@ -690,6 +692,9 @@ public class AccessionService {
                     response = errorMessage.toString();
                 }
             }
+        }
+        if (StringUtils.isNotEmpty(response) && StringUtils.isNotEmpty(incompleteResponse) && RecapConstants.SUCCESS.equalsIgnoreCase(response)){
+            return RecapConstants.SUCCESS_INCOMPLETE_RECORD;
         }
         return response;
     }

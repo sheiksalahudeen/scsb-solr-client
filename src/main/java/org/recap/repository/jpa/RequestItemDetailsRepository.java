@@ -61,50 +61,6 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
     Page<RequestItemEntity> findByItemBarcode(Pageable pageable, @Param("itemBarcode") String itemBarcode);
 
     /**
-     * Finds RequestItemEntity based on the given patron barcode.
-     *
-     * @param pageable      the pageable
-     * @param patronBarcode the patron barcode
-     * @return the page
-     */
-    @Query(value = "select request from RequestItemEntity request where request.patronId = (select patronId from PatronEntity patron where patron.institutionIdentifier = :patronBarcode)")
-    Page<RequestItemEntity> findByPatronBarcode(Pageable pageable, @Param("patronBarcode") String patronBarcode);
-
-    /**
-     * Finds RequestItemEntity based on the given patron barcode ,item barcode and delivery location.
-     *
-     * @param pageable         the pageable
-     * @param patronBarcode    the patron barcode
-     * @param itemBarcode      the item barcode
-     * @param deliveryLocation the delivery location
-     * @return the page
-     */
-    @Query(value = "select request from RequestItemEntity request where request.patronId = (select patronId from PatronEntity patron where patron.institutionIdentifier = :patronBarcode) and request.itemId = (select itemId from ItemEntity item where item.barcode = :itemBarcode) and request.stopCode = :deliveryLocation")
-    Page<RequestItemEntity> findByPatronBarcodeAndItemBarcodeAndDeliveryLocation(Pageable pageable, @Param("patronBarcode") String patronBarcode, @Param("itemBarcode") String itemBarcode, @Param("deliveryLocation") String deliveryLocation);
-
-    /**
-     * Finds RequestItemEntity based on the given patron barcode and item barcode.
-     *
-     * @param pageable      the pageable
-     * @param patronBarcode the patron barcode
-     * @param itemBarcode   the item barcode
-     * @return the page
-     */
-    @Query(value = "select request from RequestItemEntity request where request.patronId = (select patronId from PatronEntity patron where patron.institutionIdentifier = :patronBarcode) and request.itemId = (select itemId from ItemEntity item where item.barcode = :itemBarcode)")
-    Page<RequestItemEntity> findByPatronBarcodeAndItemBarcode(Pageable pageable, @Param("patronBarcode") String patronBarcode, @Param("itemBarcode") String itemBarcode);
-
-    /**
-     * Finds RequestItemEntity based on the given patron barcode and delivery location.
-     *
-     * @param pageable         the pageable
-     * @param patronBarcode    the patron barcode
-     * @param deliveryLocation the delivery location
-     * @return the page
-     */
-    @Query(value = "select request from RequestItemEntity request where request.patronId = (select patronId from PatronEntity patron where patron.institutionIdentifier = :patronBarcode) and request.stopCode = :deliveryLocation")
-    Page<RequestItemEntity> findByPatronBarcodeAndDeliveryLocation(Pageable pageable, @Param("patronBarcode") String patronBarcode, @Param("deliveryLocation") String deliveryLocation);
-
-    /**
      * Finds RequestItemEntity based on the given item barcode and delivery location.
      *
      * @param pageable         the pageable

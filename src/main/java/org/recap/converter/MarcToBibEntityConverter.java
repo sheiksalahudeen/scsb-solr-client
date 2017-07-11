@@ -67,6 +67,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             int successItemCount = 0;
             String reasonForFailureItem = "";
         Map<String, Object> map = new HashMap<>();
+        String incompleteResponse = new String();
         boolean processBib = false;
 
         Record record = (Record) marcRecord;
@@ -150,6 +151,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                             holdingsEntity.getItemEntities().add(itemEntity);
                             itemEntities.add(itemEntity);
                         }
+                        if(RecapConstants.INCOMPLETE_STATUS.equalsIgnoreCase(itemEntity.getCatalogingStatus())){
+                            incompleteResponse = RecapConstants.INCOMPLETE_STATUS;
+                        }
                     }
                 }
 
@@ -167,6 +171,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         map.put(RecapConstants.FAILED_ITEM_COUNT,failedItemCount);
         map.put(RecapConstants.SUCCESS_ITEM_COUNT,successItemCount);
         map.put(RecapConstants.REASON_FOR_ITEM_FAILURE,reasonForFailureItem);
+        map.put(RecapConstants.INCOMPLETE_RESPONSE,incompleteResponse);
 
         return map;
     }

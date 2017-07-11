@@ -71,7 +71,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setCreatedBy("etl");
         itemEntity.setLastUpdatedDate(date);
         itemEntity.setLastUpdatedBy("etl");
-        itemEntity.setBarcode("1231");
+        itemEntity.setBarcode("123178");
         String owningInstitutionItemId = String.valueOf(random.nextInt());
         itemEntity.setOwningInstitutionItemId(owningInstitutionItemId);
         itemEntity.setOwningInstitutionId(owningInstitutionId);
@@ -113,7 +113,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         assertEquals(savedItemEntity.getCallNumber(), "callNum");
         assertEquals(savedItemEntity.getCreatedBy(), "etl");
         assertEquals(savedItemEntity.getLastUpdatedBy(), "etl");
-        assertEquals(savedItemEntity.getBarcode(), "1231");
+        assertEquals(savedItemEntity.getBarcode(), "123178");
         assertEquals(savedItemEntity.getOwningInstitutionItemId(), owningInstitutionItemId);
         assertEquals(savedItemEntity.getCustomerCode(), "PA");
         assertNotNull(savedItemEntity.getHoldingsEntities());
@@ -178,7 +178,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
-        itemEntity.setBarcode("123");
+        itemEntity.setBarcode("12398");
         itemEntity.setCallNumber("x.12321");
         itemEntity.setCollectionGroupId(1);
         itemEntity.setCallNumberType("1");
