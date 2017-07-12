@@ -50,14 +50,11 @@ public class AccessionRequest {
 
         AccessionRequest that = (AccessionRequest) o;
 
-        if (itemBarcode != null ? !itemBarcode.equals(that.itemBarcode) : that.itemBarcode != null) return false;
-        return customerCode != null ? customerCode.equals(that.customerCode) : that.customerCode == null;
+        return itemBarcode != null ? itemBarcode.equals(that.itemBarcode) : that.itemBarcode == null;
     }
 
     @Override
     public int hashCode() {
-        int result = itemBarcode != null ? itemBarcode.hashCode() : 0;
-        result = 31 * result + (customerCode != null ? customerCode.hashCode() : 0);
-        return result;
+        return itemBarcode != null ? itemBarcode.hashCode() : 0;
     }
 }

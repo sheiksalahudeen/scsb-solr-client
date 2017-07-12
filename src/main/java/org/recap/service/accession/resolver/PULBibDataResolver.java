@@ -1,14 +1,18 @@
 package org.recap.service.accession.resolver;
 
+import org.apache.commons.lang3.StringUtils;
+import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.service.accession.BulkAccessionService;
 import org.recap.service.partnerservice.PrincetonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,8 +41,18 @@ public class PULBibDataResolver extends BibDataResolver {
     }
 
     @Override
-    public String processXml(Set<AccessionResponse> accessionResponses, String bibDataResponse, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) throws Exception {
-        return bulkAccessionService.processAccessionForMarcXml(accessionResponses, bibDataResponse,
+    public Object unmarshal(String bibDataResponse) {
+        return marcRecordConvert(bibDataResponse);
+    }
+
+    @Override
+    public ItemEntity getItemEntityFromRecord(Object object) {
+        return getItemEntityFormMarcRecord((List<Record>) object);
+    }
+
+    @Override
+    public String processXml(Set<AccessionResponse> accessionResponses, Object object, List<Map<String, String>> responseMapList, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) throws Exception {
+        return bulkAccessionService.processAccessionForMarcXml(accessionResponses, object,
                 responseMapList, owningInstitution, reportDataEntityList, accessionRequest);
     }
 }
