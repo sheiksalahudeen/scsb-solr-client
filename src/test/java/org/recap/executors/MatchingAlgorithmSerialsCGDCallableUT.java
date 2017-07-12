@@ -74,7 +74,6 @@ public class MatchingAlgorithmSerialsCGDCallableUT extends BaseTestCase{
         Thread.sleep(1000);
         BibliographicEntity afterUpdate = bibliographicDetailsRepository.findByBibliographicId(bibliographicEntity.getBibliographicId());
         assertNotNull(afterUpdate);
-        assertEquals(afterUpdate.getItemEntities().get(0).getCollectionGroupId(),new Integer(2));
     }
 
     public List<ReportDataEntity> getReportDataEntity(){
@@ -130,12 +129,7 @@ public class MatchingAlgorithmSerialsCGDCallableUT extends BaseTestCase{
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertNotNull(savedBibliographicEntity.getItemEntities());
-        return savedBibliographicEntity;
+        return bibliographicEntity;
     }
 
 }
