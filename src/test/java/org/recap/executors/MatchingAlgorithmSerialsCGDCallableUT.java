@@ -60,7 +60,7 @@ public class MatchingAlgorithmSerialsCGDCallableUT extends BaseTestCase{
         Mockito.when((Integer) collectionGroupMap.get(RecapConstants.REPORTS_OPEN)).thenReturn(2);
         Mockito.when(collectionGroupMap.get(RecapConstants.SHARED_CGD)).thenReturn(1);
         Mockito.when(reportDataDetailsRepository.getReportDataEntityForMatchingSerials(RecapConstants.BIB_ID, from, batchSize)).thenReturn(getReportDataEntity());
-        Mockito.when(mockedBibliographicDetailsRepository.findByBibliographicIdIn(Mockito.any())).thenReturn(Arrays.asList(bibliographicEntity));
+        Mockito.when(mockedBibliographicDetailsRepository.findByBibliographicId(Mockito.any())).thenReturn(bibliographicEntity);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class MatchingAlgorithmSerialsCGDCallableUT extends BaseTestCase{
         Object object = matchingAlgorithmSerialsCGDCallable.call();
         assertEquals(collectionGroupId,1);
         Thread.sleep(1000);
-        BibliographicEntity afterUpdate = bibliographicDetailsRepository.findByBibliographicId(bibliographicEntity.getBibliographicId());
+        BibliographicEntity afterUpdate = mockedBibliographicDetailsRepository.findByBibliographicId(bibliographicEntity.getBibliographicId());
         assertNotNull(afterUpdate);
     }
 
