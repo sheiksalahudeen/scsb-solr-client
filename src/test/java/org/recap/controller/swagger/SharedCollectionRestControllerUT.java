@@ -1,5 +1,6 @@
 package org.recap.controller.swagger;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import org.recap.model.ItemAvailabilityResponse;
 import org.recap.model.ItemAvailabityStatusRequest;
 import org.recap.model.accession.AccessionRequest;
 import org.recap.model.accession.AccessionResponse;
-import org.recap.model.accession.BatchAccessionResponse;
+import org.recap.model.accession.AccessionSummary;
 import org.recap.model.jpa.AccessionEntity;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -75,6 +76,9 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
     @Mock
     private AccessionDetailsRepository accessionDetailsRepository;
 
+    @Mock
+    private ProducerTemplate producerTemplate;
+
     @Before
     public void setup()throws Exception{
         MockitoAnnotations.initMocks(this);
@@ -126,36 +130,41 @@ public class SharedCollectionRestControllerUT extends BaseControllerUT {
         accessionResponse.setMessage(RecapConstants.SUCCESS);
         accessionResponseList.add(accessionResponse);
         Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
+        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService()).thenReturn(bulkAccessionService);
         Mockito.when(mockedSharedCollectionRestController.getInputLimit()).thenReturn(10);
+        Mockito.when(accessionService.getProducerTemplate()).thenReturn(producerTemplate);
         Mockito.when(mockedSharedCollectionRestController.getAccessionService().processRequest(accessionRequestList)).thenReturn(accessionResponseList);
+        Mockito.doCallRealMethod().when(bulkAccessionService).createSummaryReport(Mockito.any(),Mockito.any());
         Mockito.when(mockedSharedCollectionRestController.accession(accessionRequestList)).thenCallRealMethod();
         ResponseEntity responseEntity = mockedSharedCollectionRestController.accession(accessionRequestList);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(),accessionResponseList);
     }
 
     @Test
     public void testOngoingAccessionJob(){
         AccessionEntity accessionEntity = new AccessionEntity();
         accessionEntity.setCreatedDate(new Date());
+        String accessionType = RecapConstants.BULK_ACCESSION_SUMMARY;
         accessionEntity.setAccessionStatus("Complete");
         accessionEntity.setAccessionRequest("Test");
         accessionEntity.setAccessionId(1);
         AccessionRequest accessionRequest = new AccessionRequest();
         List<AccessionRequest> accessionRequestList = new ArrayList<>();
         accessionRequestList.add(accessionRequest);
-        BatchAccessionResponse batchAccessionResponse = new BatchAccessionResponse();
-        batchAccessionResponse.setSuccessRecords(1);
+        AccessionResponse accessionResponse = new AccessionResponse();
+        accessionResponse.setItemBarcode("33458456586745");
+        accessionResponse.setMessage("Success");
+        AccessionSummary accessionSummary = new AccessionSummary("Test");
+        accessionSummary.setSuccessRecords(1);
         Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService()).thenReturn(bulkAccessionService);
         Mockito.when(accessionService.getAccessionDetailsRepository()).thenReturn(accessionDetailsRepository);
         Mockito.when(mockedSharedCollectionRestController.getAccessionService()).thenReturn(accessionService);
         Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().getAccessionEntities(RecapConstants.PENDING)).thenReturn(Arrays.asList(accessionEntity));
         Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().getAccessionRequest(Mockito.any())).thenReturn(accessionRequestList);
-        Mockito.when(mockedSharedCollectionRestController.getBulkAccessionService().processAccessionRequest(accessionRequestList)).thenReturn(batchAccessionResponse);
         Mockito.when(mockedSharedCollectionRestController.ongoingAccessionJob()).thenCallRealMethod();
         String response = mockedSharedCollectionRestController.ongoingAccessionJob();
         assertNotNull(response);
-        assertEquals(response,"Success");
+
     }
 
     private BibliographicEntity saveBibEntityWithHoldingsAndItem(String itemBarcode) throws Exception {

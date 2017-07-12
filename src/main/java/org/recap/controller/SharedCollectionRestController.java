@@ -163,7 +163,7 @@ public class SharedCollectionRestController {
 
             logger.info(accessionSummary.toString());
 
-            bulkAccessionService.createSummaryReport(accessionSummary.toString(), accessionType);
+            getBulkAccessionService().createSummaryReport(accessionSummary.toString(), accessionType);
 
             responseEntity = new ResponseEntity(accessionResponsesList, getHttpHeaders(), HttpStatus.OK);
         }

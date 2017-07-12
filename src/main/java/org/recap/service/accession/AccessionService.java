@@ -178,6 +178,10 @@ public class AccessionService {
         return accessionDetailsRepository;
     }
 
+    public ProducerTemplate getProducerTemplate() {
+        return producerTemplate;
+    }
+
     /**
      * This method is used to find the owning institution code based on the customer code parameter value.
      *
@@ -616,7 +620,7 @@ public class AccessionService {
         ReportEntity reportEntity;
         reportEntity = getReportEntity(owningInstitution!=null ? owningInstitution : RecapConstants.UNKNOWN_INSTITUTION);
         reportEntity.setReportDataEntities(reportDataEntityList);
-        producerTemplate.sendBody(RecapConstants.REPORT_Q, reportEntity);
+        getProducerTemplate().sendBody(RecapConstants.REPORT_Q, reportEntity);
     }
 
     private ReportEntity getReportEntity(String owningInstitution){
