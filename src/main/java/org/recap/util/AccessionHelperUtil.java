@@ -115,17 +115,16 @@ public class AccessionHelperUtil {
 
                         // Process XML Record
                         if(accessionProcess) { // Accession process
-                            String response = bibDataResolver.processXml(accessionResponses, unmarshalObject,
-                                    responseMaps, owningInstitution, reportDataEntitys, accessionRequest);
+                            processXMLForAccession(accessionResponses, responseMaps, accessionRequest, reportDataEntitys,
+                                    owningInstitution, bibDataResolver, unmarshalObject);
                         } else {  // If attached
 
                             // update item record with new barcode. Accession Process
-                            String response = bibDataResolver.processXml(accessionResponses, unmarshalObject,
-                                    responseMaps, owningInstitution, reportDataEntitys, accessionRequest);
+                            processXMLForAccession(accessionResponses, responseMaps, accessionRequest, reportDataEntitys,
+                                    owningInstitution, bibDataResolver, unmarshalObject);
                             // Move item record information to history table
                             ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = prepareBarcodeHistoryEntity(itemEntity, itemBarcode);
                             itemBarcodeHistoryDetailsRepository.save(itemBarcodeHistoryEntity);
-                            callCheckin(accessionRequest.getItemBarcode(),owningInstitution);
                         }
                     } catch (Exception e) {
                         if(writeToReport) {
@@ -145,6 +144,12 @@ public class AccessionHelperUtil {
         accessionService.saveReportEntity(owningInstitution, reportDataEntitys);
 
         return accessionResponses;
+    }
+
+    private void processXMLForAccession(Set<AccessionResponse> accessionResponses, List<Map<String, String>> responseMaps, AccessionRequest accessionRequest, List<ReportDataEntity> reportDataEntitys, String owningInstitution, BibDataResolver bibDataResolver, Object unmarshalObject) throws Exception {
+        String response = bibDataResolver.processXml(accessionResponses, unmarshalObject,
+                responseMaps, owningInstitution, reportDataEntitys, accessionRequest);
+        callCheckin(accessionRequest.getItemBarcode(),owningInstitution);
     }
 
 
