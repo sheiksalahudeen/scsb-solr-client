@@ -65,7 +65,7 @@ public class MatchingAlgorithmMVMsCGDCallableUT extends BaseTestCase{
         Mockito.when(reportDataDetailsRepository.getReportDataEntityForMatchingMVMs(RecapConstants.BIB_ID, from, batchSize)).thenReturn(getReportDataEntity(bibliographicEntity.getBibliographicId()));
         Mockito.when((Integer) collectionGroupMap.get(RecapConstants.REPORTS_OPEN)).thenReturn(2);
         Mockito.when(collectionGroupMap.get(RecapConstants.SHARED_CGD)).thenReturn(1);
-        Mockito.when(mockedBibliographicDetailsRepository.findByBibliographicIdIn(Mockito.any())).thenReturn(Arrays.asList(bibliographicEntity));
+        Mockito.when(mockedBibliographicDetailsRepository.findByBibliographicId(Mockito.any())).thenReturn(bibliographicEntity);
     }
 
     public List<ReportDataEntity> getReportDataEntity(Integer bibId){
@@ -84,7 +84,7 @@ public class MatchingAlgorithmMVMsCGDCallableUT extends BaseTestCase{
         Object object = matchingAlgorithmMVMsCGDCallable.call();
         assertEquals(collectionGroupId,1);
         Thread.sleep(1000);
-        BibliographicEntity afterUpdate = bibliographicDetailsRepository.findByBibliographicId(bibliographicEntity.getBibliographicId());
+        BibliographicEntity afterUpdate = mockedBibliographicDetailsRepository.findByBibliographicId(bibliographicEntity.getBibliographicId());
         assertNotNull(afterUpdate);
     }
 
