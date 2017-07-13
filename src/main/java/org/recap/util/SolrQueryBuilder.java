@@ -538,8 +538,9 @@ public class SolrQueryBuilder {
         }
         query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
-                .append(and).append(coreParentFilterQuery)
-                .append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD);
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.IS_DELETED_ITEM).append(":").append(RecapConstants.FALSE)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         SolrQuery solrQuery = new SolrQuery(query.toString());
         solrQuery.setRows(rows);
         return solrQuery;
@@ -557,8 +558,9 @@ public class SolrQueryBuilder {
         query.append(buildQueryForMatchChildReturnParent(fieldName, matchingPointValues));
         query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
-                .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
-                .append(":").append(RecapConstants.SHARED_CGD);
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.IS_DELETED_ITEM).append(":").append(RecapConstants.FALSE)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         return query.toString();
     }
 
@@ -577,8 +579,9 @@ public class SolrQueryBuilder {
         query.append(fieldName).append(":").append("\"").append(matchingPointValue).append("\"");
         query.append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS)
-                .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
-                .append(":").append(RecapConstants.SHARED_CGD);
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.IS_DELETED_ITEM).append(":").append(RecapConstants.FALSE)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         return query.toString();
     }
 
@@ -594,8 +597,9 @@ public class SolrQueryBuilder {
                 .append(or).append(RecapConstants.BIB_LAST_UPDATED_DATE).append(":").append("[").append(date).append("]").append(")")
                 .append(and).append(RecapConstants.IS_DELETED_BIB).append(":").append(RecapConstants.FALSE)
                 .append(and).append(RecapConstants.BIB_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
-        query.append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION)
-                .append(":").append(RecapConstants.SHARED_CGD);
+        query.append(and).append(coreParentFilterQuery).append(RecapConstants.COLLECTION_GROUP_DESIGNATION).append(":").append(RecapConstants.SHARED_CGD)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.IS_DELETED_ITEM).append(":").append(RecapConstants.FALSE)
+                .append(and).append(coreParentFilterQuery).append(RecapConstants.ITEM_CATALOGING_STATUS).append(":").append(RecapConstants.COMPLETE_STATUS);
         return query.toString();
     }
 

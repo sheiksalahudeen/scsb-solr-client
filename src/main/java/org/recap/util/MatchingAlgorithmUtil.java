@@ -64,6 +64,11 @@ public class MatchingAlgorithmUtil {
 
     private String coreParentFilterQuery = "{!parent which=\"ContentType:parent\"}";
 
+    /**
+     * Gets report detail repository.
+     *
+     * @return the report detail repository
+     */
     public ReportDetailRepository getReportDetailRepository() {
         return reportDetailRepository;
     }
@@ -143,13 +148,13 @@ public class MatchingAlgorithmUtil {
      * Process pending matching bibs map.
      *
      * @param matchingBibEntityList the matching bib entity list
+     * @param matchingBibIds        the matching bib ids
      * @return the map
      */
-    public Map processPendingMatchingBibs(List<MatchingBibEntity> matchingBibEntityList) {
+    public Map processPendingMatchingBibs(List<MatchingBibEntity> matchingBibEntityList, Set<Integer> matchingBibIds) {
         Integer pulMatchingCount = 0;
         Integer culMatchingCount = 0;
         Integer nyplMatchingCount = 0;
-        List<Integer> matchingBibIds = new ArrayList<>();
 
         if(CollectionUtils.isNotEmpty(matchingBibEntityList)) {
             for(MatchingBibEntity matchingBibEntity : matchingBibEntityList) {
@@ -178,9 +183,7 @@ public class MatchingAlgorithmUtil {
                         List<MatchingBibEntity> bibEntities = matchingBibDetailsRepository.findByMatchingAndBibIdIn(matchingBibEntity.getMatching(), bibIds);
                         for(MatchingBibEntity bibEntity : bibEntities) {
                             matchingBibEntityMap.put(bibEntity.getBibId(), bibEntity);
-                            if(!matchingBibEntity.getBibId().equals(bibEntity.getBibId()) && matchingBibEntityList.contains(bibEntity)) {
-                                matchingBibIds.add(bibEntity.getId());
-                            }
+                            matchingBibIds.add(bibEntity.getId());
                         }
                         Map<String, Integer> countsMap = saveReportForSingleMatch(matchPointValue, bibIds, matchingBibEntity.getMatching(), matchingBibEntityMap, true);
                         pulMatchingCount = pulMatchingCount + countsMap.get("pulMatchingCount");
@@ -356,20 +359,11 @@ public class MatchingAlgorithmUtil {
 
             reportEntity.addAll(reportDataEntities);
             reportEntitiesToSave.add(reportEntity);
-            Map matchingBibMap = new HashMap();
-            matchingBibMap.put(RecapConstants.STATUS, RecapConstants.COMPLETE_STATUS);
-            matchingBibMap.put(RecapConstants.MATCHING_BIB_IDS, bibIds);
-            if(isPendingBibs) {
-                matchingBibDetailsRepository.updateStatus(RecapConstants.COMPLETE_STATUS, bibIds);
-            } else {
-                producerTemplate.sendBody("scsbactivemq:queue:updateMatchingBibEntityQ", matchingBibMap);
-            }
-        } else {
-            if(isPendingBibs) {
+            if(!isPendingBibs) {
                 Map matchingBibMap = new HashMap();
                 matchingBibMap.put(RecapConstants.STATUS, RecapConstants.COMPLETE_STATUS);
                 matchingBibMap.put(RecapConstants.MATCHING_BIB_IDS, bibIds);
-                matchingBibDetailsRepository.updateStatus(RecapConstants.COMPLETE_STATUS, bibIds);
+                producerTemplate.sendBody("scsbactivemq:queue:updateMatchingBibEntityQ", matchingBibMap);
             }
         }
         if(CollectionUtils.isNotEmpty(reportEntitiesToSave)) {
@@ -752,8 +746,12 @@ public class MatchingAlgorithmUtil {
      */
     public List<MatchingMatchPointsEntity> getMatchingMatchPointsEntity(String fieldName) throws Exception {
         List<MatchingMatchPointsEntity> matchingMatchPointsEntities = new ArrayList<>();
-        String query = RecapConstants.DOCTYPE + ":" + RecapConstants.BIB + and + RecapConstants.IS_DELETED_BIB + ":false" + and + coreParentFilterQuery + RecapConstants.COLLECTION_GROUP_DESIGNATION
-                + ":" + RecapConstants.SHARED_CGD + and + coreParentFilterQuery + RecapConstants.IS_DELETED_ITEM + ":false";
+        String query = RecapConstants.DOCTYPE + ":" + RecapConstants.BIB +
+                and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS +
+                and + RecapConstants.IS_DELETED_BIB + ":" + RecapConstants.FALSE +
+                and + coreParentFilterQuery + RecapConstants.COLLECTION_GROUP_DESIGNATION + ":" + RecapConstants.SHARED_CGD +
+                and + coreParentFilterQuery + RecapConstants.ITEM_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS +
+                and + coreParentFilterQuery + RecapConstants.IS_DELETED_ITEM + ":" + RecapConstants.FALSE;
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.setFacet(true);
         solrQuery.addFacetField(fieldName);

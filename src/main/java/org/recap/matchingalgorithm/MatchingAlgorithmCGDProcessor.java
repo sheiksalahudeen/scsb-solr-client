@@ -175,11 +175,13 @@ public class MatchingAlgorithmCGDProcessor {
                     //NYPL
                     boolean isMultipleCopy = false;
                     for(ItemEntity itemEntity : itemEntities) {
-                        if(itemEntity.getCopyNumber() > 1) {
-                            isMultipleCopy = true;
-                        }
-                        if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
-                            populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
+                        if(itemEntity != null) {
+                            if(itemEntity.getCopyNumber() != null && itemEntity.getCopyNumber() > 1) {
+                                isMultipleCopy = true;
+                            }
+                            if(itemEntity.getCollectionGroupId().equals(collectionGroupMap.get(RecapConstants.SHARED_CGD))) {
+                                populateValues(materialTypeSet, useRestrictionMap, itemEntityMap, itemEntity);
+                            }
                         }
                     }
                     if(!isMultipleCopy) {
