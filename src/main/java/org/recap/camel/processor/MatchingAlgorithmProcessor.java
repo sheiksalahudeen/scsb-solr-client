@@ -85,11 +85,16 @@ public class MatchingAlgorithmProcessor {
         itemDetailsRepository.save(itemEntities);
     }
 
+    /**
+     * Update matching bib entity.
+     *
+     * @param matchingBibMap the matching bib map
+     */
     public void updateMatchingBibEntity(Map matchingBibMap) {
         String status = (String) matchingBibMap.get(RecapConstants.STATUS);
         List<Integer> matchingBibIds = (List<Integer>) matchingBibMap.get(RecapConstants.MATCHING_BIB_IDS);
         try {
-            matchingBibDetailsRepository.updateStatus(status, matchingBibIds);
+            matchingBibDetailsRepository.updateStatusBasedOnBibs(status, matchingBibIds);
         } catch (Exception e) {
             logger.info("Exception while updating matching Bib entity status : " , e);
         }

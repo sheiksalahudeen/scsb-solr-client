@@ -168,7 +168,19 @@ public interface MatchingBibDetailsRepository extends JpaRepository<MatchingBibE
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE MatchingBibEntity mbe SET mbe.status = :status WHERE mbe.bibId in :bibIds")
-    int updateStatus(@Param("status") String status,@Param("bibIds") List<Integer> bibIds);
+    int updateStatusBasedOnBibs(@Param("status") String status, @Param("bibIds") List<Integer> bibIds);
+
+     /**
+     * Update status int.
+     *
+     * @param statusToUpdate the status to update
+     * @param actualStatus the actual status
+     * @return the int
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE MatchingBibEntity mbe SET mbe.status = :statusToUpdate WHERE mbe.status in :actualStatus")
+    int updateStatus(@Param("statusToUpdate") String statusToUpdate,@Param("actualStatus") String actualStatus);
 
     /**
      * Find by status page.

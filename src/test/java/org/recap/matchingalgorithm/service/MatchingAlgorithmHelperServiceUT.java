@@ -328,6 +328,7 @@ public class MatchingAlgorithmHelperServiceUT extends BaseTestCase{
         countMap.put(RecapConstants.PUL_MATCHING_COUNT, 1);
         countMap.put(RecapConstants.CUL_MATCHING_COUNT, 1);
         countMap.put(RecapConstants.NYPL_MATCHING_COUNT, 1);
+        Set<Integer> matchingBibIds = new HashSet<>();
         Mockito.when(matchingAlgoHelperService.getMatchingAlgorithmUtil()).thenReturn(matchingAlgorithmUtil);
         Mockito.when(matchingAlgoHelperService.getJmxHelper()).thenReturn(jmxHelper);
         Mockito.when(matchingAlgoHelperService.getMatchingBibDetailsRepository()).thenReturn(matchingBibDetailsRepository);
@@ -338,7 +339,7 @@ public class MatchingAlgorithmHelperServiceUT extends BaseTestCase{
         Mockito.when(matchingAlgoHelperService.populateReportsForPendingMatches(1000)).thenCallRealMethod();
         Mockito.when(matchingBibDetailsRepository.findByStatus(new PageRequest(0,1000), RecapConstants.PENDING)).thenReturn(getMatchingBibEntity(matchingBibEntities));
         Mockito.when(matchingBibDetailsRepository.findByStatus(new PageRequest(1,1000), RecapConstants.PENDING)).thenReturn(getMatchingBibEntity(matchingBibEntities));
-        Mockito.when(matchingAlgorithmUtil.processPendingMatchingBibs(matchingBibEntities)).thenReturn(countMap);
+        Mockito.when(matchingAlgorithmUtil.processPendingMatchingBibs(matchingBibEntities, matchingBibIds)).thenReturn(countMap);
         Mockito.when(matchingAlgoHelperService.populateReportsForSingleMatch(1000)).thenCallRealMethod();
         Map<String, Integer> countsMap = matchingAlgoHelperService.populateReportsForSingleMatch(1000);
         assertEquals(Math.toIntExact(countsMap.get(RecapConstants.PUL_MATCHING_COUNT)), 6);

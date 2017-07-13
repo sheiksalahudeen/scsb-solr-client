@@ -121,7 +121,7 @@ public class MatchingBibDetailsRepositoryUT extends BaseTestCase{
         MatchingBibEntity matchingBibEntity1 = byStatus.getContent().get(0);
         assertNotNull(matchingBibEntity1);
         assertEquals(matchingBibEntity.getId(), matchingBibEntity1.getId());
-        int updateStatus = matchingBibDetailsRepository.updateStatus(RecapConstants.COMPLETE_STATUS, Arrays.asList(matchingBibEntity.getBibId()));
+        int updateStatus = matchingBibDetailsRepository.updateStatusBasedOnBibs(RecapConstants.COMPLETE_STATUS, Arrays.asList(matchingBibEntity.getBibId()));
         assertTrue(updateStatus > 0);
         Page<MatchingBibEntity> matchingBibEntities = matchingBibDetailsRepository.findByStatus(new PageRequest(0, 10), RecapConstants.COMPLETE_STATUS);
         assertNotNull(matchingBibEntities);
