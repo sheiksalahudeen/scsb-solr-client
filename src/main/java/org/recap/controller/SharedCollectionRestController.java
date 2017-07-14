@@ -195,7 +195,7 @@ public class SharedCollectionRestController {
                 status = RecapConstants.FAILURE;
             }
         } else {
-            status = RecapConstants.FAILURE;
+            status = RecapConstants.ACCESSION_NO_PENDING_REQUESTS;
         }
         getAccessionService().updateStatusForAccessionEntities(accessionEntities, RecapConstants.COMPLETE_STATUS);
         stopWatch.stop();
