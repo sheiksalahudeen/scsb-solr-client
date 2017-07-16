@@ -20,7 +20,10 @@ public class SubmitCollectionReportRecord implements Serializable {
     @DataField(pos = 3, columnName = "Owning Institution")
     private String owningInstitution;
 
-    @DataField(pos = 4, columnName = "Message")
+    @DataField(pos = 4, columnName = "Report Type")
+    private String reportType;
+
+    @DataField(pos = 5, columnName = "Message")
     private String message;
 
     /**
@@ -75,6 +78,14 @@ public class SubmitCollectionReportRecord implements Serializable {
      */
     public void setOwningInstitution(String owningInstitution) {
         this.owningInstitution = owningInstitution;
+    }
+
+    public String getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
     }
 
     /**
