@@ -434,5 +434,7 @@ public final class RecapConstants {
     public static final String SUCCESS_INCOMPLETE_RECORD = "Success - Incomplete record";
     public static final String INCOMPLETE_RESPONSE = "incompleteResponse";
 
+    public static final String ACCESSION_NO_PENDING_REQUESTS = "No pending requests to process accession.";
+
     private RecapConstants(){}
 }
