@@ -289,7 +289,11 @@ public final class RecapConstants {
     public static final String SUBMIT_COLLECTION_REPORT = "Submit_Collection_Report";
     public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
     public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
-    public static final String SUBMIT_COLLECTION_SUMMARY_REPORT = "Submit_Collection_Summary_Report";
+    public static final String SUBMIT_COLLECTION_SUCCESS_REPORT = "Submit_Collection_Success_Report";
+    public static final String SUBMIT_COLLECTION_FAILURE_REPORT = "SubmitCollection_Failure_Report";
+    public static final String FAIL = "Fail";
+    public static final String REJECTION = "Rejection";
+    public static final String SC_EXCEPTION = "Exception";
     public static final String SUBMIT_COLLECTION_ITEM_BARCODE= "ItemBarcode";
     public static final String SUBMIT_COLLECTION_CUSTOMER_CODE= "CustomerCode";
     public static final String ITEM_BARCODE_NOT_FOUND_MSG = "Item Barcode not found";

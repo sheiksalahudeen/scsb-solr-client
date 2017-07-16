@@ -37,6 +37,7 @@ public class SubmitCollectionReportGenerator {
             if((null == submitCollectionReportRecord && submitCollectionReportRecordList.isEmpty())
                     || (isReportRecordFullyUpdated(submitCollectionReportRecord))){
                 submitCollectionReportRecord = new SubmitCollectionReportRecord();
+                submitCollectionReportRecord.setReportType(getReportType(reportEntity.getType()));
             }
             ReportDataEntity report =  iterator.next();
             String headerValue = report.getHeaderValue();
@@ -66,6 +67,18 @@ public class SubmitCollectionReportGenerator {
         return newReportObject;
     }
 
+    private String getReportType(String type){
+        if(type.equals(RecapConstants.SUBMIT_COLLECTION_SUCCESS_REPORT)){
+            return RecapConstants.SUCCESS;
+        } else if(type.equals(RecapConstants.SUBMIT_COLLECTION_FAILURE_REPORT)){
+            return RecapConstants.FAIL;
+        } else if(type.equals(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+            return RecapConstants.SC_EXCEPTION;
+        } else if(type.equals(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)){
+            return RecapConstants.REJECTION;
+        }
+        return null;
+    }
     /**
      * This method is used to get the setter method for the given one of the instance variable name in SubmitCollectionReportRecord class.
      *
