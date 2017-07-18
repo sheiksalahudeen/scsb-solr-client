@@ -46,9 +46,9 @@ public final class RecapConstants {
     public static final String IS_DELETED_HOLDINGS = "IsDeletedHoldings";
     public static final String IS_DELETED_ITEM = "IsDeletedItem";
     public static final String PUBLICATION_DATE = "PublicationDate";
-    public static final String CGD_CHANAGE_LOG = "CGDChangeLog";
-    public static final String CGD_CHANAGE_LOG_SHARED_TO_PRIVATE = "SharedToPrivate";
-    public static final String CGD_CHANAGE_LOG_OPEN_TO_PRIVATE = "OpenToPrivate";
+    public static final String CGD_CHANGE_LOG = "CGDChangeLog";
+    public static final String CGD_CHANGE_LOG_SHARED_TO_PRIVATE = "SharedToPrivate";
+    public static final String CGD_CHANGE_LOG_OPEN_TO_PRIVATE = "OpenToPrivate";
     public static final String TITLE_SUBFIELD_A = "Title_subfield_a";
     public static final String ROOT = "_root_";
 
