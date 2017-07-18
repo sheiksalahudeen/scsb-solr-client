@@ -81,6 +81,9 @@ public class SearchRecordsRequest implements Serializable {
     @ApiModelProperty(name= "catalogingStatus", value= "Cataloging Status",position = 22)
     private String catalogingStatus;
 
+    @ApiModelProperty(name= "requestingInstitution", value= "Requesting Institution",position = 22)
+    private String requestingInstitution = "";
+
     private boolean sortIncompleteRecords = false;
 
 
@@ -548,6 +551,26 @@ public class SearchRecordsRequest implements Serializable {
         this.totalRecordsCount = String.valueOf(0);
         this.showTotalCount = false;
         this.errorMessage = null;
+    }
+
+
+    /**
+     * Gets requesting institution.
+     *
+     * @return the requesting institution
+     */
+    public String getRequestingInstitution() {
+        return requestingInstitution;
+    }
+
+
+    /**
+     * Sets requesting institution.
+     *
+     * @param requestingInstitution the requesting institution
+     */
+    public void setRequestingInstitution(String requestingInstitution) {
+        this.requestingInstitution = requestingInstitution;
     }
 
     /**

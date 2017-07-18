@@ -370,6 +370,16 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    public SolrQuery getQueryForParentAndChildCriteriaForDeletedDataDump(SearchRecordsRequest searchRecordsRequest) {
+        String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
+        String queryStringForBibCriteria = "";
+        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria
+                + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted()
+                + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS
+                + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : ""));
+        return solrQuery;
+    }
+
     /**
      * Gets query for child and parent criteria.
      *

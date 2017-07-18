@@ -94,7 +94,7 @@ public class ItemEntity implements Serializable {
     @ManyToMany(mappedBy = "itemEntities")
     private List<BibliographicEntity> bibliographicEntities;
 
-    @Transient
+    @Column(name = "CGD_CHANGE_LOG")
     private String cgdChangeLog;
 
     /**
