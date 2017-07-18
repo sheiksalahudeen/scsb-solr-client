@@ -8,9 +8,10 @@ import org.recap.model.solr.BibItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created by premkb on 27/1/17.
@@ -27,7 +28,8 @@ public class DataDumpSolrDocumentRepositoryImplAT extends BaseTestCase{
         searchRecordsRequest.getOwningInstitutions().addAll(Arrays.asList("CUL", "PUL"));
         searchRecordsRequest.getMaterialTypes().addAll(Arrays.asList("Monograph", "Serial", "Other"));
         searchRecordsRequest.setDeleted(true);
-        List<BibItem> bibItemList = dataDumpSolrDocumentRepository.searchByItem(searchRecordsRequest,true);
-        assertNotNull(bibItemList);
+        Map<Integer, BibItem> bibItemMap = new HashMap<>();
+        dataDumpSolrDocumentRepository.searchByItem(searchRecordsRequest,true,bibItemMap);
+        assertTrue(!bibItemMap.isEmpty());
     }
 }
