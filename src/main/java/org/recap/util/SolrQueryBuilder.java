@@ -370,6 +370,16 @@ public class SolrQueryBuilder {
         return solrQuery;
     }
 
+    public SolrQuery getQueryForParentAndChildCriteriaForDeletedDataDump(SearchRecordsRequest searchRecordsRequest) {
+        String queryForFieldCriteria = getQueryForFieldCriteria(searchRecordsRequest);
+        String queryStringForBibCriteria = "";
+        SolrQuery solrQuery = new SolrQuery(queryStringForBibCriteria
+                + RecapConstants.IS_DELETED_BIB + ":" + searchRecordsRequest.isDeleted()
+                + and + RecapConstants.BIB_CATALOGING_STATUS + ":" + RecapConstants.COMPLETE_STATUS
+                + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : ""));
+        return solrQuery;
+    }
+
     /**
      * Gets query for child and parent criteria.
      *
@@ -400,8 +410,8 @@ public class SolrQueryBuilder {
         SolrQuery solrQuery;
         if (isCGDChangedToPrivate) {
             queryStringForItemCriteria = getQueryStringForMatchParentReturnChildForDeletedDataDumpCGDToPrivate();
-            solrQuery = new SolrQuery(queryStringForItemCriteria + and +"("+ ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_SHARED_TO_PRIVATE + "\"" +")")
-                    + or + ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANAGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANAGE_LOG_OPEN_TO_PRIVATE +"\"" +")") +")"
+            solrQuery = new SolrQuery(queryStringForItemCriteria + and +"("+ ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANGE_LOG_SHARED_TO_PRIVATE + "\"" +")")
+                    + or + ("("+RecapConstants.IS_DELETED_ITEM + ":" + false + and +RecapConstants.CGD_CHANGE_LOG + ":" + "\"" +RecapConstants.CGD_CHANGE_LOG_OPEN_TO_PRIVATE +"\"" +")") +")"
                     + (StringUtils.isNotBlank(queryForFieldCriteria) ? and + queryForFieldCriteria : "")
                     + (StringUtils.isNotBlank(queryForBibCriteria) ? and + queryForBibCriteria : ""));//to include items that got changed from shared to private, open to private for deleted export
         } else{

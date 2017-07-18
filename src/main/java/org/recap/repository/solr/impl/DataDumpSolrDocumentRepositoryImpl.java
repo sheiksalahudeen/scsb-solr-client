@@ -9,6 +9,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.search.SearchRecordsRequest;
 import org.recap.model.search.resolver.BibValueResolver;
 import org.recap.model.search.resolver.ItemValueResolver;
@@ -19,11 +21,13 @@ import org.recap.model.search.resolver.impl.item.ItemIdValueResolver;
 import org.recap.model.search.resolver.impl.item.ItemRootValueResolver;
 import org.recap.model.solr.BibItem;
 import org.recap.model.solr.Item;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.solr.main.CustomDocumentRepository;
 import org.recap.util.SolrQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -49,9 +53,15 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
     @Autowired
     private SolrQueryBuilder solrQueryBuilder;
 
+    @Autowired
+    private BibliographicDetailsRepository bibliographicDetailsRepository;
+
     private List<BibValueResolver> bibValueResolvers;
 
     private List<ItemValueResolver> itemValueResolvers;
+
+    @Value("${datadump.deleted.type.onlyorphan.institution}")
+    private String deletedOnlyOrphanInstitution;
 
     @Override
     public Map<String, Object> search(SearchRecordsRequest searchRecordsRequest) {
@@ -114,14 +124,77 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
      */
     public List<BibItem> searchByItemForDeleted(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
-        List<BibItem> onlyDeletedList = searchByItem(searchRecordsRequest,false);
-        if(onlyDeletedList != null && !onlyDeletedList.isEmpty()){
-            bibItems.addAll(onlyDeletedList);
+        boolean onlyOrphan = isDeletedOnlyOrphanInstitution(searchRecordsRequest);
+        Map<Integer, BibItem> bibItemMap = new HashMap<>();
+        if(onlyOrphan){
+            bibItems = searchByBibForDeleted(searchRecordsRequest);
+            searchByItem(searchRecordsRequest, true, bibItemMap);
+            eliminateNonOrphanRecords(bibItemMap);
+        } else {
+            searchByItem(searchRecordsRequest, true, bibItemMap);
+            searchByItem(searchRecordsRequest, false, bibItemMap);
         }
-        List<BibItem> cgdChangedToPrivate = searchByItem(searchRecordsRequest,true);
-        if(cgdChangedToPrivate != null && !cgdChangedToPrivate.isEmpty()){
-            bibItems.addAll(cgdChangedToPrivate);
+        for(Integer bibId:bibItemMap.keySet()){
+            bibItems.add(bibItemMap.get(bibId));
         }
+        return bibItems;
+    }
+
+    private void eliminateNonOrphanRecords(Map<Integer, BibItem> bibItemMap){
+        for(Integer bibId:bibItemMap.keySet()){
+            BibliographicEntity fetchedBibliographicEntity = bibliographicDetailsRepository.findByBibliographicId(bibId);
+            boolean isBibDeleted = false;
+            for(ItemEntity fetchedItemEntity:fetchedBibliographicEntity.getItemEntities()){
+                if(fetchedItemEntity.isDeleted() || isChangedToPrivateCGD(fetchedItemEntity)){
+                    isBibDeleted = true;
+                } else {
+                    isBibDeleted = false;
+                    break;
+                }
+            }
+            if (!isBibDeleted){
+                bibItemMap.remove(bibId);
+            }
+        }
+    }
+
+    private boolean isChangedToPrivateCGD(ItemEntity fetchedItemEntity){
+        if(fetchedItemEntity.getCgdChangeLog()!=null){
+            if(fetchedItemEntity.getCgdChangeLog().equals(RecapConstants.CGD_CHANGE_LOG_SHARED_TO_PRIVATE)
+                    || fetchedItemEntity.getCgdChangeLog().equals(RecapConstants.CGD_CHANGE_LOG_OPEN_TO_PRIVATE)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<BibItem> searchByBibForDeleted(SearchRecordsRequest searchRecordsRequest) throws SolrServerException, IOException {
+        List<BibItem> bibItems = new ArrayList<>();
+        SolrQuery queryForParentAndChildCriteria = solrQueryBuilder.getQueryForParentAndChildCriteriaForDeletedDataDump(searchRecordsRequest);
+        queryForParentAndChildCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
+        queryForParentAndChildCriteria.setRows(searchRecordsRequest.getPageSize());
+        QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForParentAndChildCriteria);
+        SolrDocumentList bibSolrDocumentList = queryResponse.getResults();
+        if(CollectionUtils.isNotEmpty(bibSolrDocumentList)) {
+            long numFound = bibSolrDocumentList.getNumFound();
+            String totalBibCount = String.valueOf(numFound);
+            searchRecordsRequest.setTotalRecordsCount(totalBibCount);
+            int totalPagesCount = (int) Math.ceil((double) numFound / (double) searchRecordsRequest.getPageSize());
+            searchRecordsRequest.setTotalPageCount(totalPagesCount);
+            for (Iterator<SolrDocument> iterator = bibSolrDocumentList.iterator(); iterator.hasNext(); ) {
+                SolrDocument bibSolrDocument = iterator.next();
+                BibItem bibItem = new BibItem();
+                populateBib(bibSolrDocument, bibItem);
+                bibItems.add(bibItem);
+            }
+
+            List<List<BibItem>> partitionedBibItems = Lists.partition(bibItems, 300);
+            for (Iterator<List<BibItem>> iterator = partitionedBibItems.iterator(); iterator.hasNext(); ) {
+                List<BibItem> bibItemList = iterator.next();
+                populateItemInfo(bibItemList, searchRecordsRequest);
+            }
+        }
+
         return bibItems;
     }
 
@@ -134,7 +207,7 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
      * @throws SolrServerException the solr server exception
      * @throws IOException         the io exception
      */
-    public List<BibItem> searchByItem(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate) throws SolrServerException, IOException {
+    public void searchByItem(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate,Map<Integer, BibItem> bibItemMap) throws SolrServerException, IOException {
         List<BibItem> bibItems = new ArrayList<>();
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest,isCGDChangedToPrivate);
         queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
@@ -142,7 +215,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         queryForChildAndParentCriteria.setSort(RecapConstants.TITLE_SORT, SolrQuery.ORDER.asc);
         QueryResponse queryResponse = solrTemplate.getSolrClient().query(queryForChildAndParentCriteria);
         SolrDocumentList itemSolrDocumentList = queryResponse.getResults();
-        Map<Integer, BibItem> bibItemMap = new HashMap<>();
         if(CollectionUtils.isNotEmpty(itemSolrDocumentList)) {
             long numFound = itemSolrDocumentList.getNumFound();
             String totalItemCount = String.valueOf(numFound);
@@ -159,7 +231,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 bibItems.add(bibItemMap.get(bibId));
             }
         }
-        return bibItems;
     }
 
     /**
@@ -320,5 +391,20 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             itemValueResolvers.add(new ItemBibIdValueResolver());
         }
         return itemValueResolvers;
+    }
+
+    private List<String> getInstitutionList(String institutionString){
+        List<String> institutionList = Arrays.asList(institutionString.split("\\s*,\\s*"));
+        return institutionList;
+    }
+
+    private boolean isDeletedOnlyOrphanInstitution(SearchRecordsRequest searchRecordsRequest){
+        String requestingInstitution = searchRecordsRequest.getRequestingInstitution();
+        List<String> deleteOnlyOrphanInstitutionList = getInstitutionList(deletedOnlyOrphanInstitution);
+        if(deleteOnlyOrphanInstitutionList.contains(requestingInstitution)){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
