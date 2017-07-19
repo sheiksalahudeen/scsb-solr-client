@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
+import org.marc4j.marc.Subfield;
 import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.converter.SCSBToBibEntityConverter;
@@ -747,7 +749,9 @@ public class AccessionService {
                 HoldingsEntity holdingsEntity =(HoldingsEntity) iholdings.next();
                 for (int j=0;j<fetchHoldingsEntities.size();j++) {
                     HoldingsEntity fetchHolding=fetchHoldingsEntities.get(j);
-                    if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()) {
+                    boolean matchedHoldingBasedOn852b = checkIsHoldingContentsAreEqual(holdingsEntity,fetchHolding);
+                    if(fetchHolding.getOwningInstitutionHoldingsId().equalsIgnoreCase(holdingsEntity.getOwningInstitutionHoldingsId())  && fetchHolding.getOwningInstitutionId().intValue() == holdingsEntity.getOwningInstitutionId().intValue()
+                            || matchedHoldingBasedOn852b) {
                         copyHoldingsEntity(fetchHolding,holdingsEntity);
                         iholdings.remove();
                     }else{
@@ -795,6 +799,35 @@ public class AccessionService {
             savedBibliographicEntity = saveBibRecord(fetchBibliographicEntity);
         }
         return savedBibliographicEntity;
+    }
+
+    private boolean checkIsHoldingContentsAreEqual(HoldingsEntity incomingHoldingsEntity,HoldingsEntity fetchedHoldingEntity){
+        byte[] incomingHoldingContent = incomingHoldingsEntity.getContent();
+        byte[] fetchedHoldingContent = fetchedHoldingEntity.getContent();
+        List<Record> incomingHoldingRecordList = marcUtil.readMarcXml(new String(incomingHoldingContent));
+        List<Record> fetchedHoldingRecordList = marcUtil.readMarcXml(new String(fetchedHoldingContent));
+        DataField incoming852DataField = get852(incomingHoldingRecordList);
+        DataField fetched852DataField = get852(fetchedHoldingRecordList);
+        Subfield incomingSubFieldh = incoming852DataField != null ? incoming852DataField.getSubfield('b') : null;
+        Subfield fetchedSubFieldh = fetched852DataField != null ? fetched852DataField.getSubfield('b') : null;
+        if (incomingSubFieldh != null && fetchedSubFieldh != null){
+            if(incomingSubFieldh.getData().equals(fetchedSubFieldh.getData())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private DataField get852(List<Record> recordList){
+        for(Record record:recordList){
+            List<DataField> dataFieldList = record.getDataFields();
+            for (DataField dataField:dataFieldList){
+                if (dataField.getTag().equals("852")) {
+                    return dataField;
+                }
+            }
+        }
+        return null;
     }
 
     private void processItems(List<ItemEntity> fetchItemsEntities, List<ItemEntity> itemsEntities) {
