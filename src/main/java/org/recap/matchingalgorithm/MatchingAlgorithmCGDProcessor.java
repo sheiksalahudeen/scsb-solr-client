@@ -93,14 +93,25 @@ public class MatchingAlgorithmCGDProcessor {
     }
 
     private void findItemToBeSharedBasedOnDate(Map<Integer, ItemEntity> itemEntityMap) {
-        List<ItemEntity> itemEntities = (List<ItemEntity>) itemEntityMap.values();
-        Collections.sort(itemEntities, new Comparator<ItemEntity>(){
-            @Override
-            public int compare(ItemEntity o1, ItemEntity o2) {
-                return o1.getCreatedDate().compareTo(o2.getCreatedDate());
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        itemEntities.addAll(itemEntityMap.values());
+        ItemEntity itemEntityToBeShared = getItemToBeSharedBasedOnInitialMatchingDate(itemEntities);
+        if(itemEntityToBeShared != null) {
+            itemEntityMap.remove(itemEntityToBeShared.getItemId());
+            MatchingCounter.updateCounter(itemEntityToBeShared.getOwningInstitutionId(), false);
+        } else {
+            itemEntities.sort(Comparator.comparing(ItemEntity::getCreatedDate, Comparator.naturalOrder()));
+            findAndremoveSharedItem(itemEntityMap, itemEntities);
+        }
+    }
+
+    private ItemEntity getItemToBeSharedBasedOnInitialMatchingDate (List<ItemEntity> itemEntities) {
+        for(ItemEntity itemEntity : itemEntities) {
+            if(itemEntity.getInitialMatchingDate() != null) {
+                return itemEntity;
             }
-        });
-        findAndremoveSharedItem(itemEntityMap, itemEntities);
+        }
+        return null;
     }
 
     /**
@@ -326,6 +337,10 @@ public class MatchingAlgorithmCGDProcessor {
         ItemEntity itemEntity = itemEntities.get(0);
         itemEntityMap.remove(itemEntity.getItemId());
         MatchingCounter.updateCounter(itemEntity.getOwningInstitutionId(), false);
+        if(matchingType.equalsIgnoreCase(RecapConstants.INITIAL_MATCHING_OPERATION_TYPE)) {
+            itemEntity.setInitialMatchingDate(new Date());
+            producerTemplate.sendBody("scsbactivemq:queue:updateItemsQ", itemEntity);
+        }
     }
 
     private void populateCounterMap(Map<Integer, List<Integer>> counterMap, Integer institution) {
