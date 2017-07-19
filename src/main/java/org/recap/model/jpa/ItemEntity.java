@@ -76,6 +76,10 @@ public class ItemEntity implements Serializable {
     @Column(name = "CATALOGING_STATUS")
     private String catalogingStatus;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "INITIAL_MATCHING_DATE")
+    private Date initialMatchingDate;
+
     @ManyToMany(mappedBy = "itemEntities")
     private List<HoldingsEntity> holdingsEntities;
 
@@ -436,6 +440,24 @@ public class ItemEntity implements Serializable {
      */
     public String getCatalogingStatus() {
         return catalogingStatus;
+    }
+
+    /**
+     * Gets initial matching date.
+     *
+     * @return the initial matching date
+     */
+    public Date getInitialMatchingDate() {
+        return initialMatchingDate;
+    }
+
+    /**
+     * Sets initial matching date.
+     *
+     * @param initialMatchingDate the initial matching date
+     */
+    public void setInitialMatchingDate(Date initialMatchingDate) {
+        this.initialMatchingDate = initialMatchingDate;
     }
 
     /**
