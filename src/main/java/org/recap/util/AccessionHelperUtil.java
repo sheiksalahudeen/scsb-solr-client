@@ -119,11 +119,12 @@ public class AccessionHelperUtil {
                                     owningInstitution, bibDataResolver, unmarshalObject);
                         } else {  // If attached
 
+                            String oldBarcode = itemEntity.getBarcode();
                             // update item record with new barcode. Accession Process
                             processXMLForAccession(accessionResponses, responseMaps, accessionRequest, reportDataEntitys,
                                     owningInstitution, bibDataResolver, unmarshalObject);
                             // Move item record information to history table
-                            ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = prepareBarcodeHistoryEntity(itemEntity, itemBarcode);
+                            ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = prepareBarcodeHistoryEntity(itemEntity, itemBarcode, oldBarcode);
                             itemBarcodeHistoryDetailsRepository.save(itemBarcodeHistoryEntity);
                         }
                     } catch (Exception e) {
@@ -404,11 +405,11 @@ public class AccessionHelperUtil {
         return headers;
     }
 
-    public ItemBarcodeHistoryEntity prepareBarcodeHistoryEntity(ItemEntity itemEntity, String newBarcode) {
+    public ItemBarcodeHistoryEntity prepareBarcodeHistoryEntity(ItemEntity itemEntity, String newBarcode, String oldBarcode) {
         ItemBarcodeHistoryEntity itemBarcodeHistoryEntity = new ItemBarcodeHistoryEntity();
         itemBarcodeHistoryEntity.setOwningingInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
         itemBarcodeHistoryEntity.setOwningingInstitutionItemId(itemEntity.getOwningInstitutionItemId());
-        itemBarcodeHistoryEntity.setOldBarcode(itemEntity.getBarcode());
+        itemBarcodeHistoryEntity.setOldBarcode(oldBarcode);
         itemBarcodeHistoryEntity.setNewBarcode(newBarcode);
         itemBarcodeHistoryEntity.setCreatedDate(new Date());
         return itemBarcodeHistoryEntity;
