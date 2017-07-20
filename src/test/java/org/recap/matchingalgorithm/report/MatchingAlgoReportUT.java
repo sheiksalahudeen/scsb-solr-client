@@ -36,9 +36,6 @@ public class MatchingAlgoReportUT extends BaseTestCase {
     private static final Logger logger = LoggerFactory.getLogger(MatchingAlgoReportUT.class);
 
     @Autowired
-    MatchingAlgorithmHelperService matchingAlgorithmHelperService;
-
-    @Autowired
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Mock
@@ -49,89 +46,6 @@ public class MatchingAlgoReportUT extends BaseTestCase {
 
     private Integer batchSize=10000;
     private Map collectionGroupMap = new HashMap();
-
-    @Test
-    public void fetchMultiMatchBibsForOCLCAndISBN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForOCLCandISBN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchMultiMatchBibsForOCLCAndISSN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForOCLCAndISSN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchMultiMatchBibsForOCLCAndLCCN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForOCLCAndLCCN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchMultiMatchBibsForISBNAndISSN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForISBNAndISSN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchMultiMatchBibsForISBNAndLCCN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForISBNAndLCCN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchMultiMatchBibsForISSNAndLCCN() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForISSNAndLCCN(batchSize);
-
-        stopWatch.stop();
-        Thread.sleep(1000);
-        logger.info("Total Time taken in seconds : " + stopWatch.getTotalTimeSeconds());
-    }
-
-    @Test
-    public void fetchSingleMatchBibs() throws Exception {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        matchingAlgorithmHelperService.populateReportsForSingleMatch(batchSize);
-
-        stopWatch.stop();
-        logger.info("Total Time Taken : " + stopWatch.getTotalTimeSeconds());
-    }
 
     @Test
     public void isItemCgdInSolrSyncWithDB() throws Exception {
