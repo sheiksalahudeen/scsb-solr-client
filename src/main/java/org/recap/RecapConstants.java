@@ -270,6 +270,7 @@ public final class RecapConstants {
     public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
     public static final String DEACCESSION_REPORT = "DeAccession_Report";
     public static final String ACCESSION_REPORT = "Accession_Report";
+    public static final String TRANSFER_REPORT = "Transfer_Report";
     public static final String SUCCESS_BIB_COUNT = "successBibCount";
     public static final String FAILED_BIB_COUNT = "failedBibCount";
     public static final String SUCCESS_ITEM_COUNT = "successItemCount";
@@ -435,6 +436,39 @@ public final class RecapConstants {
     public static final String INCOMPLETE_RESPONSE = "incompleteResponse";
 
     public static final String ACCESSION_NO_PENDING_REQUESTS = "No pending requests to process accession.";
+
+    public static class TRANSFER {
+        public static final String TRANSFER = "transfer";
+        public static final String INSTITUION_EMPTY = "Institution is empty";
+        public static final String UNKNOWN_INSTITUTION = "Unknow institution";
+        public static final String SOURCE_DESTINATION_ITEM_IDS_NOT_MATCHING = "Source and Destination item ids are not matching";
+        public static final String SOURCE_DESTINATION_HOLDINGS_IDS_NOT_MATCHING = "Source and Destination holdings ids are not matching";
+        public static final String SOURCE_EMPTY = "Source is empty";
+        public static final String DESTINATION_EMPTY = "Destination is empty";
+        public static final String SOURCE_OWN_INST_BIB_ID_EMPTY = "Source owning institution bib id is empty";
+        public static final String SOURCE_OWN_INST_ITEM_ID_EMPTY = "Source owning institution item id is empty";
+        public static final String DEST_OWN_INST_BIB_ID_EMPTY = "Destination owning institution bib id is empty";
+        public static final String SOURCE_OWN_INST_HOLDINGS_ID_EMPTY = "Source owning institution holdings id is empty";
+        public static final String DEST_OWN_INST_HOLDINGS_ID_EMPTY = "Destination owning institution holdings id is empty";
+        public static final String DEST_OWN_INST_ITEM_ID_EMPTY = "Destination owning institution item id is empty";
+        public static final String SOURCE_BIB_NOT_EXIST = "Source bib does not exist";
+        public static final String SOURCE_HOLDING_NOT_UNDER_SOURCE_BIB = "Source holdings is not under source bib";
+        public static final String SOURCE_ITEM_NOT_UNDER_SOURCE_HOLDING = "Source item is not under source holding";
+        public static final String DEST_HOLDINGS_ATTACHED_WITH_DIFF_BIB = "Destination holdings is linked with another bib and not under destination bib";
+
+        public static final String SUCCESSFULLY_RELINKED = "Successfully relinked";
+        public static final String RELINKED_FAILED = "Relinked Failed";
+        public static final String COMPLETED = "Completed";
+        public static final String REQUEST = "Request";
+        public static final String RESPONSE = "Response";
+        public static final String INSTITUTION = "Institution";
+        public static final String TRANSFER_TYPE = "TransferType";
+        public static class TRANSFER_TYPES {
+            public static final String HOLDINGS_TRANSFER = "Holdings Transfer";
+            public static final String ITEM_TRANSFER = "Item Transfer";
+        }
+        public static final String ROOT = "Root";
+    }
 
     private RecapConstants(){}
 }
