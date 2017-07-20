@@ -51,11 +51,11 @@ public class GenerateReportController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Date createdDate = solrIndexRequest.getCreatedDate();
-        if(createdDate == null) {
+        if (createdDate == null) {
             createdDate = new Date();
         }
         Date toDate = solrIndexRequest.getToDate();
-        if(toDate == null) {
+        if (toDate == null) {
             toDate = new Date();
         }
         String reportType = solrIndexRequest.getReportType();
@@ -63,17 +63,21 @@ public class GenerateReportController {
         String owningInstitutionCode = solrIndexRequest.getOwningInstitutionCode();
         String status;
         String fileName;
-        if(reportType.equalsIgnoreCase(RecapConstants.DEACCESSION_SUMMARY_REPORT)){
+        if (reportType.equalsIgnoreCase(RecapConstants.DEACCESSION_SUMMARY_REPORT)) {
             fileName = RecapConstants.DEACCESSION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT) || reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT) ){
+        } else if (reportType.equalsIgnoreCase(RecapConstants.ACCESSION_SUMMARY_REPORT) || reportType.equalsIgnoreCase(RecapConstants.ONGOING_ACCESSION_REPORT)) {
             fileName = RecapConstants.ACCESSION_REPORT;
-        }else if(reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT) || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)){
+        } else if (reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_REJECTION_REPORT)
+                || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT)
+                || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUCCESS_REPORT)
+                || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FAILURE_REPORT)
+                || reportType.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_SUMMARY_REPORT)) {
             fileName = RecapConstants.SUBMIT_COLLECTION_REPORT;
-        }else{
+        } else {
             fileName = RecapConstants.SOLR_INDEX_FAILURE_REPORT;
         }
         generatedReportFileName = reportGenerator.generateReport(fileName, owningInstitutionCode, reportType, solrIndexRequest.getTransmissionType(), dateUtil.getFromDate(createdDate), dateUtil.getToDate(toDate));
-        if(StringUtils.isEmpty(generatedReportFileName)) {
+        if (StringUtils.isEmpty(generatedReportFileName)) {
             status = "Report wasn't generated! Please contact help desk!";
         } else {
             status = "The Generated Report File Name : " + generatedReportFileName;
