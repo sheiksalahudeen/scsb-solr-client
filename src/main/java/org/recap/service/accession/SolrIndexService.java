@@ -104,7 +104,13 @@ public class SolrIndexService {
     public SolrInputDocument indexByBibliographicId(@RequestBody Integer bibliographicId) {
         getBibJSONUtil().setProducerTemplate(getProducerTemplate());
         BibliographicEntity bibliographicEntity = getBibliographicDetailsRepository().findByBibliographicId(bibliographicId);
-        SolrInputDocument solrInputDocument = getBibJSONUtil().generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository());
+        return indexBibliographicEntity(bibliographicEntity);
+    }
+
+    public SolrInputDocument indexBibliographicEntity(BibliographicEntity bibliographicEntity) {
+        BibJSONUtil bibJSONUtil = getBibJSONUtil();
+        bibJSONUtil.setProducerTemplate(producerTemplate);
+        SolrInputDocument solrInputDocument = bibJSONUtil.generateBibAndItemsForIndex(bibliographicEntity, getSolrTemplate(), getBibliographicDetailsRepository(), getHoldingsDetailsRepository());
         if (solrInputDocument !=null) {
             StopWatch stopWatchIndexDocument = new StopWatch();
             stopWatchIndexDocument.start();

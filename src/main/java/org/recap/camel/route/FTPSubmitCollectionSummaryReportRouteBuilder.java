@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
  * Created by hemalathas on 21/12/16.
  */
 @Component
-public class FTPSubmitCollectionsummaryReportRouteBuilder {
+public class FTPSubmitCollectionSummaryReportRouteBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionsummaryReportRouteBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSubmitCollectionSummaryReportRouteBuilder.class);
 
     /**
      * This method instantiates a new route builder to generate submit collection summary report to the FTP.
@@ -31,8 +31,9 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
      * @param ftpPrivateKey                   the ftp private key
      */
     @Autowired
-    public FTPSubmitCollectionsummaryReportRouteBuilder(CamelContext context,
-                                                        @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.pul.report}") String submitCollectionPULFtpLocation,
+    public FTPSubmitCollectionSummaryReportRouteBuilder(CamelContext context,
+                                                        @Value("${ftp.userName}") String ftpUserName, @Value("${ftp.submit.collection.report}") String submitCollectionFtpLocation,
+                                                        @Value("${ftp.submit.collection.pul.report}") String submitCollectionPULFtpLocation,
                                                         @Value("${ftp.submit.collection.cul.report}") String submitCollectionCULFtpLocation,
                                                         @Value("${ftp.submit.collection.nypl.report}") String submitCollectionNYPLFtpLocation,
                                                         @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey) {
@@ -50,7 +51,9 @@ public class FTPSubmitCollectionsummaryReportRouteBuilder {
                                     .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionCULFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
                                 .when(header(RecapConstants.FILE_NAME).contains(RecapConstants.NYPL))
                                     .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionNYPLFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS)
-                            ;
+                                .otherwise()
+                                    .to(RecapConstants.SFTP + ftpUserName + RecapConstants.AT + submitCollectionFtpLocation + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + RecapConstants.SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS);
+
                 }
             });
 

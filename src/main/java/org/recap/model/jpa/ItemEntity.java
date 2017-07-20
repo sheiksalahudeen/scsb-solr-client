@@ -576,6 +576,16 @@ public class ItemEntity implements Serializable {
     public void setCgdChangeLog(String cgdChangeLog) {
         this.cgdChangeLog = cgdChangeLog;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ItemEntity that = (ItemEntity) o;
+
+        return owningInstitutionItemId != null ? owningInstitutionItemId.equals(that.owningInstitutionItemId) : that.owningInstitutionItemId == null;
+    }
 }
 
 

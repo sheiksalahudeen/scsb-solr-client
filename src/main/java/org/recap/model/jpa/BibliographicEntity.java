@@ -342,5 +342,14 @@ public class BibliographicEntity implements Serializable {
         return itemEntityList;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BibliographicEntity that = (BibliographicEntity) o;
+
+        return owningInstitutionBibId != null ? owningInstitutionBibId.equals(that.owningInstitutionBibId) : that.owningInstitutionBibId == null;
+    }
 }
 
