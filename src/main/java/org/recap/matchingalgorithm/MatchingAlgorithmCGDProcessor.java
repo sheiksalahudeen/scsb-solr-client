@@ -137,6 +137,8 @@ public class MatchingAlgorithmCGDProcessor {
             itemEntity.setCollectionGroupId(collectionGroupId);
             if(matchingType.equalsIgnoreCase(RecapConstants.ONGOING_MATCHING_ALGORITHM)) {
                 itemEntity.setCollectionGroupEntity(collectionGroupEntity);
+            } else {
+                itemEntity.setInitialMatchingDate(null);
             }
             itemEntitiesToUpdate.add(itemEntity);
             itemChangeLogEntities.add(getItemChangeLogEntity(oldCgd, itemEntity));
