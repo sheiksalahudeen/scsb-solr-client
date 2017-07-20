@@ -311,10 +311,14 @@ public class BibJSONUtil extends MarcUtil {
     public Date getBitItemLastUpdatedDate(BibliographicEntity bibliographicEntity){
         List<ItemEntity> itemEntityList = bibliographicEntity.getItemEntities();
         List<Date> dateList = new ArrayList<>();
-        for(ItemEntity itemEntity: itemEntityList){
-            dateList.add(itemEntity.getLastUpdatedDate());
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(itemEntityList)) {
+            for(ItemEntity itemEntity: itemEntityList){
+                dateList.add(itemEntity.getLastUpdatedDate());
+            }
+            return Collections.max(dateList);
+        } else {
+            return null;
         }
-        return Collections.max(dateList);
     }
 
     /**
@@ -326,10 +330,14 @@ public class BibJSONUtil extends MarcUtil {
     public Date getBitHoldingLastUpdatedDate(BibliographicEntity bibliographicEntity){
         List<HoldingsEntity> holdingsEntityList = bibliographicEntity.getHoldingsEntities();
         List<Date> dateList = new ArrayList<>();
-        for(HoldingsEntity holdingsEntity: holdingsEntityList){
-            dateList.add(holdingsEntity.getLastUpdatedDate());
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(holdingsEntityList)) {
+            for(HoldingsEntity holdingsEntity: holdingsEntityList){
+                dateList.add(holdingsEntity.getLastUpdatedDate());
+            }
+            return Collections.max(dateList);
+        } else {
+            return null;
         }
-        return Collections.max(dateList);
     }
 
     /**

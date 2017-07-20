@@ -57,24 +57,9 @@ public class DummyDataService {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         Date currentDate = new Date();
         try {
-            bibliographicEntity.setContent(getXmlContent(RecapConstants.DUMMY_BIB_CONTENT_XML).getBytes());
-            bibliographicEntity.setCreatedDate(currentDate);
-            bibliographicEntity.setCreatedBy(RecapConstants.ACCESSION);
-            bibliographicEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-            bibliographicEntity.setLastUpdatedDate(currentDate);
-            bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
-            bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
-            bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
+            updateBibWithDummyDetails(owningInstitutionId, bibliographicEntity, currentDate,RecapConstants.ACCESSION, String.valueOf(random.nextInt()));
 
-            HoldingsEntity holdingsEntity = new HoldingsEntity();
-            holdingsEntity.setContent(getXmlContent(RecapConstants.DUMMY_HOLDING_CONTENT_XML).getBytes());
-            holdingsEntity.setCreatedDate(currentDate);
-            holdingsEntity.setCreatedBy(RecapConstants.ACCESSION);
-            holdingsEntity.setLastUpdatedDate(currentDate);
-            holdingsEntity.setOwningInstitutionId(owningInstitutionId);
-            holdingsEntity.setLastUpdatedBy(RecapConstants.ACCESSION);
-
-            holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+            HoldingsEntity holdingsEntity = getHoldingsWithDummyDetails(owningInstitutionId, currentDate,RecapConstants.ACCESSION, String.valueOf(random.nextInt()));
 
             ItemEntity itemEntity = new ItemEntity();
             itemEntity.setCallNumberType(RecapConstants.DUMMY_CALL_NUMBER_TYPE);
@@ -103,6 +88,31 @@ public class DummyDataService {
         }
         BibliographicEntity savedBibliographicEntity = accessionDAO.saveBibRecord(bibliographicEntity);
         return savedBibliographicEntity;
+    }
+
+    public HoldingsEntity getHoldingsWithDummyDetails(Integer owningInstitutionId, Date currentDate, String createdBy, String owningInstitutionHoldingsId) {
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent(getXmlContent(RecapConstants.DUMMY_HOLDING_CONTENT_XML).getBytes());
+        holdingsEntity.setCreatedDate(currentDate);
+        holdingsEntity.setCreatedBy(createdBy);
+        holdingsEntity.setLastUpdatedDate(currentDate);
+        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
+        holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
+        holdingsEntity.setLastUpdatedBy(createdBy);
+        return holdingsEntity;
+    }
+
+    public void updateBibWithDummyDetails(Integer owningInstitutionId, BibliographicEntity bibliographicEntity, Date currentDate,
+                                          String createdBy, String owningInstitutionBibId
+    ) {
+        bibliographicEntity.setContent(getXmlContent(RecapConstants.DUMMY_BIB_CONTENT_XML).getBytes());
+        bibliographicEntity.setCreatedDate(currentDate);
+        bibliographicEntity.setCreatedBy(createdBy);
+        bibliographicEntity.setLastUpdatedBy(createdBy);
+        bibliographicEntity.setLastUpdatedDate(currentDate);
+        bibliographicEntity.setOwningInstitutionId(owningInstitutionId);
+        bibliographicEntity.setOwningInstitutionBibId(owningInstitutionBibId);
+        bibliographicEntity.setCatalogingStatus(RecapConstants.INCOMPLETE_STATUS);
     }
 
     private Map getCollectionGroupMap() {
