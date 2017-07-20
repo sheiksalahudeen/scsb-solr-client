@@ -77,6 +77,11 @@ public final class RecapConstants {
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionExceptionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionExceptionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionSummaryReportQ";
+    public static final String FS_SUBMIT_COLLECTION_SUMMARY_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionSummaryReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_SUCCESS_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionSuccessReportQ";
+    public static final String FS_SUBMIT_COLLECTION_SUCCESS_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionSuccessReportQ";
+    public static final String FTP_SUBMIT_COLLECTION_FAILURE_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionFailureReportQ";
+    public static final String FS_SUBMIT_COLLECTION_FAILURE_REPORT_Q = "scsbactivemq:queue:fsSubmitCollectionFailureReportQ";
     public static final String FTP_ONGOING_ACCESSON_REPORT_Q = "scsbactivemq:queue:ftpOngoingAccessionReportQ";
     public static final String FS_ONGOING_ACCESSION_REPORT_Q = "scsbactivemq:queue:fsOngoingAccessionReportQ";
     public static final String FTP_SUBMIT_COLLECTION_REPORT_Q = "scsbactivemq:queue:ftpSubmitCollectionReportQ";
@@ -97,6 +102,11 @@ public final class RecapConstants {
     public static final String FS_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "fsSubmitCollectionExceptionReport";
     public static final String FTP_SUBMIT_COLLECTION_EXCEPTION_REPORT_ID = "ftpSubmitCollectionExceptionReport";
     public static final String FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_ID = "ftpSubmitCollectionSummaryReport";
+    public static final String FS_SUBMIT_COLLECTION_SUMMARY_REPORT_ID = "fsSubmitCollectionSummaryReport";
+    public static final String FTP_SUBMIT_COLLECTION_SUCCESS_REPORT_ID = "ftpSubmitCollectionSuccessReport";
+    public static final String FS_SUBMIT_COLLECTION_SUCCESS_REPORT_ID = "fsSubmitCollectionSuccessReport";
+    public static final String FTP_SUBMIT_COLLECTION_FAILURE_REPORT_ID = "ftpSubmitCollectionFailureReport";
+    public static final String FS_SUBMIT_COLLECTION_FAILURE_REPORT_ID = "fsSubmitCollectionFailureReport";
     public static final String FTP_SUBMIT_COLLECTION_REPORT_ID = "ftpSubmitCollectionReportRoute";
     public static final String EMAIL_ROUTE_ID = "solrClientEmailQ";
     public static final String FTP_TITLE_EXCEPTION_REPORT_ROUTE_ID = "ftpTitleExceptionReportsRoute";
@@ -291,6 +301,7 @@ public final class RecapConstants {
     public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
     public static final String SUBMIT_COLLECTION_SUCCESS_REPORT = "Submit_Collection_Success_Report";
     public static final String SUBMIT_COLLECTION_FAILURE_REPORT = "SubmitCollection_Failure_Report";
+    public static final String SUBMIT_COLLECTION_SUMMARY_REPORT = "SubmitCollectionSummary";
     public static final String FAIL = "Fail";
     public static final String REJECTION = "Rejection";
     public static final String SC_EXCEPTION = "Exception";
