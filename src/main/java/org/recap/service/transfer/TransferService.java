@@ -9,7 +9,9 @@ import org.recap.model.transfer.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.service.accession.AccessionDAO;
 import org.recap.service.accession.DummyDataService;
+import org.recap.service.accession.SolrIndexService;
 import org.recap.util.HelperUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,6 +37,9 @@ public class TransferService {
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Autowired
+    AccessionDAO accessionDAO;
+
+    @Autowired
     HoldingsDetailsRepository holdingsDetailsRepository;
 
     @Autowired
@@ -43,9 +49,13 @@ public class TransferService {
     DummyDataService dummyDataService;
 
     @Autowired
+    SolrIndexService solrIndexService;
+
+    @Autowired
     HelperUtil helperUtil;
 
 
+    @Transactional
     public List<ItemTransferResponse> processItemTransfer(TransferRequest transferRequest, InstitutionEntity institutionEntity) {
         List<ItemTransferResponse> itemTransferResponses = new ArrayList<>();
         List<ItemTransferRequest> itemTransfers = transferRequest.getItemTransfers();
@@ -73,10 +83,7 @@ public class TransferService {
                         // todo : process for orphan records
                         processOrphanRecords(sourceBib);
 
-                        bibliographicDetailsRepository.save(sourceBib);
-                        bibliographicDetailsRepository.save(destBib);
-
-                        writeChangeLog(sourceBib.getBibliographicId(), sourceHoldings.getHoldingsId(), Arrays.asList(sourceItem), destBib.getBibliographicId(), destHoldings.getHoldingsId());
+                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, destHoldings, Arrays.asList(sourceItem));
 
                         transferValidationResponse.setMessage(RecapConstants.TRANSFER.SUCCESSFULLY_RELINKED);
                     } catch (Exception e) {
@@ -207,6 +214,7 @@ public class TransferService {
         return null;
     }
 
+    @Transactional
     public List<HoldingTransferResponse> processHoldingTransfer(TransferRequest transferRequest, InstitutionEntity institutionEntity) {
         List<HoldingTransferResponse> holdingTransferResponses = new ArrayList<>();
         List<HoldingsTransferRequest> holdingTransfers = transferRequest.getHoldingTransfers();
@@ -237,10 +245,7 @@ public class TransferService {
                         // todo : process for orphan records
                         processOrphanRecords(sourceBib);
 
-                        bibliographicDetailsRepository.save(sourceBib);
-
-
-                        writeChangeLog(sourceBib.getBibliographicId(), sourceHoldings.getHoldingsId(), sourceHoldings.getItemEntities(), destBib.getBibliographicId(), sourceHoldings.getHoldingsId());
+                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, sourceHoldings, sourceHoldings.getItemEntities());
 
                         transferValidationResponse.setMessage(RecapConstants.TRANSFER.SUCCESSFULLY_RELINKED);
                     } catch (Exception e) {
@@ -259,6 +264,17 @@ public class TransferService {
         }
 
         return holdingTransferResponses;
+    }
+
+    private void saveAndIndexBib(BibliographicEntity sourceBib, HoldingsEntity sourceHoldings, BibliographicEntity destBib,
+                                 HoldingsEntity destHoldings,List<ItemEntity> itemEntities) {
+        accessionDAO.saveBibRecord(sourceBib);
+        accessionDAO.saveBibRecord(destBib);
+
+        writeChangeLog(sourceBib.getBibliographicId(), sourceHoldings.getHoldingsId(), itemEntities, destBib.getBibliographicId(), destHoldings.getHoldingsId());
+
+        solrIndexService.indexByBibliographicId(sourceBib.getBibliographicId());
+        solrIndexService.indexByBibliographicId(destBib.getBibliographicId());
     }
 
     private void processOrphanRecords(BibliographicEntity sourceBib) {
