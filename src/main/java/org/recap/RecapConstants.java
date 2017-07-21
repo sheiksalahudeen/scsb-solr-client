@@ -349,6 +349,7 @@ public final class RecapConstants {
     public static final String TRANSMISSION_TYPE = "TransmissionType";
     public static final String REPORT_TYPE = "ReportType";
     public static final String JOB_PARAM_DATA_FILE_NAME = "FileName";
+    public static final String DATE_FORMAT_FOR_REPORTS = "yyyyMMdd_HHmmss";
 
 
     public static final String  BIBITEM_LASTUPDATED_DATE = "BibItemLastUpdatedDate";
