@@ -58,7 +58,7 @@ public class FTPMatchingReportsRouteBuilder {
                             .routeId(RecapConstants.FTP_SERIAL_MVM_REPORT_ROUTE_ID)
                             .noAutoStartup()
                             .marshal().bindy(BindyType.Csv, MatchingSerialAndMVMReports.class)
-                            .to(RecapConstants.SFTP+ ftpUserName +  RecapConstants.AT + ftpMatchingReportsDirectory + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=${in.header.fileName}_${date:now:ddMMMyyyy}.csv")
+                            .to(RecapConstants.SFTP+ ftpUserName +  RecapConstants.AT + ftpMatchingReportsDirectory + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=${in.header.fileName}_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
                             .process(new StopRouteProcessor(RecapConstants.FTP_SERIAL_MVM_REPORT_ROUTE_ID))
                             .log("Matching Serial_MVM reports generated and uploaded to ftp successfully.");
@@ -77,7 +77,7 @@ public class FTPMatchingReportsRouteBuilder {
                             .routeId(RecapConstants.FTP_MATCHING_SUMMARY_REPORT_ROUTE_ID)
                             .noAutoStartup()
                             .marshal().bindy(BindyType.Csv, MatchingSummaryReport.class)
-                            .to(RecapConstants.SFTP+ ftpUserName +  RecapConstants.AT + ftpMatchingReportsDirectory + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=${in.header.fileName}_${date:now:ddMMMyyyy}.csv")
+                            .to(RecapConstants.SFTP+ ftpUserName +  RecapConstants.AT + ftpMatchingReportsDirectory + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=${in.header.fileName}_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
                             .process(new StopRouteProcessor(RecapConstants.FTP_MATCHING_SUMMARY_REPORT_ROUTE_ID))
                             .log("Matching Summary reports generated and uploaded to ftp successfully.");

@@ -143,8 +143,8 @@ public class OngoingMatchingReportsService {
         File file = null;
         if(CollectionUtils.isNotEmpty(titleExceptionReports)) {
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
-                String formattedDate = sdf.format(createdDate);
+                SimpleDateFormat sdf = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_REPORTS);
+                String formattedDate = sdf.format(new Date());
                 String fileNameWithExtension = getMatchingReportsDirectory() + File.separator + RecapConstants.TITLE_EXCEPTION_REPORT + RecapConstants.UNDER_SCORE + formattedDate + RecapConstants.CSV_EXTENSION;
                 file = getCsvUtil().createTitleExceptionReportFile(fileNameWithExtension, maxTitleCount, titleExceptionReports);
                 getCamelContext().startRoute(RecapConstants.FTP_TITLE_EXCEPTION_REPORT_ROUTE_ID);
