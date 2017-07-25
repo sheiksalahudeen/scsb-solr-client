@@ -133,6 +133,8 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
         } else {
             searchByItem(searchRecordsRequest, true, bibItemMap);
             searchByItem(searchRecordsRequest, false, bibItemMap);
+            List<BibItem> bibItemForOrphanBib = searchByBibForDeleted(searchRecordsRequest);
+            compareAndSetOnlyOrphanBibs(bibItemMap,bibItemForOrphanBib);
         }
         for(Integer bibId:bibItemMap.keySet()){
             bibItems.add(bibItemMap.get(bibId));
@@ -154,6 +156,14 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
             }
             if (!isBibDeleted){
                 bibItemMap.remove(bibId);
+            }
+        }
+    }
+
+    private void compareAndSetOnlyOrphanBibs(Map<Integer, BibItem> bibItemMap,List<BibItem> bibItemListForOrphanBib){
+        for(BibItem bibItem:bibItemListForOrphanBib){
+            if(!bibItemMap.containsKey(bibItem.getBibId())){
+                bibItemMap.put(bibItem.getBibId(),bibItem);
             }
         }
     }
@@ -208,7 +218,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
      * @throws IOException         the io exception
      */
     public void searchByItem(SearchRecordsRequest searchRecordsRequest,boolean isCGDChangedToPrivate,Map<Integer, BibItem> bibItemMap) throws SolrServerException, IOException {
-        List<BibItem> bibItems = new ArrayList<>();
         SolrQuery queryForChildAndParentCriteria = solrQueryBuilder.getDeletedQueryForDataDump(searchRecordsRequest,isCGDChangedToPrivate);
         queryForChildAndParentCriteria.setStart(searchRecordsRequest.getPageNumber() * searchRecordsRequest.getPageSize());
         queryForChildAndParentCriteria.setRows(searchRecordsRequest.getPageSize());
@@ -225,10 +234,6 @@ public class DataDumpSolrDocumentRepositoryImpl implements CustomDocumentReposit
                 SolrDocument itemSolrDocument = iterator.next();
                 Item item = getItem(itemSolrDocument);
                 getBibForItems(item, bibItemMap);
-            }
-            for (Iterator<Integer> bibIdList = bibItemMap.keySet().iterator(); bibIdList.hasNext(); ) {
-                Integer bibId = bibIdList.next();
-                bibItems.add(bibItemMap.get(bibId));
             }
         }
     }
