@@ -18,6 +18,10 @@ public class EmailPayLoad implements Serializable {
     private Date startDate;
     private String status;
     private String message;
+    private String from;
+    private String to;
+    private String cc;
+    private String subject;
 
     /**
      * Gets item barcode.
@@ -197,5 +201,77 @@ public class EmailPayLoad implements Serializable {
      */
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    /**
+     * Gets from.
+     *
+     * @return the from
+     */
+    public String getFrom() {
+        return from;
+    }
+
+    /**
+     * Sets from.
+     *
+     * @param from the from
+     */
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    /**
+     * Gets to.
+     *
+     * @return the to
+     */
+    public String getTo() {
+        return to;
+    }
+
+    /**
+     * Sets to.
+     *
+     * @param to the to
+     */
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    /**
+     * Gets cc.
+     *
+     * @return the cc
+     */
+    public String getCc() {
+        return cc;
+    }
+
+    /**
+     * Sets cc.
+     *
+     * @param cc the cc
+     */
+    public void setCc(String cc) {
+        this.cc = cc;
+    }
+
+    /**
+     * Gets subject.
+     *
+     * @return the subject
+     */
+    public String getSubject() {
+        return subject;
+    }
+
+    /**
+     * Sets subject.
+     *
+     * @param subject the subject
+     */
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }
