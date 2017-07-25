@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by premkb on 07/02/17.
@@ -41,10 +39,12 @@ public class FTPOngoingAccessionReportGenerator implements ReportGeneratorInterf
         OngoingAccessionReportGenerator ongoingAccessionReportGenerator = new OngoingAccessionReportGenerator();
         for(ReportEntity reportEntity : reportEntityList) {
             ongoingAccessionReportRecordList.add(ongoingAccessionReportGenerator.prepareOngoingAccessionReportRecord(reportEntity));
-
         }
         if(CollectionUtils.isNotEmpty(ongoingAccessionReportRecordList)) {
-            producerTemplate.sendBodyAndHeader(RecapConstants.FTP_ONGOING_ACCESSON_REPORT_Q, ongoingAccessionReportRecordList, "fileName", fileName);
+            Map<String, Object>  accessionMap = new HashMap<>();
+            accessionMap.put(RecapConstants.FILE_NAME, fileName);
+            accessionMap.put(RecapConstants.INSTITUTION_NAME, reportEntityList.get(0).getInstitutionName());
+            producerTemplate.sendBodyAndHeaders(RecapConstants.FTP_ONGOING_ACCESSON_REPORT_Q, ongoingAccessionReportRecordList, accessionMap);
 
             DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_REPORT_FILE_NAME);
             generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";

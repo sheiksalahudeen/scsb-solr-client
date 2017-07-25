@@ -4,12 +4,14 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.recap.RecapConstants;
+import org.recap.camel.processor.EmailService;
 import org.recap.camel.processor.StopRouteProcessor;
 import org.recap.model.matchingReports.MatchingSerialAndMVMReports;
 import org.recap.model.matchingReports.MatchingSummaryReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,10 +31,11 @@ public class FTPMatchingReportsRouteBuilder {
      * @param ftpUserName                 the ftp user name
      * @param ftpPrivateKey               the ftp private key
      * @param ftpKnownHost                the ftp known host
+     * @param applicationContext          the application context
      */
     public FTPMatchingReportsRouteBuilder(CamelContext camelContext, @Value("${ongoing.matching.report.directory}") String matchingReportsDirectory,
                                           @Value("${ftp.matchingAlgorithm.remote.server}") String ftpMatchingReportsDirectory, @Value("${ftp.userName}") String ftpUserName,
-                                          @Value("${ftp.privateKey}") String ftpPrivateKey, @Value("${ftp.knownHost}") String ftpKnownHost) {
+                                          @Value("${ftp.privateKey}") String ftpPrivateKey, @Value("${ftp.knownHost}") String ftpKnownHost, ApplicationContext applicationContext) {
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
@@ -79,8 +82,10 @@ public class FTPMatchingReportsRouteBuilder {
                             .marshal().bindy(BindyType.Csv, MatchingSummaryReport.class)
                             .to(RecapConstants.SFTP+ ftpUserName +  RecapConstants.AT + ftpMatchingReportsDirectory + RecapConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=${in.header.fileName}_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
+                            .bean(applicationContext.getBean(EmailService.class),RecapConstants.MATCHING_REPORTS_SEND_EMAIL)
                             .process(new StopRouteProcessor(RecapConstants.FTP_MATCHING_SUMMARY_REPORT_ROUTE_ID))
-                            .log("Matching Summary reports generated and uploaded to ftp successfully.");
+                            .log("Matching Summary reports generated and uploaded to ftp successfully.")
+                            .end();
 
                 }
             });
