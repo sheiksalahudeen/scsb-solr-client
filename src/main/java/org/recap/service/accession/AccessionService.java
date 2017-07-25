@@ -808,10 +808,10 @@ public class AccessionService {
         List<Record> fetchedHoldingRecordList = marcUtil.readMarcXml(new String(fetchedHoldingContent));
         DataField incoming852DataField = get852(incomingHoldingRecordList);
         DataField fetched852DataField = get852(fetchedHoldingRecordList);
-        Subfield incomingSubFieldh = incoming852DataField != null ? incoming852DataField.getSubfield('b') : null;
-        Subfield fetchedSubFieldh = fetched852DataField != null ? fetched852DataField.getSubfield('b') : null;
-        if (incomingSubFieldh != null && fetchedSubFieldh != null){
-            if(incomingSubFieldh.getData().equals(fetchedSubFieldh.getData())){
+        Subfield incomingSubFieldb = incoming852DataField != null ? incoming852DataField.getSubfield('b') : null;
+        Subfield fetchedSubFieldb = fetched852DataField != null ? fetched852DataField.getSubfield('b') : null;
+        if (incomingSubFieldb != null && fetchedSubFieldb != null){
+            if(incomingSubFieldb.getData().equals(fetchedSubFieldb.getData())){
                 return true;
             }
         }
