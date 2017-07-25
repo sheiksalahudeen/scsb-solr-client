@@ -42,10 +42,11 @@ public class FTPSubmitCollectionSummaryReportGenerator implements ReportGenerato
             List<SubmitCollectionReportRecord> submitCollectionReportRecords = submitCollectionReportGenerator.prepareSubmitCollectionRejectionRecord(reportEntity);
             submitCollectionReportRecordList.addAll(submitCollectionReportRecords);
         }
-        producerTemplate.sendBodyAndHeader(RecapConstants.FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q, submitCollectionReportRecordList, "fileName", fileName);
-
         DateFormat df = new SimpleDateFormat(RecapConstants.DATE_FORMAT_FOR_FILE_NAME);
         generatedFileName = fileName + "-" + df.format(new Date()) + ".csv";
+        producerTemplate.sendBodyAndHeader(RecapConstants.FTP_SUBMIT_COLLECTION_SUMMARY_REPORT_Q, submitCollectionReportRecordList, "fileName", generatedFileName);
+
+
         return generatedFileName;
     }
 }
