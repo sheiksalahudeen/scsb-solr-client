@@ -126,7 +126,7 @@ public final class RecapConstants {
     public static final String MATCHING_BIB_IDS = "matchingBibIds";
 
     public static final String REPORT_FILE_NAME = "fileName";
-    public static final String DATE_FORMAT_FOR_FILE_NAME = "ddMMMyyyy";
+    public static final String DATE_FORMAT_FOR_FILE_NAME = "yyyyMMdd_HHmmss";
     public static final String DATE_FORMAT_FOR_REPORT_FILE_NAME = "ddMMMyyyyHHmmss";
 
     public static final String VOLUME_PART_YEAR = "VolumePartYear";
@@ -406,7 +406,7 @@ public final class RecapConstants {
     public static final String PRIVATE_KEY_FILE = "?privateKeyFile=";
     public static final String KNOWN_HOST_FILE = "&knownHostsFile=";
     public static final String FILE_NAME = "fileName";
-    public static final String SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS = "&fileName=${in.header.fileName}-${date:now:ddMMMyyyyHHmmss}.csv&fileExist=append";
+    public static final String SUBMIT_COLLECTION_REPORT_SFTP_OPTIONS = "&fileName=${in.header.fileName}&fileExist=append";
     public static final String ITEM_LAST_UPDATED_DATE = "ItemLastUpdatedDate";
 
     //deaccession report
