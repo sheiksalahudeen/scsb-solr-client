@@ -69,6 +69,22 @@ public class EmailRouteBuilder {
                                         .setHeader("from", simple(from))
                                         .setHeader("to", simple(batchJobTo))
                                         .log("Email for batch job")
+                                        .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .when(header(RecapConstants.EMAIL_FOR).isEqualTo(RecapConstants.MATCHING_REPORTS))
+                                        .setHeader("subject", simple(RecapConstants.MATCHING_ALGORITHM_REPORTS))
+                                        .setBody(simple("${header.emailPayLoad.message}"))
+                                        .setHeader("from", simple(from))
+                                        .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                        .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                        .log("Email For Matching algorithm reports")
+                                        .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .when(header(RecapConstants.EMAIL_FOR).isEqualTo(RecapConstants.ACCESSION_REPORTS))
+                                        .setHeader("subject", simple(RecapConstants.ACCESSION_BATCH_COMPLETE))
+                                        .setBody(simple("${header.emailPayLoad.message}"))
+                                        .setHeader("from", simple(from))
+                                        .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                        .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                        .log("Email For Accession reports")
                                         .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword);
                 }
 

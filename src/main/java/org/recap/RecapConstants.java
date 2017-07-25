@@ -124,6 +124,8 @@ public final class RecapConstants {
     public static final String UNDER_SCORE = "_";
     public static final String CSV_EXTENSION = ".csv";
     public static final String MATCHING_BIB_IDS = "matchingBibIds";
+    public static final String MATCHING_REPORTS_SEND_EMAIL = "sendEmailForMatchingReports";
+    public static final String ACCESSION_REPORTS_SEND_EMAIL = "sendEmailForAccessionReports";
 
     public static final String REPORT_FILE_NAME = "fileName";
     public static final String DATE_FORMAT_FOR_FILE_NAME = "yyyyMMdd_HHmmss";
@@ -422,6 +424,11 @@ public final class RecapConstants {
     public static final String PENDING = "pending";
     public static final String ACCESSION_SAVE_SUCCESS_STATUS = "The accession request is successfully processed.";
     public static final String ACCESSION_SAVE_FAILURE_STATUS = "Failed to process accession request.";
+    public static final String MATCHING_REPORTS = "matchingReports";
+    public static final String ACCESSION_REPORTS = "accessionReports";
+    public static final String MATCHING_ALGORITHM_REPORTS = "MatchingAlgorithm Reports";
+    public static final String ACCESSION_BATCH_COMPLETE = "Accession Batch Complete";
+    public static final String INSTITUTION_NAME = "institutionName";
 
     public static final String MIXED_STATUS = "MixedStatus";
 
