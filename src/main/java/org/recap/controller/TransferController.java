@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.InstitutionEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -49,6 +51,9 @@ public class TransferController {
         TransferResponse transferResponse = new TransferResponse();
         String institution = transferRequest.getInstitution();
 
+        int successCount = 0;
+        int failureCount = 0;
+
         InstitutionEntity institutionEntity = null;
         if(StringUtils.isBlank(institution)) {
             transferResponse.setMessage(RecapConstants.TRANSFER.INSTITUION_EMPTY);
@@ -72,10 +77,42 @@ public class TransferController {
         List<HoldingTransferResponse> holdingTransferResponses = transferService.processHoldingTransfer(transferRequest, institutionEntity);
         transferResponse.setHoldingTransferResponses(holdingTransferResponses);
 
+        if(CollectionUtils.isNotEmpty(holdingTransferResponses)) {
+            for (Iterator<HoldingTransferResponse> iterator = holdingTransferResponses.iterator(); iterator.hasNext(); ) {
+                HoldingTransferResponse holdingTransferResponse = iterator.next();
+                if(holdingTransferResponse.isSuccess()) {
+                    successCount++;
+                } else {
+                    failureCount++;
+                }
+            }
+        }
+
         List<ItemTransferResponse> itemTransferResponses = transferService.processItemTransfer(transferRequest, institutionEntity);
         transferResponse.setItemTransferResponses(itemTransferResponses);
 
-        transferResponse.setMessage(RecapConstants.TRANSFER.COMPLETED);
+        if(CollectionUtils.isNotEmpty(itemTransferResponses)) {
+            for (Iterator<ItemTransferResponse> iterator = itemTransferResponses.iterator(); iterator.hasNext(); ) {
+                ItemTransferResponse itemTransferResponse = iterator.next();
+                if(itemTransferResponse.isSuccess()) {
+                    successCount++;
+                } else {
+                    failureCount++;
+                }
+            }
+        }
+
+
+        if(successCount > 0 && failureCount > 0) {
+            transferResponse.setMessage(RecapConstants.TRANSFER.PARTIALLY_SUCCESS);
+            return transferResponse;
+        } else if(successCount > 0) {
+            transferResponse.setMessage(RecapConstants.TRANSFER.COMPLETED);
+            return transferResponse;
+        } else if(failureCount > 0) {
+            transferResponse.setMessage(RecapConstants.TRANSFER.FAILED);
+            return transferResponse;
+        }
 
         return transferResponse;
 

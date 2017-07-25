@@ -470,7 +470,9 @@ public final class RecapConstants {
 
         public static final String SUCCESSFULLY_RELINKED = "Successfully relinked";
         public static final String RELINKED_FAILED = "Relinked Failed";
-        public static final String COMPLETED = "Completed";
+        public static final String COMPLETED = "Success";
+        public static final String FAILED = "Failed";
+        public static final String PARTIALLY_SUCCESS = "Partially Success";
         public static final String REQUEST = "Request";
         public static final String RESPONSE = "Response";
         public static final String INSTITUTION = "Institution";

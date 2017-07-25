@@ -82,6 +82,7 @@ public class TransferService {
 
                         // todo : process for orphan records
                         processOrphanRecords(sourceBib);
+                        processOrphanRecords(destBib);
 
                         saveAndIndexBib(sourceBib, sourceHoldings, destBib, destHoldings, Arrays.asList(sourceItem));
 
@@ -91,7 +92,7 @@ public class TransferService {
                         transferValidationResponse.setMessage(RecapConstants.TRANSFER.RELINKED_FAILED);
                     }
                 }
-                ItemTransferResponse itemTransferResponse = new ItemTransferResponse(transferValidationResponse.getMessage(), itemTransferRequest);
+                ItemTransferResponse itemTransferResponse = new ItemTransferResponse(transferValidationResponse.getMessage(), itemTransferRequest, transferValidationResponse.isValid());
                 itemTransferResponses.add(itemTransferResponse);
 
                 String requestString = helperUtil.getJsonString(itemTransferRequest);
@@ -138,20 +139,10 @@ public class TransferService {
                             bibliographicDetailsRepository.findByOwningInstitutionIdAndOwningInstitutionBibId(owningInstitutionId, owningInstitutionBibId);
                     if(null != destinationBibEntity) {
                         transferValidationResponse.setDestBib(destinationBibEntity);
-                        HoldingsEntity holdingsEntity = matchHoldingIdWithHoldings(owningInstitutionHoldingsId, destinationBibEntity);
-                        if(null == holdingsEntity) {
-                            // todo : check with other entity
-                            holdingsEntity = holdingsDetailsRepository.
-                                    findByOwningInstitutionHoldingsIdAndOwningInstitutionId(owningInstitutionHoldingsId, owningInstitutionId);
-                            if(null != holdingsEntity) {
-                                transferValidationResponse.setInvalidWithMessage(RecapConstants.TRANSFER.DEST_HOLDINGS_ATTACHED_WITH_DIFF_BIB);
-                            }
-                        } else {
-                            transferValidationResponse.setDestHoldings(holdingsEntity);
-                        }
-                        transferValidationResponse.setDestHoldingsId(owningInstitutionHoldingsId);
+                        validateHoldingsEntity(owningInstitutionId, transferValidationResponse, owningInstitutionHoldingsId, destinationBibEntity, true);
                     } else {
                         transferValidationResponse.setDestinationBibId(owningInstitutionBibId);
+                        validateHoldingsEntity(owningInstitutionId, transferValidationResponse, owningInstitutionHoldingsId, destinationBibEntity, false);
                     }
                 } else {
                     transferValidationResponse.setInvalidWithMessage(RecapConstants.TRANSFER.DEST_OWN_INST_ITEM_ID_EMPTY);
@@ -163,6 +154,24 @@ public class TransferService {
         } else {
             transferValidationResponse.setInvalidWithMessage(RecapConstants.TRANSFER.DEST_OWN_INST_BIB_ID_EMPTY);
         }
+    }
+
+    private void validateHoldingsEntity(Integer owningInstitutionId, TransferValidationResponse transferValidationResponse, String owningInstitutionHoldingsId, BibliographicEntity destinationBibEntity, boolean retrieveHoldingFromBib) {
+        HoldingsEntity holdingsEntity = null;
+        if (retrieveHoldingFromBib) {
+            holdingsEntity = matchHoldingIdWithHoldings(owningInstitutionHoldingsId, destinationBibEntity);
+        }
+        if(null == holdingsEntity) {
+            // todo : check with other entity
+            holdingsEntity = holdingsDetailsRepository.
+                    findByOwningInstitutionHoldingsIdAndOwningInstitutionId(owningInstitutionHoldingsId, owningInstitutionId);
+            if(null != holdingsEntity) {
+                transferValidationResponse.setInvalidWithMessage(RecapConstants.TRANSFER.DEST_HOLDINGS_ATTACHED_WITH_DIFF_BIB);
+            }
+        } else {
+            transferValidationResponse.setDestHoldings(holdingsEntity);
+        }
+        transferValidationResponse.setDestHoldingsId(owningInstitutionHoldingsId);
     }
 
     private void validSourceBibAndHoldingsAndItem(ItemSource source, Integer owningInstitutionId, TransferValidationResponse transferValidationResponse) {
@@ -244,6 +253,7 @@ public class TransferService {
 
                         // todo : process for orphan records
                         processOrphanRecords(sourceBib);
+                        processOrphanRecords(destBib);
 
                         saveAndIndexBib(sourceBib, sourceHoldings, destBib, sourceHoldings, sourceHoldings.getItemEntities());
 
@@ -254,7 +264,7 @@ public class TransferService {
                     }
 
                 }
-                HoldingTransferResponse holdingTransferResponse = new HoldingTransferResponse(transferValidationResponse.getMessage(), holdingsTransferRequest);
+                HoldingTransferResponse holdingTransferResponse = new HoldingTransferResponse(transferValidationResponse.getMessage(), holdingsTransferRequest, transferValidationResponse.isValid());
                 holdingTransferResponses.add(holdingTransferResponse);
 
                 String requestString = helperUtil.getJsonString(holdingsTransferRequest);
@@ -268,13 +278,13 @@ public class TransferService {
 
     private void saveAndIndexBib(BibliographicEntity sourceBib, HoldingsEntity sourceHoldings, BibliographicEntity destBib,
                                  HoldingsEntity destHoldings,List<ItemEntity> itemEntities) {
-        accessionDAO.saveBibRecord(sourceBib);
-        accessionDAO.saveBibRecord(destBib);
+        BibliographicEntity savevdSourceBibRecord = accessionDAO.saveBibRecord(sourceBib);
+        BibliographicEntity saveBibRecord = accessionDAO.saveBibRecord(destBib);
 
         writeChangeLog(sourceBib.getBibliographicId(), sourceHoldings.getHoldingsId(), itemEntities, destBib.getBibliographicId(), destHoldings.getHoldingsId());
 
-        solrIndexService.indexByBibliographicId(sourceBib.getBibliographicId());
-        solrIndexService.indexByBibliographicId(destBib.getBibliographicId());
+        solrIndexService.indexByBibliographicId(savevdSourceBibRecord.getBibliographicId());
+        solrIndexService.indexByBibliographicId(saveBibRecord.getBibliographicId());
     }
 
     private void processOrphanRecords(BibliographicEntity sourceBib) {
@@ -288,11 +298,15 @@ public class TransferService {
                 boolean allItemDeleted = allItemDeleted(holdingsEntity);
                 if(allItemDeleted) {
                     holdingsEntity.setDeleted(true);
+                } else {
+                    holdingsEntity.setDeleted(false);
                 }
                 allDeleted = allDeleted & holdingsEntity.isDeleted();
             }
             if(allDeleted) {
                 sourceBib.setDeleted(true);
+            } else {
+                sourceBib.setDeleted(false);
             }
         }
     }
