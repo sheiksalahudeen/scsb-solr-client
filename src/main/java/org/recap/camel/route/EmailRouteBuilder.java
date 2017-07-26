@@ -40,7 +40,7 @@ public class EmailRouteBuilder {
      */
     @Autowired
     public EmailRouteBuilder(CamelContext context, @Value("${scsb.email.username}") String username, @Value("${scsb.email.password.file}") String passwordDirectory,
-                             @Value("${scsb.email.from}") String from, @Value("${scsb.updateCgd.email.to}") String upadteCgdTo, @Value("${scsb.batch.job.email.to}") String batchJobTo,
+                             @Value("${scsb.email.from}") String from, @Value("${scsb.updateCgd.email.to}") String upadteCgdTo,@Value("${scsb.updateCgd.email.cc}") String updateCGDCC, @Value("${scsb.batch.job.email.to}") String batchJobTo,
                              @Value("${scsb.updateCgd.email.subject}") String updateCgdSubject, @Value("${scsb.batch.job.email.subject}") String batchJobSubject, @Value("${scsb.email.smtpServer}") String smtpServer) {
         try {
             context.addRoutes(new RouteBuilder() {
@@ -61,6 +61,7 @@ public class EmailRouteBuilder {
                                         .setBody(simple(emailBodyForCgdUpdate))
                                         .setHeader("from", simple(from))
                                         .setHeader("to", simple(upadteCgdTo))
+                                        .setHeader("cc",simple(updateCGDCC))
                                         .log("Email for update cgd")
                                         .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
                                     .when(header(RecapConstants.EMAIL_FOR).isEqualTo(RecapConstants.BATCHJOB))
