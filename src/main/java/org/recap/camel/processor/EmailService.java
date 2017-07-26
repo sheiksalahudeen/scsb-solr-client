@@ -128,7 +128,7 @@ public class EmailService {
         emailPayLoad.setTo(recapSupportEmailTo);
         getCcBasedOnInstitution(emailPayLoad);
         emailPayLoad.setMessage("The Report " + fileName + " is available at the FTP location " + absolutePath);
-        logger.info("Matching Algorithm Reports email has been sent to : {} and cc : {} ",emailPayLoad.getTo(),emailPayLoad.getCc());
+        logger.info("Accession Reports email has been sent to : {} and cc : {} ",emailPayLoad.getTo(),emailPayLoad.getCc());
         return emailPayLoad;
     }
 
