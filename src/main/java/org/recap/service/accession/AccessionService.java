@@ -598,7 +598,7 @@ public class AccessionService {
      */
     public String createDummyRecordIfAny(String response, String owningInstitution, List<ReportDataEntity> reportDataEntityList, AccessionRequest accessionRequest) {
         String message = response;
-        if (response != null && response.equals(RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
+        if (response != null && response.contains(RecapConstants.ITEM_BARCODE_NOT_FOUND)) {
             BibliographicEntity fetchBibliographicEntity = getBibEntityUsingBarcodeForIncompleteRecord(accessionRequest.getItemBarcode());
             if (fetchBibliographicEntity == null) {
                 String dummyRecordResponse = createDummyRecord(accessionRequest, owningInstitution);

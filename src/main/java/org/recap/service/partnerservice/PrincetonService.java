@@ -60,14 +60,9 @@ public class PrincetonService {
             params.put("barcode", itemBarcode);
             ResponseEntity<String> responseEntity = restTemplate.exchange(getIlsprincetonBibData(), HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
-        } catch (HttpClientErrorException e) {
-            logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
-            response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
-            throw new RuntimeException(response);
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR, e);
-            logger.error(RecapConstants.SERVICE_UNAVAILABLE);
-            response = ilsprincetonBibData + RecapConstants.SERVICE_UNAVAILABLE;
+            response = String.format("[%s] %s. (%s : %s)", itemBarcode, RecapConstants.ITEM_BARCODE_NOT_FOUND, ilsprincetonBibData, e.getMessage());
+            logger.error(response);
             throw new RuntimeException(response);
         }
         return bibDataResponse;

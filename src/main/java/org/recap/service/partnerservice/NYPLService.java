@@ -80,13 +80,9 @@ public class NYPLService {
             String url = getIlsNYPLBibData() + getIlsNYPLBibDataParameter();
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class, params);
             bibDataResponse = responseEntity.getBody();
-        } catch (HttpClientErrorException e) {
-            logger.error(RecapConstants.ITEM_BARCODE_NOT_FOUND);
-            response = RecapConstants.ITEM_BARCODE_NOT_FOUND;
-            throw new RuntimeException(response);
         } catch (Exception e) {
-            logger.error(RecapConstants.LOG_ERROR,e);
-            response = ilsNYPLBibData + " Service is Unavailable.";
+            response = String.format("[%s : %s] %s. (%s : %s)", itemBarcode, customerCode, RecapConstants.ITEM_BARCODE_NOT_FOUND, ilsNYPLBibData, e.getMessage());
+            logger.error(response);
             throw new RuntimeException(response);
         }
         return bibDataResponse;

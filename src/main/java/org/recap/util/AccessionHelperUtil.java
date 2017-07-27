@@ -365,7 +365,7 @@ public class AccessionHelperUtil {
     public void processException(Set<AccessionResponse> accessionResponsesList, AccessionRequest accessionRequest,
                                  List<ReportDataEntity> reportDataEntityList, String owningInstitution, Exception ex) {
         String response = ex.getMessage();
-        if (StringUtils.equalsIgnoreCase(response, RecapConstants.ITEM_BARCODE_NOT_FOUND_MSG)) {
+        if (StringUtils.contains(response, RecapConstants.ITEM_BARCODE_NOT_FOUND)) {
             logger.error(RecapConstants.LOG_ERROR + response);
         } else {
             response = RecapConstants.EXCEPTION + response;

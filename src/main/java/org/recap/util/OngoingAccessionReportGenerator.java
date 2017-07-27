@@ -1,6 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.model.csv.OngoingAccessionReportRecord;
 import org.recap.model.csv.SubmitCollectionReportRecord;
@@ -34,14 +35,16 @@ public class OngoingAccessionReportGenerator {
         OngoingAccessionReportRecord ongoingAccessionReportRecord = new OngoingAccessionReportRecord();
         for (Iterator<ReportDataEntity> iterator = reportDataEntities.iterator(); iterator.hasNext(); ) {
             ReportDataEntity report =  iterator.next();
-            String headerValue = report.getHeaderValue();
             String headerName = report.getHeaderName();
-            Method setterMethod = getSetterMethod(headerName);
-            if(null != setterMethod){
-                try {
-                    setterMethod.invoke(ongoingAccessionReportRecord, headerValue);
-                } catch (Exception e) {
-                    logger.error(RecapConstants.EXCEPTION,e);
+            if (!(StringUtils.equalsIgnoreCase(headerName, RecapConstants.ACCESSION_SUMMARY) || StringUtils.equalsIgnoreCase(headerName, RecapConstants.BULK_ACCESSION_SUMMARY))) {
+                String headerValue = report.getHeaderValue();
+                Method setterMethod = getSetterMethod(headerName);
+                if(null != setterMethod){
+                    try {
+                        setterMethod.invoke(ongoingAccessionReportRecord, headerValue);
+                    } catch (Exception e) {
+                        logger.error(RecapConstants.EXCEPTION,e);
+                    }
                 }
             }
         }
