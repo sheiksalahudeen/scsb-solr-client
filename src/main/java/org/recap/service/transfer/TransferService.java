@@ -2,6 +2,7 @@ package org.recap.service.transfer;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.recap.RecapConstants;
 import org.recap.controller.TransferController;
 import org.recap.model.jpa.*;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -84,7 +86,19 @@ public class TransferService {
                         processOrphanRecords(sourceBib);
                         processOrphanRecords(destBib);
 
-                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, destHoldings, Arrays.asList(sourceItem));
+                        Map<String, Set<Integer>> recordToDelete = new HashMap<>();
+                        Map<String, Set<Integer>> recordToIndex = new HashMap<>();
+                        addRecordToMap(RecapConstants.ITEM_ID, sourceItem.getItemId(), recordToDelete);
+
+                        List<BibliographicEntity> itemBibEntities = sourceItem.getBibliographicEntities();
+                        if(CollectionUtils.isNotEmpty(itemBibEntities)) {
+                            for (Iterator<BibliographicEntity> bibliographicEntityIterator = itemBibEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
+                                BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
+                                addRecordToMap(RecapConstants.BIB_ID, bibliographicEntity.getBibliographicId(), recordToIndex);
+                            }
+                        }
+
+                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, destHoldings, Arrays.asList(sourceItem), recordToDelete, recordToIndex);
 
                         transferValidationResponse.setMessage(RecapConstants.TRANSFER.SUCCESSFULLY_RELINKED);
                     } catch (Exception e) {
@@ -255,7 +269,37 @@ public class TransferService {
                         processOrphanRecords(sourceBib);
                         processOrphanRecords(destBib);
 
-                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, sourceHoldings, sourceHoldings.getItemEntities());
+                        Map<String, Set<Integer>> recordToDelete = new HashMap<>();
+                        Map<String, Set<Integer>> recordToIndex = new HashMap<>();
+
+                        addRecordToMap(RecapConstants.HOLDING_ID, sourceHoldings.getHoldingsId(), recordToDelete);
+
+                        List<BibliographicEntity> bibliographicEntities = sourceHoldings.getBibliographicEntities();
+                        if(CollectionUtils.isNotEmpty(bibliographicEntities)) {
+                            for (Iterator<BibliographicEntity> bibliographicEntityIterator = bibliographicEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
+                                BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
+                                addRecordToMap(RecapConstants.BIB_ID, bibliographicEntity.getBibliographicId(), recordToIndex);
+                            }
+                        }
+
+                        List<ItemEntity> itemEntities = sourceHoldings.getItemEntities();
+                        if (CollectionUtils.isNotEmpty(itemEntities)) {
+                            for (Iterator<ItemEntity> itemEntityIterator = itemEntities.iterator(); itemEntityIterator.hasNext(); ) {
+                                ItemEntity itemEntity = itemEntityIterator.next();
+                                addRecordToMap(RecapConstants.ITEM_ID, itemEntity.getItemId(), recordToDelete);
+
+                                List<BibliographicEntity> itemBibEntities = itemEntity.getBibliographicEntities();
+                                if(CollectionUtils.isNotEmpty(itemBibEntities)) {
+                                    for (Iterator<BibliographicEntity> bibliographicEntityIterator = itemBibEntities.iterator(); bibliographicEntityIterator.hasNext(); ) {
+                                        BibliographicEntity bibliographicEntity = bibliographicEntityIterator.next();
+                                        addRecordToMap(RecapConstants.BIB_ID, bibliographicEntity.getBibliographicId(), recordToIndex);
+                                    }
+                                }
+                            }
+                        }
+
+
+                        saveAndIndexBib(sourceBib, sourceHoldings, destBib, sourceHoldings, itemEntities, recordToDelete, recordToIndex);
 
                         transferValidationResponse.setMessage(RecapConstants.TRANSFER.SUCCESSFULLY_RELINKED);
                     } catch (Exception e) {
@@ -276,15 +320,71 @@ public class TransferService {
         return holdingTransferResponses;
     }
 
+    private void addRecordToMap(String key, Integer value, Map<String, Set<Integer>> recordToDelete) {
+        if (null != value) {
+            Set<Integer> ids = recordToDelete.get(key);
+            if(null == ids) {
+                ids = new HashSet<>();
+            }
+            ids.add(value);
+            recordToDelete.put(key, ids);
+        }
+    }
+
     private void saveAndIndexBib(BibliographicEntity sourceBib, HoldingsEntity sourceHoldings, BibliographicEntity destBib,
-                                 HoldingsEntity destHoldings,List<ItemEntity> itemEntities) {
+                                 HoldingsEntity destHoldings, List<ItemEntity> itemEntities, Map<String, Set<Integer>> recordToDelete, Map<String, Set<Integer>> recordToIndex) {
         BibliographicEntity savevdSourceBibRecord = accessionDAO.saveBibRecord(sourceBib);
         BibliographicEntity saveBibRecord = accessionDAO.saveBibRecord(destBib);
 
         writeChangeLog(sourceBib.getBibliographicId(), sourceHoldings.getHoldingsId(), itemEntities, destBib.getBibliographicId(), destHoldings.getHoldingsId());
 
-        solrIndexService.indexByBibliographicId(savevdSourceBibRecord.getBibliographicId());
-        solrIndexService.indexByBibliographicId(saveBibRecord.getBibliographicId());
+        deleteRecordForRelink(recordToDelete);
+
+        addRecordToMap(RecapConstants.BIB_ID, savevdSourceBibRecord.getBibliographicId(), recordToIndex);
+        addRecordToMap(RecapConstants.BIB_ID, saveBibRecord.getBibliographicId(), recordToIndex);
+
+        indexRecordForRelink(recordToIndex);
+
+    }
+
+    private void deleteRecordForRelink(Map<String, Set<Integer>> recordToDelete) {
+        if(recordToDelete.size() > 0) {
+            for (Iterator<String> iterator = recordToDelete.keySet().iterator(); iterator.hasNext(); ) {
+                String docId = iterator.next();
+                Set<Integer> ids = recordToDelete.get(docId);
+                if(CollectionUtils.isNotEmpty(ids)) {
+                    for (Iterator<Integer> stringIterator = ids.iterator(); stringIterator.hasNext(); ) {
+                        Integer id = stringIterator.next();
+                        try {
+                            solrIndexService.deleteByDocId(docId, String.valueOf(id));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (SolrServerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void indexRecordForRelink(Map<String, Set<Integer>> recordToIndex) {
+        if(recordToIndex.size() > 0) {
+            for (Iterator<String> iterator = recordToIndex.keySet().iterator(); iterator.hasNext(); ) {
+                String docId = iterator.next();
+                Set<Integer> ids = recordToIndex.get(docId);
+                if(CollectionUtils.isNotEmpty(ids)) {
+                    for (Iterator<Integer> stringIterator = ids.iterator(); stringIterator.hasNext(); ) {
+                        Integer id = stringIterator.next();
+                        try {
+                            solrIndexService.indexByBibliographicId(id);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void processOrphanRecords(BibliographicEntity sourceBib) {
